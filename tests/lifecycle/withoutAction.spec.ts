@@ -1,6 +1,6 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor, t} from "../../index.js"
-import {messagesFixture} from "@pkg/fixtures"
+import {MetaFor} from "../../index"
+import {messagesFixture} from "../fixtures/broadcast"
 
 describe("Инициализация без действия", async () => {
   const {waitForMessages} = messagesFixture()

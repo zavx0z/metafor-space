@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll, afterAll } from "bun:test"
+import { describe, expect, it, afterAll } from "bun:test"
 import { MetaFor } from "../index.js"
 
 describe("Неполноценная частица в режиме разработки", async () => {

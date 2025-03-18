@@ -12,14 +12,15 @@ import type { CoreObj, CoreDefinition, Core } from "./types/core"
 import type { Actions } from "./types/action"
 import type { ReactionType } from "./types/reaction"
 import type { ViewDefinition } from "./types/view"
-import type { CreateOptions } from "./types/create"
+
+import type {FabricCallbackCreateProps} from "./types/fabric";
 
 /**
- * Опции частицы
+ * Конфигурация частицы
  * @property description - Описание частицы
  * @property development - Режим разработки (подключена валидация)
  */
-export type ParticleOptions = {
+export type ParticleConf = {
   description?: string
   development?: boolean
 }
@@ -27,10 +28,10 @@ export type ParticleOptions = {
 /**
  * Фабрика частиц пространства MetaFor
  * @param tag - Имя частицы
- * @param description - Описание частицы
+ * @param conf - Конфигурация частицы
  * @returns {MetaFor}
  */ // prettier-ignore
-export declare function MetaFor(tag: string, options?: ParticleOptions): {
+export declare function MetaFor(tag: string, conf?: ParticleConf): {
     /**
      * Все возможные состояния частицы
      */
@@ -64,13 +65,13 @@ export declare function MetaFor(tag: string, options?: ParticleOptions): {
                                  * - реакциями
                                  * - представлением отображения
                                  */
-                                create: (data: CreateOptions<C, S, I>) => Particle<S, C, I>
+                                create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
                             }
                             /**
                              * Создание частицы с:
                              * - реакциями
                              */
-                            create: (data: CreateOptions<C, S, I>) => Particle<S, C, I>
+                            create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
                         },
                         /**
                          * Представление отображения частицы
@@ -80,12 +81,12 @@ export declare function MetaFor(tag: string, options?: ParticleOptions): {
                              * Создание базовой частицы с:
                              * - представлением отображения
                              */
-                            create: (data: CreateOptions<C, S, I>) => Particle<S, C, I>
+                            create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
                         },
                         /**
                          * Создание базовой частицы.
                          */
-                        create: (data: CreateOptions<C, S, I>) => Particle<S, C, I>
+                        create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
                     }
                 }
             }
@@ -98,6 +99,27 @@ export declare function MetaFor(tag: string, options?: ParticleOptions): {
  * @template S - Состояния
  * @template C - Контекст
  * @template I - Ядро
+ * @property id - Идентификатор частицы
+ * @property title - Заголовок частицы
+ * @property description - Описание частицы
+ * @property state - Состояние частицы
+ * @property context - Контекст частицы
+ * @property states - Состояния частицы
+ * @property types - Типы частицы
+ * @property transitions - Переходы частицы
+ * @property actions - Действия частицы
+ * @property core - Ядро частицы
+ * @property reactions - Реакции частицы
+ * @property channel - Канал частицы
+ * @property process - Флаг процесса частицы
+ * @property component - Компонент частицы
+ * @property update - Обновление частицы    
+ * @property _updateExternal - Обновление частицы из вне
+ * @property onUpdate - Обработчик обновления частицы
+ * @property onTransition - Обработчик перехода частицы
+ * @property snapshot - Снимок частицы
+ * @property graph - Граф частицы
+ * @property destroy - Уничтожение частицы
  */
 export declare class Particle<S extends string, C extends Record<string, any>, I extends Record<string, any>> {
   id: string

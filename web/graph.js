@@ -9,9 +9,9 @@
  * @returns {Promise<MetaForGraph & HTMLElement>} Компонент графа
  */
 export default async function (particle) {
-  const quantumGraph = /** @type {MetaForGraph} */ (document.querySelector("metafor-graph"))
+  const metaforGraph = /** @type {MetaForGraph} */ (document.querySelector("metafor-graph"))
 
-  return quantumGraph.addParticle(particle.snapshot()).then((component) => {
+  return metaforGraph.addParticle(particle.snapshot()).then((component) => {
     // Добавляем обработчики обновлений
     particle.onTransition((_, newState) => component.updateState(newState))
     const originalUpdate = particle.update.bind(particle)

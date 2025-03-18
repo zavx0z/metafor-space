@@ -1,8 +1,7 @@
-// @ts-nocheck
 import {afterAll, beforeAll, describe, expect, test} from "bun:test"
-import {createGraphFixture} from "@metafor/fixtures/graph.fixture.ts"
+import {createBrowserFixture} from "./fixtures/browser"
 
-const fixture = createGraphFixture({
+const fixture = createBrowserFixture({
   headless: false,
   devtools: true,
   width: 1024 * 2,
@@ -24,10 +23,10 @@ describe("Граф частицы", () => {
       const particle = window
         .MetaFor("test-particle")
         .states("IDLE", "ACTIVE")
-        .context({
-          value: window.t.number({title: "Значение для тестирования переходов", nullable: false})
-        })
-        .collapses([
+        .context((t) => ({
+          value: t.number({title: "Значение для тестирования переходов", nullable: false})
+        }))
+        .transitions([
           {from: "IDLE", to: [{state: "ACTIVE", trigger: {value: {gt: 0}}}]}
         ])
         .core()

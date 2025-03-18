@@ -1,7 +1,8 @@
 {
   "name": "@metafor/space",
+  "description": "MetaFor particle system",
+  "version": "1.0.0",
   "type": "module",
-  "version": "0.4.4",
   "license": "MIT",
   "author": "zavx0z",
   "homepage": "https://github.com/zavx0z/metafor-space",
@@ -16,7 +17,6 @@
     "html template",
     "actor system"
   ],
-  "description": "MetaFor particle system",
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
@@ -27,15 +27,19 @@
     "validator",
     "types"
   ],
+  "exports": {
+    ".": "./index.js",
+    "./validator": "./validator/index.js"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "puppeteer": "^24.4.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "scripts": {
     "publish": "bun publish --access public",
-    "unpublish:all": "npm unpublish @metafor/space -f",
     "test": "bun test tests",
     "test[watch]": "bun test tests --watch",
     "test:init": "bun test tests/init.spec.ts",
@@ -61,9 +65,5 @@
     "test:extract": "bun test tests/extract.spec.ts",
     "test:pipe": "bun test tests/pipe.spec.ts",
     "test:trigger:lock": "bun test tests/triggerLock.spec.ts"
-  },
-  "exports": {
-    ".": "./index.js",
-    "./validator": "./validator/index.js"
   }
 }

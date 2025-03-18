@@ -1,6 +1,18 @@
 /**
+ * @typedef {import("./types/context").ContextDefinition} ContextDefinition
+ */
+/**
+ * @template {ContextDefinition} C
+ * @typedef {import("./types/metafor").UpdateContextParams<C>} UpdateContextParams<C>
+ */
+/**
+ * @template {Record<string, any>} I
+ * @typedef {import("./types/core").Core<I>} Core
+ */
+
+/**
  * @template {string} S - состояние
- * @template {import("./types/index.js").ContextDefinition} C - контекст
+ * @template {ContextDefinition} C - контекст
  * @template {Record<string, any>} I - ядро
  */
 export class Particle {
@@ -29,16 +41,16 @@ export class Particle {
       this.$state.clear()
       this.types = {}
       this.context = {}
-      this.core = /** @type {import('./types/index.js').Core<I>} */ ({})
+      this.core = /** @type {Core<I>} */ ({})
       this.actions = {}
       this.transitions.length = 0
       this.reactions.length = 0
       this.#parsedCore = {}
-      if (typeof destroy === "function") destroy(/** @type {import('./').Particle<S, C, I>} */ (/** @type {unknown} */ (this)))
+      if (typeof destroy === "function") destroy(this)
     }
     this.states = states
     this.$state = this.#createSignal(initialState)
-    this.context = /** @type {import('./types/index.js').ContextData<C>} */ (
+    this.context = /** @type {import('./types/context').ContextData<C>} */ (
       Object.keys(contextDefinition).reduce((acc, key) => {
         const createValue = contextData && contextData[key]
         const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
@@ -52,63 +64,47 @@ export class Particle {
     this.transitions = transitions || []
     if (onTransition)
       this.$state.onChange((oldValue, newValue) => {
-        if (newValue !== undefined) onTransition(oldValue, newValue, /** @type {import('./').Particle<S, C, I>} */ (/** @type {unknown} */ (this)))
+        if (newValue !== undefined) onTransition(oldValue, newValue, this)
       })
     if (onUpdate) this.onUpdate(onUpdate)
 
-    this.core = /** @type {import('./types/index.js').Core<I>}*/ (
-      (() => {
-        let /** @type {string | null} */ currentCaller = null
-        const self = /** @type {import('./types/core.ts').Core<I>} */ ({})
-        const coreObj = core({
-          update: (ctx) =>
-            this._updateExternal({ context: ctx, srcName: "core", funcName: currentCaller || "unknown" }),
-          context: this.context,
-          self,
-        })
-
-        // Создаем прокси для self, чтобы синхронизировать значения
-        Object.entries(coreObj).forEach(([key, value]) => {
-          if (typeof value !== "function") {
-            Object.defineProperty(self, key, {
-              get: () => coreObj[key],
-              //@ts-ignore
-              set: (newValue) => (coreObj[key] = newValue),
-              enumerable: true,
-              configurable: true,
-            })
-          } else {
+    this.core = /** @type {Core<I>} */ ((() => {
+      let /** @type {string | null} */ currentCaller = null
+      const self = /** @type {Core<I>} */ ({})
+      const coreObj = core({ update: (ctx) => this._updateExternal({ context: ctx, srcName: "core", funcName: currentCaller || "unknown" }), context: this.context, self })
+      // Прокси для self, для синхронизации значений
+      Object.entries(coreObj).forEach(([key, value]) => {
+        if (typeof value !== "function") {
+          Object.defineProperty(self, key, {
+            get: () => coreObj[key],
             //@ts-ignore
-            self[key] = value
+            set: (newValue) => (coreObj[key] = newValue),
+            enumerable: true,
+            configurable: true,
+          })//@ts-ignore
+        } else self[key] = value
+      })
+      const wrappedCore = Object.entries(coreObj).reduce((acc, [name, value]) => {
+        if (typeof value === "function") {
+          //@ts-ignore
+          acc[name] = (...args) => {
+            currentCaller = name
+            const result = value.apply(coreObj, args)
+            currentCaller = null
+            return result
           }
+        } else Object.defineProperty(acc, name, {
+          get: () => coreObj[name],
+          //@ts-ignore
+          set: (newValue) => coreObj[name] = newValue,
+          enumerable: true,
+          configurable: true,
         })
-
-        const wrappedCore = Object.entries(coreObj).reduce((acc, [name, value]) => {
-          if (typeof value === "function") {
-            //@ts-ignore
-            acc[name] = (...args) => {
-              currentCaller = name
-              const result = value.apply(coreObj, args)
-              currentCaller = null
-              return result
-            }
-          } else {
-            Object.defineProperty(acc, name, {
-              get: () => coreObj[name],
-              set: (newValue) => {
-                //@ts-ignore
-                coreObj[name] = newValue
-              },
-              enumerable: true,
-              configurable: true,
-            })
-          }
-          return acc
-        }, {})
-        Object.assign(self, wrappedCore)
-        return wrappedCore
-      })()
-    )
+        return acc
+      }, {})
+      Object.assign(self, wrappedCore)
+      return wrappedCore
+    })())
     //@ts-ignore присваивание свойству ядра переданного объекта, массива или карты
     Object.entries(coreData || {}).forEach(
       ([key, value]) =>
@@ -185,13 +181,13 @@ export class Particle {
   }
 
   /**  Обновление контекста из внешнего источника (core, reaction)
-   * @param {import("./types/metafor.ts").UpdateContextParams<C>} params - параметры обновления контекста */
+   * @param {UpdateContextParams<C>} params - параметры обновления контекста */
   _updateExternal = ({ context, srcName = "core", funcName = "unknown" }) => {
     const updCtx = this.#updateContext({ context, srcName, funcName })
     if (updCtx && !this.process) this.#transition()
   }
 
-  /** @param {import('./types/index.js').Action<C, I>} action */
+  /** @param {import('./types/action').Action<C, I>} action */
   #runAction(action) {
     this.process = true
     const result = action({
@@ -204,7 +200,7 @@ export class Particle {
     else finallyFn()
   }
 
-  /** @param {import('./types/metafor.ts').UpdateContextParams<C>} params */
+  /** @param {UpdateContextParams<C>} params */
   #updateContext = ({ context, srcName = "unknown", funcName = "unknown" }) => {
     const updCtx = Object.keys(context).reduce((acc, /** @type {keyof C} */ key) => {
       if (this.context[key] !== context[key]) {
@@ -217,7 +213,7 @@ export class Particle {
       this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
       this.channel.postMessage(
         /** @type {BroadcastMessage} */ ({
-          meta: { name: this.id, func: funcName, target: srcName, timestamp: Date.now() },
+          meta: { particle: this.id, func: funcName, target: srcName, timestamp: Date.now() },
           patch: { path: `/context`, op: "replace", value: updCtx },
         })
       )
@@ -276,7 +272,7 @@ export class Particle {
 
   /** @template T
    * @param {T} value
-   * @returns {import('./types/state.js').SignalType<T>} */
+   * @returns {import('./types/state').SignalType<T>} */
   #createSignal(value) {
     const listeners = new Set()
     return {
@@ -314,11 +310,9 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/**
- *  @type {import("./").MetaFor}
- */ // prettier-ignore
-export function MetaFor(tag, particleOptions = {}) {
-  const {development, description} = particleOptions
+/** @type {import("./").MetaFor} */ // prettier-ignore
+export function MetaFor(tag, conf = {}) {
+  const {development, description} = conf
   if (development) {
       import("./validator")
       setDevChannel(new BroadcastChannel("validator"))
@@ -396,24 +390,13 @@ export function MetaFor(tag, particleOptions = {}) {
     },
   }
 }
+
 /**
- * @template {import("./types/context.d.ts").ContextDefinition} C
- * @template {string} S
- * @template {import("./types/core.d.ts").CoreObj} I
- *
- * @param {Object} Options
- * @param {boolean|undefined} Options.development
- * @param {string|undefined} Options.description
- * @param {string} Options.tag
- * @param {import("./types/create.d.ts").CreateOptions<C, S, I>} Options.options
- * @param {S[]} Options.states
- * @param {import("./types/context.d.ts").ContextDefinition} Options.contextDefinition
- * @param {import("./types/transition.d.ts").Transitions<C, S>} Options.transitions
- * @param {import("./types/action.d.ts").Actions<C, I>} Options.actions
- * @param {import("./types/core.d.ts").CoreDefinition<I, C>} Options.coreDefinition
- * @param {import("./types/reaction.d.ts").ReactionType<C, I>} [Options.reactions=[]]
- * @returns
- */ // prettier-ignore
+ * @template {string} S - состояние 
+ * @template {import('./types/context').ContextDefinition} C - контекст
+ * @template {Record<string, any>} I - ядро
+ * @param {import("./types/fabric").FabricCallbackCreateFuncHelper<S, C, I>} parameters
+ * */ // prettier-ignore
 const createParticle = ({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions=[]}) => {
   development && import("./validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
@@ -426,11 +409,11 @@ const createParticle = ({development, description, tag, options, states, context
 }
 
 /**
- * @template {import('./types/index.d.ts').ContextDefinition} C
+ * @template {import('./types/context').ContextDefinition} C
  *
- * @param {import('./types/trigger.d.ts').TriggerType<C>} trigger
- * @param {import('./types/index.d.ts').ContextData<C>} context
- * @param {import('./types/index.d.ts').ContextDefinition} types
+ * @param {import('./types/trigger').TriggerType<C>} trigger
+ * @param {import('./types/context').ContextData<C>} context
+ * @param {import('./types/context').ContextDefinition} types
  */
 export function matchTrigger(trigger, context, types) {
   for (const key in trigger) {

@@ -3,7 +3,7 @@ declare global {
    * Сообщение для обмена данными между частицами
    * @interface BroadcastMessage
    * @property meta - Метаданные сообщения
-   * @property meta.name - Имя частицы
+   * @property meta.particle - Имя частицы
    * @property meta.func - Имя функции
    * @property meta.target - Цель функции
    * @property meta.timestamp - Время отправки сообщения
@@ -14,7 +14,7 @@ declare global {
    */
   type BroadcastMessage = {
     meta: {
-      name: string
+      particle: string
       func: string
       target: string
       timestamp: number

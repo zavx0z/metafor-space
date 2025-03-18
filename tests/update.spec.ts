@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index.js"
-import { messagesFixture } from "@pkg/fixtures"
+import { MetaFor } from "../index"
+import { messagesFixture } from "./fixtures/broadcast"
 
 describe("update", async () => {
   const { waitForMessages } = messagesFixture()
@@ -15,22 +15,12 @@ describe("update", async () => {
       {
         from: "INITIAL",
         action: "actionInit",
-        to: [
-          {
-            state: "NEXT",
-            trigger: { field2: 42 },
-          },
-        ],
+        to: [{ state: "NEXT", trigger: { field2: 42 } }],
       },
       {
         from: "NEXT",
         action: "actionDouble",
-        to: [
-          {
-            state: "FINAL",
-            trigger: { field2: 100, field1: "test" },
-          },
-        ],
+        to: [{ state: "FINAL", trigger: { field2: 100, field1: "test" } }],
       },
     ])
     .core(({ update }) => ({

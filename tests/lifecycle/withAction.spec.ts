@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../../index.js"
-import { messagesFixture } from "@pkg/fixtures"
+import { MetaFor } from "../../index"
+import { messagesFixture } from "../fixtures/broadcast"
 
 describe("Инициализация c действием", async () => {
   const {waitForMessages} = messagesFixture()
