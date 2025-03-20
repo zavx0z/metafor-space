@@ -1,2 +1,1 @@
-[test]
-# preload = "../fixtures/happydom.ts"
+preload = ["./dom/happydom.ts"]
