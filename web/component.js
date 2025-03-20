@@ -1,5 +1,4 @@
-// @ts-ignore
-import { html as q_html, render } from "/html.js"
+import { html as q_html, render } from "../dom/html/html.js"
 
 /**
  * Преобразует строку из camelCase в kebab-case
@@ -52,11 +51,12 @@ export default ({ view, particle }) => {
       connectedCallback() {
         const updateView = () => {
           const result = view.render({
-            update: (context) => particle._updateExternal({ 
-              context: context, 
-              srcName: "component", 
-              funcName: "handler" 
-            }),
+            update: (context) =>
+              particle._updateExternal({
+                context: context,
+                srcName: "component",
+                funcName: "handler",
+              }),
             context: particle.context,
             state: particle.state,
             core: particle.core,
