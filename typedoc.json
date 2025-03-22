@@ -1,0 +1,31 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["./types/index.d.ts"],
+    "out": "docs",
+    "name": "MetaFor Framework",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "includeVersion": true,
+    "disableSources": true,
+    "readme": "README.md",
+    "theme": "default",
+    "tsconfig": "typedoc-tsconfig.json",
+    "categorizeByGroup": true,
+    "categoryOrder": [
+        "Core",
+        "Particle",
+        "Context",
+        "State",
+        "Action",
+        "Transition",
+        "Reaction",
+        "View",
+        "*"
+    ],
+    "sort": ["source-order"],
+    "validation": {
+        "invalidLink": true,
+        "notExported": true
+    }
+}

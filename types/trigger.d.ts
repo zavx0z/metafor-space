@@ -2,6 +2,14 @@ import type {ArrayDefinition, BooleanDefinition, ContextDefinition, EnumDefiniti
 
 /**
  * Условия триггера для enum
+ * 
+ * Триггеры — это ключевой механизм в MetaFor, который определяет, при каких условиях 
+ * происходит переход между состояниями. Они обеспечивают декларативное описание 
+ * логики, гарантируя предсказуемость и простоту управления состояниями.
+ * 
+ * Триггеры enum позволяют проверять значения перечислений на равенство, вхождение в список,
+ * или проверять значение на null.
+ * 
  * @interface EnumTriggerCondition
  * @template E - Тип значений enum
  * @property isNull - Является ли значение null
@@ -9,6 +17,13 @@ import type {ArrayDefinition, BooleanDefinition, ContextDefinition, EnumDefiniti
  * @property notEq - Не равно указанному значению
  * @property oneOf - Одно из указанных значений
  * @property notOneOf - Не одно из указанных значений
+ * 
+ * @example
+ * ```
+ * { role: "admin" } // Проверка на равенство значению "admin"
+ * { role: { oneOf: ["admin", "moderator"] } } // Проверка на вхождение в список
+ * { role: { isNull: true } } // Проверка на null
+ * ```
  */
 export type EnumTriggerCondition<E extends readonly (string | number)[]> =
   | E[number]
@@ -22,6 +37,10 @@ export type EnumTriggerCondition<E extends readonly (string | number)[]> =
     }
 /**
  * Условия триггера для строк
+ * 
+ * Позволяют проверять строковые значения на различные условия, такие как равенство, 
+ * совпадение с регулярным выражением, начало или конец строки и другие.
+ * 
  * @interface StringTriggerCondition
  * @property isNull - Является ли значение null
  * @property startsWith - Начинается ли с указанной строки
@@ -35,6 +54,14 @@ export type EnumTriggerCondition<E extends readonly (string | number)[]> =
  * @property notEndsWith - Не заканчивается на указанную строку
  * @property length - Длина строки
  * @property between - Должна быть между двумя строками
+ * 
+ * @example
+ * ```
+ * { name: "John" } // Проверка на равенство строке "John"
+ * { name: { startsWith: "J" } } // Строка начинается с "J"
+ * { name: { pattern: /^J.*n$/ } } // Соответствует регулярному выражению
+ * { name: { length: { gt: 3 } } } // Длина строки больше 3
+ * ```
  */
 export type StringTriggerCondition =
   | string
@@ -56,6 +83,10 @@ export type StringTriggerCondition =
     }
 /**
  * Условия триггера для чисел
+ * 
+ * Позволяют проверять числовые значения на различные условия, такие как равенство,
+ * больше/меньше, диапазон и другие.
+ * 
  * @interface NumberTriggerCondition
  * @property isNull - Является ли значение null
  * @property eq - Равно указанному числу
@@ -68,9 +99,14 @@ export type StringTriggerCondition =
  * @property notGte - Не больше или равно указанному числу
  * @property notLt - Не меньше указанного числа
  * @property notLte - Не меньше или равно указанному числу
- * @property min - Минимальное значение
- * @property max - Максимальное значение
  * @property between - Должно быть между двумя числами
+ * 
+ * @example
+ * ```
+ * { age: 18 } // Проверка на равенство числу 18
+ * { age: { gt: 18 } } // Число больше 18
+ * { age: { between: [18, 65] } } // Число в диапазоне от 18 до 65
+ * ```
  */
 export type NumberTriggerCondition =
   | number
@@ -91,12 +127,23 @@ export type NumberTriggerCondition =
     }
 /**
  * Условия триггера для булевых значений
+ * 
+ * Позволяют проверять булевы значения на различные условия, такие как равенство,
+ * логическое равенство и другие.
+ * 
  * @interface BooleanTriggerCondition
  * @property isNull - Является ли значение null
  * @property eq - Равно указанному булеву значению
  * @property notEq - Не равно указанному булеву значению
  * @property logicalEq - Логическое равенство
  * @property notNull - Не является ли значение null
+ * 
+ * @example
+ * ```
+ * { isActive: true } // Проверка на равенство true
+ * { isActive: { eq: true } } // Проверка на равенство true
+ * { isActive: { notNull: true } } // Проверка на не-null
+ * ```
  */
 export type BooleanTriggerCondition =
   | boolean
@@ -111,8 +158,34 @@ export type BooleanTriggerCondition =
 
 /**
  * Тип триггера
+ * 
+ * Объединяет все возможные условия триггеров для разных типов данных контекста.
+ * Триггеры используются в переходах для определения условий перехода между состояниями.
+ * 
+ * Основные принципы работы триггеров:
+ * 1. Декларативность - триггеры описываются в виде условий, связанных с параметрами контекста
+ * 2. Единичность срабатывания - в каждый момент времени может сработать только один триггер
+ * 3. Приоритет проверки - условие isNull проверяется в первую очередь
+ * 4. Валидация на этапе разработки - все триггеры проверяются на пересечения
+ * 
  * @interface TriggerType
  * @template C - Тип определения контекста
+ * 
+ * @example
+ * ```
+ * .transitions([
+ *   {
+ *     from: "IDLE",
+ *     to: "LOADING",
+ *     trigger: { isLoading: true }, // Триггер: переход произойдет, когда isLoading станет true
+ *   },
+ *   {
+ *     from: "LOADING",
+ *     to: "LOADED",
+ *     trigger: { items: { length: { gt: 0 } } }, // Триггер: переход произойдет, когда длина массива items станет больше 0
+ *   }
+ * ])
+ * ```
  */
 export type TriggerType<C extends ContextDefinition> = Partial<{
   [K in keyof C]: C[K] extends StringEnumDefinition<infer V>
