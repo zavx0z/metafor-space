@@ -1,9 +1,12 @@
-import type { ContextData, ContextDefinition, PartialContextData } from "./context"
-import type { DebugOptions, GraphOptions, Meta } from "./index"
-import type { CoreData, CoreDefinition } from "./core"
-import type { Particle } from "../index"
-import type { Actions } from "./action"
-import type { ReactionType } from "./reaction"
+import type {ContextData, ContextDefinition, PartialContextData} from "./context"
+import type {CoreData, CoreDefinition} from "./core"
+import type {DebugOptions, GraphOptions, Particle} from "../index"
+import type {Actions} from "./action"
+import type {ReactionType} from "./reaction"
+
+export type Meta = {
+  name?: string
+}
 
 /**
  * Опции создания частицы в коллбеке create

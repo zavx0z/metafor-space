@@ -246,7 +246,7 @@ export class Particle {
       if (newValue !== undefined) listener(oldValue, newValue)
     })
 
-  /** @returns {import('./types/index.js').Snapshot<C, S>} */
+  /** @returns {import('./').Snapshot<C, S>} */
   snapshot() {
     const parsedActions = parseFunctions(this.actions)
     return {

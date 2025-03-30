@@ -13,7 +13,7 @@ export function validateSnapshot(snapshot) {
 }
 
 /**
- * @template {import("./types/index.d.ts").ContextDefinition} C
+ * @template {import("./types/context").ContextDefinition} C
  * @template {string} S
  * @template {Record<string, unknown>} I
  *

@@ -69,7 +69,7 @@ function isType(value, expectedType) {
 /**
  * Проверяет корректность триггера
  * @param {string} field Название поля
- * @param {import('../types/index.d.ts').TypeDefinition} definition Тип поля
+ * @param {import('../types/context').TypeDefinition} definition Тип поля
  * @param {any} value Значение триггера
  * @throws {Error} Если триггер некорректен
  */
@@ -100,7 +100,7 @@ function validateTrigger(field, definition, value) {
  * Проверяет корректность триггера для строкового поля
  * @param {string} field - Название поля
  * @param {any} value - Значение триггера
- * @param {import('../types/index.d.ts').TypeDefinition} definition - Определение типа
+ * @param {import('../types/context').TypeDefinition} definition - Определение типа
  * @throws {Error} Если триггер некорректен
  */
 function validateStringTrigger(field, value, definition) {
@@ -132,7 +132,7 @@ function validateStringTrigger(field, value, definition) {
  * Проверяет корректность триггера для числового поля
  * @param {string} field - Название поля
  * @param {any} value - Значение триггера
- * @param {import('../types/index.d.ts').TypeDefinition} definition - Определение типа
+ * @param {import('../types/context').TypeDefinition} definition - Определение типа
  * @throws {Error} Если триггер некорректен
  */
 function validateNumberTrigger(field, value, definition) {
@@ -156,7 +156,7 @@ function validateNumberTrigger(field, value, definition) {
  * Проверяет корректность триггера для булевого поля
  * @param {string} field - Название поля
  * @param {any} value - Значение триггера
- * @param {import('../types/index.d.ts').TypeDefinition} definition - Определение типа
+ * @param {import('../types/context').TypeDefinition} definition - Определение типа
  * @throws {Error} Если триггер некорректен
  */
 function validateBooleanTrigger(field, value, definition) {
@@ -207,7 +207,7 @@ function validateArrayTrigger(field, value) {
 /**
  * Проверяет корректность триггера для enum
  * @param {string} field - Название поля
- * @param {import('../types/index.d.ts').EnumDefinition<any>} definition - Тип поля
+ * @param {import('../types/context').EnumDefinition<any>} definition - Тип поля
  * @param {any} value - Значение триггера
  * @throws {Error} Если триггер некорректен
  */

@@ -1,17 +1,16 @@
-import type { Snapshot } from "./types"
-import type { ParticleConstructorParams } from "./types/metafor"
+import type {ParticleConstructorParams} from "./types/metafor"
 import type {
-  ContextDefinition,
-  ContextTypes,
-  UpdateParameters,
-  OnUpdateContextData,
-  ContextData,
+    ContextData,
+    ContextDefinition,
+    ContextTypes,
+    OnUpdateContextData,
+    UpdateParameters,
 } from "./types/context"
-import type { Transitions } from "./types/transition"
-import type { CoreObj, CoreDefinition, Core } from "./types/core"
-import type { Actions } from "./types/action"
-import type { ReactionType } from "./types/reaction"
-import type { ViewDefinition } from "./types/view"
+import type {Transitions} from "./types/transition"
+import type {Core, CoreDefinition, CoreObj} from "./types/core"
+import type {Actions} from "./types/action"
+import type {ReactionType} from "./types/reaction"
+import type {ViewDefinition} from "./types/view"
 
 import type {FabricCallbackCreateProps} from "./types/fabric";
 
@@ -95,6 +94,33 @@ export declare function MetaFor(tag: string, conf?: ParticleConf): {
 }
 
 /**
+ * Снимок состояния частицы
+ * @interface Snapshot
+ * @template C
+ * @template S
+ * @property id - Идентификатор снимка
+ * @property title - Заголовок снимка
+ * @property description - Описание снимка
+ * @property state - Текущее состояние
+ * @property states - Доступные состояния
+ * @property context - Данные контекста
+ * @property types - Определение типов контекста
+ * @property transitions - Переходы
+ */
+export type Snapshot<C extends Record<string, any>, S> = {
+    id: string
+    title?: string
+    description?: string
+    state: S
+    states: readonly S[]
+    context: ContextData<C>
+    types: ContextDefinition
+    transitions: Transitions<C, S>
+    actions: Record<string, { read: string[]; write: string[] }>
+    core: Record<string, { read: string[]; write: string[] }>
+}
+
+/**
  * Интерфейс частицы
  * @template S - Состояния
  * @template C - Контекст
@@ -147,3 +173,16 @@ export declare class Particle<S extends string, C extends Record<string, any>, I
   graph: () => Promise<any>
   destroy: () => void
 }
+
+/**
+ * Опции графа
+ * @interface GraphOptions
+ */
+export type GraphOptions = boolean
+/**
+ * Опции отладки
+ * @interface DebugOptions
+ * @property host - Хост для отладки
+ * @property port - Порт для отладки
+ */
+export type DebugOptions = boolean | { host?: string; port?: number }

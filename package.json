@@ -44,6 +44,7 @@
   },
   "scripts": {
     "publish-pkg": "bun publish --access public",
+    "docs": "bunx typedoc",
     "test": "bun test tests",
     "test[watch]": "bun test tests --watch",
     "test:init": "bun test tests/init.spec.ts",
@@ -70,12 +71,30 @@
     "test:pipe": "bun test tests/pipe.spec.ts",
     "test:trigger:lock": "bun test tests/triggerLock.spec.ts"
   },
-  "bun-create": {
-    "preinstall": "echo 'Installing...'",
-    "postinstall": [
-      "echo 'Done!'"
+  "typedocOptions": {
+    "entryPoints": [
+      "./types/index.d.ts"
     ],
-    "start": "bun run echo 'Hello world!'"
+    "out": "docs",
+    "name": "MetaFor",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "includeVersion": true,
+    "disableSources": true,
+    "readme": "README.md",
+    "theme": "default",
+    "tsconfig": "tsconfig.typedoc.json",
+    "categorizeByGroup": true,
+    "categoryOrder": [
+    ],
+    "sort": [
+      "source-order"
+    ],
+    "validation": {
+      "invalidLink": true,
+      "notExported": true
+    }
   },
   "dependencies": {
     "create-particle": "^1.1.46"

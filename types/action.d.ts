@@ -9,6 +9,7 @@ import type {Core} from "./core.d.ts"
  * @property context - Данные контекста
  * @property update - Функция обновления контекста
  * @property core - Внутренние данные
+ *
  */
 export type Action<C extends ContextDefinition, I extends Record<string, unknown>> = ({context, update}: { context: ContextData<C>; update: Update<C>; core: Core<I> }) => void | Promise<void>
 

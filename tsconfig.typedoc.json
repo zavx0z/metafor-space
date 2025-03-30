@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false
+  },
+  "include": [
+    "index.d.ts",
+    "types/*.d.ts"
+  ],
+  "exclude": ["node_modules", "**/*.spec.ts"],
+  "typedocOptions": {
+    "entryPoints": ["./index.d.ts", "./types/*.d.ts"],
+    "out": "docs"
+  }
+}

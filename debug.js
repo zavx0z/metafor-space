@@ -41,11 +41,11 @@ export function createWebSocketConnection(options) {
 
 /**
  * @template {string} S
- * @template {import("./types/index.d.ts").ContextDefinition} C
+ * @template {import("./types/context").ContextDefinition} C
  * @template {Record<string, any>} I
  *
  * @param {import('./').Particle<S, C, I>} particle
- * @param {import("./types/index.d.ts").DebugOptions} options
+ * @param {import("./").DebugOptions} options
  */
 export default function (particle, options) {
   let ws
@@ -106,7 +106,7 @@ export default function (particle, options) {
   })
   const originalUpdate = particle.update.bind(particle)
   // @ts-ignore
-  particle.update = /** @param {import('./types/index.d.ts').ContextData<C>} context */ (context) => {
+  particle.update = /** @param {import('./types/context').ContextData<C>} context */ (context) => {
     // @ts-ignore
     originalUpdate(context)
     ws.send(JSON.stringify({ patch: { path: `/${particle.id}`, op: "replace", value: { context: context } } }))
