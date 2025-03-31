@@ -5,10 +5,15 @@ export type CoreObj = Record<string, any>
 export type CoreData<I extends CoreObj> = Partial<I>
 
 /**
- * Данные ядра
- * @interface CoreDefinition
- * @template I - Внутренние данные
- * @template C - Контекст
+ Данные ядра
+
+ @template I - Внутренние данные
+ @template C - Контекст
+
+ @param params - Параметры
+ @param params.update - Функция обновления контекста
+ @param params.context - Данные контекста
+ @param params.self - Ядро
  */
 export type CoreDefinition<I extends CoreObj, C extends ContextDefinition> = (params: {
   update: Update<C>
@@ -17,9 +22,9 @@ export type CoreDefinition<I extends CoreObj, C extends ContextDefinition> = (pa
 }) => I
 
 /**
- * Функционал ядра
- * @interface Core
- * @template I
+ Функционал ядра
+
+ @template I - Внутренние данные
  */
 export type Core<I extends CoreObj> = {
   [K in keyof I]: I[K] extends (...args: infer Args) => infer R ? (...args: Args) => R : I[K]
