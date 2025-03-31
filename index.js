@@ -212,7 +212,7 @@ export class Particle {
     if (Object.keys(updCtx).length > 0) {
       this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
       this.channel.postMessage(
-        /** @type {BroadcastMessage} */ ({
+        /** @type {import('./types/particle').BroadcastMessage} */ ({
           meta: { particle: this.id, func: funcName, target: srcName, timestamp: Date.now() },
           patch: { path: `/context`, op: "replace", value: updCtx },
         })

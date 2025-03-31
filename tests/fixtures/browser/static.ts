@@ -53,7 +53,8 @@ const resolveFilePath = (requestedPath: string): string | null => {
   if (existsSync(requestedPath) && !statSync(requestedPath).isDirectory()) return requestedPath
 
   // Проверка, является ли запрашиваемый путь директорией
-  if (existsSync(requestedPath) && statSync(requestedPath).isDirectory()) requestedPath = join(requestedPath, "index.js")
+  if (existsSync(requestedPath) && statSync(requestedPath).isDirectory())
+    requestedPath = join(requestedPath, "index.js")
 
   // Проверка наличия файла с хешем в имени, если не найден точный файл
   const dir = dirname(requestedPath)

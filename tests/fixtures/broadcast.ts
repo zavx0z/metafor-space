@@ -1,6 +1,9 @@
-import {afterAll} from "bun:test"
+import { afterAll } from "bun:test"
+import { type BroadcastMessage } from "../../types/particle"
 
-export const messagesFixture = (options?: {particle: string}): {
+export const messagesFixture = (options?: {
+  particle: string
+}): {
   messages: BroadcastMessage[]
   onmessage: (cb: (message: BroadcastMessage) => void) => void
   waitForMessages: (delay?: number) => Promise<BroadcastMessage[]>
@@ -8,15 +11,15 @@ export const messagesFixture = (options?: {particle: string}): {
   const channel = new BroadcastChannel("channel")
   afterAll(() => channel.close())
   const messages: BroadcastMessage[] = []
-  
-  channel.addEventListener("message", ({data}) => {
+
+  channel.addEventListener("message", ({ data }) => {
     if (!options?.particle || data.meta?.particle === options.particle) {
       messages.push(data)
     }
   })
-  
+
   const onmessage = (cb: (message: BroadcastMessage) => void) => {
-    channel.addEventListener("message", ({data}) => {
+    channel.addEventListener("message", ({ data }) => {
       if (!options?.particle || data.meta?.particle === options.particle) {
         cb(data)
       }
@@ -25,7 +28,7 @@ export const messagesFixture = (options?: {particle: string}): {
 
   const waitForMessages = async (delay = 1000): Promise<BroadcastMessage[]> => {
     let lastMessageTime = Date.now()
-    
+
     return new Promise((resolve) => {
       const checkMessages = () => {
         const now = Date.now()
@@ -36,16 +39,12 @@ export const messagesFixture = (options?: {particle: string}): {
         setTimeout(checkMessages, 100)
       }
 
-      const messageHandler = ({data}: MessageEvent) => {
-        if (!options?.particle || data.meta?.particle === options.particle) {
-          lastMessageTime = Date.now()
-        }
-      }
-      
-      channel.addEventListener("message", messageHandler)
+      channel.addEventListener("message", ({ data }: MessageEvent) => {
+        if (!options?.particle || data.meta?.particle === options.particle) lastMessageTime = Date.now()
+      })
       checkMessages()
     })
   }
 
-  return {messages, onmessage, waitForMessages}
+  return { messages, onmessage, waitForMessages }
 }

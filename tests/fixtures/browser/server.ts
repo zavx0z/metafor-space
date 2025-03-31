@@ -48,21 +48,21 @@ const server = Bun.serve({
           </body>
           </html>
         `,
-        {headers: {"Content-Type": "text/html"}}
+        { headers: { "Content-Type": "text/html" } }
       )
     else if (url.pathname === "/favicon.ico")
       return new Response(
         Buffer.from("AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAA=", "base64"),
-        {headers: {"Content-Type": "image/x-icon"}}
+        { headers: { "Content-Type": "image/x-icon" } }
       )
     else {
       const path = join(PROJECT_DIR, url.pathname)
-      return new Response(Bun.file(path), {headers: {"Content-Type": getMimeType(url.pathname)}})
+      return new Response(Bun.file(path), { headers: { "Content-Type": getMimeType(url.pathname) } })
     }
   },
   error(error) {
     console.log(error)
-    return new Response(`<pre>${error}\n${error.stack}</pre>`, {headers: {"Content-Type": "text/html"}})
-  }
+    return new Response(`<pre>${error}\n${error.stack}</pre>`, { headers: { "Content-Type": "text/html" } })
+  },
 })
 console.log(`Server started on http://${server.hostname}:${server.port}`)

@@ -1,7 +1,7 @@
-import puppeteer, {Browser, ElementHandle, Page} from "puppeteer"
-import {MetaFor} from "../../../index.js"
-import type {Subprocess} from "bun"
-import {join} from "node:path"
+import puppeteer, { Browser, ElementHandle, Page } from "puppeteer"
+import { MetaFor } from "../../../index.js"
+import type { Subprocess } from "bun"
+import { join } from "node:path"
 
 const cssEscape = (value: string) => value.replace(/\//g, "\\$&")
 
@@ -72,7 +72,7 @@ export interface BrowserFixture {
  * Создает фикстуру для тестирования графа
  * @param config - Конфигурация фикстуры
  */
-  export function createBrowserFixture(config: BrowserFixtureConfig = {}): BrowserFixture {
+export function createBrowserFixture(config: BrowserFixtureConfig = {}): BrowserFixture {
   const width = config.width ?? 1024 * 2
   const height = config.height ?? 768 * 2
   const port = config.port ?? 4422
@@ -105,7 +105,7 @@ export interface BrowserFixture {
       processServer = Bun.spawn({
         cmd: ["bun", "run", "--port", `${port}`, join(import.meta.dir, "server.ts")],
         stdout: "inherit",
-        stderr: "inherit"
+        stderr: "inherit",
       })
       console.log("Сервер запущен. PID:", process.pid)
 
@@ -114,13 +114,13 @@ export interface BrowserFixture {
       browser = await puppeteer.launch({
         headless,
         devtools,
-        defaultViewport: {width, height},
+        defaultViewport: { width, height },
         args: [
           `--window-size=${width},${height}`,
           "--disable-dev-shm-usage",
           "--no-sandbox",
-          "--disable-setuid-sandbox"
-        ]
+          "--disable-setuid-sandbox",
+        ],
       })
 
       // Создаем страницу с расширенными методами
@@ -141,9 +141,9 @@ export interface BrowserFixture {
               clipboardData = text
               return Promise.resolve()
             },
-            readText: () => Promise.resolve(clipboardData)
+            readText: () => Promise.resolve(clipboardData),
           },
-          configurable: true
+          configurable: true,
         })
       })
 
@@ -163,19 +163,19 @@ export interface BrowserFixture {
         return originalClick(cssEscape(selector), options)
       }
 
-      page.on("console", msg => console.log("PAGE LOG:", msg.text()))
-      page.on("pageerror", err => console.log("PAGE ERROR:", err.toString()))
+      page.on("console", (msg) => console.log("PAGE LOG:", msg.text()))
+      page.on("pageerror", (err) => console.log("PAGE ERROR:", err.toString()))
 
       // Открываем тестовую страницу
       await page.goto(`http://localhost:${port}`, {
         waitUntil: "networkidle0",
-        timeout: 10000
+        timeout: 10000,
       })
     },
 
     async teardown() {
       processServer.kill()
       await browser.close()
-    }
+    },
   }
 }
