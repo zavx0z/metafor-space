@@ -1,14 +1,15 @@
 /**
- * Типы условий для разных типов данных
- * @typedef {Object} ConditionKeys
- * @property {Set<string>} string - Ключи для строковых условий
- * @property {Set<string>} number - Ключи для числовых условий
- * @property {Set<string>} boolean - Ключи для логических условий
- * @property {Set<string>} enum - Ключи для enum условий
- * @property {Set<string>} array - Ключи для условий массивов
+ Типы условий для разных типов данных
+
+ @typedef {Object} ConditionKeys
+ @property {Set<string>} string - Ключи для строковых условий
+ @property {Set<string>} number - Ключи для числовых условий
+ @property {Set<string>} boolean - Ключи для логических условий
+ @property {Set<string>} enum - Ключи для enum условий
+ @property {Set<string>} array - Ключи для условий массивов
  */
 
-/** @type {ConditionKeys} */
+/** @type {ConditionKeys} */ // prettier-ignore
 const CONDITIONS = {
   string: new Set(["startsWith", "endsWith", "include", "pattern", "not", "eq", "notEq", "notInclude", "notStartsWith", "notEndsWith", "isNull", "between", "length"]),
   number: new Set(["isNull", "eq", "gt", "gte", "lt", "lte", "notEq", "notGt", "notGte", "notLt", "notLte", "between"]),
@@ -18,36 +19,45 @@ const CONDITIONS = {
 }
 
 /**
- * Валидация триггеров
- * @param {Object} params Параметры валидации
- * @param {string} params.tag Имя частицы
- * @param {import('../types/transitions.d.ts').Transitions<any, any>} params.transitions Массив переходов
- * @param {import('../types/context.d.ts').ContextDefinition} params.contextDefinition Определение контекста
+ Валидация триггеров
+
+ @param {Object} params
+ @param {string} params.tag Имя частицы
+ @param {import('../types/transitions').Transitions<any, any>} params.transitions Массив переходов
+ @param {import('../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
-export function validateTriggers({tag, transitions: transitionsList, contextDefinition}) {
+export function validateTriggers({ tag, transitions: transitionsList, contextDefinition }) {
   transitionsList.forEach((transition, transitionIndex) => {
-    transition.to.forEach(to => {
+    transition.to.forEach((to) => {
       if (!to.trigger) return
 
       if (Object.keys(to.trigger).length === 0) {
-        throw new Error(`Пустой триггер в переходе из состояния "${transition.from}" в "${to.state}". Триггер должен содержать хотя бы одно условие.`)
+        throw new Error(
+          `Пустой триггер в переходе из состояния "${transition.from}" в "${to.state}". Триггер должен содержать хотя бы одно условие.`
+        )
       }
 
       Object.entries(to.trigger).forEach(([field, condition]) => {
         const fieldDef = contextDefinition[field]
-        if (!fieldDef) throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.from}`)
+        if (!fieldDef)
+          throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.from}`)
 
         validateTrigger(field, fieldDef, condition)
 
         if (typeof condition === "object" && condition !== null) {
           const conditionKeys = Object.keys(condition)
-          if (conditionKeys.length === 0) throw new Error(`Пустое условие в триггере /${transition.from}/${field}/trigger`)
+          if (conditionKeys.length === 0)
+            throw new Error(`Пустое условие в триггере /${transition.from}/${field}/trigger`)
 
           const allowedKeys = CONDITIONS[fieldDef.type]
-          const invalidKeys = conditionKeys.filter(key => !allowedKeys.has(key))
+          const invalidKeys = conditionKeys.filter((key) => !allowedKeys.has(key))
 
           if (invalidKeys.length > 0)
-            throw new Error(`Недопустимые ключи условия [${invalidKeys.join(", ")}] для типа "${fieldDef.type}" в триггере /${transition.from}/${field}/trigger. Допустимые ключи: ${Array.from(allowedKeys).join(", ")}`)
+            throw new Error(
+              `Недопустимые ключи условия [${invalidKeys.join(", ")}] для типа "${fieldDef.type}" в триггере /${
+                transition.from
+              }/${field}/trigger. Допустимые ключи: ${Array.from(allowedKeys).join(", ")}`
+            )
         }
       })
     })
@@ -55,10 +65,11 @@ export function validateTriggers({tag, transitions: transitionsList, contextDefi
 }
 
 /**
- * Проверяет тип значения
- * @param {any} value Значение для проверки
- * @param {string} expectedType Ожидаемый тип
- * @returns {boolean} Результат проверки
+ Проверяет тип значения
+
+ @param {any} value Значение для проверки
+ @param {string} expectedType Ожидаемый тип
+ @returns {boolean} Результат проверки
  */
 function isType(value, expectedType) {
   if (expectedType === "array") return Array.isArray(value)
@@ -67,11 +78,12 @@ function isType(value, expectedType) {
 }
 
 /**
- * Проверяет корректность триггера
- * @param {string} field Название поля
- * @param {import('../types/context').TypeDefinition} definition Тип поля
- * @param {any} value Значение триггера
- * @throws {Error} Если триггер некорректен
+ Проверяет корректность триггера
+
+ @param {string} field Название поля
+ @param {import('../types/context').TypeDefinition} definition Тип поля
+ @param {any} value Значение триггера
+ @throws {Error} Если триггер некорректен
  */
 function validateTrigger(field, definition, value) {
   /** @type {Record<string, Function>} */
@@ -80,7 +92,7 @@ function validateTrigger(field, definition, value) {
     number: validateNumberTrigger,
     boolean: validateBooleanTrigger,
     enum: validateEnumTrigger,
-    array: validateArrayTrigger
+    array: validateArrayTrigger,
   }
 
   const validator = validators[definition.type]
@@ -97,11 +109,12 @@ function validateTrigger(field, definition, value) {
 }
 
 /**
- * Проверяет корректность триггера для строкового поля
- * @param {string} field - Название поля
- * @param {any} value - Значение триггера
- * @param {import('../types/context').TypeDefinition} definition - Определение типа
- * @throws {Error} Если триггер некорректен
+ Проверяет корректность триггера для строкового поля
+
+ @param {string} field - Название поля
+ @param {any} value - Значение триггера
+ @param {import('../types/context').TypeDefinition} definition - Определение типа
+ @throws {Error} Если триггер некорректен
  */
 function validateStringTrigger(field, value, definition) {
   if (value === null) {
@@ -116,24 +129,27 @@ function validateStringTrigger(field, value, definition) {
   if (isType(value, "object")) {
     const allowedKeys = CONDITIONS.string
     const keys = Object.keys(value)
-    const hasValidKey = keys.some(key => allowedKeys.has(key))
+    const hasValidKey = keys.some((key) => allowedKeys.has(key))
 
     if (hasValidKey) return
   }
 
   throw new Error(
-    `Некорректный триггер для строкового поля "${field}". Ожидается строка, регулярное выражение или объект с ключами ${Array.from(CONDITIONS.string)
-      .map(key => `"${key}"`)
+    `Некорректный триггер для строкового поля "${field}". Ожидается строка, регулярное выражение или объект с ключами ${Array.from(
+      CONDITIONS.string
+    )
+      .map((key) => `"${key}"`)
       .join(", ")}. Получено: ${JSON.stringify(value)}`
   )
 }
 
 /**
- * Проверяет корректность триггера для числового поля
- * @param {string} field - Название поля
- * @param {any} value - Значение триггера
- * @param {import('../types/context').TypeDefinition} definition - Определение типа
- * @throws {Error} Если триггер некорректен
+ Проверяет корректность триггера для числового поля
+
+ @param {string} field - Название поля
+ @param {any} value - Значение триггера
+ @param {import('../types/context').TypeDefinition} definition - Определение типа
+ @throws {Error} Если триггер некорректен
  */
 function validateNumberTrigger(field, value, definition) {
   if (value === null && definition.nullable) return
@@ -141,23 +157,26 @@ function validateNumberTrigger(field, value, definition) {
   if (isType(value, "object")) {
     const allowedKeys = CONDITIONS.number
     const keys = Object.keys(value)
-    const hasValidKey = keys.some(key => allowedKeys.has(key))
+    const hasValidKey = keys.some((key) => allowedKeys.has(key))
 
     if (hasValidKey) return
   }
   throw new Error(
-    `Некорректный триггер для числового поля "${field}". Ожидается число или объект с ключами ${Array.from(CONDITIONS.number)
-      .map(key => `"${key}"`)
+    `Некорректный триггер для числового поля "${field}". Ожидается число или объект с ключами ${Array.from(
+      CONDITIONS.number
+    )
+      .map((key) => `"${key}"`)
       .join(", ")}. Получено: ${JSON.stringify(value)}`
   )
 }
 
 /**
- * Проверяет корректность триггера для булевого поля
- * @param {string} field - Название поля
- * @param {any} value - Значение триггера
- * @param {import('../types/context').TypeDefinition} definition - Определение типа
- * @throws {Error} Если триггер некорректен
+ Проверяет корректность триггера для булевого поля
+
+ @param {string} field - Название поля
+ @param {any} value - Значение триггера
+ @param {import('../types/context').TypeDefinition} definition - Определение типа
+ @throws {Error} Если триггер некорректен
  */
 function validateBooleanTrigger(field, value, definition) {
   if (value === null) {
@@ -171,45 +190,51 @@ function validateBooleanTrigger(field, value, definition) {
   if (isType(value, "object")) {
     const allowedKeys = CONDITIONS.boolean
     const keys = Object.keys(value)
-    const hasValidKey = keys.some(key => allowedKeys.has(key))
+    const hasValidKey = keys.some((key) => allowedKeys.has(key))
 
     if (hasValidKey) return
   }
   throw new Error(
-    `Некорректный триггер для булевого поля "${field}". Ожидается булево значение или объект с ключами ${Array.from(CONDITIONS.boolean)
-      .map(key => `"${key}"`)
+    `Некорректный триггер для булевого поля "${field}". Ожидается булево значение или объект с ключами ${Array.from(
+      CONDITIONS.boolean
+    )
+      .map((key) => `"${key}"`)
       .join(", ")}. Получено: ${JSON.stringify(value)}`
   )
 }
 
 /**
- * Проверяет корректность триггера для массива
- * @param {string} field - Название поля
- * @param {any} value - Значение триггера
- * @throws {Error} Если триггер некорректен
+ Проверяет корректность триггера для массива
+
+ @param {string} field - Название поля
+ @param {any} value - Значение триггера
+ @throws {Error} Если триггер некорректен
  */
 function validateArrayTrigger(field, value) {
   if (Array.isArray(value)) return
   if (isType(value, "object")) {
     const allowedKeys = CONDITIONS.array
     const keys = Object.keys(value)
-    const hasValidKey = keys.some(key => allowedKeys.has(key))
+    const hasValidKey = keys.some((key) => allowedKeys.has(key))
 
     if (hasValidKey) return
   }
   throw new Error(
-    `Некорректный триггер для поля массива "${field}". Ожидается массив или объект с ключами ${Array.from(CONDITIONS.array)
-      .map(key => `"${key}"`)
+    `Некорректный триггер для поля массива "${field}". Ожидается массив или объект с ключами ${Array.from(
+      CONDITIONS.array
+    )
+      .map((key) => `"${key}"`)
       .join(", ")}. Получено: ${JSON.stringify(value)}`
   )
 }
 
 /**
- * Проверяет корректность триггера для enum
- * @param {string} field - Название поля
- * @param {import('../types/context').EnumDefinition<any>} definition - Тип поля
- * @param {any} value - Значение триггера
- * @throws {Error} Если триггер некорректен
+ Проверяет корректность триггера для enum
+
+ @param {string} field - Название поля
+ @param {import('../types/context').EnumDefinition<any>} definition - Тип поля
+ @param {any} value - Значение триггера
+ @throws {Error} Если триггер некорректен
  */
 function validateEnumTrigger(field, value, definition) {
   if (value === null) {
@@ -219,10 +244,14 @@ function validateEnumTrigger(field, value, definition) {
     return
   }
 
-  const {values} = definition
+  const { values } = definition
   if (typeof value === "string" || typeof value === "number") {
     if (!values?.includes(value)) {
-      throw new Error(`Значение "${value}" не является допустимым для enum поля "${field}". Допустимые значения: [${values.join(", ")}].`)
+      throw new Error(
+        `Значение "${value}" не является допустимым для enum поля "${field}". Допустимые значения: [${values.join(
+          ", "
+        )}].`
+      )
     }
     return
   }
@@ -230,14 +259,16 @@ function validateEnumTrigger(field, value, definition) {
   if (isType(value, "object")) {
     const allowedKeys = CONDITIONS.enum
     const keys = Object.keys(value)
-    const hasValidKey = keys.some(key => allowedKeys.has(key))
+    const hasValidKey = keys.some((key) => allowedKeys.has(key))
 
     if (hasValidKey) return
   }
 
   throw new Error(
-    `Некорректный триггер для enum поля "${field}". Ожидается строка, число или объект с ключами ${Array.from(CONDITIONS.enum)
-      .map(key => `"${key}"`)
+    `Некорректный триггер для enum поля "${field}". Ожидается строка, число или объект с ключами ${Array.from(
+      CONDITIONS.enum
+    )
+      .map((key) => `"${key}"`)
       .join(", ")}. Получено: ${JSON.stringify(value)}`
   )
 }

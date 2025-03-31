@@ -1,14 +1,15 @@
 /**
- * Проверяет параметры создания частицы
- * @param {Object} params Параметры валидации
- * @param {Object} params.options Опции создания частицы
- * @param {string} params.options.state Начальное состояние
- * @param {Object} [params.options.context] Начальный контекст
- * @param {Object} [params.options.debug] Опции отладки
- * @param {Object} [params.options.graph] Опции графа
- * @param {string[]} params.states Список допустимых состояний
- * @throws {Error} Если параметры некорректны
- */
+ Проверяет параметры создания частицы
+
+ @param {Object} params Параметры валидации
+ @param {Object} params.options Опции создания частицы
+ @param {string} params.options.state Начальное состояние
+ @param {Object} [params.options.context] Начальный контекст
+ @param {Object} [params.options.debug] Опции отладки
+ @param {Object} [params.options.graph] Опции графа
+ @param {string[]} params.states Список допустимых состояний
+ @throws {Error} Если параметры некорректны
+ */ // prettier-ignore
 export function validateParticleOptions({options, states}) {
   if (!options || typeof options !== "object") throw new Error("Не указаны опции создания частицы")
   const {state, context, debug, graph} = options

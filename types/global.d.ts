@@ -22,23 +22,6 @@ declare global {
     patch: Patch
   }
   /**
-   * Правило перехода между состояниями
-   * @interface MetaForTransition
-   * @property from - Исходное состояние
-   * @property action - Действие при переходе
-   * @property to - Массив целевых состояний
-   * @property to[].state - Целевое состояние
-   * @property to[].trigger - Условия для перехода в целевое состояние
-   */
-  type MetaForTransition = {
-    from: string
-    action?: string
-    to: Array<{
-      state: string
-      trigger: Record<string, any>
-    }>
-  }
-  /**
    * Снимок состояния частицы
    * @interface MetaForSnapshot
    * @property id - Идентификатор снимка

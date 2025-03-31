@@ -1,12 +1,13 @@
 /**
- * Проверяет корректность поля контекста
- * @param {string} field - Название поля
- * @param {import('../types/context').TypeDefinition} value - Значение поля
- * @throws {Error} Если поле не соответствует требованиям
+ Проверяет корректность поля контекста
+
+ @param {string} field - Название поля
+ @param {import('../types/context').TypeDefinition} value - Значение поля
+ @throws {Error} Если поле не соответствует требованиям
  */
 function validateContextField(field, value) {
   const RESERVED_KEYWORDS = ["state"]
-  
+
   if (RESERVED_KEYWORDS.includes(field)) {
     throw new Error(`Поле "${field}" является зарезервированным ключевым словом`)
   }
@@ -20,7 +21,7 @@ function validateContextField(field, value) {
   /** @typedef {'string' | 'number' | 'boolean' | 'enum'} AllowedType */
 
   if (!ALLOWED_TYPES.includes(/** @type {AllowedType} */ (value.type))) {
-    throw new Error(`Неподдерживаемый тип "${value.type}" для поля "${field}". ` + `Поддерживаемые типы: ${ALLOWED_TYPES.join(", ")}`)
+    throw new Error(`Неподдерживаемый тип "${value.type}" для поля "${field}". ` + `Поддерживаемые типы: ${ALLOWED_TYPES.join(", ")}`) // prettier-ignore
   }
 
   if (value.type === "enum") {
@@ -31,9 +32,10 @@ function validateContextField(field, value) {
 }
 
 /**
- * Проверяет корректность всего объекта контекста
- * @param {import('../types/context').ContextDefinition} ctxDef - Объект контекста
- * @throws {Error} Если контекст не соответствует требованиям
+ Проверяет корректность всего объекта контекста
+
+ @param {import('../types/context').ContextDefinition} ctxDef - Объект контекста
+ @throws {Error} Если контекст не соответствует требованиям
  */
 export function validateContextDefinition(ctxDef) {
   if (!ctxDef || typeof ctxDef !== "object") throw new Error("Контекст должен быть объектом")
