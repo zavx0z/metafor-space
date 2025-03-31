@@ -1,8 +1,8 @@
-import type {ArrayDefinition, BooleanDefinition, ContextDefinition, EnumDefinition, NumberDefinition, NumberEnumDefinition, StringDefinition, StringEnumDefinition} from "./context.d.ts"
+import type {ArrayDefinition, BooleanDefinition, ContextDefinition, NumberDefinition, NumberEnumDefinition, StringDefinition, StringEnumDefinition} from "./context.d.ts"
 
 /**
  * Условия триггера для enum
- * @interface EnumTriggerCondition
+ *
  * @template E - Тип значений enum
  * @property isNull - Является ли значение null
  * @property eq - Равно указанному значению
@@ -22,7 +22,7 @@ export type EnumTriggerCondition<E extends readonly (string | number)[]> =
     }
 /**
  * Условия триггера для строк
- * @interface StringTriggerCondition
+ *
  * @property isNull - Является ли значение null
  * @property startsWith - Начинается ли с указанной строки
  * @property endsWith - Заканчивается ли на указанную строку
@@ -56,7 +56,7 @@ export type StringTriggerCondition =
     }
 /**
  * Условия триггера для чисел
- * @interface NumberTriggerCondition
+ *
  * @property isNull - Является ли значение null
  * @property eq - Равно указанному числу
  * @property gt - Больше указанного числа
@@ -91,7 +91,7 @@ export type NumberTriggerCondition =
     }
 /**
  * Условия триггера для булевых значений
- * @interface BooleanTriggerCondition
+ *
  * @property isNull - Является ли значение null
  * @property eq - Равно указанному булеву значению
  * @property notEq - Не равно указанному булеву значению
@@ -111,7 +111,7 @@ export type BooleanTriggerCondition =
 
 /**
  * Тип триггера
- * @interface TriggerType
+ *
  * @template C - Тип определения контекста
  */
 export type TriggerType<C extends ContextDefinition> = Partial<{

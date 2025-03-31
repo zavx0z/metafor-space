@@ -12,113 +12,83 @@ import type {Actions} from "./types/action"
 import type {ReactionType} from "./types/reaction"
 import type {ViewDefinition} from "./types/view"
 
-import type {FabricCallbackCreateProps} from "./types/fabric";
+import type {FabricCallbackCreateProps} from "./types/create"
+import type {Snapshot} from "./types/particle"
 
 /**
- * Конфигурация частицы
- * @property description - Описание частицы
- * @property development - Режим разработки (подключена валидация)
+ # Фабрика частиц (Акторов)
+
+ > Декларативное описание сущности и её поведения
+
+ ## Основные составляющие:
+ - Состояния
+ - Контекст
+ - Переходы между состояниями
+ - Ядро
+ - Действия
+ - Функция создания частицы
+
+ ## Дополнительные составляющие:
+ - Представление отображения частицы
+ - Реакции на изменения других частиц
+
+ ## Схемы создания частиц:
+ - Базовая
+ - С представлением
+ - С реакциями
+ - С представлением и реакциями
+
+ ## Состоит из этапов:
+ 1. Определение имени и опций частицы
+ 2. Определение состояний частицы
+ 3. Определение контекста частицы
+ 4. Определение переходов между состояниями
+ 5. Определение ядра частицы
+ 6. Определение действий частицы
+ 7. Определение реакций частицы
+ @param tag - Имя частицы
+ @param [conf] - Конфигурация частицы
+ @param conf.description - Описание частицы
+ @param conf.development - Режим разработки (подключена валидация)
  */
-export type ParticleConf = {
-  description?: string
-  development?: boolean
-}
-
-/**
- * Фабрика частиц пространства MetaFor
- * @param tag - Имя частицы
- * @param conf - Конфигурация частицы
- * @returns {MetaFor}
- */ // prettier-ignore
-export declare function MetaFor(tag: string, conf?: ParticleConf): {
-    /**
-     * Все возможные состояния частицы
-     */
-    states: <S extends string>( ...states: S[]) => {
-        /**
-         * Контекст частицы
-         */
-        context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
-            /**
-             * Переходы между состояниями
-             */
-            transitions: (transitions: Transitions<C, S>) => {
-                /**
-                 * Ядро частицы
-                 */
-                core: <I extends CoreObj>(core: CoreDefinition<I, C> = () => Object.create({})) => {
-                    /**
-                     * Действия частицы
-                     */
-                    actions: (actions: Actions<C, I>) => {
-                        /**
-                         * Реакции на изменения других частиц
-                         */
-                        reactions: (reactions: ReactionType<C, I>) => {
-                            /**
-                             * Представление отображения частицы
-                             */
-                            view: (view: ViewDefinition<I, C, S>) => {
-                                /**
-                                 * Создание базовой частицы с:
-                                 * - реакциями
-                                 * - представлением отображения
-                                 */
-                                create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
-                            }
-                            /**
-                             * Создание частицы с:
-                             * - реакциями
-                             */
-                            create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
-                        },
-                        /**
-                         * Представление отображения частицы
-                         */
-                        view: (view: ViewDefinition<I, C, S>) => {
-                            /**
-                             * Создание базовой частицы с:
-                             * - представлением отображения
-                             */
-                            create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
-                        },
-                        /**
-                         * Создание базовой частицы.
-                         */
-                        create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Снимок состояния частицы
- * @interface Snapshot
- * @template C
- * @template S
- * @property id - Идентификатор снимка
- * @property title - Заголовок снимка
- * @property description - Описание снимка
- * @property state - Текущее состояние
- * @property states - Доступные состояния
- * @property context - Данные контекста
- * @property types - Определение типов контекста
- * @property transitions - Переходы
- */
-export type Snapshot<C extends Record<string, any>, S> = {
-    id: string
-    title?: string
+export declare function MetaFor(
+  tag: string,
+  conf?: {
     description?: string
-    state: S
-    states: readonly S[]
-    context: ContextData<C>
-    types: ContextDefinition
-    transitions: Transitions<C, S>
-    actions: Record<string, { read: string[]; write: string[] }>
-    core: Record<string, { read: string[]; write: string[] }>
+    development?: boolean
+  }
+): {
+  states: <S extends string>(
+    ...states: S[]
+  ) => {
+    context: <C extends ContextDefinition>(
+      context: (types: ContextTypes) => C
+    ) => {
+      transitions: (transitions: Transitions<C, S>) => {
+        core: <I extends CoreObj>(
+          core: CoreDefinition<I, C> = () => Object.create({})
+        ) => {
+          actions: (actions: Actions<C, I>) => {
+            reactions: (reactions: ReactionType<C, I>) => {
+              view: (view: ViewDefinition<I, C, S>) => {
+                create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+              }
+              create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+            }
+            view: (view: ViewDefinition<I, C, S>) => {
+              create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+            }
+            create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+          }
+        }
+      }
+    }
+  }
 }
+
+/**
+
+ */
 
 /**
  * Интерфейс частицы
@@ -139,7 +109,7 @@ export type Snapshot<C extends Record<string, any>, S> = {
  * @property channel - Канал частицы
  * @property process - Флаг процесса частицы
  * @property component - Компонент частицы
- * @property update - Обновление частицы    
+ * @property update - Обновление частицы
  * @property _updateExternal - Обновление частицы из вне
  * @property onUpdate - Обработчик обновления частицы
  * @property onTransition - Обработчик перехода частицы
@@ -174,15 +144,3 @@ export declare class Particle<S extends string, C extends Record<string, any>, I
   destroy: () => void
 }
 
-/**
- * Опции графа
- * @interface GraphOptions
- */
-export type GraphOptions = boolean
-/**
- * Опции отладки
- * @interface DebugOptions
- * @property host - Хост для отладки
- * @property port - Порт для отладки
- */
-export type DebugOptions = boolean | { host?: string; port?: number }
