@@ -1,15 +1,15 @@
 /**
- * @typedef {Object} WebSocketOptions
- * @property {string} url
- * @property {function({meta: {name: string}, patch: {op: string, path: string, value: any}}, WebSocket): void} onMessage
- * @property {function(WebSocket): void} [onOpen]
- * @property {function(WebSocket): void} [onClose]
- * @property {function(Event): void} [onError]
+ @typedef {Object} WebSocketOptions
+ @property {string} url
+ @property {function({meta: {name: string}, patch: {op: string, path: string, value: any}}, WebSocket): void} onMessage
+ @property {function(WebSocket): void} [onOpen]
+ @property {function(WebSocket): void} [onClose]
+ @property {function(Event): void} [onError]
  */
 
 /**
- * @param {WebSocketOptions} options
- * @returns {WebSocket}
+ @param {WebSocketOptions} options
+ @returns {WebSocket}
  */
 export function createWebSocketConnection(options) {
   const socket = new WebSocket(options.url)
@@ -40,12 +40,11 @@ export function createWebSocketConnection(options) {
 }
 
 /**
- * @template {string} S
- * @template {import("./types/context").ContextDefinition} C
- * @template {Record<string, any>} I
- *
- * @param {import('./').Particle<S, C, I>} particle
- * @param {import("./").DebugOptions} options
+ @template {string} S
+ @template {import("./types/context").ContextDefinition} C
+ @template {Record<string, any>} I
+ @param {import('./').Particle<S, C, I>} particle
+ @param {import("./types/create").DebugOptions} options
  */
 export default function (particle, options) {
   let ws

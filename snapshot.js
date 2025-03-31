@@ -1,8 +1,8 @@
 import { Particle } from "./index.js"
 
 /**
- * @param {Record<string, any>} snapshot
- * @throws {Error}
+ @param {Record<string, any>} snapshot
+ @throws {Error}
  */
 export function validateSnapshot(snapshot) {
   if (!snapshot.types) throw new Error("В снапшоте отсутствуют типы полей контекста")
@@ -13,12 +13,12 @@ export function validateSnapshot(snapshot) {
 }
 
 /**
- * @template {import("./types/context").ContextDefinition} C
- * @template {string} S
- * @template {Record<string, unknown>} I
- *
- * @param {Record<string, any>} snapshot
- * @returns {import('./index.js').Particle<S, C, I>}
+ @template {import("./types/context").ContextDefinition} C
+ @template {string} S
+ @template {Record<string, unknown>} I
+
+ @param {Record<string, any>} snapshot
+ @returns {import('./index.js').Particle<S, C, I>}
  */
 export function ParticleFromSnapshot(snapshot) {
   validateSnapshot(snapshot)
