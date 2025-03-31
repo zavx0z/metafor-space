@@ -37,7 +37,7 @@ import type {
  @template C - Проброс определения контекста для автодополнения
  @template S - Проброс состояний для автодополнения
  */
-export type Transitions<C extends ContextDefinition, S extends string[]> = Array<Transition<C, S>>
+export type Transitions<C extends ContextDefinition, S> = Array<Transition<C, S>>
 
 /**
  Переход

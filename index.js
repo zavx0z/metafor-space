@@ -1,4 +1,3 @@
-/** @typedef {import("./types/context").ContextDefinition} ContextDefinition */
 /**
  @template {Record<string, any>} I
  @typedef {import("./types/core").Core<I>} Core
@@ -6,7 +5,7 @@
 
 /**
  @template {string} S - состояние
- @template {ContextDefinition} C - контекст
+ @template {import("./types/context").ContextDefinition} C - контекст
  @template {Record<string, any>} I - ядро
  */
 export class Particle {
@@ -388,7 +387,7 @@ export function MetaFor(tag, conf = {}) {
  @template {string} S - состояние
  @template {import('./types/context').ContextDefinition} C - контекст
  @template {Record<string, any>} I - ядро
- @param {import("./types/create.js").FabricCallbackCreateFuncHelper<S, C, I>} parameters
+ @param {import("./types").FabricCallbackCreateFuncHelper<S, C, I>} parameters
  */ // prettier-ignore
 const createParticle = ({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions=[]}) => {
   development && import("./validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))

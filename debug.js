@@ -44,7 +44,7 @@ export function createWebSocketConnection(options) {
  @template {import("./types/context").ContextDefinition} C
  @template {Record<string, any>} I
  @param {import('./').Particle<S, C, I>} particle
- @param {import("./types/create").DebugOptions} options
+ @param {import("./types/create").FabricCallbackCreateProps<I, S, C>['debug']} options
  */
 export default function (particle, options) {
   let ws
