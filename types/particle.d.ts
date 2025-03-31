@@ -2,18 +2,21 @@ import type { ContextData, ContextDefinition } from "./context"
 import type { Transitions } from "./transitions"
 
 /**
- * Снимок состояния частицы
- * @interface Snapshot
- * @template C
- * @template S
- * @property id - Идентификатор снимка
- * @property title - Заголовок снимка
- * @property description - Описание снимка
- * @property state - Текущее состояние
- * @property states - Доступные состояния
- * @property context - Данные контекста
- * @property types - Определение типов контекста
- * @property transitions - Переходы
+ Снимок состояния частицы
+
+ @template C - Тип контекста
+ @template S - Тип состояния
+ 
+ @property id - Идентификатор снимка
+ @property title - Заголовок снимка
+ @property description - Описание снимка
+ @property state - Текущее состояние
+ @property states - Доступные состояния
+ @property context - Данные контекста
+ @property types - Определение типов контекста
+ @property transitions - Переходы
+ @property actions - Действия
+ @property core - Ядро
  */
 export type Snapshot<C extends Record<string, any>, S> = {
   id: string
@@ -30,7 +33,6 @@ export type Snapshot<C extends Record<string, any>, S> = {
 
 /**
  Сообщение для обмена данными между частицами
-
 
  @property meta - Метаданные сообщения
  @property meta.particle - Имя частицы
