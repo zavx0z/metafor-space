@@ -411,7 +411,7 @@ const createParticle = ({development, description, tag, options, states, context
 /**
  * @template {import('./types/context').ContextDefinition} C
  *
- * @param {import('./types/trigger').TriggerType<C>} trigger
+ * @param {import('./types/transitions.js').TriggerType<C>} trigger
  * @param {import('./types/context').ContextData<C>} context
  * @param {import('./types/context').ContextDefinition} types
  */

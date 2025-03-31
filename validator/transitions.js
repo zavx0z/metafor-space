@@ -48,7 +48,7 @@ function canCreateCycle({fromState, toState, forwardConditions, backwardConditio
 /**
  * Проверяет циклические зависимости
  * @param {Object} params
- * @param {Array<import('../types/transition.d.ts').Transition<any, any>>} params.transitions
+ * @param {Array<import('../types/transitions.d.ts').Transition<any, any>>} params.transitions
  */
 export function validateCycles({transitions: transitionsList}) {
   /** @type {Map<string, Array<{state: string, conditions: Record<string, any>}>>} */

@@ -21,7 +21,7 @@ const CONDITIONS = {
  * Валидация триггеров
  * @param {Object} params Параметры валидации
  * @param {string} params.tag Имя частицы
- * @param {import('../types/transition.d.ts').Transitions<any, any>} params.transitions Массив переходов
+ * @param {import('../types/transitions.d.ts').Transitions<any, any>} params.transitions Массив переходов
  * @param {import('../types/context.d.ts').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTriggers({tag, transitions: transitionsList, contextDefinition}) {

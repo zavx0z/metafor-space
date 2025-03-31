@@ -6,7 +6,7 @@ import type {
     OnUpdateContextData,
     UpdateParameters,
 } from "./types/context"
-import type {Transitions} from "./types/transition"
+import type {Transitions} from "./types/transitions"
 import type {Core, CoreDefinition, CoreObj} from "./types/core"
 import type {Actions} from "./types/action"
 import type {ReactionType} from "./types/reaction"

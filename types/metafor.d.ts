@@ -1,6 +1,6 @@
 import type { Actions } from "./action.d.ts"
 import type { CoreData } from "./core.d.ts"
-import type { Transitions } from "./transition.d.ts"
+import type { Transitions } from "./transitions.d.ts"
 import type { ContextData, ContextDefinition } from "./context.d.ts"
 import type { CoreDefinition } from "./core.d.ts"
 import type { ReactionType } from "./reaction.d.ts"

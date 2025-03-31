@@ -1,5 +1,5 @@
 import type {ContextData, ContextDefinition} from "./context";
-import type {Transitions} from "./transition";
+import type {Transitions} from "./transitions";
 
 /**
  * Снимок состояния частицы
