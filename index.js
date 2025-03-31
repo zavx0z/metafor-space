@@ -187,7 +187,7 @@ export class Particle {
     if (updCtx && !this.process) this.#transition()
   }
 
-  /** @param {import('./types/action').Action<C, I>} action */
+  /** @param {import('./types/actions.js').Action<C, I>} action */
   #runAction(action) {
     this.process = true
     const result = action({

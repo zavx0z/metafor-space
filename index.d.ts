@@ -8,7 +8,7 @@ import type {
 } from "./types/context"
 import type {Transitions} from "./types/transitions"
 import type {Core, CoreDefinition, CoreObj} from "./types/core"
-import type {Actions} from "./types/action"
+import type {Actions} from "./types/actions"
 import type {ReactionType} from "./types/reaction"
 import type {ViewDefinition} from "./types/view"
 

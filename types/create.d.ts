@@ -1,7 +1,7 @@
 import type { ContextData, ContextDefinition, PartialContextData } from "./context"
 import type { CoreData, CoreDefinition } from "./core"
 import type { Particle } from "../index"
-import type { Actions } from "./action"
+import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"
 
 export type Meta = {

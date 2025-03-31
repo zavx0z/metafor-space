@@ -1,4 +1,4 @@
-import type { Actions } from "./action.d.ts"
+import type { Actions } from "./actions.d.ts"
 import type { CoreData } from "./core.d.ts"
 import type { Transitions } from "./transitions.d.ts"
 import type { ContextData, ContextDefinition } from "./context.d.ts"
