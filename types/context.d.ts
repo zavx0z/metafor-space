@@ -111,6 +111,28 @@ export type PartialContextData<C extends ContextDefinition> = Partial<{
  */
 export type Update<C extends ContextDefinition> = (context: UpdateParameters<C>) => void
 
+
+/**
+ Утилиты для создания типов контекста
+
+ Предоставляет методы для определения типов полей контекста частицы.
+
+ @property string - Создает определение строкового типа
+ @property number - Создает определение числового типа
+ @property boolean - Создает определение булева типа
+ @property array - Создает определение типа массива
+ @property enum - Создает определение типа enum
+ */
+export type ContextTypes = {
+    string: (params: { title?: string; nullable?: boolean; default?: string }) => StringDefinition
+    number: (params: { title?: string; nullable?: boolean; default?: number }) => NumberDefinition
+    boolean: (params: { title?: string; nullable?: boolean; default?: boolean }) => BooleanDefinition
+    array: (params: { title?: string; nullable?: boolean; default?: any[] }) => ArrayDefinition
+    enum: <T extends string | number>(
+        ...values: T[]
+    ) => (options?: { title?: string; nullable?: boolean; default?: T }) => EnumDefinition<T[]>
+}
+
 /**
  Определение типа булева
 
@@ -180,27 +202,6 @@ export type ArrayDefinition = {
 }
 
 /**
- Утилиты для создания типов контекста
-
- Предоставляет методы для определения типов полей контекста частицы.
-
- @property string - Создает определение строкового типа
- @property number - Создает определение числового типа
- @property boolean - Создает определение булева типа
- @property array - Создает определение типа массива
- @property enum - Создает определение типа enum
- */
-export type ContextTypes = {
-    string: (params: { title?: string; nullable?: boolean; default?: string }) => StringDefinition
-    number: (params: { title?: string; nullable?: boolean; default?: number }) => NumberDefinition
-    boolean: (params: { title?: string; nullable?: boolean; default?: boolean }) => BooleanDefinition
-    array: (params: { title?: string; nullable?: boolean; default?: any[] }) => ArrayDefinition
-    enum: <T extends string | number>(
-        ...values: T[]
-    ) => (options?: { title?: string; nullable?: boolean; default?: T }) => EnumDefinition<T[]>
-}
-
-/**
  Определение типа enum
 
  @template T - Тип значений enum
@@ -233,4 +234,18 @@ export type NumberEnumDefinition<T extends readonly number[]> = EnumDefinition<T
 export type StringEnumDefinition<T extends readonly string[]> = EnumDefinition<T> & {
     type: "enum"
     values: T
+}
+
+/**
+ Параметры обновления контекста
+
+ @template C - Тип контекста
+ @property context - Данные контекста для обновления
+ @property srcName - Имя источника изменения
+ @property funcName - Имя функции вызвавшей изменение
+ */
+export type UpdateContextParams<C extends Record<string, any>> = {
+    context: ContextData<C>
+    srcName?: string
+    funcName?: string
 }

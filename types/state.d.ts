@@ -1,14 +1,4 @@
 /**
- Слушатель сигналов
- 
- @template T - Тип состояния
-
- @property preview - Предыдущее состояние
- @property current - Текущее состояние
- */
-type SignalListener<T extends string> = (preview: T, current: T) => void
-
-/**
  Тип сигнала
 
  @template T - Тип состояния
@@ -19,8 +9,18 @@ type SignalListener<T extends string> = (preview: T, current: T) => void
  @property clear - Очистить слушателей
  */
 export type SignalType<T extends string> = {
-  value: () => T
-  setValue: (state: T) => void
-  onChange: (listener: SignalListener<T>) => () => void
-  clear: () => void
+    value: () => T
+    setValue: (state: T) => void
+    onChange: (listener: SignalListener<T>) => () => void
+    clear: () => void
 }
+
+/**
+ Слушатель сигналов
+
+ @template T - Тип состояния
+
+ @property preview - Предыдущее состояние
+ @property current - Текущее состояние
+ */
+type SignalListener<T extends string> = (preview: T, current: T) => void

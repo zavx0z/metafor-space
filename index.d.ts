@@ -1,19 +1,18 @@
-import type {ParticleConstructorParams} from "./types/metafor"
 import type {
-    ContextData,
-    ContextDefinition,
-    ContextTypes,
-    OnUpdateContextData,
-    UpdateParameters,
+  ContextData,
+  ContextDefinition,
+  ContextTypes,
+  OnUpdateContextData,
+  UpdateParameters,
 } from "./types/context"
-import type {Transitions} from "./types/transitions"
-import type {Core, CoreDefinition, CoreObj} from "./types/core"
-import type {Actions} from "./types/actions"
-import type {ReactionType} from "./types/reaction"
-import type {ViewDefinition} from "./types/view"
+import type { Transitions } from "./types/transitions"
+import type { Core, CoreDefinition, CoreObj } from "./types/core"
+import type { Actions } from "./types/actions"
+import type { ReactionType } from "./types/reaction"
+import type { ViewDefinition } from "./types/view"
 
-import type {FabricCallbackCreateProps} from "./types/create"
-import type {Snapshot} from "./types/particle"
+import type { FabricCallbackCreateProps } from "./types/create"
+import type { ParticleConstructorParams, Snapshot } from "./types/particle"
 
 /**
  # Фабрика частиц (Акторов)
@@ -87,35 +86,33 @@ export declare function MetaFor(
 }
 
 /**
+ Интерфейс частицы
 
- */
+ @template S - Состояния
+ @template C - Контекст
+ @template I - Ядро
 
-/**
- * Интерфейс частицы
- * @template S - Состояния
- * @template C - Контекст
- * @template I - Ядро
- * @property id - Идентификатор частицы
- * @property title - Заголовок частицы
- * @property description - Описание частицы
- * @property state - Состояние частицы
- * @property context - Контекст частицы
- * @property states - Состояния частицы
- * @property types - Типы частицы
- * @property transitions - Переходы частицы
- * @property actions - Действия частицы
- * @property core - Ядро частицы
- * @property reactions - Реакции частицы
- * @property channel - Канал частицы
- * @property process - Флаг процесса частицы
- * @property component - Компонент частицы
- * @property update - Обновление частицы
- * @property _updateExternal - Обновление частицы из вне
- * @property onUpdate - Обработчик обновления частицы
- * @property onTransition - Обработчик перехода частицы
- * @property snapshot - Снимок частицы
- * @property graph - Граф частицы
- * @property destroy - Уничтожение частицы
+ @property id - Идентификатор частицы
+ @property title - Заголовок частицы
+ @property description - Описание частицы
+ @property state - Состояние частицы
+ @property context - Контекст частицы
+ @property states - Состояния частицы
+ @property types - Типы частицы
+ @property transitions - Переходы частицы
+ @property actions - Действия частицы
+ @property core - Ядро частицы
+ @property reactions - Реакции частицы
+ @property channel - Канал частицы
+ @property process - Флаг процесса частицы
+ @property component - Компонент частицы
+ @property update - Обновление частицы
+ @property _updateExternal - Обновление частицы из вне
+ @property onUpdate - Обработчик обновления частицы
+ @property onTransition - Обработчик перехода частицы
+ @property snapshot - Снимок частицы
+ @property graph - Граф частицы
+ @property destroy - Уничтожение частицы
  */
 export declare class Particle<S extends string, C extends Record<string, any>, I extends Record<string, any>> {
   id: string
@@ -143,4 +140,3 @@ export declare class Particle<S extends string, C extends Record<string, any>, I
   graph: () => Promise<any>
   destroy: () => void
 }
-

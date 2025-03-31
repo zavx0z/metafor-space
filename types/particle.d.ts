@@ -1,5 +1,9 @@
 import type { ContextData, ContextDefinition } from "./context"
 import type { Transitions } from "./transitions"
+import type { Actions } from "./actions"
+import type { CoreData, CoreDefinition } from "./core"
+import type { ReactionType } from "./reaction"
+import type { Particle } from "../index"
 
 /**
  Снимок состояния частицы
@@ -65,4 +69,43 @@ export type Patch = {
   path: string
   op: "add" | "remove" | "replace" | "move" | "copy" | "test"
   value: any
+}
+
+/**
+ Параметры конструктора Particle
+
+ @template S - Тип состояний
+ @template C - Тип контекста
+ @template I - Тип действий
+
+ @property channel - Канал для коммуникации
+ @property id - Идентификатор частицы
+ @property states - Список возможных состояний
+ @property contextDefinition - Определение контекста
+ @property transitions - Правила переходов
+ @property initialState - Начальное состояние
+ @property contextData - Начальные данные контекста
+ @property actions - Действия частицы
+ @property core - Определение ядра
+ @property coreData - Данные ядра
+ @property reactions - Реакции на изменения
+ @property onTransition - Callback при изменении состояния
+ @property onUpdate - Callback при изменении контекста
+ @property destroy - Callback при уничтожении частицы
+ */
+export type ParticleConstructorParams<S extends string, C extends ContextDefinition, I extends Record<string, any>> = {
+  channel: BroadcastChannel
+  id: string
+  states: S[]
+  contextDefinition: ContextDefinition
+  transitions: Transitions<C, S>
+  initialState: S
+  contextData: ContextData<C>
+  actions: Actions<C, I>
+  core: CoreDefinition<I, C>
+  coreData: CoreData<I>
+  reactions: ReactionType<C, I>
+  onTransition?: (oldState: S, newState: S, particle: Particle<S, C, I>) => void
+  onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
+  destroy?: (particle: Particle<S, C, I>) => void
 }

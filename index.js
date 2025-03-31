@@ -3,7 +3,7 @@
  */
 /**
  * @template {ContextDefinition} C
- * @typedef {import("./types/metafor").UpdateContextParams<C>} UpdateContextParams<C>
+ * @typedef {import("./types/context").UpdateContextParams<C>} UpdateContextParams<C>
  */
 /**
  * @template {Record<string, any>} I
@@ -27,7 +27,7 @@ export class Particle {
     return this.$state.value()
   }
 
-  /** @param {import('./types/metafor').ParticleConstructorParams<S, C, I>} params */ // prettier-ignore
+  /** @param {import('./types/particle').ParticleConstructorParams<S, C, I>} params */ // prettier-ignore
   constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, actions, core, coreData, reactions, onTransition, onUpdate, destroy }) {
     this.channel = channel
     this.id = id
@@ -270,7 +270,8 @@ export class Particle {
     }
   }
 
-  /** @template T
+  /**
+   * @template T
    * @param {T} value
    * @returns {import('./types/state').SignalType<T>} */
   #createSignal(value) {
@@ -292,9 +293,7 @@ export class Particle {
         listeners.add(listener)
         return () => listeners.delete(listener)
       },
-      clear: () => {
-        listeners.clear()
-      },
+      clear: listeners.clear,
     }
   }
 }
@@ -369,7 +368,7 @@ export function MetaFor(tag, conf = {}) {
                           return {
                             create: (options) => {
                               const particle = createParticle({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions: []})
-                              
+
                               if (view.isolated === undefined) view.isolated = true
                               if (options.view?.isolated === false) view.isolated = false
                               import("./web/component.js").then((module) => module.default({ view, particle }))
@@ -392,7 +391,7 @@ export function MetaFor(tag, conf = {}) {
 }
 
 /**
- * @template {string} S - состояние 
+ * @template {string} S - состояние
  * @template {import('./types/context').ContextDefinition} C - контекст
  * @template {Record<string, any>} I - ядро
  * @param {import("./types/create.js").FabricCallbackCreateFuncHelper<S, C, I>} parameters
