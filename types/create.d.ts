@@ -1,6 +1,9 @@
 import type { ContextData, ContextDefinition, PartialContextData } from "./context"
-import type { CoreData } from "./core"
+import type { CoreData, CoreDefinition } from "./core"
 import type { Particle } from "../index"
+import type { Transitions } from "./transitions"
+import type { Actions } from "./actions"
+import type { ReactionType } from "./reaction"
 
 /**
  Опции создания частицы в коллбеке create
@@ -41,14 +44,15 @@ export type FabricCallbackCreateProps<C extends ContextDefinition, S extends str
   }
   /** Начальные данные ядра */
   core?: CoreData<I>
-  /** 
-   Опции отладки 
-   
-   Принимает либо булевый флаг, либо объект с хостом и портом.
-   Если булевый флаг true, то будет использоваться дефолтный хост и порт.
-   Если объект, то будет использоваться указанный хост и порт.
-   По умолчанию хост - localhost, порт - 3000.
-  */
+  /**
+     Опции отладки
+
+     Принимает либо булевый флаг, либо объект с хостом и портом:
+
+     - Если булевый флаг true, то будет использоваться дефолтный хост и порт.
+     - Если объект, то будет использоваться указанный хост и порт.
+     По умолчанию хост - localhost, порт - 3000.
+     */
   debug?:
     | boolean
     | {
@@ -60,8 +64,56 @@ export type FabricCallbackCreateProps<C extends ContextDefinition, S extends str
 
   /** Опции визуализации графа */
   graph?: boolean
-  /** Обработчик смены состояния */
+  /**
+   Обработчик смены состояния
+
+   @param oldState - Старое состояние
+   @param newState - Новое состояние
+   @param particle - Частица
+   */
   onTransition?: (oldState: S, newState: S, particle: Particle<S, C, I>) => void
-  /** Обработчик обновления контекста */
+  /**
+   Обработчик обновления контекста 
+   
+   @param context - Контекст частицы
+   @param srcName - Имя функции, которая вызвала обновление
+   @param funcName - Имя функции, которая вызвала обновление
+   */
   onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
+}
+
+/**
+ Параметры для функции используемой в коллбеке create
+ @hidden
+
+ @template C - контекст
+ @template S - состояние
+ @template I - core
+
+ @property development - режим разработки
+ @property description - описание
+ @property tag - тег
+ @property options - опции
+ @property states - состояния
+ @property contextDefinition - определение контекста
+ @property transitions - переходы
+ @property actions - действия
+ @property coreDefinition - определение ядра
+ @property reactions - реакции
+ */
+export type FabricCallbackCreateFuncHelper<
+  S extends string,
+  C extends ContextDefinition,
+  I extends Record<string, any>
+> = {
+  development?: boolean
+  description?: string
+  tag: string
+  options: FabricCallbackCreateProps<C, S, I>
+  states: S[]
+  contextDefinition: ContextDefinition
+  transitions: Transitions<C, S>
+  actions: Actions<C, I>
+  coreDefinition: CoreDefinition<I, C>
+  reactions: ReactionType<C, I>
 }
