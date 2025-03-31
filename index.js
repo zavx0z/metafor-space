@@ -1,19 +1,13 @@
+/** @typedef {import("./types/context").ContextDefinition} ContextDefinition */
 /**
- * @typedef {import("./types/context").ContextDefinition} ContextDefinition
- */
-/**
- * @template {ContextDefinition} C
- * @typedef {import("./types/context").UpdateContextParams<C>} UpdateContextParams<C>
- */
-/**
- * @template {Record<string, any>} I
- * @typedef {import("./types/core").Core<I>} Core
+ @template {Record<string, any>} I
+ @typedef {import("./types/core").Core<I>} Core
  */
 
 /**
- * @template {string} S - состояние
- * @template {ContextDefinition} C - контекст
- * @template {Record<string, any>} I - ядро
+ @template {string} S - состояние
+ @template {ContextDefinition} C - контекст
+ @template {Record<string, any>} I - ядро
  */
 export class Particle {
   title = ""
@@ -181,7 +175,7 @@ export class Particle {
   }
 
   /**  Обновление контекста из внешнего источника (core, reaction)
-   * @param {UpdateContextParams<C>} params - параметры обновления контекста */
+   * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста */
   _updateExternal = ({ context, srcName = "core", funcName = "unknown" }) => {
     const updCtx = this.#updateContext({ context, srcName, funcName })
     if (updCtx && !this.process) this.#transition()
@@ -200,7 +194,7 @@ export class Particle {
     else finallyFn()
   }
 
-  /** @param {UpdateContextParams<C>} params */
+  /** @param {import("./types/context").UpdateContextParams<C>} params */
   #updateContext = ({ context, srcName = "unknown", funcName = "unknown" }) => {
     const updCtx = Object.keys(context).reduce((acc, /** @type {keyof C} */ key) => {
       if (this.context[key] !== context[key]) {
@@ -231,16 +225,16 @@ export class Particle {
   #updateListeners = new Set()
 
   /** Уведомления об изменении значений контекста
-   * @param {(values: import('./types/context.d.ts').OnUpdateContextData<C>) => void} listener - функция которая будет вызываться при изменении значений контекста
-   * @returns {() => void} функция для отписки от уведомлений */
+    @param {(values: import('./types/context.d.ts').OnUpdateContextData<C>) => void} listener - функция которая будет вызываться при изменении значений контекста
+    @returns {() => void} функция для отписки от уведомлений */
   onUpdate(listener) {
     this.#updateListeners.add(listener)
     return () => this.#updateListeners.delete(listener)
   }
 
   /** Уведомления о переходах между состояниями
-   * @param {(oldState: S, newState: S) => void} listener
-   * @returns {() => void} */
+    @param {(oldState: S, newState: S) => void} listener
+    @returns {() => void} */
   onTransition = (listener) =>
     this.$state.onChange((oldValue, newValue) => {
       if (newValue !== undefined) listener(oldValue, newValue)
@@ -271,9 +265,9 @@ export class Particle {
   }
 
   /**
-   * @template T
-   * @param {T} value
-   * @returns {import('./types/state').SignalType<T>} */
+   @template T
+   @param {T} value
+   @returns {import('./types/state').SignalType<T>} */
   #createSignal(value) {
     const listeners = new Set()
     return {
@@ -300,8 +294,8 @@ export class Particle {
 
 let devChannel = null
 /**
- * Установка канала для разработки
- * @param {BroadcastChannel} channel - Канал для разработки
+ Установка канала для разработки
+ @param {BroadcastChannel} channel - Канал для разработки
  */
 const setDevChannel = (channel) => {
   devChannel = channel
@@ -391,11 +385,11 @@ export function MetaFor(tag, conf = {}) {
 }
 
 /**
- * @template {string} S - состояние
- * @template {import('./types/context').ContextDefinition} C - контекст
- * @template {Record<string, any>} I - ядро
- * @param {import("./types/create.js").FabricCallbackCreateFuncHelper<S, C, I>} parameters
- * */ // prettier-ignore
+ @template {string} S - состояние
+ @template {import('./types/context').ContextDefinition} C - контекст
+ @template {Record<string, any>} I - ядро
+ @param {import("./types/create.js").FabricCallbackCreateFuncHelper<S, C, I>} parameters
+ */ // prettier-ignore
 const createParticle = ({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions=[]}) => {
   development && import("./validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
@@ -408,11 +402,10 @@ const createParticle = ({development, description, tag, options, states, context
 }
 
 /**
- * @template {import('./types/context').ContextDefinition} C
- *
- * @param {import('./types/transitions.js').TriggerType<C>} trigger
- * @param {import('./types/context').ContextData<C>} context
- * @param {import('./types/context').ContextDefinition} types
+ @template {import('./types/context').ContextDefinition} C
+ @param {import('./types/transitions.js').TriggerType<C>} trigger
+ @param {import('./types/context').ContextData<C>} context
+ @param {import('./types/context').ContextDefinition} types
  */
 export function matchTrigger(trigger, context, types) {
   for (const key in trigger) {
@@ -516,13 +509,12 @@ const pattern = {
 }
 
 /**
- * Парсит функцию и извлекает читаемые и обновляемые свойства контекста
- * @typedef {Object} ParsedResult
- * @property {string[]} read - Список читаемых свойств контекста
- * @property {string[]} write - Список обновляемых свойств контекста
- *
- * @param {Function} func - Функция для анализа
- * @returns {ParsedResult} Результат парсинга
+ Парсит функцию и извлекает читаемые и обновляемые свойства контекста
+ @typedef {Object} ParsedResult
+ @property {string[]} read - Список читаемых свойств контекста
+ @property {string[]} write - Список обновляемых свойств контекста
+ @param {Function} func - Функция для анализа
+ @returns {ParsedResult} Результат парсинга
  */
 export function parseFunction(func) {
   const code = func.toString()
@@ -562,9 +554,9 @@ export function parseFunction(func) {
 }
 
 /**
- * Парсит все функции объекта (действия или ядро)
- * @param {Record<string, Function>} funcs - Объект с функциями
- * @returns {Record<string, ParsedResult>} Результаты парсинга для каждой функции
+ Парсит все функции объекта (действия или ядро)
+ @param {Record<string, Function>} funcs - Объект с функциями
+ @returns {Record<string, ParsedResult>} Результаты парсинга для каждой функции
  */
 export const parseFunctions = (funcs) =>
   Object.entries(funcs).reduce((/** @type {Record<string, ParsedResult>} */ acc, [name, func]) => {
