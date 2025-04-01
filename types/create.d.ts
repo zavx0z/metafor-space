@@ -23,7 +23,7 @@ import type { ReactionType } from "./reaction"
  })
  ```
  */
-export type FabricCallbackCreateProps<C extends ContextDefinition, S extends string, I extends Record<string, any>> = {
+export type CreateParams<C extends ContextDefinition, S extends string, I extends Record<string, any>> = {
   /** Метаданные частицы */
   meta?: {
     /** Имя частицы */
@@ -109,7 +109,7 @@ export type FabricCallbackCreateFuncHelper<
   development?: boolean
   description?: string
   tag: string
-  options: FabricCallbackCreateProps<C, S, I>
+  options: CreateParams<C, S, I>
   states: S[]
   contextDefinition: ContextDefinition
   transitions: Transitions<C, S>

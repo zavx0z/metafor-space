@@ -11,7 +11,7 @@ import type { Actions } from "./types/actions"
 import type { ReactionType } from "./types/reaction"
 import type { ViewDefinition } from "./types/view"
 
-import type { FabricCallbackCreateProps } from "./types/create"
+import type { CreateParams } from "./types/create"
 import type { ParticleConstructorParams, Snapshot } from "./types/particle"
 
 /**
@@ -70,14 +70,14 @@ export declare function MetaFor(
           actions: (actions: Actions<C, I>) => {
             reactions: (reactions: ReactionType<C, I>) => {
               view: (view: ViewDefinition<I, C, S>) => {
-                create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+                create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
               }
-              create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+              create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
             }
             view: (view: ViewDefinition<I, C, S>) => {
-              create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+              create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
             }
-            create: (data: FabricCallbackCreateProps<C, S, I>) => Particle<S, C, I>
+            create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
           }
         }
       }

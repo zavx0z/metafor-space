@@ -142,7 +142,7 @@ export function validateCore({ tag, core }) {
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Идентификатор частицы
- @param {import('../types/create').FabricCallbackCreateProps<any, any, any>} params.options Конфигурация инстанса частицы
+ @param {import('../types/create').CreateParams<any, any, any>} params.options Конфигурация инстанса частицы
  @param {string[]} params.states Состояния частицы
  @throws {Error} Если найдены ошибки в конфигурации частицы
  */
