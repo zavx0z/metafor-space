@@ -37,11 +37,12 @@
     "@happy-dom/global-registrator": "17.3.0",
     "@types/bun": "latest",
     "happy-dom": "^17.4.4",
-    "puppeteer": "^24.4.0",
-    "typedoc": "^0.28.1"
+    "puppeteer": "^24.5.0",
+    "typedoc": "0.28.1",
+    "typedoc-plugin-include-example": "^2.0.2"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.8.2"
   },
   "scripts": {
     "publish-pkg": "bun publish --access public",
@@ -75,6 +76,9 @@
   "typedocOptions": {
     "entryPoints": [
       "./types/index.d.ts"
+    ],
+    "plugin": [
+      "typedoc-plugin-include-example"
     ],
     "out": "docs",
     "name": "MetaFor",
