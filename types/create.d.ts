@@ -1,6 +1,6 @@
 import type { ContextData, ContextDefinition, PartialContextData } from "./context"
 import type { CoreData, CoreDefinition } from "./core"
-import type { Particle } from "../index"
+import type { Meta } from "../index"
 import type { Transitions } from "./transitions"
 import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"
@@ -71,7 +71,7 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
    @param newState - Новое состояние
    @param particle - Частица
    */
-  onTransition?: (oldState: S, newState: S, particle: Particle<S, C, I>) => void
+  onTransition?: (oldState: S, newState: S, particle: Meta<S, C, I>) => void
   /**
    Обработчик обновления контекста 
    

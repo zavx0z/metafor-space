@@ -1,11 +1,11 @@
 import type {
-  ArrayDefinition,
-  BooleanDefinition,
-  ContextDefinition,
-  NumberDefinition,
-  NumberEnumDefinition,
-  StringDefinition,
-  StringEnumDefinition,
+    ArrayDefinition,
+    BooleanDefinition,
+    ContextDefinition,
+    NumberDefinition,
+    NumberEnumDefinition,
+    StringDefinition,
+    StringEnumDefinition,
 } from "./context"
 
 /**
@@ -48,18 +48,26 @@ export type Transitions<C extends ContextDefinition, S> = Array<Transition<C, S>
  @template S - Тип состояния
  */
 export type Transition<C extends ContextDefinition, S> = {
-  /**
-   * Исходное состояние
-   */
-  from: S
-  /**
-   * Действие, выполняемое при переходе
-   */
-  action?: string
-  /**
-   * Набор целевых состояний с условиями триггеров
-   */
-  to: TransitionTo<C, S>[]
+    /**
+     Исходное состояние
+
+     Состояние, находясь в котором, производится проверка условий перехода для целевых состояний.
+     */
+    from: S
+    /**
+     Действие, выполняемое при входе в состояние
+
+     Действие, выполняется при входе в состояние, указанное в `from`.
+
+     @default undefined
+     */
+    action?: string
+    /**
+     Набор целевых состояний с условиями перехода
+
+     Набор целевых состояний, в которые возможен переход из состояния, указанного в `from`.
+     */
+    to: TransitionTo<C, S>[]
 }
 
 /**
@@ -69,14 +77,14 @@ export type Transition<C extends ContextDefinition, S> = {
  @template S - Тип состояния
  */
 export type TransitionTo<C extends ContextDefinition, S> = {
-  /**
-   * Целевое состояние
-   */
-  state: S
-  /**
-   * Условия триггера для перехода
-   */
-  trigger: TriggerType<C>
+    /**
+     Целевое состояние
+     */
+    state: S
+    /**
+     Условия триггера для перехода
+     */
+    trigger: TriggerType<C>
 }
 
 /**
@@ -85,129 +93,136 @@ export type TransitionTo<C extends ContextDefinition, S> = {
  @template C - Тип определения контекста
  */
 export type TriggerType<C extends ContextDefinition> = Partial<{
-  [K in keyof C]: C[K] extends StringEnumDefinition<infer V>
-    ? EnumTriggerCondition<V>
-    : C[K] extends NumberEnumDefinition<infer V>
-    ? EnumTriggerCondition<V>
-    : C[K] extends StringDefinition
-    ? StringTriggerCondition
-    : C[K] extends NumberDefinition
-    ? NumberTriggerCondition
-    : C[K] extends BooleanDefinition
-    ? BooleanTriggerCondition
-    : C[K] extends ArrayDefinition
-    ? any[] | { length: NumberTriggerCondition }
-    : never
+    [K in keyof C]: C[K] extends StringEnumDefinition<infer V>
+        ? EnumTriggerCondition<V>
+        : C[K] extends NumberEnumDefinition<infer V>
+            ? EnumTriggerCondition<V>
+            : C[K] extends StringDefinition
+                ? StringTriggerCondition
+                : C[K] extends NumberDefinition
+                    ? NumberTriggerCondition
+                    : C[K] extends BooleanDefinition
+                        ? BooleanTriggerCondition
+                        : C[K] extends ArrayDefinition
+                            ? any[] | { length: NumberTriggerCondition }
+                            : never
 }>
 
 /**
  Условия триггера для булевых значений
 
- @property isNull - Является ли значение null
- @property eq - Равно указанному булеву значению
- @property notEq - Не равно указанному булеву значению
- @property logicalEq - Логическое равенство
- @property notNull - Не является ли значение null
+ | Параметр   | Тип     | Описание                           |
+ | ---------- | ------- | ---------------------------------- |
+ | isNull     | boolean | Является ли значение null          |
+ | eq         | boolean | Равно указанному булеву значению   |
+ | notEq      | boolean | Не равно указанному булеву значению|
+ | logicalEq  | boolean | Логическое равенство               |
+ | notNull    | boolean | Не является ли значение null       |
  */
 export type BooleanTriggerCondition =
-  | boolean
-  | null
-  | {
-      isNull?: boolean
-      eq?: boolean
-      notEq?: boolean
-      logicalEq?: boolean
-      notNull?: boolean
-    }
+    | boolean
+    | null
+    | {
+    isNull?: boolean
+    eq?: boolean
+    notEq?: boolean
+    logicalEq?: boolean
+    notNull?: boolean
+}
 
 /**
  Условия триггера для enum
 
+ | Параметр  | Тип         | Описание                       |
+ | --------- | ----------- | ------------------------------ |
+ | isNull    | boolean     | Является ли значение null      |
+ | eq        | E[number]   | Равно указанному значению      |
+ | notEq     | E[number]   | Не равно указанному значению   |
+ | oneOf     | E[number][] | Одно из указанных значений     |
+ | notOneOf  | E[number][] | Не одно из указанных значений  |
+
  @template E - Тип значений enum
- @property isNull - Является ли значение null
- @property eq - Равно указанному значению
- @property notEq - Не равно указанному значению
- @property oneOf - Одно из указанных значений
- @property notOneOf - Не одно из указанных значений
  */
 export type EnumTriggerCondition<E extends readonly (string | number)[]> =
-  | E[number]
-  | null
-  | {
-      isNull?: boolean
-      eq?: E[number]
-      notEq?: E[number]
-      oneOf?: E[number][]
-      notOneOf?: E[number][]
-    }
+    | E[number]
+    | null
+    | {
+    isNull?: boolean
+    eq?: E[number]
+    notEq?: E[number]
+    oneOf?: E[number][]
+    notOneOf?: E[number][]
+}
 
 /**
  Условия триггера для строк
 
- @property isNull - Является ли значение null
- @property startsWith - Начинается ли с указанной строки
- @property endsWith - Заканчивается ли на указанную строку
- @property include - Включает ли указанную подстроку
- @property pattern - Шаблон регулярного выражения
- @property eq - Равно указанной строке
- @property notEq - Не равно указанной строке
- @property notInclude - Не включает указанную подстроку
- @property notStartsWith - Не начинается с указанной строки
- @property notEndsWith - Не заканчивается на указанную строку
- @property length - Длина строки
- @property between - Должна быть между двумя строками
+ | Параметр       | Тип                                  | Описание                              |
+ | -------------- | ------------------------------------ | ------------------------------------- |
+ | isNull         | boolean                              | Является ли значение null             |
+ | startsWith     | string                               | Начинается ли с указанной строки      |
+ | endsWith       | string                               | Заканчивается ли на указанную строку  |
+ | include        | string                               | Включает ли указанную подстроку       |
+ | pattern        | RegExp                               | Шаблон регулярного выражения          |
+ | eq             | string                               | Равно указанной строке                |
+ | notEq          | string                               | Не равно указанной строке             |
+ | notInclude     | string                               | Не включает указанную подстроку       |
+ | notStartsWith  | string                               | Не начинается с указанной строки      |
+ | notEndsWith    | string                               | Не заканчивается на указанную строку  |
+ | length         | number \| { min?: number; max?: number } | Длина строки                      |
+ | between        | [string, string]                     | Должна быть между двумя строками      |
  */
 export type StringTriggerCondition =
-  | string
-  | RegExp
-  | null
-  | {
-      isNull?: boolean
-      startsWith?: string
-      endsWith?: string
-      include?: string
-      pattern?: RegExp
-      eq?: string
-      notEq?: string
-      notInclude?: string
-      notStartsWith?: string
-      notEndsWith?: string
-      length?: number | { min?: number; max?: number }
-      between?: [string, string]
-    }
+    | string
+    | RegExp
+    | null
+    | {
+    isNull?: boolean
+    startsWith?: string
+    endsWith?: string
+    include?: string
+    pattern?: RegExp
+    eq?: string
+    notEq?: string
+    notInclude?: string
+    notStartsWith?: string
+    notEndsWith?: string
+    length?: number | { min?: number; max?: number }
+    between?: [string, string]
+}
 
 /**
  Условия триггера для чисел
 
- @property isNull - Является ли значение null
- @property eq - Равно указанному числу
- @property gt - Больше указанного числа
- @property gte - Больше или равно указанному числу
- @property lt - Меньше указанного числа
- @property lte - Меньше или равно указанному числу
- @property notEq - Не равно указанному числу
- @property notGt - Не больше указанного числа
- @property notGte - Не больше или равно указанному числу
- @property notLt - Не меньше указанного числа
- @property notLte - Не меньше или равно указанному числу
- @property min - Минимальное значение
- @property max - Максимальное значение
- @property between - Должно быть между двумя числами
+ | Параметр | Тип              | Описание                              |
+ | -------- | ---------------- | ------------------------------------- |
+ | isNull   | boolean          | Является ли значение null             |
+ | eq       | number           | Равно указанному числу                |
+ | gt       | number           | Больше указанного числа               |
+ | gte      | number           | Больше или равно указанному числу     |
+ | lt       | number           | Меньше указанного числа               |
+ | lte      | number           | Меньше или равно указанному числу     |
+ | notEq    | number           | Не равно указанному числу             |
+ | notGt    | number           | Не больше указанного числа            |
+ | notGte   | number           | Не больше или равно указанному числу  |
+ | notLt    | number           | Не меньше указанного числа            |
+ | notLte   | number           | Не меньше или равно указанному числу  |
+ | between  | [number, number] | Должно быть между двумя числами       |
  */
 export type NumberTriggerCondition =
-  | number
-  | null
-  | {
-      isNull?: boolean
-      eq?: number
-      gt?: number
-      gte?: number
-      lt?: number
-      lte?: number
-      notEq?: number
-      notGt?: number
-      notGte?: number
-      notLt?: number
-      notLte?: number
-      between?: [number, number]
-    }
+    | number
+    | null
+    | {
+    isNull?: boolean
+    eq?: number
+    gt?: number
+    gte?: number
+    lt?: number
+    lte?: number
+    notEq?: number
+    notGt?: number
+    notGte?: number
+    notLt?: number
+    notLte?: number
+    between?: [number, number]
+}

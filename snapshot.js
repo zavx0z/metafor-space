@@ -1,4 +1,4 @@
-import { Particle } from "./index.js"
+import { Meta } from "./index.js"
 
 /**
  @param {Record<string, any>} snapshot
@@ -18,12 +18,12 @@ export function validateSnapshot(snapshot) {
  @template {Record<string, unknown>} I
 
  @param {Record<string, any>} snapshot
- @returns {import('./index.js').Particle<S, C, I>}
+ @returns {import('./index.js').Meta<S, C, I>}
  */
 export function ParticleFromSnapshot(snapshot) {
   validateSnapshot(snapshot)
   const channel = new BroadcastChannel("channel")
-  return new Particle({
+  return new Meta({
     channel,
     id: snapshot.id,
     states: snapshot.states,

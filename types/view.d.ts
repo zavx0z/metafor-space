@@ -1,4 +1,4 @@
-import type { Particle } from "../index"
+import type { Meta } from "../index"
 import type { ContextData, ContextDefinition, Update } from "./context"
 import type { Core, CoreObj } from "./core"
 
@@ -44,7 +44,7 @@ export type ConditionsMap = Map<string | number, Condition>
  */
 export type ComponentParams<I extends CoreObj, C extends ContextDefinition, S extends string> = {
   view: ViewDefinition<I, C, S>
-  particle: Particle<S, C, I>
+  particle: Meta<S, C, I>
 }
 
 /**

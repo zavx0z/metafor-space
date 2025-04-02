@@ -3,7 +3,7 @@ import type { Transitions } from "./transitions"
 import type { Actions } from "./actions"
 import type { CoreData, CoreDefinition } from "./core"
 import type { ReactionType } from "./reaction"
-import type { Particle } from "../index"
+import type { Meta } from "../index"
 
 /**
  Снимок состояния частицы
@@ -93,7 +93,7 @@ export type Patch = {
  @property onUpdate - Callback при изменении контекста
  @property destroy - Callback при уничтожении частицы
  */
-export type ParticleConstructorParams<S extends string, C extends ContextDefinition, I extends Record<string, any>> = {
+export type MetaConstructor<S extends string, C extends ContextDefinition, I extends Record<string, any>> = {
   channel: BroadcastChannel
   id: string
   states: S[]
@@ -105,7 +105,7 @@ export type ParticleConstructorParams<S extends string, C extends ContextDefinit
   core: CoreDefinition<I, C>
   coreData: CoreData<I>
   reactions: ReactionType<C, I>
-  onTransition?: (oldState: S, newState: S, particle: Particle<S, C, I>) => void
+  onTransition?: (oldState: S, newState: S, particle: Meta<S, C, I>) => void
   onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
-  destroy?: (particle: Particle<S, C, I>) => void
+  destroy?: (particle: Meta<S, C, I>) => void
 }

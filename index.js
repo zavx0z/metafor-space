@@ -1,14 +1,9 @@
 /**
- @template {Record<string, any>} I
- @typedef {import("./types/core").Core<I>} Core
- */
-
-/**
  @template {string} S - состояние
  @template {import("./types/context").ContextDefinition} C - контекст
  @template {Record<string, any>} I - ядро
  */
-export class Particle {
+export class Meta {
   title = ""
   description = ""
   graph = /** @type {() => Promise<any>} */ () => Promise.resolve(/** @type {any} */ (undefined))
@@ -20,7 +15,7 @@ export class Particle {
     return this.$state.value()
   }
 
-  /** @param {import('./types/particle').ParticleConstructorParams<S, C, I>} params */ // prettier-ignore
+  /** @param {import('./types/meta').MetaConstructor<S, C, I>} params */ // prettier-ignore
   constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, actions, core, coreData, reactions, onTransition, onUpdate, destroy }) {
     this.channel = channel
     this.id = id
@@ -34,7 +29,7 @@ export class Particle {
       this.$state.clear()
       this.types = {}
       this.context = {}
-      this.core = /** @type {Core<I>} */ ({})
+      this.core = /** @type {import("./types/core").Core<I>} */ ({})
       this.actions = {}
       this.transitions.length = 0
       this.reactions.length = 0
@@ -61,9 +56,9 @@ export class Particle {
       })
     if (onUpdate) this.onUpdate(onUpdate)
 
-    this.core = /** @type {Core<I>} */ ((() => {
+    this.core = /** @type {import("./types/core").Core<I>} */ ((() => {
       let /** @type {string | null} */ currentCaller = null
-      const self = /** @type {Core<I>} */ ({})
+      const self = /** @type {import("./types/core").Core<I>} */ ({})
       const coreObj = core({ update: (ctx) => this._updateExternal({ context: ctx, srcName: "core", funcName: currentCaller || "unknown" }), context: this.context, self })
       // Прокси для self, для синхронизации значений
       Object.entries(coreObj).forEach(([key, value]) => {
@@ -109,7 +104,7 @@ export class Particle {
 
     this.actions = actions
     this.reactions = reactions
-    // TODO: при восстановлении частицы входить в состояние без вызова действия
+    // TODO: при восстановлении входить в состояние без вызова действия
     this.process = true
     this.channel.postMessage({
       meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
@@ -180,7 +175,7 @@ export class Particle {
     if (updCtx && !this.process) this.#transition()
   }
 
-  /** @param {import('./types/actions.js').Action<C, I>} action */
+  /** @param {import('./types/actions').Action<C, I>} action */
   #runAction(action) {
     this.process = true
     const result = action({
@@ -205,7 +200,7 @@ export class Particle {
     if (Object.keys(updCtx).length > 0) {
       this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
       this.channel.postMessage(
-        /** @type {import('./types/particle').BroadcastMessage} */ ({
+        /** @type {import('./types/meta.js').BroadcastMessage} */ ({
           meta: { particle: this.id, func: funcName, target: srcName, timestamp: Date.now() },
           patch: { path: `/context`, op: "replace", value: updCtx },
         })
@@ -214,7 +209,7 @@ export class Particle {
     return updCtx
   }
 
-  /** @type {import('./types/context.d.ts').Update<C>} */
+  /** @type {import('./types/context').Update<C>} */
   update = (context) => {
     this.#updateContext({ context })
     if (this.process) return undefined
@@ -224,7 +219,7 @@ export class Particle {
   #updateListeners = new Set()
 
   /** Уведомления об изменении значений контекста
-    @param {(values: import('./types/context.d.ts').OnUpdateContextData<C>) => void} listener - функция которая будет вызываться при изменении значений контекста
+    @param {(values: import('./types/context').OnUpdateContextData<C>) => void} listener - функция которая будет вызываться при изменении значений контекста
     @returns {() => void} функция для отписки от уведомлений */
   onUpdate(listener) {
     this.#updateListeners.add(listener)
@@ -239,7 +234,7 @@ export class Particle {
       if (newValue !== undefined) listener(oldValue, newValue)
     })
 
-  /** @returns {import('./types/particle').Snapshot<C, S>} */
+  /** @returns {import('./types/meta.js').Snapshot<C, S>} */
   snapshot() {
     const parsedActions = parseFunctions(this.actions)
     return {
@@ -393,7 +388,7 @@ const createParticle = ({development, description, tag, options, states, context
   development && import("./validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
   const channel = new BroadcastChannel("channel")
-  const particle = new Particle({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, actions, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
+  const particle = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, actions, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
   particle.description = description || options.description || ""
   if (graph) particle.graph = () => import("./web/graph.js").then((module) => module.default(particle))
   if (debug) import("./debug.js").then((module) => module.default(particle, debug))

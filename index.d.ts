@@ -12,7 +12,7 @@ import type { ReactionType } from "./types/reaction"
 import type { ViewDefinition } from "./types/view"
 
 import type { CreateParams } from "./types/create"
-import type { ParticleConstructorParams, Snapshot } from "./types/particle"
+import type { MetaConstructor, Snapshot } from "./types/meta"
 
 /**
  # Фабрика частиц (Акторов)
@@ -70,14 +70,14 @@ export declare function MetaFor(
           actions: (actions: Actions<C, I>) => {
             reactions: (reactions: ReactionType<C, I>) => {
               view: (view: ViewDefinition<I, C, S>) => {
-                create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
+                create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
               }
-              create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
+              create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
             }
             view: (view: ViewDefinition<I, C, S>) => {
-              create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
+              create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
             }
-            create: (data: CreateParams<C, S, I>) => Particle<S, C, I>
+            create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
           }
         }
       }
@@ -86,7 +86,7 @@ export declare function MetaFor(
 }
 
 /**
- Интерфейс частицы
+ Meta -
 
  @template S - Состояния
  @template C - Контекст
@@ -114,7 +114,7 @@ export declare function MetaFor(
  @property graph - Граф частицы
  @property destroy - Уничтожение частицы
  */
-export declare class Particle<S extends string, C extends Record<string, any>, I extends Record<string, any>> {
+export declare class Meta<S extends string, C extends Record<string, any>, I extends Record<string, any>> {
   id: string
   title?: string
   description?: string
@@ -130,7 +130,7 @@ export declare class Particle<S extends string, C extends Record<string, any>, I
   process: boolean
   component: Element
 
-  constructor(params: ParticleConstructorParams<S, C, I>)
+  constructor(params: MetaConstructor<S, C, I>)
 
   update: (context: UpdateParameters<C>) => void
   _updateExternal: (params: { context: UpdateParameters<C>; srcName?: string; funcName?: string }) => void
