@@ -67,7 +67,7 @@ export type Transition<C extends ContextDefinition, S> = {
 
      Набор целевых состояний, в которые возможен переход из состояния, указанного в `from`.
      */
-  to: TransitionTo<C, S>[]
+  to: To<C, S>[]
 }
 
 /**
@@ -76,7 +76,7 @@ export type Transition<C extends ContextDefinition, S> = {
  @template C - Тип данных контекста
  @template S - Тип состояния
  */
-export type TransitionTo<C extends ContextDefinition, S> = {
+type To<C extends ContextDefinition, S> = {
   /**
      Целевое состояние
      */
