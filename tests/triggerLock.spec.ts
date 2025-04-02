@@ -13,14 +13,14 @@ test("блокировка триггеров перед входом в нов�
       {
         from: "INIT",
         action: "initAction",
-        to: [{ state: "PROCESS", trigger: { value: { gt: 10 } } }],
+        to: [{ state: "PROCESS", when: { value: { gt: 10 } } }],
       },
       {
         from: "PROCESS",
         action: "syncAction",
         to: [
-          { state: "DONE", trigger: { value: { gt: 14 } } },
-          { state: "INIT", trigger: { value: { lt: 4 } } },
+          { state: "DONE", when: { value: { gt: 14 } } },
+          { state: "INIT", when: { value: { lt: 4 } } },
         ],
       },
     ])
@@ -64,7 +64,7 @@ test("блокировка триггеров для асинхронного д
         to: [
           {
             state: "DONE",
-            trigger: { value: { gt: 10 } },
+              when: { value: { gt: 10 } },
           },
         ],
       },
@@ -101,7 +101,7 @@ test("снятие блокировки после действия", async () =
         to: [
           {
             state: "DONE",
-            trigger: { value: { gt: 10 } },
+            when: { value: { gt: 10 } },
           },
         ],
       },

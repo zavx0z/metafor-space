@@ -14,18 +14,18 @@ describe("Сериализация и десериализация частиц�
     .transitions([
       {
         from: "IDLE",
-        to: [{ state: "RUNNING", trigger: { url: { include: "https" }, retries: { gt: 0, lt: 5 } } }],
+        to: [{ state: "RUNNING", when: { url: { include: "https" }, retries: { gt: 0, lt: 5 } } }],
       },
       {
         from: "RUNNING",
         to: [
-          {state: "SUCCESS", trigger: {isComplete: "true"}},
-          {state: "ERROR", trigger: {errorCode: {gt: 400, lt: 599}}}
+          {state: "SUCCESS", when: {isComplete: "true"}},
+          {state: "ERROR", when: {errorCode: {gt: 400, lt: 599}}}
         ]
       },
       {
         from: "ERROR",
-        to: [{state: "IDLE", trigger: {retries: {gt: 0, lt: 5}}}]
+        to: [{state: "IDLE", when: {retries: {gt: 0, lt: 5}}}]
       }
     ])
     .core(({update, context}) => ({
@@ -78,13 +78,13 @@ describe("Сериализация и десериализация частиц�
     .transitions([
       {
         from: "IDLE",
-        to: [{ state: "RUNNING", trigger: { url: { include: "https" }, retries: { gt: 0, lt: 5 } } }],
+        to: [{ state: "RUNNING", when: { url: { include: "https" }, retries: { gt: 0, lt: 5 } } }],
       },
       {
         from: "RUNNING",
         to: [
-          {state: "SUCCESS", trigger: {isComplete: "true"}},
-          {state: "ERROR", trigger: {errorCode: {gt: 400, lt: 599}}}
+          {state: "SUCCESS", when: {isComplete: "true"}},
+          {state: "ERROR", when: {errorCode: {gt: 400, lt: 599}}}
         ]
       }
     ])

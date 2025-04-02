@@ -151,8 +151,8 @@ export class Meta {
     const transitions = this.transitions.find((t) => t.from === this.state)
     if (transitions) {
       for (const transition of transitions.to) {
-        if (Object.keys(transition.trigger).length === 0) break
-        if (matchTrigger(transition.trigger, this.context, this.types)) {
+        if (Object.keys(transition.when).length === 0) break
+        if (matchTrigger(transition.when, this.context, this.types)) {
           const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
           const action = actionDefinition?.action && this.actions[actionDefinition.action]
           if (!action) {
@@ -251,7 +251,7 @@ export class Meta {
         from: t.from,
         to: t.to.map((toState) => ({
           state: toState.state,
-          trigger: toState.trigger,
+          when: toState.when,
         })),
         action: t.action,
       })),
@@ -397,7 +397,7 @@ const createParticle = ({development, description, tag, options, states, context
 
 /**
  @template {import('./types/context').ContextDefinition} C
- @param {import('./types/transitions.js').TriggerType<C>} trigger
+ @param {import('./types/transitions.js').When<C>} trigger
  @param {import('./types/context').ContextData<C>} context
  @param {import('./types/context').ContextDefinition} types
  */

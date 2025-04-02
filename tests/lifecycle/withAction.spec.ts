@@ -22,12 +22,12 @@ describe("Инициализация c действием", async () => {
       {
         from: "INITIAL",
         action: "initial",
-        to: [{ state: "NEXT", trigger: { value: nextContext.value } }],
+        to: [{ state: "NEXT", when: { value: nextContext.value } }],
       },
       {
         from: "NEXT",
         action: "next",
-        to: [{state: "OTHER", trigger: {value: otherContext.value}}]
+        to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
     ])
     .core()

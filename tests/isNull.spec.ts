@@ -6,7 +6,7 @@ describe("null триггер", () => {
     const particle = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -20,7 +20,7 @@ describe("null триггер", () => {
 
     particle = template
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -29,7 +29,7 @@ describe("null триггер", () => {
 
     particle = template
       .context((t) => ({ name: t.string({ nullable: false, default: "" }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { name: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { name: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -38,7 +38,7 @@ describe("null триггер", () => {
 
     particle = template
       .context((t) => ({ active: t.boolean({ nullable: false, default: false }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { active: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -47,7 +47,7 @@ describe("null триггер", () => {
 
     particle = template
       .context((t) => ({ status: t.enum("active", "inactive")({ nullable: false, default: "active" }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { status: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { status: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -59,7 +59,7 @@ describe("null триггер", () => {
     const particle = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ name: t.string({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { name: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { name: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -71,7 +71,7 @@ describe("null триггер", () => {
     const particle = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ active: t.boolean({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { active: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -83,7 +83,7 @@ describe("null триггер", () => {
     const particle = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ status: t.enum("active", "inactive")({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { status: null } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { status: null } }] }])
       .core()
       .actions({})
       .create({ state: "ОЖИДАНИЕ" })
@@ -103,7 +103,7 @@ describe("isNull триггер", () => {
           to: [
             {
               state: "ДОБАВИТЬ",
-              trigger: { size: { isNull: false, gt: 4 } },
+              when: { size: { isNull: false, gt: 4 } },
             },
           ],
         },
@@ -133,7 +133,7 @@ describe("isNull триггер", () => {
           to: [
             {
               state: "ДОБАВИТЬ",
-              trigger: {
+              when: {
                 size: { isNull: false, gt: 4 },
               },
             },
@@ -157,7 +157,7 @@ describe("isNull триггер", () => {
     const particle = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: { isNull: true } } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: true } } }] }])
       .core()
       .actions({})
       .reactions([])
@@ -179,7 +179,7 @@ describe("isNull триггер", () => {
           to: [
             {
               state: "ДОБАВИТЬ",
-              trigger: {
+              when: {
                 size: { isNull: true },
               },
             },
@@ -209,7 +209,7 @@ describe("isNull триггер", () => {
           to: [
             {
               state: "ДОБАВИТЬ",
-              trigger: {
+              when: {
                 size: { isNull: false, gt: 5, lt: 15 },
               },
             },
@@ -233,7 +233,7 @@ describe("isNull триггер", () => {
       .context((t) => ({ size: t.number({ nullable: true }) }))
       .transitions([
         /* FIXME: валидатор не должен пропускать такой триггер */
-        { from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: { isNull: false, gt: 5, lt: 15 } } }] },
+        { from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: false, gt: 5, lt: 15 } } }] },
       ])
       .core()
       .actions({})
@@ -246,7 +246,7 @@ describe("isNull триггер", () => {
     const particle = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: { isNull: true } } }] }])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: true } } }] }])
       .core()
       .actions({})
       .reactions([])

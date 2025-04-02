@@ -97,7 +97,7 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
             src: "transitions",
           })
         }
-        if (!to.trigger) {
+        if (!to.when) {
           sendError({
             id: tag,
             message: `Отсутствует обязательное поле 'trigger' в transitions[${index}].to[${toIndex}]`,

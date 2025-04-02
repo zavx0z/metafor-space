@@ -15,12 +15,12 @@ describe("update", async () => {
       {
         from: "INITIAL",
         action: "actionInit",
-        to: [{ state: "NEXT", trigger: { field2: 42 } }],
+        to: [{ state: "NEXT", when: { field2: 42 } }],
       },
       {
         from: "NEXT",
         action: "actionDouble",
-        to: [{ state: "FINAL", trigger: { field2: 100, field1: "test" } }],
+        to: [{ state: "FINAL", when: { field2: 100, field1: "test" } }],
       },
     ])
     .core(({ update }) => ({

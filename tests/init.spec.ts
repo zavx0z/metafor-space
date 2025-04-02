@@ -11,17 +11,17 @@ const userActor = MetaFor("user")
   .transitions([
     {
       from: "АНОНИМНЫЙ",
-      to: [{ state: "АВТОРИЗАЦИЯ", trigger: { email: { isNull: false }, password: { isNull: false } } }],
+      to: [{ state: "АВТОРИЗАЦИЯ", when: { email: { isNull: false }, password: { isNull: false } } }],
     },
     {
       from: "АВТОРИЗАЦИЯ",
       action: "login",
-      to: [{ state: "АВТОРИЗОВАН", trigger: { nickname: { isNull: false } } }],
+      to: [{ state: "АВТОРИЗОВАН", when: { nickname: { isNull: false } } }],
     },
   ])
 
 describe("Инициализация частицы", () => {
-  const nickname = "zavx0z"
+  const nickname = "zavx0z" 
   const email = "zavx0z@ya.ru"
   const password = "123456"
 

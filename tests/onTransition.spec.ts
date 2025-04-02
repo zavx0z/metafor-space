@@ -11,22 +11,22 @@ const particle = MetaFor("Обработчик событий")
   .transitions([
     {
       from: "IDLE",
-      to: [{ state: "RUNNING", trigger: { url: { startsWith: "https://" }, responseTime: { gt: 0, lt: 5000 } } }],
+      to: [{ state: "RUNNING", when: { url: { startsWith: "https://" }, responseTime: { gt: 0, lt: 5000 } } }],
     },
     {
       from: "RUNNING",
       to: [
-        { state: "SUCCESS", trigger: { responseTime: { gt: 0, lt: 5000 }, errorCode: 200 } },
-        { state: "ERROR", trigger: { errorCode: { gt: 400, lt: 599 } } },
+        { state: "SUCCESS", when: { responseTime: { gt: 0, lt: 5000 }, errorCode: 200 } },
+        { state: "ERROR", when: { errorCode: { gt: 400, lt: 599 } } },
       ],
     },
     {
       from: "ERROR",
-      to: [{ state: "IDLE", trigger: { url: { startsWith: "https://" } } }],
+      to: [{ state: "IDLE", when: { url: { startsWith: "https://" } } }],
     },
     {
       from: "SUCCESS",
-      to: [{ state: "IDLE", trigger: { url: { startsWith: "https://" } } }],
+      to: [{ state: "IDLE", when: { url: { startsWith: "https://" } } }],
     },
   ])
   .core()

@@ -23,7 +23,7 @@ describe("Неполноценная частица в режиме разраб
       .transitions([
         {
           from: "ОЖИДАНИЕ",
-          to: [{ state: "РАБОТА", trigger: {} }],
+          to: [{ state: "РАБОТА", when: {} }],
         },
       ])
       .core(() => ({}))

@@ -1,11 +1,11 @@
 import type {
-    ArrayDefinition,
-    BooleanDefinition,
-    ContextDefinition,
-    NumberDefinition,
-    NumberEnumDefinition,
-    StringDefinition,
-    StringEnumDefinition,
+  ArrayDefinition,
+  BooleanDefinition,
+  ContextDefinition,
+  NumberDefinition,
+  NumberEnumDefinition,
+  StringDefinition,
+  StringEnumDefinition,
 } from "./context"
 
 /**
@@ -48,26 +48,26 @@ export type Transitions<C extends ContextDefinition, S> = Array<Transition<C, S>
  @template S - Тип состояния
  */
 export type Transition<C extends ContextDefinition, S> = {
-    /**
+  /**
      Исходное состояние
 
      Состояние, находясь в котором, производится проверка условий перехода для целевых состояний.
      */
-    from: S
-    /**
+  from: S
+  /**
      Действие, выполняемое при входе в состояние
 
      Действие, выполняется при входе в состояние, указанное в `from`.
 
      @default undefined
      */
-    action?: string
-    /**
+  action?: string
+  /**
      Набор целевых состояний с условиями перехода
 
      Набор целевых состояний, в которые возможен переход из состояния, указанного в `from`.
      */
-    to: TransitionTo<C, S>[]
+  to: TransitionTo<C, S>[]
 }
 
 /**
@@ -77,39 +77,39 @@ export type Transition<C extends ContextDefinition, S> = {
  @template S - Тип состояния
  */
 export type TransitionTo<C extends ContextDefinition, S> = {
-    /**
+  /**
      Целевое состояние
      */
-    state: S
-    /**
-     Условия триггера для перехода
+  state: S
+  /**
+     Условия сравнения для перехода
      */
-    trigger: TriggerType<C>
+  when: When<C>
 }
 
 /**
- Тип триггера
+ Условия сравнения для перехода
 
  @template C - Тип определения контекста
  */
-export type TriggerType<C extends ContextDefinition> = Partial<{
-    [K in keyof C]: C[K] extends StringEnumDefinition<infer V>
-        ? EnumTriggerCondition<V>
-        : C[K] extends NumberEnumDefinition<infer V>
-            ? EnumTriggerCondition<V>
-            : C[K] extends StringDefinition
-                ? StringTriggerCondition
-                : C[K] extends NumberDefinition
-                    ? NumberTriggerCondition
-                    : C[K] extends BooleanDefinition
-                        ? BooleanTriggerCondition
-                        : C[K] extends ArrayDefinition
-                            ? any[] | { length: NumberTriggerCondition }
-                            : never
+export type When<C extends ContextDefinition> = Partial<{
+  [K in keyof C]: C[K] extends StringEnumDefinition<infer V>
+    ? CondEnum<V>
+    : C[K] extends NumberEnumDefinition<infer V>
+    ? CondEnum<V>
+    : C[K] extends StringDefinition
+    ? CondString
+    : C[K] extends NumberDefinition
+    ? CondNumber
+    : C[K] extends BooleanDefinition
+    ? CondBoolean
+    : C[K] extends ArrayDefinition
+    ? any[] | { length: CondNumber }
+    : never
 }>
 
 /**
- Условия триггера для булевых значений
+ Условия для булевых значений
 
  | Параметр   | Тип     | Описание                           |
  | ---------- | ------- | ---------------------------------- |
@@ -119,19 +119,19 @@ export type TriggerType<C extends ContextDefinition> = Partial<{
  | logicalEq  | boolean | Логическое равенство               |
  | notNull    | boolean | Не является ли значение null       |
  */
-export type BooleanTriggerCondition =
-    | boolean
-    | null
-    | {
-    isNull?: boolean
-    eq?: boolean
-    notEq?: boolean
-    logicalEq?: boolean
-    notNull?: boolean
-}
+type CondBoolean =
+  | boolean
+  | null
+  | {
+      isNull?: boolean
+      eq?: boolean
+      notEq?: boolean
+      logicalEq?: boolean
+      notNull?: boolean
+    }
 
 /**
- Условия триггера для enum
+ Условия для enum
 
  | Параметр  | Тип         | Описание                       |
  | --------- | ----------- | ------------------------------ |
@@ -143,19 +143,19 @@ export type BooleanTriggerCondition =
 
  @template E - Тип значений enum
  */
-export type EnumTriggerCondition<E extends readonly (string | number)[]> =
-    | E[number]
-    | null
-    | {
-    isNull?: boolean
-    eq?: E[number]
-    notEq?: E[number]
-    oneOf?: E[number][]
-    notOneOf?: E[number][]
-}
+type CondEnum<E extends readonly (string | number)[]> =
+  | E[number]
+  | null
+  | {
+      isNull?: boolean
+      eq?: E[number]
+      notEq?: E[number]
+      oneOf?: E[number][]
+      notOneOf?: E[number][]
+    }
 
 /**
- Условия триггера для строк
+ Условия для строк
 
  | Параметр       | Тип                                  | Описание                              |
  | -------------- | ------------------------------------ | ------------------------------------- |
@@ -172,27 +172,27 @@ export type EnumTriggerCondition<E extends readonly (string | number)[]> =
  | length         | number \| { min?: number; max?: number } | Длина строки                      |
  | between        | [string, string]                     | Должна быть между двумя строками      |
  */
-export type StringTriggerCondition =
-    | string
-    | RegExp
-    | null
-    | {
-    isNull?: boolean
-    startsWith?: string
-    endsWith?: string
-    include?: string
-    pattern?: RegExp
-    eq?: string
-    notEq?: string
-    notInclude?: string
-    notStartsWith?: string
-    notEndsWith?: string
-    length?: number | { min?: number; max?: number }
-    between?: [string, string]
-}
+type CondString =
+  | string
+  | RegExp
+  | null
+  | {
+      isNull?: boolean
+      startsWith?: string
+      endsWith?: string
+      include?: string
+      pattern?: RegExp
+      eq?: string
+      notEq?: string
+      notInclude?: string
+      notStartsWith?: string
+      notEndsWith?: string
+      length?: number | { min?: number; max?: number }
+      between?: [string, string]
+    }
 
 /**
- Условия триггера для чисел
+ Условия для чисел
 
  | Параметр | Тип              | Описание                              |
  | -------- | ---------------- | ------------------------------------- |
@@ -209,20 +209,20 @@ export type StringTriggerCondition =
  | notLte   | number           | Не меньше или равно указанному числу  |
  | between  | [number, number] | Должно быть между двумя числами       |
  */
-export type NumberTriggerCondition =
-    | number
-    | null
-    | {
-    isNull?: boolean
-    eq?: number
-    gt?: number
-    gte?: number
-    lt?: number
-    lte?: number
-    notEq?: number
-    notGt?: number
-    notGte?: number
-    notLt?: number
-    notLte?: number
-    between?: [number, number]
-}
+type CondNumber =
+  | number
+  | null
+  | {
+      isNull?: boolean
+      eq?: number
+      gt?: number
+      gte?: number
+      lt?: number
+      lte?: number
+      notEq?: number
+      notGt?: number
+      notGte?: number
+      notLt?: number
+      notLte?: number
+      between?: [number, number]
+    }

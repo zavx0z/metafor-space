@@ -11,7 +11,7 @@ describe("Enum тип", () => {
       .transitions([
         {
           from: "INITIAL",
-          to: [{ state: "FINAL", trigger: { status: "active" } }],
+          to: [{ state: "FINAL", when: { status: "active" } }],
         },
       ])
       .core()
@@ -30,7 +30,7 @@ describe("Enum тип", () => {
       .transitions([
         {
           from: "INITIAL",
-          to: [{ state: "ACTIVE", trigger: { status: "active" } }],
+          to: [{ state: "ACTIVE", when: { status: "active" } }],
         },
       ])
       .core()
@@ -50,11 +50,11 @@ describe("Enum тип", () => {
       .transitions([
         {
           from: "INITIAL",
-          to: [{ state: "ACTIVE", trigger: { status: { oneOf: ["active", "pending"] } } }],
+          to: [{ state: "ACTIVE", when: { status: { oneOf: ["active", "pending"] } } }],
         },
         {
           from: "ACTIVE",
-          to: [{state: "INACTIVE", trigger: {status: "inactive"}}]
+          to: [{state: "INACTIVE", when: {status: "inactive"}}]
         }
       ])
       .core(({update}) => ({
@@ -99,7 +99,7 @@ describe("Enum тип", () => {
       .transitions([
         {
           from: "INITIAL",
-          to: [{ state: "ACTIVE", trigger: { status: 2 } }],
+          to: [{ state: "ACTIVE", when: { status: 2 } }],
         },
       ])
       .core()

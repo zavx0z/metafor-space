@@ -14,7 +14,7 @@ const userActor = MetaFor("user")
       to: [
         {
           state: "АВТОРИЗАЦИЯ",
-          trigger: { email: { isNull: false }, password: { isNull: false } },
+          when: { email: { isNull: false }, password: { isNull: false } },
         },
       ],
     },
@@ -24,7 +24,7 @@ const userActor = MetaFor("user")
       to: [
         {
           state: "АВТОРИЗОВАН",
-          trigger: { nickname: { isNull: false } },
+          when: { nickname: { isNull: false } },
         },
       ],
     },

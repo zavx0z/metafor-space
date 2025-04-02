@@ -29,15 +29,15 @@ const CONDITIONS = {
 export function validateTriggers({ tag, transitions: transitionsList, contextDefinition }) {
   transitionsList.forEach((transition, transitionIndex) => {
     transition.to.forEach((to) => {
-      if (!to.trigger) return
+      if (!to.when) return
 
-      if (Object.keys(to.trigger).length === 0) {
+      if (Object.keys(to.when).length === 0) {
         throw new Error(
           `Пустой триггер в переходе из состояния "${transition.from}" в "${to.state}". Триггер должен содержать хотя бы одно условие.`
         )
       }
 
-      Object.entries(to.trigger).forEach(([field, condition]) => {
+      Object.entries(to.when).forEach(([field, condition]) => {
         const fieldDef = contextDefinition[field]
         if (!fieldDef)
           throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.from}`)

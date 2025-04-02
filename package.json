@@ -34,10 +34,11 @@
     "./validator": "./validator/index.js"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "puppeteer": "^24.4.0",
     "@happy-dom/global-registrator": "17.3.0",
-    "happy-dom": "^17.4.4"
+    "@types/bun": "latest",
+    "happy-dom": "^17.4.4",
+    "puppeteer": "^24.4.0",
+    "typedoc": "^0.28.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -87,8 +88,7 @@
     "tsconfig": "tsconfig.typedoc.json",
     "categorizeByGroup": true,
     "maxTypeConversionDepth": 100,
-    "categoryOrder": [
-    ],
+    "categoryOrder": [],
     "sort": [
       "source-order"
     ],

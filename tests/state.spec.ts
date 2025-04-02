@@ -12,22 +12,22 @@ describe("Корректные переходы состояний при заг
     .transitions([
       {
         from: "IDLE",
-        to: [{ state: "LOADING", trigger: { url: { startsWith: "https://" }, responseTime: { gt: 0, lt: 5000 } } }],
+        to: [{ state: "LOADING", when: { url: { startsWith: "https://" }, responseTime: { gt: 0, lt: 5000 } } }],
       },
       {
         from: "LOADING",
         to: [
-          {state: "SUCCESS", trigger: {responseTime: {gt: 0, lt: 5000}, code: 200}},
-          {state: "ERROR", trigger: {code: {gt: 400, lt: 599}}}
+          {state: "SUCCESS", when: {responseTime: {gt: 0, lt: 5000}, code: 200}},
+          {state: "ERROR", when: {code: {gt: 400, lt: 599}}}
         ]
       },
       {
         from: "ERROR",
-        to: [{state: "LOADING", trigger: {responseTime: {gt: 0, lt: 5000}, code: {gt: 400, lt: 599}}}]
+        to: [{state: "LOADING", when: {responseTime: {gt: 0, lt: 5000}, code: {gt: 400, lt: 599}}}]
       },
       {
         from: "SUCCESS",
-        to: [{state: "IDLE", trigger: {url: {include: "complete"}}}]
+        to: [{state: "IDLE", when: {url: {include: "complete"}}}]
       }
     ])
   const particle = template

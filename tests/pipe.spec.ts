@@ -12,12 +12,12 @@ describe("Пайплайн", () => {
       {
         from: "IDLE",
         action: "idle",
-        to: [{ state: "ACTIVE", trigger: { username: { include: "user" }, progress: { gt: 0, lt: 50 } } }],
+        to: [{ state: "ACTIVE", when: { username: { include: "user" }, progress: { gt: 0, lt: 50 } } }],
       },
       {
         from: "ACTIVE",
         action: "active",
-        to: [{ state: "COMPLETE", trigger: { progress: { gt: 100 } } }],
+        to: [{ state: "COMPLETE", when: { progress: { gt: 100 } } }],
       },
     ])
     .core()

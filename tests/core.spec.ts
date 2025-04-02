@@ -12,12 +12,12 @@ describe("core", () => {
       .transitions([
         {
           from: "ОЖИДАНИЕ",
-          to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", trigger: { isSpacePressed: true } }],
+          to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }],
           action: "init",
         },
         {
           from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
-          to: [{ state: "ОЖИДАНИЕ", trigger: { isSpacePressed: false } }],
+          to: [{ state: "ОЖИДАНИЕ", when: { isSpacePressed: false } }],
         },
       ])
       .core(({ update }) => ({
@@ -65,7 +65,7 @@ describe("core", () => {
         isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
       }))
       .transitions([
-        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", trigger: { isSpacePressed: true } }] },
+        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }] },
       ])
       .core(({ update }) => {
         // Создаем объект с общим состоянием
@@ -92,7 +92,7 @@ describe("core", () => {
         isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
       }))
       .transitions([
-        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", trigger: { isSpacePressed: true } }] },
+        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }] },
       ])
       .core(({ update }) => ({
         /** Используем стрелочную функцию, которая замкнет coreState */
@@ -141,7 +141,7 @@ describe("core", () => {
         .transitions([
           {
             from: "INITIAL",
-            to: [{ state: "MODIFIED", trigger: { isUpdated: true } }],
+            to: [{ state: "MODIFIED", when: { isUpdated: true } }],
           },
         ])
         .core(({ update }) => ({

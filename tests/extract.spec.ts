@@ -17,22 +17,22 @@ const particle = MetaFor("action-extract")
     {
       from: "state-1",
       action: "bodyDot",
-      to: [{ state: "state-2", trigger: { a: 1 } }],
+      to: [{ state: "state-2", when: { a: 1 } }],
     },
     {
       from: "state-2",
       action: "argDestruct",
-      to: [{ state: "state-1", trigger: { a: 1 } }],
+      to: [{ state: "state-1", when: { a: 1 } }],
     },
     {
       from: "state-1",
       action: "multiReadWrite",
-      to: [{ state: "state-2", trigger: { a: 1 } }],
+      to: [{ state: "state-2", when: { a: 1 } }],
     },
     {
       from: "state-2",
       action: "noReadWrite",
-      to: [{ state: "state-1", trigger: { a: 1 } }],
+      to: [{ state: "state-1", when: { a: 1 } }],
     },
   ])
   .core(({ context, update }) => ({

@@ -64,7 +64,7 @@ export function validateCycles({ transitions: transitionsList }) {
     transition.to.forEach((trans) => {
       transitions.get(transition.from)?.push({
         state: trans.state,
-        conditions: trans.trigger || {},
+        conditions: trans.when || {},
       })
     })
   })

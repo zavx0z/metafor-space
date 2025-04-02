@@ -27,7 +27,7 @@ describe("Граф частицы", () => {
           value: t.number({title: "Значение для тестирования переходов", nullable: false})
         }))
         .transitions([
-          {from: "IDLE", to: [{state: "ACTIVE", trigger: {value: {gt: 0}}}]}
+          {from: "IDLE", to: [{state: "ACTIVE", when: {value: {gt: 0}}}]}
         ])
         .core()
         .actions({})
