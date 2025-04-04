@@ -30,8 +30,7 @@
 
  @template C - Проброс определения контекста для автодополнения
  @template S - Проброс состояний для автодополнения
-
- * @includeExample tests/core.spec.ts
+ @includeExample tests/core.spec.ts
  */
 export type Transitions<C extends ContextDefinition, S> = Array<Transition<C, S>>
 

@@ -1,7 +1,7 @@
 {
   "name": "@metafor/space",
   "description": "MetaFor particle system",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "type": "module",
   "license": "MIT",
   "author": "zavx0z",
@@ -49,7 +49,7 @@
     "docs": "bunx typedoc",
     "test": "bun test tests",
     "test[watch]": "bun test tests --watch",
-    "test:init": "bun test tests/init.spec.ts",
+    "test:init": "bun test tests/metafor.spec.ts",
     "test:state": "bun test tests/state.spec.ts",
     "test:onTransition": "bun test tests/onTransition.spec.ts",
     "test:serialize": "bun test tests/serialize.spec.ts",
