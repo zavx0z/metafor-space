@@ -1,7 +1,7 @@
 import type { Meta } from "../index"
 import type { ContextData, ContextDefinition, Update } from "./context"
 import type { Core, CoreObj } from "./core"
-
+import type { html } from "../dom/html/html"
 /**
  Структура условного блока для компонента
  
@@ -91,5 +91,5 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
   context: ContextData<C>
   state: S
   core: Core<I>
-  html: (strings: TemplateStringsArray, ...values: any[]) => string
+  html: html
 }

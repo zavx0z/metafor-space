@@ -1,4 +1,5 @@
-import { html as q_html, render } from "../dom/html/html.js"
+import { html, render } from "../dom/html/html"
+
 
 /**
  * Преобразует строку из camelCase в kebab-case
@@ -10,10 +11,10 @@ const camelToKebab = (str) => {
 }
 
 /**
- * @template {import("../types/core.d.ts").CoreObj} I
- * @template {import("../types/context.d.ts").ContextDefinition} C
+ * @template {import("../types/core").CoreObj} I
+ * @template {import("../types/context").ContextDefinition} C
  * @template {string} S
- * @param {import("../types/view.d.ts").ComponentParams<I, C, S>} params
+ * @param {import("../types/view").ComponentParams<I, C, S>} params
  */
 export default ({ view, particle }) => {
   const particleContextKeys = Object.keys(particle.context).map(camelToKebab)
@@ -60,7 +61,7 @@ export default ({ view, particle }) => {
             context: particle.context,
             state: particle.state,
             core: particle.core,
-            html: q_html,
+            html: html,
           })
           render(result, this.shadow ?? this)
         }
