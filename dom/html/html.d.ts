@@ -1,7 +1,10 @@
 import type { ResultType, TemplateResult } from "./types/html"
 
-/**
- * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.*/
+export declare const nothing = typeof Symbol.for("nothing")
+
+  /**
+ * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.
+ */
 export type TagFunction = <T extends ResultType>(
   type: T
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
@@ -76,3 +79,29 @@ export type SVGElement = (strings: TemplateStringsArray, ...values: unknown[]) =
  * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<3>}
  */
 export type MathML = (strings: TemplateStringsArray, ...values: any[]) => TemplateResult<3>
+
+/**
+ * Устанавливает значение объекта Ref или вызывает callback-функцию ref с привязанным
+ * к ней элементом.
+ *
+ * Объект Ref действует как контейнер для ссылки на элемент. Callback-функция ref -
+ * это функция, которая принимает элемент в качестве единственного аргумента.
+ *
+ * Директива ref устанавливает значение объекта Ref или вызывает callback-функцию ref
+ * во время рендеринга, если связанный элемент изменился.
+ *
+ * Примечание: Если callback-функция ref рендерится в другую позицию элемента или
+ * удаляется при последующем рендеринге, она сначала будет вызвана с `undefined`,
+ * а затем с новым элементом, к которому она была привязана (если таковой имеется).
+ *
+ * @example
+ * // Использование объекта Ref
+ * const inputRef = createRef();
+ * render(html`<input ${ref(inputRef)}>`, container);
+ * inputRef.value.focus();
+ *
+ * // Использование callback-функции
+ * const callback = (inputElement) => inputElement.focus();
+ * render(html`<input ${ref(callback)}>`, container);
+ */
+export type Reference = <T extends Element>(ref: (el: Element | undefined) => void) => RefDirective

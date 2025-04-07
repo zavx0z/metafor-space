@@ -10,11 +10,12 @@ import type { Core, CoreDefinition, CoreObj } from "./types/core"
 import type { Actions } from "./types/actions"
 import type { ReactionType } from "./types/reaction"
 import type { ViewDefinition } from "./types/view"
-
 import type { CreateParams } from "./types/create"
 import type { MetaConstructor, Snapshot } from "./types/meta"
 
+export { BroadcastMessage } from "./types/meta"
 /**
+ 
  # MetaFor - мета для ... 
 
  Создает класс/коллекцию Мета - которые порождают сущности - называемые meta.
@@ -42,24 +43,17 @@ import type { MetaConstructor, Snapshot } from "./types/meta"
  @param conf.development - Режим разработки (подключена валидация)
  
  @includeExample tests/metafor.spec.ts
- */
+ */ // prettier-ignore
 export declare function MetaFor(
   tag: string,
   conf?: {
     description?: string
     development?: boolean
   }
-): {
-  states: <S extends string>(
-    ...states: S[]
-  ) => {
-    context: <C extends ContextDefinition>(
-      context: (types: ContextTypes) => C
-    ) => {
+): { states: <S extends string>( ...states: S[] ) => {
+    context: <C extends ContextDefinition>( context: (types: ContextTypes) => C ) => {
       transitions: (transitions: Transitions<C, S>) => {
-        core: <I extends CoreObj>(
-          core: CoreDefinition<I, C> = () => Object.create({})
-        ) => {
+        core: <I extends CoreObj>( core: CoreDefinition<I, C> = () => Object.create({}) ) => {
           actions: (actions: Actions<C, I>) => {
             reactions: (reactions: ReactionType<C, I>) => {
               view: (view: ViewDefinition<I, C, S>) => {
@@ -79,7 +73,7 @@ export declare function MetaFor(
 }
 
 /**
- Meta -
+ Meta - класс частицы
 
  @template S - Состояния
  @template C - Контекст

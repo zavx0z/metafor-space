@@ -69,7 +69,7 @@ export class RefDirective extends AsyncDirective {
   }
 
   /**
-   * @param {import("../html.js").ElementPart} part
+   * @param {import("../types/html").ElementPart} part
    * @param {[RefOrCallback<T>]} args
    * @returns {typeof nothing}
    */
@@ -135,32 +135,4 @@ export class RefDirective extends AsyncDirective {
   }
 }
 
-/**
- * Устанавливает значение объекта Ref или вызывает callback-функцию ref с привязанным
- * к ней элементом.
- *
- * Объект Ref действует как контейнер для ссылки на элемент. Callback-функция ref -
- * это функция, которая принимает элемент в качестве единственного аргумента.
- *
- * Директива ref устанавливает значение объекта Ref или вызывает callback-функцию ref
- * во время рендеринга, если связанный элемент изменился.
- *
- * Примечание: Если callback-функция ref рендерится в другую позицию элемента или
- * удаляется при последующем рендеринге, она сначала будет вызвана с `undefined`,
- * а затем с новым элементом, к которому она была привязана (если таковой имеется).
- *
- * @template {Element} T
- * @param {RefOrCallback<T>} ref
- * @returns {RefDirective}
- *
- * @example
- * // Использование объекта Ref
- * const inputRef = createRef();
- * render(html`<input ${ref(inputRef)}>`, container);
- * inputRef.value.focus();
- *
- * // Использование callback-функции
- * const callback = (inputElement) => inputElement.focus();
- * render(html`<input ${ref(callback)}>`, container);
- */
 export const ref = directive(RefDirective)

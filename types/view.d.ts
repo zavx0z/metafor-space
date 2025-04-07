@@ -1,7 +1,8 @@
 import type { Meta } from "../index"
 import type { ContextData, ContextDefinition, Update } from "./context"
 import type { Core, CoreObj } from "./core"
-import type { html } from "../dom/html/html"
+import type { html, Reference } from "../dom/html/html"
+
 /**
  Структура условного блока для компонента
  
@@ -85,6 +86,7 @@ type MountParams<I extends Record<string, any>> = ({
  @property state - Состояние компонента
  @property core - Экземпляр частицы
  @property html - Функция для рендеринга HTML
+ @property ref - Функция для создания ссылок на DOM элементы
  */
 type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefinition, S extends string> = {
   update: Update<C>
@@ -92,4 +94,5 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
   state: S
   core: Core<I>
   html: html
+  ref: Reference
 }

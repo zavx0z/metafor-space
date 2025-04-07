@@ -1,4 +1,5 @@
 import { html, render } from "../dom/html/html"
+import { ref } from "../dom/html/directives/ref"
 
 
 /**
@@ -50,6 +51,7 @@ export default ({ view, particle }) => {
       }
 
       connectedCallback() {
+        console.log("connectedCallback")
         const updateView = () => {
           const result = view.render({
             update: (context) =>
@@ -62,7 +64,9 @@ export default ({ view, particle }) => {
             state: particle.state,
             core: particle.core,
             html: html,
+            ref: ref,
           })
+          // @ts-ignore
           render(result, this.shadow ?? this)
         }
         particle.component = this.shadow?.host ?? this

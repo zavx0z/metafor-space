@@ -2,10 +2,13 @@
 
 ## Содержание
 
-1. [Обзор](#обзор)
-2. [Рендеринг шаблонов](#рендеринг-шаблонов)
-3. [Рендеринг динамических данных](#рендеринг-динамических-данных)
-4. [Стили и шаблоны](#стили-и-шаблоны)
+- [@metafor/html](#metaforhtml)
+  - [Содержание](#содержание)
+  - [Обзор](#обзор)
+  - [Рендеринг шаблонов](#рендеринг-шаблонов)
+  - [Рендеринг динамических данных](#рендеринг-динамических-данных)
+    - [Параметры рендеринга](#параметры-рендеринга)
+  - [Стили и шаблоны](#стили-и-шаблоны)
 
 ## Обзор
 
@@ -17,12 +20,15 @@
 Основными импортами `@metafor/html` являются `html` и `render`:
 
 Для серверного кода (typescript)
+
 ```typescript
-import {html, render} from '@pkg/html';
+import { html, render } from "@pkg/html"
 ```
+
 Для клиентского кода (без сборки)
-``` javascript
-import {html, render} from 'quantum/html/html.js';
+
+```javascript
+import { html, render } from "quantum/html/html.js"
 ```
 
 Пакет также включает дополнительные модули:
@@ -30,7 +36,7 @@ import {html, render} from 'quantum/html/html.js';
 - `@metafor/html/directives/*` - [Встроенные директивы](./docs/directives.md)
 - `@metafor/html/directive.js` - [Пользовательские директивы](./docs/custom-directives.md)
 - `@metafor/html/async-directive.js` - [Пользовательские асинхронные директивы](./docs/custom-directives.md#асинхронные-директивы)
-- `@metafor/html/directive-helpers.js` - [Помощники директив для императивных обновлений](./docs/custom-directives.md/#imperative-dom-access:-update\(\))
+- `@metafor/html/directive-helpers.js` - [Помощники директив для императивных обновлений](<./docs/custom-directives.md/#imperative-dom-access:-update()>)
 - `@metafor/html/static.js` - [Статический HTML-тег](./docs/expressions.md/#static-expressions)
 
 ## Рендеринг шаблонов
@@ -45,11 +51,11 @@ html`<h1>Hello ${name}</h1>`
 Шаблоны не создают или обновляют DOM напрямую. Вместо этого они возвращают `TemplateResult`, который используется функцией `render()` для фактического обновления DOM:
 
 ```javascript
-import {html, render} from '@pkg/html';
+import { html, render } from "@pkg/html"
 
-const name = 'world';
-const sayHi = html`<h1>Hello ${name}</h1>`;
-render(sayHi, document.body);
+const name = "world"
+const sayHi = html`<h1>Hello ${name}</h1>`
+render(sayHi, document.body)
 ```
 
 ## Рендеринг динамических данных
@@ -57,16 +63,16 @@ render(sayHi, document.body);
 Чтобы шаблон был динамическим, создайте функцию, которая возвращает `TemplateResult`. Вызывайте эту функцию каждый раз, когда данные изменяются:
 
 ```javascript
-import {html, render} from '@pkg/html/index';
+import { html, render } from "@pkg/html/index"
 
 // Определение функции шаблона
-const myTemplate = (name) => html`<div>Hello ${name}</div>`;
+const myTemplate = (name) => html`<div>Hello ${name}</div>`
 
 // Первичный рендеринг
-render(myTemplate('earth'), document.body);
+render(myTemplate("earth"), document.body)
 
 // Обновление данных
-render(myTemplate('mars'), document.body);
+render(myTemplate("mars"), document.body)
 ```
 
 Функция шаблона не создает DOM, что делает её быстрой и дешевой. Она возвращает `TemplateResult`, который используется для обновления только измененных частей DOM. Это позволяет эффективно создавать UI как функцию
@@ -83,7 +89,6 @@ render(myTemplate('mars'), document.body);
 Пример:
 
 ```html
-
 <div id="container">
   <header>АТОМ</header>
   <footer>Copyright 2025</footer>
@@ -91,10 +96,10 @@ render(myTemplate('mars'), document.body);
 ```
 
 ```javascript
-const template = () => html`<section>Динамический контент</section>`;
-const container = document.getElementById('container');
-const renderBefore = container.querySelector('footer');
-render(template(), container, {renderBefore});
+const template = () => html`<section>Динамический контент</section>`
+const container = document.getElementById("container")
+const renderBefore = container.querySelector("footer")
+render(template(), container, { renderBefore })
 ```
 
 Шаблон будет отображаться между элементами `<header>` и `<footer>`.
@@ -114,4 +119,3 @@ render(template(), container, {renderBefore});
 - [`styleMap`](./docs/directives.md#stylemap): Применяет стили на основе карты свойств и значений.
 
 `@metafor/html` обеспечивает гибкость и производительность при работе с динамическими данными и шаблонами в современных веб-приложениях.
-

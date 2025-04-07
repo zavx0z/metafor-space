@@ -25,8 +25,8 @@
  */
 export const DEV_MODE = true
 // Позволяет минификаторам переименовывать ссылки на globalThis
-export const global = globalThis
-export const trustedTypes = /** @type { TrustedTypePolicyFactory} */ (/** @type {any} */ (global).trustedTypes)
+const global = globalThis
+const trustedTypes = /** @type { TrustedTypePolicyFactory} */ (/** @type {any} */ (global).trustedTypes)
 /**
  * TrustedTypePolicy для HTML, которая объявляется с помощью функции тега шаблона html.
  *
@@ -374,7 +374,7 @@ const createSanitizer = (node, name, type) => sanitizerFactoryInternal(node, nam
 
 /** @type {import("./").TagFunction} */
 const tag = type => (strings, ...values) => ({_$atomType$: type, strings, values}) // prettier-ignore
-/**@type {import("./").HTML} */
+/**@type {import("./").html} */
 export const html = tag(HTML_RESULT)
 /**@type {import("./").SVGElement} */
 export const svg = tag(SVG_RESULT)
@@ -1183,10 +1183,8 @@ export class EventPart extends AttributePart {
 
 export class ElementPart {
   type = ELEMENT_PART
-  /** @type {undefined} */ _$committedValue
-  /** @type {Disconnectable | undefined} */ _$parent
-  /** @type {Set<Disconnectable> | undefined} */ _$disconnectableChildren = undefined
-  /** @type {RenderOptions | undefined} */ options
+  _$committedValue = undefined
+  _$disconnectableChildren = undefined
 
   /**
    * @param {Element} element - Элемент

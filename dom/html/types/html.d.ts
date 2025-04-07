@@ -132,3 +132,12 @@ export interface Disconnectable {
   // затратно для деревьев без AsyncDirectives.
   _$isConnected: boolean
 }
+
+export declare class ElementPart {
+  type: typeof ELEMENT_PART
+  _$committedValue: undefined
+  _$parent: Disconnectable | undefined
+  _$disconnectableChildren: Set<Disconnectable> | undefined
+  options: RenderOptions | undefined
+  element: Element
+}

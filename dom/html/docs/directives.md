@@ -3,7 +3,7 @@
 Директивы — это функции, которые могут расширять MetaFor, настраивая способ отображения выражения. MetaFor включает ряд встроенных директив, помогающих с различными потребностями отображения:
 
 | **Директива**                       | **Краткое содержание**                                                                                                     |
-|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 |                                     | [**_Стайлинг_**](#стайлинг)                                                                                                |
 | [classMap](#classmap)               | Назначает элементу список классов на основе объекта.                                                                       |
 | [styleMap](#stylemap)               | Задает список свойств стиля для элемента на основе объекта.                                                                |
@@ -45,7 +45,7 @@
 **Импорт**
 
 ```js
-import {classMap} from "@pkg/html/directives/class-map.js"
+import { classMap } from "@pkg/html/directives/class-map.js"
 ```
 
 **Синтаксис функции**
@@ -66,7 +66,7 @@ classMap(classInfo: {[name: string]: string | boolean | number})
 ```js
 class MyElement extends LitElement {
   static properties = {
-    enabled: {type: Boolean}
+    enabled: { type: Boolean },
   }
 
   constructor() {
@@ -75,10 +75,8 @@ class MyElement extends LitElement {
   }
 
   render() {
-    const classes = {enabled: this.enabled, hidden: false}
-    return html`
-      <div class=${classMap(classes)}>Classy text</div>
-    `
+    const classes = { enabled: this.enabled, hidden: false }
+    return html` <div class=${classMap(classes)}>Classy text</div> `
   }
 }
 
@@ -88,9 +86,7 @@ customElements.define("my-element", MyElement)
 **Комбинирование со статическими классами**
 
 ```js
-html`
-  <div class="my-widget ${classMap(dynamicClasses)}">Static and dynamic</div>
-`
+html` <div class="my-widget ${classMap(dynamicClasses)}">Static and dynamic</div> `
 ```
 
 > **Примечание**: Выражение classMap должно быть единственным в class атрибуте, но его можно комбинировать со статическими значениями.
@@ -104,7 +100,7 @@ html`
 **Импорт**
 
 ```js
-import {styleMap} from "@pkg/html/directives/style-map.js"
+import { styleMap } from "@pkg/html/directives/style-map.js"
 ```
 
 **Синтаксис функции**
@@ -125,8 +121,8 @@ styleMap(styleInfo: {[name: string]: string | null | undefined})
 ```js
 class MyElement extends LitElement {
   static properties = {
-    color: {type: String},
-    size: {type: String}
+    color: { type: String },
+    size: { type: String },
   }
 
   constructor() {
@@ -138,11 +134,9 @@ class MyElement extends LitElement {
   render() {
     const styles = {
       color: this.color,
-      fontSize: this.size
+      fontSize: this.size,
     }
-    return html`
-      <div style=${styleMap(styles)}>Stylish text</div>
-    `
+    return html` <div style=${styleMap(styles)}>Stylish text</div> `
   }
 }
 
@@ -166,7 +160,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {when} from "@pkg/html/directives/when.js"
+import { when } from "@pkg/html/directives/when.js"
 ```
 
 **Синтаксис функции**
@@ -186,7 +180,7 @@ when(condition: boolean, trueCase: () => unknown, falseCase?: () => unknown)
 ```js
 class MyElement extends LitElement {
   static properties = {
-    isLoggedIn: {type: Boolean}
+    isLoggedIn: { type: Boolean },
   }
 
   constructor() {
@@ -197,16 +191,10 @@ class MyElement extends LitElement {
   render() {
     return html`
       ${when(
-      this.isLoggedIn,
-      () =>
-        html`
-            <p>Welcome back, user!</p>
-          `,
-      () =>
-        html`
-            <p>Please log in.</p>
-          `
-    )}
+        this.isLoggedIn,
+        () => html` <p>Welcome back, user!</p> `,
+        () => html` <p>Please log in.</p> `
+      )}
     `
   }
 }
@@ -229,7 +217,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {choose} from "@pkg/html/directives/choose.js"
+import { choose } from "@pkg/html/directives/choose.js"
 ```
 
 **Синтаксис функции**
@@ -245,14 +233,15 @@ choose(key: unknown, cases: Array<[key: unknown, value: () => unknown]>, fallbac
 Директива `choose` позволяет отображать различные шаблоны в зависимости от значения ключа.
 
 **Пример использования**
+
 ```js
 html`
-    ${choose(
+  ${choose(
     this.status,
     [
       ["loading", () => html`<p>Loading...</p>`],
       ["success", () => html`<p>Data loaded successfully!</p>`],
-      ["error", () => html`<p>Error loading data.</p>`]
+      ["error", () => html`<p>Error loading data.</p>`],
     ],
     () => html`<p>Unknown status.</p>`
   )}
@@ -273,7 +262,7 @@ html`
 **Импорт**
 
 ```js
-import {map} from "@pkg/html/directives/map.js"
+import { map } from "@pkg/html/directives/map.js"
 ```
 
 **Синтаксис функции**
@@ -293,7 +282,7 @@ map(items: Iterable<T>, callback: (item: T, index: number) => unknown)
 ```js
 class MyElement extends LitElement {
   static properties = {
-    items: {type: Array}
+    items: { type: Array },
   }
 
   constructor() {
@@ -304,10 +293,7 @@ class MyElement extends LitElement {
   render() {
     return html`
       <ul>
-        ${map(
-      this.items,
-      (item, index) => html`<li>${index + 1}: ${item}</li>`
-    )}
+        ${map(this.items, (item, index) => html`<li>${index + 1}: ${item}</li>`)}
       </ul>
     `
   }
@@ -330,7 +316,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {repeat} from "@pkg/html/directives/repeat.js"
+import { repeat } from "@pkg/html/directives/repeat.js"
 ```
 
 **Синтаксис функции**
@@ -351,14 +337,14 @@ repeat(items: Iterable<T>, keyFn?: KeyFn<T>, template: ItemTemplate<T>)
 ```js
 class MyElement extends LitElement {
   static properties = {
-    items: {}
+    items: {},
   }
 
   constructor() {
     super()
     this.items = [
-      {id: 1, name: "Item 1"},
-      {id: 2, name: "Item 2"}
+      { id: 1, name: "Item 1" },
+      { id: 2, name: "Item 2" },
     ]
   }
 
@@ -366,10 +352,10 @@ class MyElement extends LitElement {
     return html`
       <ul>
         ${repeat(
-      this.items,
-      item => item.id,
-      (item, index) => html`<li>${index}: ${item.name}</li>`
-    )}
+          this.items,
+          (item) => item.id,
+          (item, index) => html`<li>${index}: ${item.name}</li>`
+        )}
       </ul>
     `
   }
@@ -392,7 +378,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {join} from "@pkg/html/directives/join.js"
+import { join } from "@pkg/html/directives/join.js"
 ```
 
 **Синтаксис функции**
@@ -413,7 +399,7 @@ join(items: Iterable<unknown>, separator: () => unknown)
 **Импорт**
 
 ```js
-import {range} from "@pkg/html/directives/range.js"
+import { range } from "@pkg/html/directives/range.js"
 ```
 
 **Синтаксис функции**
@@ -435,7 +421,7 @@ range(start: number, end: number, step?: number): Iterable<number>
 **Импорт**
 
 ```js
-import {ifDefined} from "@pkg/html/directives/if-defined.js"
+import { ifDefined } from "@pkg/html/directives/if-defined.js"
 ```
 
 **Синтаксис функции**
@@ -453,13 +439,13 @@ ifDefined(value: unknown)
 **Пример использования**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {ifDefined} from "@pkg/html/directives/if-defined.js"
+import { LitElement, html } from "@pkg/html/index"
+import { ifDefined } from "@pkg/html/directives/if-defined.js"
 
 class MyElement extends LitElement {
   static properties = {
     filename: {},
-    size: {}
+    size: {},
   }
 
   constructor() {
@@ -469,9 +455,7 @@ class MyElement extends LitElement {
   }
 
   render() {
-    return html`
-      <img src="/images/${ifDefined(this.size)}/${ifDefined(this.filename)}" />
-    `
+    return html` <img src="/images/${ifDefined(this.size)}/${ifDefined(this.filename)}" /> `
   }
 }
 
@@ -497,7 +481,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {cache} from "@pkg/html/directives/cache.js"
+import { cache } from "@pkg/html/directives/cache.js"
 ```
 
 **Синтаксис функции**
@@ -515,19 +499,15 @@ cache(value: TemplateResult | unknown)
 **Пример использования**
 
 ```javascript
-import {LitElement, html} from "@pkg/html/index"
-import {cache} from "@pkg/html/directives/cache.js"
+import { LitElement, html } from "@pkg/html/index"
+import { cache } from "@pkg/html/directives/cache.js"
 
-const detailView = data => html`
-  <div>Details: ${data.details}</div>
-`
-const summaryView = data => html`
-  <div>Summary: ${data.summary}</div>
-`
+const detailView = (data) => html` <div>Details: ${data.details}</div> `
+const summaryView = (data) => html` <div>Summary: ${data.summary}</div> `
 
 class MyElement extends LitElement {
   static properties = {
-    data: {}
+    data: {},
   }
 
   constructor() {
@@ -535,18 +515,12 @@ class MyElement extends LitElement {
     this.data = {
       showDetails: true,
       details: "More info",
-      summary: "Overview"
+      summary: "Overview",
     }
   }
 
   render() {
-    return html`
-      ${cache(
-      this.data.showDetails
-        ? detailView(this.data)
-        : summaryView(this.data)
-    )}
-    `
+    return html` ${cache(this.data.showDetails ? detailView(this.data) : summaryView(this.data))} `
   }
 }
 
@@ -569,7 +543,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {keyed} from "@pkg/html/directives/keyed.js"
+import { keyed } from "@pkg/html/directives/keyed.js"
 ```
 
 **Синтаксис функции**
@@ -587,12 +561,12 @@ keyed(key: unknown, value: unknown)
 **Пример использования**
 
 ```javascript
-import {LitElement, html} from "@pkg/html"
-import {keyed} from "@pkg/html/directives/keyed.js"
+import { LitElement, html } from "@pkg/html"
+import { keyed } from "@pkg/html/directives/keyed.js"
 
 class MyElement extends LitElement {
   static properties = {
-    userId: {}
+    userId: {},
   }
 
   constructor() {
@@ -601,16 +575,7 @@ class MyElement extends LitElement {
   }
 
   render() {
-    return html`
-      <div>
-        ${keyed(
-      this.userId,
-      html`
-            <user-card .userId=${this.userId}></user-card>
-          `
-    )}
-      </div>
-    `
+    return html` <div>${keyed(this.userId, html` <user-card .userId=${this.userId}></user-card> `)}</div> `
   }
 }
 
@@ -633,7 +598,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {guard} from "@pkg/html/directives/guard.js"
+import { guard } from "@pkg/html/directives/guard.js"
 ```
 
 **Синтаксис функции**
@@ -651,8 +616,8 @@ guard(dependencies: unknown[], valueFn: () => unknown)
 **Пример использования**
 
 ```javascript
-import {LitElement, html} from "@pkg/html"
-import {guard} from "@pkg/html/directives/guard.js"
+import { LitElement, html } from "@pkg/html"
+import { guard } from "@pkg/html/directives/guard.js"
 
 function calculateSHA(value) {
   console.log("Calculating SHA...")
@@ -661,7 +626,7 @@ function calculateSHA(value) {
 
 class MyElement extends LitElement {
   static properties = {
-    value: {}
+    value: {},
   }
 
   constructor() {
@@ -670,9 +635,7 @@ class MyElement extends LitElement {
   }
 
   render() {
-    return html`
-      <div>${guard([this.value], () => calculateSHA(this.value))}</div>
-    `
+    return html` <div>${guard([this.value], () => calculateSHA(this.value))}</div> `
   }
 }
 
@@ -695,7 +658,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {live} from "@pkg/html/directives/live.js"
+import { live } from "@pkg/html/directives/live.js"
 ```
 
 **Синтаксис функции**
@@ -713,12 +676,12 @@ live(value: unknown)
 **Пример использования**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {live} from "@pkg/html/directives/live.js"
+import { LitElement, html } from "@pkg/html/index"
+import { live } from "@pkg/html/directives/live.js"
 
 class MyElement extends LitElement {
   static properties = {
-    value: {type: String}
+    value: { type: String },
   }
 
   constructor() {
@@ -728,8 +691,7 @@ class MyElement extends LitElement {
 
   render() {
     return html`
-      <input .value=${live(this.value)}
-             @input=${(e) => this.value = e.target.value}>
+      <input .value=${live(this.value)} @input=${(e) => (this.value = e.target.value)} />
       <p>Текущее значение: ${this.value}</p>
     `
   }
@@ -756,7 +718,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {ref, createRef} from "@pkg/html/directives/ref.js"
+import { ref, createRef } from "@pkg/html/directives/ref.js"
 ```
 
 **Синтаксис функции**
@@ -775,8 +737,8 @@ createRef(): Ref
 **Пример использования с объектом Ref**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {ref, createRef} from "@pkg/html/directives/ref.js"
+import { LitElement, html } from "@pkg/html/index"
+import { ref, createRef } from "@pkg/html/directives/ref.js"
 
 class MyElement extends LitElement {
   inputRef = createRef()
@@ -787,9 +749,7 @@ class MyElement extends LitElement {
   }
 
   render() {
-    return html`
-      <input ${ref(this.inputRef)} type="text">
-    `
+    return html` <input ${ref(this.inputRef)} type="text" /> `
   }
 }
 
@@ -799,14 +759,12 @@ customElements.define("my-element", MyElement)
 **Пример использования с callback-функцией**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {ref} from "@pkg/html/directives/ref.js"
+import { LitElement, html } from "@pkg/html/index"
+import { ref } from "@pkg/html/directives/ref.js"
 
 class MyElement extends LitElement {
   render() {
-    return html`
-      <input ${ref((element) => element?.focus())} type="text">
-    `
+    return html` <input ${ref((element) => element?.focus())} type="text" /> `
   }
 }
 
@@ -834,7 +792,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {templateContent} from "@pkg/html/directives/template-content.js"
+import { templateContent } from "@pkg/html/directives/template-content.js"
 ```
 
 **Синтаксис функции**
@@ -852,16 +810,14 @@ templateContent(templateElement: HTMLTemplateElement)
 **Пример использования**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {templateContent} from "@pkg/html/directives/template-content.js"
+import { LitElement, html } from "@pkg/html/index"
+import { templateContent } from "@pkg/html/directives/template-content.js"
 
 const templateEl = document.querySelector("template#myContent")
 
 class MyElement extends LitElement {
   render() {
-    return html`
-      Вот содержимое из элемента шаблона: ${templateContent(templateEl)}
-    `
+    return html` Вот содержимое из элемента шаблона: ${templateContent(templateEl)} `
   }
 }
 
@@ -883,7 +839,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {unsafeHTML} from "@pkg/html/directives/unsafe-html.js"
+import { unsafeHTML } from "@pkg/html/directives/unsafe-html.js"
 ```
 
 **Синтаксис функции**
@@ -901,16 +857,14 @@ unsafeHTML(value: string | typeof nothing | typeof noChange)
 **Пример использования**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {unsafeHTML} from "@pkg/html/directives/unsafe-html.js"
+import { LitElement, html } from "@pkg/html/index"
+import { unsafeHTML } from "@pkg/html/directives/unsafe-html.js"
 
 const markup = "<h3>Some HTML to render.</h3>"
 
 class MyElement extends LitElement {
   render() {
-    return html`
-      Внимание! Потенциально небезопасный HTML: ${unsafeHTML(markup)}
-    `
+    return html` Внимание! Потенциально небезопасный HTML: ${unsafeHTML(markup)} `
   }
 }
 
@@ -931,7 +885,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {unsafeSVG} from "@pkg/html/directives/unsafe-svg.js"
+import { unsafeSVG } from "@pkg/html/directives/unsafe-svg.js"
 ```
 
 **Синтаксис функции**
@@ -949,8 +903,8 @@ unsafeSVG(value: string | typeof nothing | typeof noChange)
 **Пример использования**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {unsafeSVG} from "@pkg/html/directives/unsafe-svg.js"
+import { LitElement, html } from "@pkg/html/index"
+import { unsafeSVG } from "@pkg/html/directives/unsafe-svg.js"
 
 const svg = '<circle cx="50" cy="50" r="40" fill="red" />'
 
@@ -987,7 +941,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {until} from "@pkg/html/directives/until.js"
+import { until } from "@pkg/html/directives/until.js"
 ```
 
 **Синтаксис функции**
@@ -1005,26 +959,21 @@ until(...values: unknown[])
 **Пример использования**
 
 ```js
-import {LitElement, html} from "@pkg/html/index"
-import {until} from "@pkg/html/directives/until.js"
+import { LitElement, html } from "@pkg/html/index"
+import { until } from "@pkg/html/directives/until.js"
 
 class MyElement extends LitElement {
   static properties = {
-    content: {state: true}
+    content: { state: true },
   }
 
   constructor() {
     super()
-    this.content = fetch("./content.txt").then(r => r.text())
+    this.content = fetch("./content.txt").then((r) => r.text())
   }
 
   render() {
-    return html`
-      ${until(
-      this.content,
-      html`<span>Загрузка...</span>`
-    )}
-    `
+    return html` ${until(this.content, html`<span>Загрузка...</span>`)} `
   }
 }
 
@@ -1046,7 +995,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {asyncAppend} from "@pkg/html/directives/async-append.js"
+import { asyncAppend } from "@pkg/html/directives/async-append.js"
 ```
 
 **Синтаксис функции**
@@ -1064,19 +1013,19 @@ asyncAppend(iterable: AsyncIterable<I>, mapper?: (item: I, index?: number) => un
 **Пример использования**
 
 ```javascript
-import {LitElement, html} from "@pkg/html/index"
-import {asyncAppend} from "@pkg/html/directives/async-append.js"
+import { LitElement, html } from "@pkg/html/index"
+import { asyncAppend } from "@pkg/html/directives/async-append.js"
 
 async function* tossCoins(count) {
   for (let i = 0; i < count; i++) {
     yield Math.random() > 0.5 ? "Орел" : "Решка"
-    await new Promise(r => setTimeout(r, 1000))
+    await new Promise((r) => setTimeout(r, 1000))
   }
 }
 
 class MyElement extends LitElement {
   static properties = {
-    tosses: {state: true}
+    tosses: { state: true },
   }
 
   constructor() {
@@ -1087,10 +1036,7 @@ class MyElement extends LitElement {
   render() {
     return html`
       <ul>
-        ${asyncAppend(
-      this.tosses,
-      (v) => html`<li>${v}</li>`
-    )}
+        ${asyncAppend(this.tosses, (v) => html`<li>${v}</li>`)}
       </ul>
     `
   }
@@ -1116,7 +1062,7 @@ customElements.define("my-element", MyElement)
 **Импорт**
 
 ```js
-import {asyncReplace} from "@pkg/html/directives/async-replace.js"
+import { asyncReplace } from "@pkg/html/directives/async-replace.js"
 ```
 
 **Синтаксис функции**
@@ -1135,19 +1081,19 @@ asyncReplace(iterable: AsyncIterable<I>, mapper?: (item: I, index?: number) => u
 **Пример использования**
 
 ```javascript
-import {LitElement, html} from "@pkg/html/index"
-import {asyncReplace} from "@pkg/html/directives/async-replace.js"
+import { LitElement, html } from "@pkg/html/index"
+import { asyncReplace } from "@pkg/html/directives/async-replace.js"
 
 async function* tossCoins(count) {
   for (let i = 0; i < count; i++) {
     yield Math.random() > 0.5 ? "Орел" : "Решка"
-    await new Promise(r => setTimeout(r, 1000))
+    await new Promise((r) => setTimeout(r, 1000))
   }
 }
 
 class MyElement extends LitElement {
   static properties = {
-    tosses: {state: true}
+    tosses: { state: true },
   }
 
   constructor() {
@@ -1156,14 +1102,7 @@ class MyElement extends LitElement {
   }
 
   render() {
-    return html`
-      <div>
-        ${asyncReplace(
-      this.tosses,
-      v => html`<span>Результат: ${v}</span>`
-    )}
-      </div>
-    `
+    return html` <div>${asyncReplace(this.tosses, (v) => html`<span>Результат: ${v}</span>`)}</div> `
   }
 }
 

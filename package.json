@@ -1,7 +1,7 @@
 {
   "name": "@metafor/space",
   "description": "MetaFor particle system",
-  "version": "1.3.3",
+  "version": "1.3.15",
   "type": "module",
   "workspaces": [
     "dom/html"
@@ -31,7 +31,11 @@
     "types",
     "web/component.js",
     "dom/html/html.d.ts",
-    "dom/html/html.js"
+    "dom/html/html.js",
+    "dom/html/directives/*",
+    "dom/html/directive.js",
+    "dom/html/async-directive.js",
+    "dom/html/types/*"
   ],
   "exports": {
     ".": "./index.js",
@@ -41,10 +45,13 @@
   "devDependencies": {
     "@happy-dom/global-registrator": "17.3.0",
     "@types/bun": "latest",
+    "concat-md": "^0.5.1",
     "happy-dom": "^17.4.4",
     "puppeteer": "^24.5.0",
-    "typedoc": "0.28.1",
-    "typedoc-plugin-include-example": "^2.0.2"
+    "rimraf": "^6.0.1",
+    "typedoc": "^0.28.1",
+    "typedoc-plugin-include-example": "^2.0.2",
+    "typedoc-plugin-markdown": "^4.6.1"
   },
   "peerDependencies": {
     "typescript": "^5.8.2"
@@ -52,6 +59,7 @@
   "scripts": {
     "publish-pkg": "bun publish --access public",
     "docs": "bunx typedoc",
+    "rules": "bunx rimraf temp-docs && bunx typedoc --entryPoints ./index.d.ts --readme none --plugin typedoc-plugin-markdown --theme markdown --out temp-docs && bunx concat-md temp-docs > rule.md && bunx rimraf temp-docs",
     "test": "bun test tests",
     "test[watch]": "bun test tests --watch",
     "test:init": "bun test tests/metafor.spec.ts",
@@ -76,7 +84,8 @@
     "test:sync": "bun test tests/sync.spec.ts",
     "test:extract": "bun test tests/extract.spec.ts",
     "test:pipe": "bun test tests/pipe.spec.ts",
-    "test:trigger:lock": "bun test tests/triggerLock.spec.ts"
+    "test:trigger:lock": "bun test tests/triggerLock.spec.ts",
+    "test:view": "bun test tests/view.spec.ts"
   },
   "typedocOptions": {
     "entryPoints": [
