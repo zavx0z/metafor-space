@@ -9,10 +9,10 @@
  @property clear - Очистить слушателей
  */
 export type SignalType<T extends string> = {
-    value: () => T
-    setValue: (state: T) => void
-    onChange: (listener: SignalListener<T>) => () => void
-    clear: () => void
+  value: () => T
+  setValue: (state: T) => void
+  onChange: (listener: SignalListener<T>) => () => void
+  clear: () => void
 }
 
 /**

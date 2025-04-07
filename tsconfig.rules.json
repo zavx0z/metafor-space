@@ -13,5 +13,8 @@
     "index.d.ts",
     "types/*.d.ts"
   ],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

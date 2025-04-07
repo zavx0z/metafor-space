@@ -1,13 +1,13 @@
-import type {ContextData, ContextDefinition, Update} from "./context"
-import type {Core} from "./core"
+import type { ContextData, ContextDefinition, Update } from "./context"
+import type { Core } from "./core"
 
 /**
- @property {number | null} user - Идентификатор пользователя.
- @property {string} device - Идентификатор устройства.
- @property {number} tab - Идентификатор вкладки или окна браузера. Полезно для управления данными в нескольких вкладках или окнах.
- @property {string} name - ID частицы.
- @property {number} index - Уникальный идентификатор экземпляра компонента. Если не задан, генерируется автоматически.
- @property {number} timestamp - Время отправки.
+ @property user - Идентификатор пользователя.
+ @property device - Идентификатор устройства.
+ @property tab - Идентификатор вкладки или окна браузера. Полезно для управления данными в нескольких вкладках или окнах.
+ @property particle - ID частицы.
+ @property index - Уникальный идентификатор экземпляра компонента. Если не задан, генерируется автоматически.
+ @property timestamp - Время отправки.
  */
 type MetaDataType = {
   user?: number | null
@@ -24,16 +24,21 @@ type MetaDataType = {
  @template C - Тип контекста
  @template I - Тип данных
 
- @property {string} path - Путь к изменяемому свойству.
- @property {"add" | "remove" | "update"} op - Тип операции.
- @property {() => void} action - Функция, которая будет вызвана при изменении данных.
+ @property path - Путь к изменяемому свойству.
+ @property op - Тип операции.
+ @property action - Функция, которая будет вызвана при изменении данных.
  */
 export type ReactionType<C extends ContextDefinition, I extends Record<string, unknown>> = Array<
   {
     path?: string
     op?: "add" | "remove" | "update"
-    action: ({patch, context, update, core}: {
-      patch: {path: string; op: "add" | "remove" | "update" | "replace"; value: any}
+    action: ({
+      patch,
+      context,
+      update,
+      core,
+    }: {
+      patch: { path: string; op: "add" | "remove" | "update" | "replace"; value: any }
       context: ContextData<C>
       meta: MetaDataType
       update: Update<C>
