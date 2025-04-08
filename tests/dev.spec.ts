@@ -1,5 +1,5 @@
 import { describe, expect, it, afterAll } from "bun:test"
-import { MetaFor } from "../index.js"
+import { MetaFor } from "../types"
 
 describe("Неполноценная частица в режиме разработки", async () => {
   const channel = new BroadcastChannel("validator")

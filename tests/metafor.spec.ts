@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index"
+import { MetaFor } from "../types"
 
 describe("Конструктор MetaFor", () => {
   const nickname = "zavx0z"

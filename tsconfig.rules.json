@@ -10,7 +10,7 @@
     "noImplicitAny": false
   },
   "include": [
-    "index.d.ts",
+    "types/index.d.ts",
     "types/*.d.ts"
   ],
   "exclude": [

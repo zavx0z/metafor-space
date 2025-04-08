@@ -4,16 +4,16 @@ import type {
   ContextTypes,
   OnUpdateContextData,
   UpdateParameters,
-} from "./types/context"
-import type { Transitions } from "./types/transitions"
-import type { Core, CoreDefinition, CoreObj } from "./types/core"
-import type { Actions } from "./types/actions"
-import type { ReactionType } from "./types/reaction"
-import type { ViewDefinition } from "./types/view"
-import type { CreateParams } from "./types/create"
-import type { MetaConstructor, Snapshot } from "./types/meta"
+} from "./context"
+import type { Transitions } from "./transitions"
+import type { Core, CoreDefinition, CoreObj } from "./core"
+import type { Actions } from "./actions"
+import type { ReactionType } from "./reaction"
+import type { ViewDefinition } from "./view"
+import type { CreateParams } from "./create"
+import type { MetaConstructor, Snapshot } from "./meta"
 
-export { BroadcastMessage } from "./types/meta"
+export { BroadcastMessage } from "./meta"
 /**
  
  # MetaFor - мета для ... 

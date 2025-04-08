@@ -1,3 +1,7 @@
+# create/*
+create/rules/index.js
+create/metafor/index.js
+
 # dependencies (bun install)
 node_modules
 

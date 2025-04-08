@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index.js"
+import { MetaFor } from "../types"
 
 describe("Пайплайн", () => {
   const particle = MetaFor("manager-progress")

@@ -1,6 +1,6 @@
 import type { ContextData, ContextDefinition, PartialContextData } from "./context"
 import type { CoreData, CoreDefinition } from "./core"
-import type { Meta } from "../index"
+import type { Meta } from "./index"
 import type { Transitions } from "./transitions"
 import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"

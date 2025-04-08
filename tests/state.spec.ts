@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index.js"
+import { MetaFor } from "../types"
 
 describe("Корректные переходы состояний при загрузке данных", () => {
   const template = MetaFor("Загрузчик данных")

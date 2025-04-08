@@ -1,4 +1,4 @@
-import {MetaFor} from "../index.js"
+import {MetaFor} from "../types"
 import {describe, expect, test} from "bun:test"
 
 describe("Enum тип", () => {

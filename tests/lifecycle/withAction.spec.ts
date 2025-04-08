@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../../index"
+import { MetaFor } from "../../types"
 import { messagesFixture } from "../fixtures/broadcast"
 
 describe("Инициализация c действием", async () => {

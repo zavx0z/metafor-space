@@ -3,7 +3,7 @@ import type { Transitions } from "./transitions"
 import type { Actions } from "./actions"
 import type { CoreData, CoreDefinition } from "./core"
 import type { ReactionType } from "./reaction"
-import type { Meta } from "../index"
+import type { Meta } from "./index"
 
 /**
  Снимок состояния частицы

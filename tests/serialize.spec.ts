@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor} from "../index.js"
+import {MetaFor} from "../types"
 import {ParticleFromSnapshot} from "../snapshot.js"
 
 describe("Сериализация и десериализация частицы с состояниями IDLE, RUNNING, ERROR, SUCCESS", () => {

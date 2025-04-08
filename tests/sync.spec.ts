@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index.js"
+import { MetaFor } from "../types"
 
 describe("Синхронизация core и context", async () => {
     const particle = MetaFor("sync-test")

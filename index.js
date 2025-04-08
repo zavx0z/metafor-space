@@ -297,7 +297,7 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/** @type {import("./").MetaFor} */ // prettier-ignore
+/** @type {import("./types").MetaFor} */ // prettier-ignore
 export function MetaFor(tag, conf = {}) {
   const {development, description} = conf
   if (development) {
@@ -446,10 +446,10 @@ export function matchTrigger(trigger, context, types) {
         continue
       case "number":
         if ("eq" in condition && value !== condition.eq) return false
-        if ("gt" in condition && condition.gt !== undefined && value <= condition.gt) return false
-        if ("gte" in condition && condition.gte !== undefined && value < condition.gte) return false
-        if ("lt" in condition && condition.lt !== undefined && value >= condition.lt) return false
-        if ("lte" in condition && condition.lte !== undefined && value > condition.lte) return false
+        if ("gt" in condition && condition.gt !== undefined && condition.gt !== null && Number(value) <= Number(condition.gt)) return false
+        if ("gte" in condition && condition.gte !== undefined && condition.gte !== null && Number(value) < Number(condition.gte)) return false
+        if ("lt" in condition && condition.lt !== undefined && condition.lt !== null && Number(value) >= Number(condition.lt)) return false
+        if ("lte" in condition && condition.lte !== undefined && condition.lte !== null && Number(value) > Number(condition.lte)) return false
         if ("between" in condition && Array.isArray(condition.between)) {
           const [min, max] = condition.between
           // @ts-ignore

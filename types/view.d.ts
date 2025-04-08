@@ -1,4 +1,4 @@
-import type { Meta } from "../index"
+import type { Meta } from "./index"
 import type { ContextData, ContextDefinition, Update } from "./context"
 import type { Core, CoreObj } from "./core"
 import type { html, Reference } from "../dom/html/html"
