@@ -1,0 +1,29 @@
+{
+  "name": "create-metafor",
+  "version": "0.0.10",
+  "description": "Create MetaFor App",
+  "type": "module",
+  "bin": {
+    "create-metafor": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "build": "bun build ./index.ts --outdir . --target node",
+    "prepublishOnly": "bun run build"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.0.0",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

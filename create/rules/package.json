@@ -1,0 +1,36 @@
+{
+  "name": "create-rules",
+  "version": "0.0.48",
+  "description": "Create rules for MetaFor",
+  "author": "zavx0z",
+  "license": "MIT",
+  "keywords": [
+    "metafor",
+    "rules",
+    "typedoc",
+    "typedoc-plugin-markdown",
+    "cursor",
+    "cursor rules"
+  ],
+  "type": "module",
+  "files": [
+    "index.js"
+  ],
+  "bin": {
+    "create-rules": "./index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "typedoc": "^0.28.1",
+    "concat-md": "^0.5.1",
+    "typedoc-plugin-markdown": "^4.6.1"
+  },
+  "scripts": {
+    "publish-pkg": "bun run ./scripts/updateVersion.ts && bun build ./index.ts --outdir . --target node && bun publish"
+  }
+}

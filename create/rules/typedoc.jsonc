@@ -1,0 +1,67 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "name": "MetaFor",
+    "entryPoints": [
+        // "./types/*"
+        "../../types/state.d.ts"
+    ],
+    "plugin": [
+        "typedoc-plugin-include-example",
+        "typedoc-plugin-markdown",
+        "./plugin.js"
+    ],
+    "readme": "none",
+    "validation": {
+        "invalidLink": true,
+        "notExported": true
+    },
+    "tsconfig": "tsconfig.json",
+    "outputs": [
+        {
+            "name": "markdown",
+            "path": "./typedoc-rules"
+        }
+    ],
+    "disableSources": true,
+    "includeVersion": false,
+    "theme": "markdown",
+    "navigation": {
+        "includeCategories": false,
+        "includeGroups": false,
+        "includeFolders": false,
+        "compactFolders": false,
+        "excludeReferences": true
+    },
+    "includeHierarchySummary": false,
+    "categorizeByGroup": false,
+    "router": "module",
+    "hideBreadcrumbs": true,
+    "hidePageHeader": true
+}
+//   "typedocOptions": {
+//     "entryPoints": [
+//       "./types/index.d.ts"
+//     ],
+//     "plugin": [
+//       "typedoc-plugin-include-example"
+//     ],
+//     "out": "docs",
+//     "excludePrivate": true,
+//     "excludeProtected": true,
+//     "excludeExternals": true,
+//     "includeVersion": true,
+//     "disableSources": true,
+//     "readme": "README.md",
+//     "theme": "default",
+//     "tsconfig": "tsconfig.typedoc.json",
+//     "categorizeByGroup": true,
+//     "maxTypeConversionDepth": 100,
+//     "categoryOrder": [],
+//     "sort": [
+//       "source-order"
+//     ],
+//     "validation": {
+//       "invalidLink": true,
+//       "notExported": true
+//     }
+//   }
