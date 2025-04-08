@@ -1,5 +1,5 @@
-import {MetaFor} from "../types"
-import {describe, expect, test} from "bun:test"
+import { MetaFor } from "@metafor/space"
+import { describe, expect, test } from "bun:test"
 
 describe("Enum тип", () => {
   test("создание enum типа", () => {

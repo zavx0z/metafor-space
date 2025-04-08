@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../types"
+import { MetaFor } from "@metafor/space"
 
 describe("core", () => {
   describe("обработка нажатия и отпускания пробела", () => {

@@ -1,5 +1,5 @@
 import puppeteer, { Browser, ElementHandle, Page } from "puppeteer"
-import { MetaFor } from "../../../types"
+import { MetaFor } from "@metafor/space"
 import type { Subprocess } from "bun"
 import { join } from "node:path"
 

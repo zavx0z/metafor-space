@@ -107,7 +107,7 @@ export declare class Meta<S extends string, C extends Record<string, any>, I ext
   description?: string
   state: S
   context: ContextData<C>
-  states: readonly S[]
+  states: readonly (S | undefined)[] 
   types: Record<string, any>
   transitions: Transitions<C, S>
   actions: Actions<C, I>

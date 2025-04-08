@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru" class="theme-dark">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MetaFor Browser Test</title>
+    <style>
+        html, body {
+            height: 100vh;
+            width: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color, #121212);
+        }
+    </style>
+    <!--            <link rel="icon" type="image/x-icon" href="/favicon.ico"/>-->
+    <!--            <link rel="stylesheet" href="/viewport/style.css"/>-->
+    <!--            <script type="importmap">-->
+    <!--              {-->
+    <!--                "imports": {-->
+    <!--                  "elkjs": "/layout/lib/elk-api.js"-->
+    <!--                }-->
+    <!--              }-->
+    <!--            </script>-->
+    <script type="module">
+        const channel = new BroadcastChannel("validator")
+        channel.onmessage = ({data}) => console.warn(data)
+        // debugger
+        import {MetaFor} from "/index.js"
+
+        window.MetaFor = MetaFor
+        window.dataStore = new Map()
+    </script>
+</head>
+<body>
+</body>
+</html>

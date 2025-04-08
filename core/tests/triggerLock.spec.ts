@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { MetaFor } from "../types"
+import { MetaFor } from "@metafor/space"
 
 test("блокировка триггеров перед входом в новое состояние", async () => {
   let value = -1

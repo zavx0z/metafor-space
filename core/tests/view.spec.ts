@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "bun:test"
-import { MetaFor } from "../types"
+import { MetaFor } from "@metafor/space"
 
 describe("View", () => {
   beforeAll(() => {

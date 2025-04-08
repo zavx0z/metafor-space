@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../types"
+import { MetaFor } from "@metafor/space"
 
 const particle = MetaFor("Обработчик событий")
   .states("IDLE", "RUNNING", "ERROR", "SUCCESS")

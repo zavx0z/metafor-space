@@ -25,5 +25,6 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "exclude": ["node_modules", "**/snapshot/**/*"]
+  "exclude": [
+    "node_modules", "**/snapshot/**/*", "fixtures/browser/index.html"]
 }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../types"
-import { messagesFixture } from "./fixtures/broadcast"
+import { MetaFor } from "@metafor/space"
+import { messagesFixture } from "../../fixtures/broadcast"
 
 describe("update", async () => {
   const { waitForMessages } = messagesFixture()

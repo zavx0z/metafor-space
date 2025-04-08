@@ -1,4 +1,2 @@
-preload = ["./dom/happydom.ts"]
-
 [test]
 preload = ["./dom/happydom.ts"]
