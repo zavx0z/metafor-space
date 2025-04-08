@@ -2,23 +2,16 @@
 
 import prompts from "prompts"
 import chalk from "chalk"
-import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { dirname } from "node:path"
-import { readFile } from "node:fs/promises"
+import { currentVersion } from "./src/version"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-let version = "0.0.1"
-try {
-  const pkg = JSON.parse(await readFile(join(__dirname, "package.json"), "utf-8"))
-  version = pkg.version
-} catch (error) {
-  console.warn("Не удалось прочитать версию из package.json")
-}
 
 async function init() {
+  const version = await currentVersion(__dirname)
   console.log(
     chalk.blue(`
     Create cursor rules v${version}
