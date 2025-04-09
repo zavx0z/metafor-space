@@ -1,6 +1,6 @@
 {
   "name": "create-rules",
-  "version": "0.0.57",
+  "version": "0.0.59",
   "description": "Create rules for MetaFor",
   "author": "zavx0z",
   "license": "MIT",
@@ -32,6 +32,6 @@
   },
   "scripts": {
     "dev": "bun run index.ts",
-    "publish-pkg": "bun run ./scripts/updateVersion.ts && bun build ./index.ts --outdir . --target node && bun publish"
+    "publish-pkg": "bun run ../../scripts/updateVersion.ts ./ && bun build ./index.ts --outdir . --target node && bun publish"
   }
 }

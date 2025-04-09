@@ -1,5 +1,5 @@
 import { join } from "node:path"
-import { readFile } from "node:fs/promises"
+import { readFile, writeFile } from "node:fs/promises"
 
 export const currentVersion = async (path: string) => {
   try {
@@ -7,6 +7,7 @@ export const currentVersion = async (path: string) => {
     return pkg.version
   } catch (error) {
     console.warn("Не удалось прочитать версию из package.json")
-    return null
+    throw new Error("Не удалось прочитать версию из package.json")
   }
 }
+
