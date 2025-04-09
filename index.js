@@ -218,20 +218,16 @@ export class Meta {
 
   #updateListeners = new Set()
 
-  /** Уведомления об изменении значений контекста
-    @param {(values: import('./types/context').OnUpdateContextData<C>) => void} listener - функция которая будет вызываться при изменении значений контекста
-    @returns {() => void} функция для отписки от уведомлений */
-  onUpdate(listener) {
-    this.#updateListeners.add(listener)
-    return () => this.#updateListeners.delete(listener)
+  /** @type {import('./types/meta').OnUpdate<C>}*/
+  onUpdate(cb) {
+    this.#updateListeners.add(cb)
+    return () => this.#updateListeners.delete(cb)
   }
 
-      /** Уведомления о переходах между состояниями
-        @param {(oldState: S, newState: S) => void} listener
-        @returns {() => void} */
-  onTransition = (listener) =>
+  /** @type {import('./types/meta').OnTransition<S, C, I>}*/
+  onTransition = (cb) =>
     this.$state.onChange((oldValue, newValue) => {
-      if (newValue !== undefined) listener(oldValue, newValue)
+      if (newValue !== undefined) cb(oldValue, newValue)
     })
 
   /** @returns {import('./types/meta.js').Snapshot<C, S>} */
@@ -397,7 +393,7 @@ const createParticle = ({development, description, tag, options, states, context
 
 /**
  @template {import('./types/context').ContextDefinition} C
- @param {import('./types/transitions.js').When<C>} trigger
+ @param {import('./types/transitions').When<C>} trigger
  @param {import('./types/context').ContextData<C>} context
  @param {import('./types/context').ContextDefinition} types
  */
@@ -446,10 +442,34 @@ export function matchTrigger(trigger, context, types) {
         continue
       case "number":
         if ("eq" in condition && value !== condition.eq) return false
-        if ("gt" in condition && condition.gt !== undefined && condition.gt !== null && Number(value) <= Number(condition.gt)) return false
-        if ("gte" in condition && condition.gte !== undefined && condition.gte !== null && Number(value) < Number(condition.gte)) return false
-        if ("lt" in condition && condition.lt !== undefined && condition.lt !== null && Number(value) >= Number(condition.lt)) return false
-        if ("lte" in condition && condition.lte !== undefined && condition.lte !== null && Number(value) > Number(condition.lte)) return false
+        if (
+          "gt" in condition &&
+          condition.gt !== undefined &&
+          condition.gt !== null &&
+          Number(value) <= Number(condition.gt)
+        )
+          return false
+        if (
+          "gte" in condition &&
+          condition.gte !== undefined &&
+          condition.gte !== null &&
+          Number(value) < Number(condition.gte)
+        )
+          return false
+        if (
+          "lt" in condition &&
+          condition.lt !== undefined &&
+          condition.lt !== null &&
+          Number(value) >= Number(condition.lt)
+        )
+          return false
+        if (
+          "lte" in condition &&
+          condition.lte !== undefined &&
+          condition.lte !== null &&
+          Number(value) > Number(condition.lte)
+        )
+          return false
         if ("between" in condition && Array.isArray(condition.between)) {
           const [min, max] = condition.between
           // @ts-ignore

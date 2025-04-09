@@ -121,8 +121,8 @@ export declare class Meta<S extends string, C extends Record<string, any>, I ext
 
   update: (context: UpdateParameters<C>) => void
   _updateExternal: (params: { context: UpdateParameters<C>; srcName?: string; funcName?: string }) => void
-  onUpdate: (listener: (context: OnUpdateContextData<C>) => void) => () => void
-  onTransition: (listener: (oldState: S, newState: S) => void) => () => void
+  onUpdate: OnUpdate<C>
+  onTransition: OnTransition<S, C, I>
   snapshot: () => Snapshot<C, S>
   graph: () => Promise<any>
   destroy: () => void

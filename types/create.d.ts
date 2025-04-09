@@ -4,7 +4,7 @@ import type { Meta } from "./index"
 import type { Transitions } from "./transitions"
 import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"
-
+import type { OnTransitionCallBack, OnUpdateCallBack } from "./meta"
 /**
  Опции создания частицы в коллбеке create
 
@@ -65,9 +65,9 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
   /** Опции визуализации графа */
   graph?: boolean
   /** Обработчик смены состояния */
-  onTransition?: OnTransition<S, C, I>
+  onTransition?: OnTransitionCallBack<S, C, I>
   /** Обработчик обновления контекста */
-  onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
+  onUpdate?: OnUpdateCallBack<C>
 }
 
 /**

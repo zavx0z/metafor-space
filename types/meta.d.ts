@@ -105,13 +105,44 @@ export type MetaConstructor<S extends string, C extends ContextDefinition, I ext
   core: CoreDefinition<I, C>
   coreData: CoreData<I>
   reactions: ReactionType<C, I>
-  onTransition?: OnTransition<S, C, I>
-  onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
+  onTransition?: OnTransitionCallBack<S, C, I>
+  onUpdate?: OnUpdateCallBack<C>
   destroy?: (particle: Meta<S, C, I>) => void
 }
 
 /**
- * Уведомления о переходах между состояниями
+ * Уведомление об изменениях контекста
+ *
+ * @param cb - Коллбек
+ * @returns - Функция для отписки от уведомлений
+ */
+export type OnUpdate<C extends ContextDefinition> = (cb: OnUpdateCallBack<C>) => () => void
+
+/**
+ * Коллбек обрабатывающий изменения контекста
+ *
+ * @param context - Контекст
+ * @param srcName - Имя источника
+ * @param funcName - Имя функции
+ */
+export type OnUpdateCallBack<C extends ContextDefinition> = (
+  context: ContextData<C>,
+  srcName?: string,
+  funcName?: string
+) => void
+
+/**
+ * Уведомление о переходах между состояниями
+ *
+ * @param cb - Коллбек
+ * @returns - Функция для отписки от уведомлений
+ */
+export type OnTransition<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
+  cb: OnTransitionCallBack<S, C, I>
+) => () => void
+
+/**
+ * Коллбек обрабатывающий изменения состояний
  *
  * @template S - Тип состояний
  * @template C - Тип контекста
@@ -121,7 +152,7 @@ export type MetaConstructor<S extends string, C extends ContextDefinition, I ext
  * @param current - Текущее состояние
  * @param meta - Мета
  */
-export type OnTransition<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
+export type OnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
   preview: S | undefined,
   current: S | undefined,
   meta?: Meta<S, C, I>
