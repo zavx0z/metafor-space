@@ -24,3 +24,13 @@ export type SignalType<T extends string> = {
  @property current - Текущее состояние
  */
 type SignalListener<T extends string> = (preview: T, current: T) => void
+
+/**
+ * Создать сигнал
+ * @hidden
+ * 
+ * @template T - Тип состояния
+ * @param value - Значение
+ * @returns Сигнал
+ */
+export type CreateSignal<T extends string> = (value: T) => SignalType<T>

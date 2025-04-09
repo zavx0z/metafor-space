@@ -254,10 +254,7 @@ export class Meta {
     }
   }
 
-  /**
-   @template T
-   @param {T} value
-   @returns {import('./types/state').SignalType<T>} */
+  /** @type {import('./types/state').CreateSignal<S>} */
   #createSignal(value) {
     const listeners = new Set()
     return {
