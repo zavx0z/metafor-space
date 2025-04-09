@@ -2,7 +2,7 @@
  Проверяет корректность поля контекста
 
  @param {string} field - Название поля
- @param {import('../types/context').TypeDefinition} value - Значение поля
+ @param {import('../../types/context').TypeDefinition} value - Значение поля
  @throws {Error} Если поле не соответствует требованиям
  */
 function validateContextField(field, value) {
@@ -34,7 +34,7 @@ function validateContextField(field, value) {
 /**
  Проверяет корректность всего объекта контекста
 
- @param {import('../types/context').ContextDefinition} ctxDef - Объект контекста
+ @param {import('../../types/context').ContextDefinition} ctxDef - Объект контекста
  @throws {Error} Если контекст не соответствует требованиям
  */
 export function validateContextDefinition(ctxDef) {

@@ -1,4 +1,4 @@
-import { Meta } from "./index.js"
+import { Meta } from "../index.js"
 
 /**
  @param {Record<string, any>} snapshot
@@ -13,12 +13,12 @@ export function validateSnapshot(snapshot) {
 }
 
 /**
- @template {import("./types/context").ContextDefinition} C
+ @template {import("../types/context.js").ContextDefinition} C
  @template {string} S
  @template {Record<string, unknown>} I
 
  @param {Record<string, any>} snapshot
- @returns {import('./index.js').Meta<S, C, I>}
+ @returns {import('../index.js').Meta<S, C, I>}
  */
 export function ParticleFromSnapshot(snapshot) {
   validateSnapshot(snapshot)

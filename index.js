@@ -301,13 +301,13 @@ const setDevChannel = (channel) => {
 export function MetaFor(tag, conf = {}) {
   const {development, description} = conf
   if (development) {
-      import("./validator")
+      import("./core/validator/index.js")
       setDevChannel(new BroadcastChannel("validator"))
       // todo: добавить проверку имени частицы
   }
   return {
     states(...states) {
-      development && import("./validator").then((module) => module.validateStates({ tag, states }))
+      development && import("./core/validator/index.js").then((module) => module.validateStates({ tag, states }))
       return {
         context(context) {
           const contextDefinition = context({
@@ -317,17 +317,17 @@ export function MetaFor(tag, conf = {}) {
             array: params => ({type: "array", ...params}),
             enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
           })
-          development && import("./validator").then((module) => module.validateContextDefinition({ tag, context: contextDefinition }))
+          development && import("./core/validator/index.js").then((module) => module.validateContextDefinition({ tag, context: contextDefinition }))
           return {
             transitions(transitions) {
                 if (development) {
                     const data = {tag, transitions: [...transitions], contextDefinition}
-                    import("./validator").then((module) => module.validateTransitions(data))
+                    import("./core/validator/index.js").then((module) => module.validateTransitions(data))
                 }
               return {
                 core(core = () => Object.create({})) {
                   const coreDefinition = core
-                  development && import("./validator").then((module) => module.validateCore({ tag, core: coreDefinition }))
+                  development && import("./core/validator/index.js").then((module) => module.validateCore({ tag, core: coreDefinition }))
                   return {
                     actions(actions) {
                       return {
@@ -342,7 +342,7 @@ export function MetaFor(tag, conf = {}) {
 
                                 if (view.isolated === undefined) view.isolated = true
                                 if (options.view?.isolated === false) view.isolated = false
-                                import("./web/component.js").then((module) => module.default({ view,  particle }))
+                                import("./core/web/component.js").then((module) => module.default({ view,  particle }))
 
                                 return particle
                               },
@@ -359,7 +359,7 @@ export function MetaFor(tag, conf = {}) {
 
                               if (view.isolated === undefined) view.isolated = true
                               if (options.view?.isolated === false) view.isolated = false
-                              import("./web/component.js").then((module) => module.default({ view, particle }))
+                              import("./core/web/component.js").then((module) => module.default({ view, particle }))
 
                               return particle
                             },
@@ -385,13 +385,13 @@ export function MetaFor(tag, conf = {}) {
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
  */ // prettier-ignore
 const createParticle = ({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions=[]}) => {
-  development && import("./validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
+  development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
   const channel = new BroadcastChannel("channel")
   const particle = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, actions, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
   particle.description = description || options.description || ""
-  if (graph) particle.graph = () => import("./web/graph.js").then((module) => module.default(particle))
-  if (debug) import("./debug.js").then((module) => module.default(particle, debug))
+  if (graph) particle.graph = () => import("./core/web/graph.js").then((module) => module.default(particle))
+  if (debug) import("./core/debug.js").then((module) => module.default(particle, debug))
   return particle
 }
 

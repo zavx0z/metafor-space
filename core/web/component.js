@@ -1,5 +1,5 @@
-import { html, render } from "../dom/html/html"
-import { ref } from "../dom/html/directives/ref"
+import { html, render } from "../../dom/html/html"
+import { ref } from "../../dom/html/directives/ref"
 
 
 /**
@@ -12,10 +12,10 @@ const camelToKebab = (str) => {
 }
 
 /**
- * @template {import("../types/core").CoreObj} I
- * @template {import("../types/context").ContextDefinition} C
+ * @template {import("../../types/core").CoreObj} I
+ * @template {import("../../types/context").ContextDefinition} C
  * @template {string} S
- * @param {import("../types/view").ComponentParams<I, C, S>} params
+ * @param {import("../../types/view").ComponentParams<I, C, S>} params
  */
 export default ({ view, particle }) => {
   const particleContextKeys = Object.keys(particle.context).map(camelToKebab)

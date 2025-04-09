@@ -56,8 +56,8 @@ export function validateContextDefinition({ tag, context }) {
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Имя частицы
- @param {import('../types/transitions.d.ts').Transitions<any, any>} params.transitions Массив переходов
- @param {import('../types/context.d.ts').ContextDefinition} params.contextDefinition Определение контекста
+ @param {import('../../types/transitions').Transitions<any, any>} params.transitions Массив переходов
+ @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTransitions({ tag, transitions, contextDefinition }) {
   if (!Array.isArray(transitions)) {
@@ -125,7 +125,7 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Идентификатор частицы
- @param {import('../types/core').CoreDefinition<any, any>} params.core Конфигурация ядра
+ @param {import('../../types/core').CoreDefinition<any, any>} params.core Конфигурация ядра
  @throws {Error} Если найдены ошибки в конфигурации ядра
  */
 export function validateCore({ tag, core }) {
@@ -142,7 +142,7 @@ export function validateCore({ tag, core }) {
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Идентификатор частицы
- @param {import('../types/create').CreateParams<any, any, any>} params.options Конфигурация инстанса частицы
+ @param {import('../../types/create').CreateParams<any, any, any>} params.options Конфигурация инстанса частицы
  @param {string[]} params.states Состояния частицы
  @throws {Error} Если найдены ошибки в конфигурации частицы
  */

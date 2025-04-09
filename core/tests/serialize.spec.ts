@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { MetaFor } from "@metafor/space"
-import { ParticleFromSnapshot } from "../../snapshot.js"
+import { ParticleFromSnapshot } from "../snapshot.js"
 
 describe("Сериализация и десериализация частицы с состояниями IDLE, RUNNING, ERROR, SUCCESS", () => {
   const particle = MetaFor("Задача")

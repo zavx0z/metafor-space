@@ -1,11 +1,11 @@
 // @ts-nocheck
 /**
  * Создает и настраивает граф для частицы
- * @template {import("../types/context").ContextDefinition} C - контекст частицы
+ * @template {import("../../types/context.js").ContextDefinition} C - контекст частицы
  * @template {string} S - состояние частицы
  * @template {Record<string, any>} I - ядро частицы
  *
- * @param {import('../index.js').MetaForParticle<S, C, I>} particle - Экземпляр частицы
+ * @param {import('../../index.js').MetaForParticle<S, C, I>} particle - Экземпляр частицы
  * @returns {Promise<HTMLElement>} Компонент графа
  */
 export default async function (particle) {
