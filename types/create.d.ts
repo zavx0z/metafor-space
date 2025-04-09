@@ -64,21 +64,9 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
 
   /** Опции визуализации графа */
   graph?: boolean
-  /**
-   Обработчик смены состояния
-
-   @param oldState - Старое состояние
-   @param newState - Новое состояние
-   @param particle - Частица
-   */
-  onTransition?: (oldState: S, newState: S, particle: Meta<S, C, I>) => void
-  /**
-   Обработчик обновления контекста 
-   
-   @param context - Контекст частицы
-   @param srcName - Имя функции, которая вызвала обновление
-   @param funcName - Имя функции, которая вызвала обновление
-   */
+  /** Обработчик смены состояния */
+  onTransition?: OnTransition<S, C, I>
+  /** Обработчик обновления контекста */
   onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
 }
 

@@ -105,7 +105,24 @@ export type MetaConstructor<S extends string, C extends ContextDefinition, I ext
   core: CoreDefinition<I, C>
   coreData: CoreData<I>
   reactions: ReactionType<C, I>
-  onTransition?: (oldState: S, newState: S, particle: Meta<S, C, I>) => void
+  onTransition?: OnTransition<S, C, I>
   onUpdate?: (context: ContextData<C>, srcName?: string, funcName?: string) => void
   destroy?: (particle: Meta<S, C, I>) => void
 }
+
+/**
+ * Уведомления о переходах между состояниями
+ *
+ * @template S - Тип состояний
+ * @template C - Тип контекста
+ * @template I - Тип действий
+ *
+ * @param preview - Предыдущее состояние
+ * @param current - Текущее состояние
+ * @param meta - Мета
+ */
+export type OnTransition<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
+  preview: S | undefined,
+  current: S | undefined,
+  meta?: Meta<S, C, I>
+) => void

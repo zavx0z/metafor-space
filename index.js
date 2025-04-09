@@ -226,9 +226,9 @@ export class Meta {
     return () => this.#updateListeners.delete(listener)
   }
 
-  /** Уведомления о переходах между состояниями
-    @param {(oldState: S, newState: S) => void} listener
-    @returns {() => void} */
+      /** Уведомления о переходах между состояниями
+        @param {(oldState: S, newState: S) => void} listener
+        @returns {() => void} */
   onTransition = (listener) =>
     this.$state.onChange((oldValue, newValue) => {
       if (newValue !== undefined) listener(oldValue, newValue)
