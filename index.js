@@ -36,8 +36,6 @@ export class Meta {
       this.#parsedCore = {}
       if (typeof destroy === "function") destroy(this)
     }
-    this.states = states
-    this.$state = this.#createSignal(initialState)
     this.context = /** @type {import('./types/context').ContextData<C>} */ (
       Object.keys(contextDefinition).reduce((acc, key) => {
         const createValue = contextData && contextData[key]
@@ -47,15 +45,9 @@ export class Meta {
         else return { ...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined }
       }, {})
     )
-
     this.types = contextDefinition
     this.transitions = transitions || []
-    if (onTransition)
-      this.$state.onChange((oldValue, newValue) => {
-        if (newValue !== undefined) onTransition(oldValue, newValue, this)
-      })
     if (onUpdate) this.onUpdate(onUpdate)
-
     this.core = /** @type {import("./types/core").Core<I>} */ ((() => {
       let /** @type {string | null} */ currentCaller = null
       const self = /** @type {import("./types/core").Core<I>} */ ({})
@@ -134,7 +126,16 @@ export class Meta {
       const finallyFn = () => (this.process = false)
       if (result?.then) result.finally(finallyFn)
       else finallyFn()
-    } else this.process = false
+    } else {
+      this.process = false
+    }
+
+    this.states = states
+    this.$state = this.#createSignal(initialState)
+    if (onTransition)
+      this.$state.onChange((oldValue, newValue) => {
+        if (newValue !== undefined) onTransition(oldValue, newValue, this)
+      })
   }
 
   get process() {
