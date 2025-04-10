@@ -157,3 +157,11 @@ export type OnTransitionCallBack<S extends string, C extends ContextDefinition, 
   current: S | undefined,
   meta?: Meta<S, C, I>
 ) => void
+
+/**
+ * Процесс мета
+ * 
+ * Когда мета выполняет действие, то в процессе хранится название действия
+ * Когда мета ничего не выполняет, то в процессе хранится null
+ */ // todo: вместо строки должны быть названия actions
+ export type Process = string | null

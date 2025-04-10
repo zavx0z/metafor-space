@@ -8,12 +8,8 @@ export class Meta {
   description = ""
   graph = /** @type {() => Promise<any>} */ () => Promise.resolve(/** @type {any} */ (undefined))
   component = /**@type {HTMLElement | Element} */ (/** @type {unknown} */ (null))
-  #process = false
+  #process = /** @type {import('./types/meta').Process} */ (null)
   #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
-
-  get state() {
-    return this.$state.value()
-  }
 
   /** @param {import('./types/meta').MetaConstructor<S, C, I>} params */ // prettier-ignore
   constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, actions, core, coreData, reactions, onTransition, onUpdate, destroy }) {
@@ -97,7 +93,6 @@ export class Meta {
     this.actions = actions
     this.reactions = reactions
     // TODO: при восстановлении входить в состояние без вызова действия
-    this.process = true
     this.channel.postMessage({
       meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
       patch: { path: "/", op: "add", value: this.snapshot() },
@@ -118,16 +113,17 @@ export class Meta {
     const actionDefinition = this.transitions.find((i) => i.from === this.state && i.action)
     const action = actionDefinition?.action && this.actions[actionDefinition.action]
     if (action) {
+      this.process = action.name
       const result = action({
         context: this.context,
         update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
         core: this.core,
       })
-      const finallyFn = () => (this.process = false)
+      const finallyFn = () => (this.process = null)
       if (result?.then) result.finally(finallyFn)
       else finallyFn()
     } else {
-      this.process = false
+      this.process = null
     }
 
     this.states = states
@@ -137,11 +133,13 @@ export class Meta {
         if (newValue !== undefined) onTransition(oldValue, newValue, this)
       })
   }
-
+  get state() {
+    return this.$state.value()
+  }
   get process() {
     return this.#process
   }
-
+  /** @param {import('./types/meta').Process} value */
   set process(value) {
     this.#process = value
     if (!value) this.update(this.context)
@@ -160,7 +158,7 @@ export class Meta {
             this.$state.setValue(transition.state)
             break
           }
-          this.process = true
+          this.process = null
           this.$state.setValue(transition.state)
           this.#runAction(action)
           break
@@ -178,13 +176,13 @@ export class Meta {
 
   /** @param {import('./types/actions').Action<C, I>} action */
   #runAction(action) {
-    this.process = true
+    this.process = action.name
     const result = action({
       context: this.context,
       update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
       core: this.core,
     })
-    const finallyFn = () => (this.process = false)
+    const finallyFn = () => (this.process = null)
     if (result?.then) result.finally(finallyFn)
     else finallyFn()
   }
