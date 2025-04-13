@@ -12,13 +12,16 @@ export class Meta {
   #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
 
   get state() {
-    return this.$state.value()
+    return this.$state?.value()
   }
 
   /** @param {import('./types/meta').MetaConstructor<S, C, I>} params */ // prettier-ignore
   constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, actions, core, coreData, reactions, onTransition, onUpdate, destroy }) {
     this.channel = channel
     this.id = id
+    this.actions = actions
+    this.reactions = reactions
+    this.$state = this.#createSignal(initialState)
     this.destroy = () => {
       this.channel.postMessage({
         meta: { particle: this.id, func: "destroy", target: "particle", timestamp: Date.now() },
@@ -95,10 +98,6 @@ export class Meta {
           ? value //@ts-ignore
           : (this.core[key] = Object.isFrozen(value) ? value : Object.freeze(value)))
     )
-
-    this.actions = actions
-    this.reactions = reactions
-
     this.channel.onmessage = ({ data: { meta, patch } }) => {
       this.reactions.forEach((reaction) => {
         if (reaction.particle && reaction.particle === meta.name) {
@@ -112,7 +111,6 @@ export class Meta {
         }
       })
     }
-    this.$state = this.#createSignal(initialState)
     // TODO: при восстановлении входить в состояние без вызова действия
     this.channel.postMessage({
       meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
@@ -128,7 +126,6 @@ export class Meta {
     const actionDefinition = this.transitions.find((i) => i.from === initialState && i.action)
     const action = actionDefinition?.action && this.actions[actionDefinition.action]
     if (action) {
-      this.$state.setValue(initialState)
       this.process = true
       const result = action({
         context: this.context,
@@ -136,13 +133,11 @@ export class Meta {
         core: this.core,
       })
       const finallyFn = () => {
-        this.$state.setValue(initialState)
         this.process = false
       }
       if (result?.then) result.finally(finallyFn)
       else finallyFn()
     } else {
-      this.$state.setValue(initialState)
       this.process = false
     }
   }
