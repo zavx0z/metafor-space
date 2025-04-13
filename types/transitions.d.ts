@@ -1,3 +1,4 @@
+import type { ActionClean } from "./actions"
 /**
  # Переходы
 
@@ -59,7 +60,7 @@ export type Transition<C extends ContextDefinition, S> = {
 
      @default undefined
      */
-  action?: string
+  action?: string | ActionClean<C>
   /**
      Набор целевых состояний с условиями перехода
 

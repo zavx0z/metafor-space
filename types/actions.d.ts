@@ -20,6 +20,21 @@ export type Action<C extends ContextDefinition, I extends Record<string, unknown
 }) => void | Promise<void>
 
 /**
+ Чистое действие
+
+ @template C - Тип данных контекста
+ @property context - Данные контекста
+ @property update - Функция обновления контекста
+ */
+ export type ActionClean<C extends ContextDefinition> = ({
+  context,
+  update,
+}: {
+  context: ContextData<C>
+  update: Update<C>
+}) => void | Promise<void>
+
+/**
  Действия
 
  @template C - Тип данных контекста

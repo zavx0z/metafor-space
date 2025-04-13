@@ -124,21 +124,11 @@ export class Meta {
     }
     if (onUpdate) this.onUpdate(onUpdate)
     const actionDefinition = this.transitions.find((i) => i.from === initialState && i.action)
-    const action = actionDefinition?.action && this.actions[actionDefinition.action]
-    if (action) {
+
+    if (actionDefinition?.action) {
       this.process = true
-      const result = action({
-        context: this.context,
-        update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
-        core: this.core,
-      })
-      const finallyFn = () => {
-        this.process = false
-      }
-      if (result?.then) result.finally(finallyFn)
-      else finallyFn()
-    } else {
-      this.process = false
+      if (typeof actionDefinition?.action === "function") this.#runCleanAction(actionDefinition.action)
+      else if (typeof actionDefinition?.action === "string") this.#runAction(this.actions[actionDefinition.action])
     }
   }
 
@@ -159,15 +149,14 @@ export class Meta {
         if (Object.keys(transition.when).length === 0) break
         if (matchTrigger(transition.when, this.context, this.types)) {
           const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
-          const action = actionDefinition?.action && this.actions[actionDefinition.action]
-          if (!action) {
-            this.$state.setValue(transition.state)
-            break
-          }
+
           this.process = true
           this.$state.setValue(transition.state)
-          this.#runAction(action)
-          break
+
+          if (!actionDefinition?.action) break
+
+          if (typeof actionDefinition?.action === "function") this.#runCleanAction(actionDefinition.action)
+          else if (typeof actionDefinition?.action === "string") this.#runAction(this.actions[actionDefinition.action])
         }
       }
     }
@@ -180,9 +169,20 @@ export class Meta {
     if (updCtx && !this.process) this.#transition()
   }
 
+  /** @param {import('./types/actions').ActionClean<C>} action */
+  #runCleanAction(action) {
+    this.process = true
+    const result = action({
+      context: this.context,
+      update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
+    })
+    const finallyFn = () => (this.process = false)
+    if (result?.then) result.finally(finallyFn)
+    else finallyFn()
+  }
+
   /** @param {import('./types/actions').Action<C, I>} action */
   #runAction(action) {
-    this.process = true
     const result = action({
       context: this.context,
       update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
@@ -239,14 +239,13 @@ export class Meta {
 
   /** @returns {import('./types/meta.js').Snapshot<C, S>} */
   snapshot() {
-    const parsedActions = parseFunctions(this.actions)
     return {
       id: this.id,
       title: this.title || "",
       description: this.description || "",
       state: this.state,
       states: this.states,
-      actions: parsedActions,
+      actions: parseFunctions(this.actions),
       core: this.#parsedCore,
       context: this.context,
       types: this.types,
@@ -256,7 +255,7 @@ export class Meta {
           state: toState.state,
           when: toState.when,
         })),
-        action: t.action,
+        action: typeof t.action === 'string' ? t.action : undefined
       })),
     }
   }

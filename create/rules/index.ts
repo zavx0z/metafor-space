@@ -66,7 +66,14 @@ const meta = MetaFor("rules")
     },
     {
       from: "вывод приветственного сообщения",
-      action: "logInfo",
+      action: async ({ context, update }) => {
+        console.log(
+          chalk.blue(`
+          Create cursor rules v${context.version}
+          ---------------------------
+        `)
+        )
+      },
       to: [{ state: "поиск package.json", when: { error: null } }],
     },
     {
@@ -113,14 +120,6 @@ const meta = MetaFor("rules")
       } catch (error) {
         update({ error: (error as Error).message })
       }
-    },
-    logInfo: async ({ context, update }) => {
-      console.log(
-        chalk.blue(`
-        Create cursor rules v${context.version}
-        ---------------------------
-      `)
-      )
     },
     readPackageJson: async ({ context, update, core }) => {
       try {
