@@ -37,7 +37,6 @@ export class Meta {
       if (typeof destroy === "function") destroy(this)
     }
     this.states = states
-    this.$state = this.#createSignal(initialState)
     this.context = /** @type {import('./types/context').ContextData<C>} */ (
       Object.keys(contextDefinition).reduce((acc, key) => {
         const createValue = contextData && contextData[key]
@@ -50,11 +49,6 @@ export class Meta {
 
     this.types = contextDefinition
     this.transitions = transitions || []
-    if (onTransition)
-      this.$state.onChange((oldValue, newValue) => {
-        if (newValue !== undefined) onTransition(oldValue, newValue, this)
-      })
-    if (onUpdate) this.onUpdate(onUpdate)
 
     this.core = /** @type {import("./types/core").Core<I>} */ ((() => {
       let /** @type {string | null} */ currentCaller = null
@@ -104,12 +98,7 @@ export class Meta {
 
     this.actions = actions
     this.reactions = reactions
-    // TODO: при восстановлении входить в состояние без вызова действия
-    this.process = true
-    this.channel.postMessage({
-      meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
-      patch: { path: "/", op: "add", value: this.snapshot() },
-    })
+
     this.channel.onmessage = ({ data: { meta, patch } }) => {
       this.reactions.forEach((reaction) => {
         if (reaction.particle && reaction.particle === meta.name) {
@@ -123,18 +112,38 @@ export class Meta {
         }
       })
     }
-    const actionDefinition = this.transitions.find((i) => i.from === this.state && i.action)
+    const actionDefinition = this.transitions.find((i) => i.from === initialState && i.action)
     const action = actionDefinition?.action && this.actions[actionDefinition.action]
     if (action) {
+      this.$state = this.#createSignal(initialState)
+      this.process = true
       const result = action({
         context: this.context,
         update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
         core: this.core,
       })
-      const finallyFn = () => (this.process = false)
+      const finallyFn = () => {
+        this.$state = this.#createSignal(initialState)
+        this.process = false
+      }
       if (result?.then) result.finally(finallyFn)
       else finallyFn()
-    } else this.process = false
+    } else {
+      this.$state = this.#createSignal(initialState)
+      this.process = false
+    }
+
+    if (onTransition) {
+      this.$state.onChange((oldValue, newValue) => {
+        if (newValue !== undefined) onTransition(oldValue, newValue, this)
+      })
+    }
+    if (onUpdate) this.onUpdate(onUpdate)
+    // TODO: при восстановлении входить в состояние без вызова действия
+    this.channel.postMessage({
+      meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
+      patch: { path: "/", op: "add", value: this.snapshot() },
+    })
   }
 
   get process() {
@@ -212,7 +221,7 @@ export class Meta {
   /** @type {import('./types/context').Update<C>} */
   update = (context) => {
     this.#updateContext({ context })
-    if (this.process) return undefined
+    if (this.process) return
     this.#transition()
   }
 
@@ -221,7 +230,9 @@ export class Meta {
   /** @type {import('./types/meta').OnUpdate<C>}*/
   onUpdate(cb) {
     this.#updateListeners.add(cb)
-    return () => this.#updateListeners.delete(cb)
+    return () => {
+      this.#updateListeners.delete(cb)
+    }
   }
 
   /** @type {import('./types/meta').OnTransition<S, C, I>}*/

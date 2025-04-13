@@ -2,7 +2,6 @@ import type {
   ContextData,
   ContextDefinition,
   ContextTypes,
-  OnUpdateContextData,
   UpdateParameters,
 } from "./context"
 import type { Transitions } from "./transitions"
@@ -11,7 +10,7 @@ import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"
 import type { ViewDefinition } from "./view"
 import type { CreateParams } from "./create"
-import type { MetaConstructor, Snapshot } from "./meta"
+import type { MetaConstructor, Snapshot, OnUpdate, OnTransition } from "./meta"
 
 export { BroadcastMessage } from "./meta"
 /**

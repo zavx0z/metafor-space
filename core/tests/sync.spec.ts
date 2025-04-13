@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { MetaFor } from "@metafor/space"
 
 describe("Синхронизация core и context", async () => {
-    const particle = MetaFor("sync-test")
+    const meta = MetaFor("sync-test")
     .states("IDLE")
     .context((t) => ({
       dataLength: t.number({ default: 0 }),
@@ -28,22 +28,22 @@ describe("Синхронизация core и context", async () => {
   let count = 50
   const delay = 100
   const interval = setInterval(() => {
-    particle.core.pushData(count)
+    meta.core.pushData(count)
     count--
     if (count === 0) clearInterval(interval)
   }, delay)
 
-  particle.onUpdate(values => {
+  meta.onUpdate(values => {
     if (values.dataLength > 4) {
       test("Данные ядра синхронизируются с контекстом", () => {
-        particle.core.popData()
+        meta.core.popData()
         // Simulate heavy synchronous computation (~1 second)
         let result = 0
         for (let i = 0; i < 100_000_000; i++) {
           result += Math.sin(i) * Math.cos(i)
         }
-        expect(particle.context.dataLength).toBe(0)
-        expect(particle.core.data.length).toBe(0)
+        expect(meta.context.dataLength).toBe(0)
+        expect(meta.core.data.length).toBe(0)
       })
     }
   })

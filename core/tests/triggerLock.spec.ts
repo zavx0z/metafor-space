@@ -1,23 +1,23 @@
 import { expect, test } from "bun:test"
 import { MetaFor } from "@metafor/space"
 
-test("блокировка триггеров перед входом в новое состояние", async () => {
+test("блокировка условий перед входом в новое состояние", async () => {
   let value = -1
 
-  const particle = MetaFor("test-sync")
+  const meta = MetaFor("test-sync")
     .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
       value: t.number({ nullable: true }),
     }))
     .transitions([
       {
-        from: "INIT",
         action: "initAction",
+        from: "INIT",
         to: [{ state: "PROCESS", when: { value: { gt: 10 } } }],
       },
       {
-        from: "PROCESS",
         action: "syncAction",
+        from: "PROCESS",
         to: [
           { state: "DONE", when: { value: { gt: 14 } } },
           { state: "INIT", when: { value: { lt: 4 } } },
@@ -39,20 +39,22 @@ test("блокировка триггеров перед входом в нов�
     })
     .create({
       state: "INIT",
-      onTransition: async (_, newState, particle) => {
+      onTransition: async (_, newState, meta) => {
+        console.log(newState)
         if (newState === "PROCESS") {
-          particle.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке триггеров
-          value = particle.context.value
+          console.log(newState, meta?.context.value)
+          meta?.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке триггеров
+          value = meta?.context.value
         }
       },
     })
   await Bun.sleep(1000)
   expect(value).toBe(1)
-  expect(particle.state).toBe("DONE")
+  expect(meta.state).toBe("DONE")
 })
 
 test("блокировка триггеров для асинхронного действия", async () => {
-  const particle = MetaFor("test-async")
+  const meta = MetaFor("test-async")
     .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
       value: t.number({ nullable: true }),
@@ -79,17 +81,17 @@ test("блокировка триггеров для асинхронного д
     .reactions([])
     .create({ state: "INIT" })
     
-  const result: unknown = particle.update({ value: 1 })
+  const result: unknown = meta.update({ value: 1 })
   if (result instanceof Promise) {
-    expect(particle.process).toBe(true)
+    expect(meta.process).toBe(true)
     await result
-    expect(particle.process).toBe(false)
+    expect(meta.process).toBe(false)
   }
-  expect(particle.state).toBe("INIT") // Проверяем что триггер заблокирован во время действия
+  expect(meta.state).toBe("INIT") // Проверяем что триггер заблокирован во время действия
 })
 
 test("снятие блокировки после действия", async () => {
-  const particle = MetaFor("test-lock")
+  const meta = MetaFor("test-lock")
     .states("INIT", "DONE")
     .context((t) => ({
       value: t.number({ nullable: true }),
@@ -116,9 +118,9 @@ test("снятие блокировки после действия", async () =
     .reactions([])
     .create({ state: "INIT", context: { value: 2 } })
 
-  expect(particle.state).toBe("INIT")
-  expect(particle.process).toBe(true)
+  expect(meta.state).toBe("INIT")
+  expect(meta.process).toBe(true)
   await Bun.sleep(100)
-  expect(particle.process).toBe(false)
-  expect(particle.state).toBe("DONE")
+  expect(meta.process).toBe(false)
+  expect(meta.state).toBe("DONE")
 })
