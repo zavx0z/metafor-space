@@ -44,7 +44,7 @@ describe("update", async () => {
 
   const messages = await waitForMessages()
 
-  expect(messages[0].patch.op, "Первое сообщение о добавлении нового частицы").toBe("add")
+  expect(messages[0].patch.op, "Первое сообщение о добавлении новой meta").toBe("add")
 
   test("actionInit в INITIAL", () => {
     expect(particle.state).toBe("NEXT")

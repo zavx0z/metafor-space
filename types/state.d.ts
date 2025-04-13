@@ -28,7 +28,7 @@ type SignalListener<T extends string> = (preview: T, current: T) => void
 /**
  * Создать сигнал
  * @hidden
- * 
+ *
  * @template T - Тип состояния
  * @param value - Значение
  * @returns Сигнал

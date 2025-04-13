@@ -112,26 +112,12 @@ export class Meta {
         }
       })
     }
-    const actionDefinition = this.transitions.find((i) => i.from === initialState && i.action)
-    const action = actionDefinition?.action && this.actions[actionDefinition.action]
-    if (action) {
-      this.$state = this.#createSignal(initialState)
-      this.process = true
-      const result = action({
-        context: this.context,
-        update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
-        core: this.core,
-      })
-      const finallyFn = () => {
-        this.$state = this.#createSignal(initialState)
-        this.process = false
-      }
-      if (result?.then) result.finally(finallyFn)
-      else finallyFn()
-    } else {
-      this.$state = this.#createSignal(initialState)
-      this.process = false
-    }
+    this.$state = this.#createSignal(initialState)
+    // TODO: при восстановлении входить в состояние без вызова действия
+    this.channel.postMessage({
+      meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
+      patch: { path: "/", op: "add", value: this.snapshot() },
+    })
 
     if (onTransition) {
       this.$state.onChange((oldValue, newValue) => {
@@ -139,11 +125,26 @@ export class Meta {
       })
     }
     if (onUpdate) this.onUpdate(onUpdate)
-    // TODO: при восстановлении входить в состояние без вызова действия
-    this.channel.postMessage({
-      meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
-      patch: { path: "/", op: "add", value: this.snapshot() },
-    })
+    const actionDefinition = this.transitions.find((i) => i.from === initialState && i.action)
+    const action = actionDefinition?.action && this.actions[actionDefinition.action]
+    if (action) {
+      this.$state.setValue(initialState)
+      this.process = true
+      const result = action({
+        context: this.context,
+        update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
+        core: this.core,
+      })
+      const finallyFn = () => {
+        this.$state.setValue(initialState)
+        this.process = false
+      }
+      if (result?.then) result.finally(finallyFn)
+      else finallyFn()
+    } else {
+      this.$state.setValue(initialState)
+      this.process = false
+    }
   }
 
   get process() {
