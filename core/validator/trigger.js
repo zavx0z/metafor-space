@@ -23,7 +23,7 @@ const CONDITIONS = {
 
  @param {Object} params
  @param {string} params.tag Имя частицы
- @param {import('../../types/transitions').Transitions<any, any>} params.transitions Массив переходов
+ @param {import('../../types/transitions').Transitions<any,any, any>} params.transitions Массив переходов
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTriggers({ tag, transitions: transitionsList, contextDefinition }) {

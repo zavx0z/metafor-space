@@ -19,7 +19,6 @@ import type { Meta } from "./index"
  @property context - Данные контекста
  @property types - Определение типов контекста
  @property transitions - Переходы
- @property actions - Действия
  @property core - Ядро
  */
 export type Snapshot<C extends Record<string, any>, S> = {
@@ -30,8 +29,7 @@ export type Snapshot<C extends Record<string, any>, S> = {
   states: readonly S[]
   context: ContextData<C>
   types: ContextDefinition
-  transitions: Transitions<C, S>
-  actions: Record<string, { read: string[]; write: string[] }>
+  transitions: Transitions<S, C, I>
   core: Record<string, { read: string[]; write: string[] }>
 }
 
@@ -72,36 +70,34 @@ export type Patch = {
 }
 
 /**
- Параметры конструктора Particle
+ Параметры конструктора Meta
 
  @template S - Тип состояний
  @template C - Тип контекста
  @template I - Тип действий
 
  @property channel - Канал для коммуникации
- @property id - Идентификатор частицы
+ @property id - Идентификатор meta
  @property states - Список возможных состояний
  @property contextDefinition - Определение контекста
  @property transitions - Правила переходов
  @property initialState - Начальное состояние
  @property contextData - Начальные данные контекста
- @property actions - Действия частицы
  @property core - Определение ядра
  @property coreData - Данные ядра
  @property reactions - Реакции на изменения
  @property onTransition - Callback при изменении состояния
  @property onUpdate - Callback при изменении контекста
- @property destroy - Callback при уничтожении частицы
+ @property destroy - Callback при уничтожении meta
  */
 export type MetaConstructor<S extends string, C extends ContextDefinition, I extends Record<string, any>> = {
   channel: BroadcastChannel
   id: string
   states: S[]
   contextDefinition: ContextDefinition
-  transitions: Transitions<C, S>
+  transitions: Transitions<S, C, I>
   initialState: S
   contextData: ContextData<C>
-  actions: Actions<C, I>
   core: CoreDefinition<I, C>
   coreData: CoreData<I>
   reactions: ReactionType<C, I>

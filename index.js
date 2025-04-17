@@ -16,10 +16,9 @@ export class Meta {
   }
 
   /** @param {import('./types/meta').MetaConstructor<S, C, I>} params */ // prettier-ignore
-  constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, actions, core, coreData, reactions, onTransition, onUpdate, destroy }) {
+  constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, core, coreData, reactions, onTransition, onUpdate, destroy }) {
     this.channel = channel
     this.id = id
-    this.actions = actions
     this.reactions = reactions
     this.$state = this.#createSignal(initialState)
     this.destroy = () => {
@@ -33,7 +32,6 @@ export class Meta {
       this.types = {}
       this.context = {}
       this.core = /** @type {import("./types/core").Core<I>} */ ({})
-      this.actions = {}
       this.transitions.length = 0
       this.reactions.length = 0
       this.#parsedCore = {}
@@ -127,8 +125,7 @@ export class Meta {
 
     if (actionDefinition?.action) {
       this.process = true
-      if (typeof actionDefinition?.action === "function") this.#runCleanAction(actionDefinition.action)
-      else if (typeof actionDefinition?.action === "string") this.#runAction(this.actions[actionDefinition.action])
+      this.#runAction(actionDefinition.action)
     }
   }
 
@@ -154,9 +151,7 @@ export class Meta {
           this.$state.setValue(transition.state)
 
           if (!actionDefinition?.action) break
-
-          if (typeof actionDefinition?.action === "function") this.#runCleanAction(actionDefinition.action)
-          else if (typeof actionDefinition?.action === "string") this.#runAction(this.actions[actionDefinition.action])
+          this.#runAction(actionDefinition.action)
         }
       }
     }
@@ -167,18 +162,6 @@ export class Meta {
   _updateExternal = ({ context, srcName = "core", funcName = "unknown" }) => {
     const updCtx = this.#updateContext({ context, srcName, funcName })
     if (updCtx && !this.process) this.#transition()
-  }
-
-  /** @param {import('./types/actions').ActionClean<C>} action */
-  #runCleanAction(action) {
-    this.process = true
-    const result = action({
-      context: this.context,
-      update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
-    })
-    const finallyFn = () => (this.process = false)
-    if (result?.then) result.finally(finallyFn)
-    else finallyFn()
   }
 
   /** @param {import('./types/actions').Action<C, I>} action */
@@ -245,7 +228,6 @@ export class Meta {
       description: this.description || "",
       state: this.state,
       states: this.states,
-      actions: parseFunctions(this.actions),
       core: this.#parsedCore,
       context: this.context,
       types: this.types,
@@ -255,7 +237,7 @@ export class Meta {
           state: toState.state,
           when: toState.when,
         })),
-        action: typeof t.action === 'string' ? t.action : undefined
+        action: typeof t.action === "string" ? t.action : undefined,
       })),
     }
   }
@@ -296,13 +278,13 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/** @type {import("./types").MetaFor} */ // prettier-ignore
+/** @type {import("./types").MetaFor} */
 export function MetaFor(tag, conf = {}) {
-  const {development, description} = conf
+  const { development, description } = conf
   if (development) {
-      import("./core/validator/index.js")
-      setDevChannel(new BroadcastChannel("validator"))
-      // todo: добавить проверку имени частицы
+    import("./core/validator/index.js")
+    setDevChannel(new BroadcastChannel("validator"))
+    // todo: добавить проверку имени частицы
   }
   return {
     states(...states) {
@@ -310,59 +292,101 @@ export function MetaFor(tag, conf = {}) {
       return {
         context(context) {
           const contextDefinition = context({
-            string: params => ({type: "string", ...params}),
-            number: params => ({type: "number", ...params}),
-            boolean: params => ({type: "boolean", ...params}),
-            array: params => ({type: "array", ...params}),
-            enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
+            string: (params) => ({ type: "string", ...params }),
+            number: (params) => ({ type: "number", ...params }),
+            boolean: (params) => ({ type: "boolean", ...params }),
+            array: (params) => ({ type: "array", ...params }),
+            enum:
+              (...values) =>
+              (params = {}) => ({ type: "enum", values, ...params }),
           })
-          development && import("./core/validator/index.js").then((module) => module.validateContextDefinition({ tag, context: contextDefinition }))
+          development &&
+            import("./core/validator/index.js").then((module) =>
+              module.validateContextDefinition({ tag, context: contextDefinition })
+            )
           return {
-            transitions(transitions) {
-                if (development) {
-                    const data = {tag, transitions: [...transitions], contextDefinition}
-                    import("./core/validator/index.js").then((module) => module.validateTransitions(data))
-                }
+            core(core = () => Object.create({})) {
+              const coreDefinition = core
+              development &&
+                import("./core/validator/index.js").then((module) => module.validateCore({ tag, core: coreDefinition }))
               return {
-                core(core = () => Object.create({})) {
-                  const coreDefinition = core
-                  development && import("./core/validator/index.js").then((module) => module.validateCore({ tag, core: coreDefinition }))
+                transitions(transitions) {
+                  if (development) {
+                    const data = { tag, transitions: [...transitions], contextDefinition }
+                    import("./core/validator/index.js").then((module) => module.validateTransitions(data))
+                  }
                   return {
-                    actions(actions) {
-                      return {
-                        reactions: (reactions = []) => ({
+                    reactions: (reactions = []) => ({
+                      create: (options) => {
+                        return createMeta({
+                          development,
+                          description,
+                          tag,
+                          options,
+                          states,
+                          contextDefinition,
+                          transitions,
+                          coreDefinition,
+                          reactions,
+                        })
+                      },
+                      view: (view) => {
+                        return {
                           create: (options) => {
-                            return createParticle({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions})
-                          },
-                          view: (view) => {
-                            return {
-                              create: (options) => {
-                                const particle = createParticle({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions})
+                            const particle = createMeta({
+                              development,
+                              description,
+                              tag,
+                              options,
+                              states,
+                              contextDefinition,
+                              transitions,
+                              coreDefinition,
+                              reactions,
+                            })
 
-                                if (view.isolated === undefined) view.isolated = true
-                                if (options.view?.isolated === false) view.isolated = false
-                                import("./core/web/component.js").then((module) => module.default({ view,  particle }))
+                            if (view.isolated === undefined) view.isolated = true
+                            if (options.view?.isolated === false) view.isolated = false
+                            import("./core/web/component.js").then((module) => module.default({ view, particle }))
 
-                                return particle
-                              },
-                            }
+                            return particle
                           },
-                        }),
+                        }
+                      },
+                    }),
+                    create: (options) => {
+                      return createMeta({
+                        development,
+                        description,
+                        tag,
+                        options,
+                        states,
+                        contextDefinition,
+                        transitions,
+                        coreDefinition,
+                        reactions: [],
+                      })
+                    },
+                    view: (view) => {
+                      return {
                         create: (options) => {
-                          return createParticle({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions: []})
-                        },
-                        view: (view) => {
-                          return {
-                            create: (options) => {
-                              const particle = createParticle({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions: []})
+                          const particle = createMeta({
+                            development,
+                            description,
+                            tag,
+                            options,
+                            states,
+                            contextDefinition,
+                            transitions,
+                            coreDefinition,
+                            reactions: [],
+                          })
 
-                              if (view.isolated === undefined) view.isolated = true
-                              if (options.view?.isolated === false) view.isolated = false
-                              import("./core/web/component.js").then((module) => module.default({ view, particle }))
+                          if (view.isolated === undefined) view.isolated = true
+                          if (options.view?.isolated === false) view.isolated = false
+                          import("./core/web/component.js").then((module) => module.default({ view, particle }))
 
-                              return particle
-                            },
-                          }
+                          return particle
                         },
                       }
                     },
@@ -383,11 +407,11 @@ export function MetaFor(tag, conf = {}) {
  @template {Record<string, any>} I - ядро
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
  */ // prettier-ignore
-const createParticle = ({development, description, tag, options, states, contextDefinition, transitions, actions, coreDefinition, reactions=[]}) => {
+const createMeta = ({development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions=[]}) => {
   development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
   const channel = new BroadcastChannel("channel")
-  const particle = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, actions, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
+  const particle = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
   particle.description = description || options.description || ""
   if (graph) particle.graph = () => import("./core/web/graph.js").then((module) => module.default(particle))
   if (debug) import("./core/debug.js").then((module) => module.default(particle, debug))

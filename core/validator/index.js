@@ -56,7 +56,7 @@ export function validateContextDefinition({ tag, context }) {
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Имя частицы
- @param {import('../../types/transitions').Transitions<any, any>} params.transitions Массив переходов
+ @param {import('../../types/transitions').Transitions<any, any, any>} params.transitions Массив переходов
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTransitions({ tag, transitions, contextDefinition }) {

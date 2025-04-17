@@ -11,12 +11,13 @@ const meta = MetaFor("nodes", {
   .context((t) => ({
     status: t.enum("start", "end")({ title: "Status", default: "start" }),
   }))
+  .core()
   .transitions([
     {
       from: "начало",
-    //   action: async () => {
-    //     console.log("начало")
-    //   },
+      action: ({ context }) => {
+        console.log(context)
+      },
       to: [
         {
           state: "конец",
@@ -41,8 +42,6 @@ const meta = MetaFor("nodes", {
       ],
     },
   ])
-  .core()
-  .actions({})
   .create({
     state: "начало",
     onTransition: (preview, current, meta) => {

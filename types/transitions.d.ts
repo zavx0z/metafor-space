@@ -1,4 +1,4 @@
-import type { ActionClean } from "./actions"
+import type { Action } from "./actions"
 /**
  # Переходы
 
@@ -31,9 +31,10 @@ import type { ActionClean } from "./actions"
 
  @template C - Проброс определения контекста для автодополнения
  @template S - Проброс состояний для автодополнения
+ @template I - Проброс ядра для автодополнения
  @includeExample tests/core.spec.ts
  */
-export type Transitions<C extends ContextDefinition, S> = Array<Transition<C, S>>
+export type Transitions<S extends string, C extends ContextDefinition, I extends CoreObj> = Array<Transition<C, S, I>>
 
 /**
  Переход
@@ -43,8 +44,9 @@ export type Transitions<C extends ContextDefinition, S> = Array<Transition<C, S>
 
  @template C - Тип данных контекста
  @template S - Тип состояния
+ @template I - Тип ядра
  */
-export type Transition<C extends ContextDefinition, S> = {
+export type Transition<C extends ContextDefinition, S, I extends CoreObj> = {
   /**
      Исходное состояние
 
@@ -60,7 +62,7 @@ export type Transition<C extends ContextDefinition, S> = {
 
      @default undefined
      */
-  action?: string | ActionClean<C>
+  action?: Action<C, I>
   /**
      Набор целевых состояний с условиями перехода
 

@@ -1,9 +1,4 @@
-import type {
-  ContextData,
-  ContextDefinition,
-  ContextTypes,
-  UpdateParameters,
-} from "./context"
+import type { ContextData, ContextDefinition, ContextTypes, UpdateParameters } from "./context"
 import type { Transitions } from "./transitions"
 import type { Core, CoreDefinition, CoreObj } from "./core"
 import type { Actions } from "./actions"
@@ -51,20 +46,18 @@ export declare function MetaFor(
   }
 ): { states: <S extends string>( ...states: S[] ) => {
     context: <C extends ContextDefinition>( context: (types: ContextTypes) => C ) => {
-      transitions: (transitions: Transitions<C, S>) => {
-        core: <I extends CoreObj>( core: CoreDefinition<I, C> = () => Object.create({}) ) => {
-          actions: (actions: Actions<C, I>) => {
-            reactions: (reactions: ReactionType<C, I>) => {
-              view: (view: ViewDefinition<I, C, S>) => {
-                create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
-              }
-              create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
-            }
+      core: <I extends CoreObj>( core: CoreDefinition<I, C> = () => Object.create({}) ) => {
+        transitions: (transitions: Transitions<S, C, I>) => {
+          reactions: (reactions: ReactionType<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
               create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
             }
             create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
           }
+          view: (view: ViewDefinition<I, C, S>) => {
+            create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
+          }
+          create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
         }
       }
     }
@@ -78,27 +71,26 @@ export declare function MetaFor(
  @template C - Контекст
  @template I - Ядро
 
- @property id - Идентификатор частицы
- @property title - Заголовок частицы
- @property description - Описание частицы
- @property state - Состояние частицы
- @property context - Контекст частицы
- @property states - Состояния частицы
- @property types - Типы частицы
- @property transitions - Переходы частицы
- @property actions - Действия частицы
- @property core - Ядро частицы
- @property reactions - Реакции частицы
- @property channel - Канал частицы
- @property process - Флаг процесса частицы
- @property component - Компонент частицы
- @property update - Обновление частицы
- @property _updateExternal - Обновление частицы из вне
- @property onUpdate - Обработчик обновления частицы
- @property onTransition - Обработчик перехода частицы
- @property snapshot - Снимок частицы
- @property graph - Граф частицы
- @property destroy - Уничтожение частицы
+ @property id - Идентификатор meta
+ @property title - Заголовок meta
+ @property description - Описание meta
+ @property state - Состояние meta
+ @property context - Контекст meta
+ @property states - Состояния meta
+ @property types - Типы meta
+ @property transitions - Переходы meta
+ @property core - Ядро meta
+ @property reactions - Реакции meta
+ @property channel - Канал meta
+ @property process - Флаг процесса meta
+ @property component - Компонент meta
+ @property update - Обновление meta
+ @property _updateExternal - Обновление meta из вне
+ @property onUpdate - Обработчик обновления meta
+ @property onTransition - Обработчик перехода meta
+ @property snapshot - Снимок meta
+ @property graph - Граф meta
+ @property destroy - Уничтожение meta
  */
 export declare class Meta<S extends string, C extends Record<string, any>, I extends Record<string, any>> {
   id: string
@@ -106,10 +98,9 @@ export declare class Meta<S extends string, C extends Record<string, any>, I ext
   description?: string
   state: S
   context: ContextData<C>
-  states: readonly (S | undefined)[] 
+  states: readonly (S | undefined)[]
   types: Record<string, any>
-  transitions: Transitions<C, S>
-  actions: Actions<C, I>
+  transitions: Transitions<S, C, I>
   core: Core<I>
   reactions: ReactionType<C, I>
   channel: BroadcastChannel

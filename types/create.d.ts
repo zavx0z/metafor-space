@@ -100,8 +100,7 @@ export type FabricCallbackCreateFuncHelper<
   options: CreateParams<C, S, I>
   states: S[]
   contextDefinition: ContextDefinition
-  transitions: Transitions<C, S>
-  actions: Actions<C, I>
+  transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
   reactions: ReactionType<C, I>
 }
