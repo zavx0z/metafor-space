@@ -60,6 +60,25 @@
         "@types/trusted-types": "^2.0.7",
       },
     },
+    "nodes": {
+      "name": "@metafor/nodes",
+      "devDependencies": {
+        "@types/bun": "latest",
+        "elkjs": "^0.10.0",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "viewport": {
+      "name": "@metafor/viewport",
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
   },
   "packages": {
     "@babel/code-frame": ["@babel/code-frame@7.26.2", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.25.9", "js-tokens": "^4.0.0", "picocolors": "^1.0.0" } }, "sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ=="],
@@ -69,6 +88,10 @@
     "@gerrit0/mini-shiki": ["@gerrit0/mini-shiki@3.2.3", "", { "dependencies": { "@shikijs/engine-oniguruma": "^3.2.2", "@shikijs/langs": "^3.2.2", "@shikijs/themes": "^3.2.2", "@shikijs/types": "^3.2.2", "@shikijs/vscode-textmate": "^10.0.2" } }, "sha512-yemSYr0Oiqk5NAQRfbD5DKUTlThiZw1MxTMx/YpQTg6m4QRJDtV2JTYSuNevgx1ayy/O7x+uwDjh3IgECGFY/Q=="],
 
     "@happy-dom/global-registrator": ["@happy-dom/global-registrator@17.3.0", "", { "dependencies": { "happy-dom": "^17.3.0" } }, "sha512-0InzPego4klbD/MLYO4X4h1hF7a98lZqpBDezXFbHnZLJLYn+KUg7c7O3pMVOXo0kQn2diaX5eEJYEvUFTGE1Q=="],
+
+    "@metafor/nodes": ["@metafor/nodes@workspace:nodes"],
+
+    "@metafor/viewport": ["@metafor/viewport@workspace:viewport"],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 
@@ -237,6 +260,8 @@
     "domutils": ["domutils@2.8.0", "", { "dependencies": { "dom-serializer": "^1.0.1", "domelementtype": "^2.2.0", "domhandler": "^4.2.0" } }, "sha512-w96Cjofp72M5IIhpjgobBimYEfoPjx1Vx0BSX9P30WBdZW2WIKU0T1Bd0kz2eNZ9ikjKgHbEyKx8BB6H1L3h3A=="],
 
     "dunder-proto": ["dunder-proto@1.0.1", "", { "dependencies": { "call-bind-apply-helpers": "^1.0.1", "es-errors": "^1.3.0", "gopd": "^1.2.0" } }, "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A=="],
+
+    "elkjs": ["elkjs@0.10.0", "", {}, "sha512-v/3r+3Bl2NMrWmVoRTMBtHtWvRISTix/s9EfnsfEWApNrsmNjqgqJOispCGg46BPwIFdkag3N/HYSxJczvCm6w=="],
 
     "emoji-regex": ["emoji-regex@10.1.0", "", {}, "sha512-xAEnNCT3w2Tg6MA7ly6QqYJvEoY1tm9iIjJ3yMKK9JPlWuRHAMoe5iETwQnx3M9TVbFMfsrBgWKR+IsmswwNjg=="],
 

@@ -63,13 +63,13 @@ export default class ELK {
    * @param {Object} [options.defaultLayoutOptions] - Параметры по умолчанию для алгоритма
    * @param {Array<string>} [options.algorithms] - Алгоритмы для использования
    * @param {((url: string) => Worker) | undefined} [options.workerFactory] - Фабрика для создания worker
-   * @param {string} [options.workerUrl="/quantum/layout/lib/elk-worker.js"] - URL для создания worker
+   * @param {string} [options.workerUrl="/nodes/layout/lib/elk-worker.js"] - URL для создания worker
    */
   constructor({
     defaultLayoutOptions = {},
     algorithms = ["layered", "stress", "mrtree", "radial", "force", "disco", "sporeOverlap", "sporeCompaction", "rectpacking"],
     workerFactory,
-    workerUrl = "/quantum/layout/lib/elk-worker.js"
+    workerUrl = "/nodes/layout/lib/elk-worker.js"
   } = {}) {
     this.defaultLayoutOptions = defaultLayoutOptions
     this.initialized = false
