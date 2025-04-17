@@ -121,12 +121,12 @@ export class Meta {
       })
     }
     if (onUpdate) this.onUpdate(onUpdate)
-    const actionDefinition = this.transitions.find((i) => i.from === initialState && i.action)
 
-    if (actionDefinition?.action) {
+    const transition = this.transitions.find((i) => i.from === initialState)
+    if (transition?.action) {
       this.process = true
-      this.#runAction(actionDefinition.action)
-    }
+      this.#runAction(transition.action)
+    } else this.#transition()
   }
 
   get process() {

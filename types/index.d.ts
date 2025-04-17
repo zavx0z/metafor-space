@@ -1,7 +1,6 @@
 import type { ContextData, ContextDefinition, ContextTypes, UpdateParameters } from "./context"
 import type { Transitions } from "./transitions"
 import type { Core, CoreDefinition, CoreObj } from "./core"
-import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"
 import type { ViewDefinition } from "./view"
 import type { CreateParams } from "./create"

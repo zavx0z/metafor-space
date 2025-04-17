@@ -8,38 +8,35 @@ const userActor = MetaFor("user")
     email: string({ title: "Email", nullable: true }),
     password: string({ title: "Пароль", nullable: true }),
   }))
-  .transitions([
-    {
-      from: "АНОНИМНЫЙ",
-      to: [
-        {
-          state: "АВТОРИЗАЦИЯ",
-          when: { email: { isNull: false }, password: { isNull: false } },
-        },
-      ],
-    },
-    {
-      from: "АВТОРИЗАЦИЯ",
-      action: "login",
-      to: [
-        {
-          state: "АВТОРИЗОВАН",
-          when: { nickname: { isNull: false } },
-        },
-      ],
-    },
-  ])
+  .core()
 
 describe("Actions", () => {
   test("При входе в состояние выполняется действие", async () => {
     const user = userActor
-      .core()
-      .actions({
-        login: ({ update }) => {
-          const nickname = "zavx0z"
-          update({ nickname })
+      .transitions([
+        {
+          from: "АНОНИМНЫЙ",
+          to: [
+            {
+              state: "АВТОРИЗАЦИЯ",
+              when: { email: { isNull: false }, password: { isNull: false } },
+            },
+          ],
         },
-      })
+        {
+          from: "АВТОРИЗАЦИЯ",
+          action: ({ update }) => {
+            const nickname = "zavx0z"
+            update({ nickname })
+          },
+          to: [
+            {
+              state: "АВТОРИЗОВАН",
+              when: { nickname: { isNull: false } },
+            },
+          ],
+        },
+      ])
       .create({
         state: "АНОНИМНЫЙ",
         context: { email: "zavx0z@ya.ru", password: "123456" },
@@ -51,13 +48,30 @@ describe("Actions", () => {
 
   test("Асинхронное действие", async () => {
     const user = userActor
-      .core()
-      .actions({
-        login: async ({ update }) => {
-          await new Promise((resolve) => setTimeout(resolve, 100))
-          update({ nickname: "async_user" })
+      .transitions([
+        {
+          from: "АНОНИМНЫЙ",
+          to: [
+            {
+              state: "АВТОРИЗАЦИЯ",
+              when: { email: { isNull: false }, password: { isNull: false } },
+            },
+          ],
         },
-      })
+        {
+          from: "АВТОРИЗАЦИЯ",
+          action: async ({ update }) => {
+            await new Promise((resolve) => setTimeout(resolve, 100))
+            update({ nickname: "async_user" })
+          },
+          to: [
+            {
+              state: "АВТОРИЗОВАН",
+              when: { nickname: { isNull: false } },
+            },
+          ],
+        },
+      ])
       .create({
         state: "АНОНИМНЫЙ",
         context: { nickname: null },
@@ -70,15 +84,32 @@ describe("Actions", () => {
 
   test("Действие может обновлять несколько полей контекста", () => {
     const user = userActor
-      .core()
-      .actions({
-        login: ({ update }) => {
-          update({
-            nickname: "multi_update",
-            email: "updated@email.com",
-          })
+      .transitions([
+        {
+          from: "АНОНИМНЫЙ",
+          to: [
+            {
+              state: "АВТОРИЗАЦИЯ",
+              when: { email: { isNull: false }, password: { isNull: false } },
+            },
+          ],
         },
-      })
+        {
+          from: "АВТОРИЗАЦИЯ",
+          action: ({ update }) => {
+            update({
+              nickname: "multi_update",
+              email: "updated@email.com",
+            })
+          },
+          to: [
+            {
+              state: "АВТОРИЗОВАН",
+              when: { nickname: { isNull: false } },
+            },
+          ],
+        },
+      ])
       .create({
         state: "АНОНИМНЫЙ",
         context: {
@@ -94,13 +125,30 @@ describe("Actions", () => {
   test("Действие не выполняется если триггеры не сработали", () => {
     let actionCalled = false
     const user = userActor
-      .core()
-      .actions({
-        login: ({ update }) => {
-          actionCalled = true
-          update({ nickname: "should_not_update" })
+      .transitions([
+        {
+          from: "АНОНИМНЫЙ",
+          to: [
+            {
+              state: "АВТОРИЗАЦИЯ",
+              when: { email: { isNull: false }, password: { isNull: false } },
+            },
+          ],
         },
-      })
+        {
+          from: "АВТОРИЗАЦИЯ",
+          action: ({ update }) => {
+            actionCalled = true
+            update({ nickname: "should_not_update" })
+          },
+          to: [
+            {
+              state: "АВТОРИЗОВАН",
+              when: { nickname: { isNull: false } },
+            },
+          ],
+        },
+      ])
       .create({ state: "АНОНИМНЫЙ", context: { nickname: null } })
     user.update({ email: "test@test.com" })
     expect(user.state).toBe("АНОНИМНЫЙ")

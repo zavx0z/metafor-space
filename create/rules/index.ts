@@ -57,6 +57,9 @@ MetaFor("rules", {
     cancel: t.boolean({ title: "отмена", nullable: true }),
     error: t.string({ title: "ошибка", nullable: true }),
   }))
+    .core(() => ({
+      packageJson: /** @type {Object} */ undefined,
+    }))
   .transitions([
     {
       from: "подписка на отмену",
@@ -105,7 +108,15 @@ MetaFor("rules", {
     },
     {
       from: "поиск package.json",
-      action: "readPackageJson",
+      action: async ({ context, update, core }) => {
+          try {
+              const packageJson = await readPackageJson(join(__dirname, context.packageJsonPath))
+              update({ projectName: packageJson.name })
+              core.packageJson = packageJson
+          } catch (error) {
+              update({ error: (error as Error).message })
+          }
+      },
       to: [
         { state: "вывод данных о проекте", when: { error: null } },
         { state: "ошибка чтения package.json", when: { error: { isNull: false } } },
@@ -187,7 +198,7 @@ MetaFor("rules", {
     },
     {
       from: "генерация правил",
-      action: ({ context }) => {
+      action: () => {
         console.log(chalk.green("Генерация правил..."))
       },
       to: [
@@ -198,7 +209,7 @@ MetaFor("rules", {
     },
     {
       from: "правила сгенерированы",
-      action: ({ context }) => {
+      action: () => {
         console.log(chalk.green("Правила сгенерированы"))
       },
       to: [
@@ -232,29 +243,14 @@ MetaFor("rules", {
     },
     {
       from: "завершение работы",
-      action: "exit",
+      action: ({ core }) => {
+          core.packageJson = undefined
+          // core.destroy()
+          process.exit(0)
+      },
       to: [],
     },
   ])
-  .core(({ context, update }) => ({
-    packageJson: /** @type {Object} */ undefined,
-  }))
-  .actions({
-    readPackageJson: async ({ context, update, core }) => {
-      try {
-        const packageJson = await readPackageJson(join(__dirname, context.packageJsonPath))
-        update({ projectName: packageJson.name })
-        core.packageJson = packageJson
-      } catch (error) {
-        update({ error: (error as Error).message })
-      }
-    },
-    exit: ({ core }) => {
-      core.packageJson = undefined
-      // core.destroy()
-      process.exit(0)
-    },
-  })
   .create({
     state: "подписка на отмену",
     onUpdate: (value) => {
@@ -292,9 +288,3 @@ async function init() {
   console.log(`\nTemplate: ${response.template}`)
   console.log(`Directory: ${response.projectName}`)
 }
-
-// init().catch((e) => {
-//   console.error(e)
-
-//   process.exit(1)
-// })

@@ -2,7 +2,6 @@ import type { ContextData, ContextDefinition, PartialContextData } from "./conte
 import type { CoreData, CoreDefinition } from "./core"
 import type { Meta } from "./index"
 import type { Transitions } from "./transitions"
-import type { Actions } from "./actions"
 import type { ReactionType } from "./reaction"
 import type { OnTransitionCallBack, OnUpdateCallBack } from "./meta"
 /**

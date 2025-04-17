@@ -2,18 +2,6 @@ import type { ContextData, ContextDefinition, Update } from "./context.d.ts"
 import type { Core } from "./core.d.ts"
 
 /**
- Действия объявленные в конструкторе Meta в actions
-
- Предпочтительно не использовать чистые действия, а объявлять их в transitions.
-
- @template C - Тип данных контекста
- @template I - Тип внутренних данных
-
- @property [key: string]: Action<C, I> - Действие
- */
-export type Actions<C extends ContextDefinition, I extends Record<string, unknown>> = { [key: string]: Action<C, I> }
-
-/**
  Действие объявленное в transitions
 
  Может хранить и получать данные из core
@@ -21,7 +9,7 @@ export type Actions<C extends ContextDefinition, I extends Record<string, unknow
 
  @template C - Тип данных контекста
  @template I - Тип внутренних данных
- 
+
  @property context - Данные контекста
  @property update - Функция обновления контекста
  @property core - Внутренние данные и сервисы
