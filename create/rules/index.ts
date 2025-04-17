@@ -270,11 +270,6 @@ MetaFor("rules", {
   })
 
 async function init() {
-  const version = await currentVersion(__dirname)
-
-  // const pkg = await readPackageJson(__dirname)
-  // console.log(pkg)
-
   const response = await prompts([
     {
       type: "text",
