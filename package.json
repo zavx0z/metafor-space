@@ -5,7 +5,9 @@
   "type": "module",
   "workspaces": [
     "dom/*",
-    "create/*"
+    "create/*",
+    "nodes",
+    "viewport"
   ],
   "license": "MIT",
   "author": "zavx0z",
