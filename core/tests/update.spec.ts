@@ -5,24 +5,12 @@ import { messagesFixture } from "../../fixtures/broadcast"
 describe("update", async () => {
   const { waitForMessages } = messagesFixture()
 
-  const particle = MetaFor("test")
+  const meta = MetaFor("test")
     .states("INITIAL", "NEXT", "FINAL")
     .context((t) => ({
       field1: t.string({ nullable: true }),
       field2: t.number({ default: 0 }),
     }))
-    .transitions([
-      {
-        from: "INITIAL",
-        action: "actionInit",
-        to: [{ state: "NEXT", when: { field2: 42 } }],
-      },
-      {
-        from: "NEXT",
-        action: "actionDouble",
-        to: [{ state: "FINAL", when: { field2: 100, field1: "test" } }],
-      },
-    ])
     .core(({ update }) => ({
       coreMethod: () => {
         update({ field1: "test" })
@@ -31,15 +19,18 @@ describe("update", async () => {
         update({ field1: "test1", field2: 1 })
       },
     }))
-    .actions({
-      actionInit: ({ update }) => {
-        update({ field2: 42 })
+    .transitions([
+      {
+        from: "INITIAL",
+        action: ({ update }) => update({ field2: 42 }),
+        to: [{ state: "NEXT", when: { field2: 42 } }],
       },
-      actionDouble: ({ update }) => {
-        update({ field1: "action1", field2: 42 })
+      {
+        from: "NEXT",
+        action: ({ update }) => update({ field1: "action1", field2: 42 }),
+        to: [{ state: "FINAL", when: { field2: 100, field1: "test" } }],
       },
-    })
-    .reactions([])
+    ])
     .create({ state: "INITIAL" })
 
   const messages = await waitForMessages()
@@ -47,10 +38,10 @@ describe("update", async () => {
   expect(messages[0].patch.op, "Первое сообщение о добавлении новой meta").toBe("add")
 
   test("actionInit в INITIAL", () => {
-    expect(particle.state).toBe("NEXT")
+    expect(meta.state).toBe("NEXT")
     expect(messages[1]).toMatchObject({
       meta: {
-        particle: "test",
+        meta: "test",
         func: "actionInit",
         target: "action",
         timestamp: expect.any(Number),
@@ -67,10 +58,10 @@ describe("update", async () => {
   })
 
   test("actionDouble в NEXT", () => {
-    expect(particle.state).toBe("NEXT")
+    expect(meta.state).toBe("NEXT")
     expect(messages[3]).toMatchObject({
       meta: {
-        particle: "test",
+        meta: "test",
         func: "actionDouble",
         target: "action",
         timestamp: expect.any(Number),
@@ -85,11 +76,11 @@ describe("update", async () => {
 
   test("update должен логировать источник вызова и измененные поля", async () => {
     // Проверяем одиночный вызов update из core
-    particle.core.coreMethod()
+    meta.core.coreMethod()
     await Bun.sleep(10)
     expect(messages[4]).toMatchObject({
       meta: {
-        particle: "test",
+        meta: "test",
         func: "coreMethod",
         target: "core",
         timestamp: expect.any(Number),
@@ -102,11 +93,11 @@ describe("update", async () => {
     })
 
     // Проверяем множественные вызовы update из core
-    particle.core.complexMethod()
+    meta.core.complexMethod()
     await Bun.sleep(10)
     expect(messages[5]).toEqual({
       meta: {
-        particle: "test",
+        meta: "test",
         func: "complexMethod",
         target: "core",
         timestamp: expect.any(Number),

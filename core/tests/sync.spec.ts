@@ -2,27 +2,25 @@ import { describe, expect, test } from "bun:test"
 import { MetaFor } from "@metafor/space"
 
 describe("Синхронизация core и context", async () => {
-    const meta = MetaFor("sync-test")
+  const meta = MetaFor("sync-test")
     .states("IDLE")
     .context((t) => ({
       dataLength: t.number({ default: 0 }),
     }))
-    .transitions([])
-    .core(({update}) => ({
+    .core(({ update }) => ({
       data: [],
       popData() {
-        update({dataLength: 0})
+        update({ dataLength: 0 })
         this.data.splice(0, this.data.length)
       },
       pushData(data: any) {
         this.data.push(data)
-        update({dataLength: this.data.length})
-      }
+        update({ dataLength: this.data.length })
+      },
     }))
-    .actions({})
-    .reactions([])
+    .transitions([])
     .create({
-      state: "IDLE"
+      state: "IDLE",
     })
 
   let count = 50
@@ -33,7 +31,7 @@ describe("Синхронизация core и context", async () => {
     if (count === 0) clearInterval(interval)
   }, delay)
 
-  meta.onUpdate(values => {
+  meta.onUpdate((values) => {
     if (values.dataLength > 4) {
       test("Данные ядра синхронизируются с контекстом", () => {
         meta.core.popData()

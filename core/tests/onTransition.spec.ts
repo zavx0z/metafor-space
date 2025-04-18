@@ -1,13 +1,14 @@
 import { describe, expect, test } from "bun:test"
 import { MetaFor } from "@metafor/space"
 
-const particle = MetaFor("Обработчик событий")
+const meta = MetaFor("Обработчик событий")
   .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
   .context((t) => ({
     url: t.string({ title: "URL", nullable: true }),
     responseTime: t.number({ title: "Время ответа", nullable: true }),
     errorCode: t.number({ title: "Код ошибки", nullable: true }),
   }))
+  .core()
   .transitions([
     {
       from: "IDLE",
@@ -29,8 +30,6 @@ const particle = MetaFor("Обработчик событий")
       to: [{ state: "IDLE", when: { url: { startsWith: "https://" } } }],
     },
   ])
-  .core()
-  .actions({})
   .create({
     state: "IDLE",
     context: {
@@ -43,14 +42,14 @@ const particle = MetaFor("Обработчик событий")
 describe("Подписка на изменения состояния (onTransition)", () => {
   describe("Базовая работа подписки", () => {
     test("Подписка должна срабатывать при изменении состояния", async () => {
-      let oldState = ""
-      let newState = ""
+      let oldState: string | undefined
+      let newState: string | undefined
 
-      particle.onTransition((prevState, nextState) => {
+      meta.onTransition((prevState, nextState) => {
         oldState = prevState
         newState = nextState
       })
-      particle.update({ url: "https://api.example.com", responseTime: 2000, errorCode: 0 })
+      meta.update({ url: "https://api.example.com", responseTime: 2000, errorCode: 0 })
 
       await Bun.sleep(10)
 
@@ -61,9 +60,9 @@ describe("Подписка на изменения состояния (onTransit
     test("Подписка не должна срабатыват при переходе в то же состояние", () => {
       let callbackCalled = false
 
-      particle.onTransition(() => (callbackCalled = true))
+      meta.onTransition(() => (callbackCalled = true))
 
-      particle.update({ url: "https://api.example.com", responseTime: 2000, errorCode: 0 })
+      meta.update({ url: "https://api.example.com", responseTime: 2000, errorCode: 0 })
 
       expect(callbackCalled).toBe(false)
     })
@@ -74,10 +73,10 @@ describe("Подписка на изменения состояния (onTransit
       let firstCallbackCalled = false
       let secondCallbackCalled = false
 
-      particle.onTransition(() => (firstCallbackCalled = true))
-      particle.onTransition(() => (secondCallbackCalled = true))
+      meta.onTransition(() => (firstCallbackCalled = true))
+      meta.onTransition(() => (secondCallbackCalled = true))
 
-      particle.update({ errorCode: 500 })
+      meta.update({ errorCode: 500 })
       await Bun.sleep(10)
       expect(firstCallbackCalled).toBe(true)
       expect(secondCallbackCalled).toBe(true)
@@ -87,13 +86,13 @@ describe("Подписка на изменения состояния (onTransit
       let firstCallbackCalled = false
       let secondCallbackCalled = false
 
-      const unsubscribe = particle.onTransition(() => (firstCallbackCalled = true))
+      const unsubscribe = meta.onTransition(() => (firstCallbackCalled = true))
 
-      particle.onTransition(() => (secondCallbackCalled = true))
+      meta.onTransition(() => (secondCallbackCalled = true))
 
       unsubscribe()
 
-      particle.update({ url: "https://api.example.com", responseTime: 3000, errorCode: 0 })
+      meta.update({ url: "https://api.example.com", responseTime: 3000, errorCode: 0 })
 
       expect(firstCallbackCalled).toBe(false)
       expect(secondCallbackCalled).toBe(true)
@@ -104,16 +103,16 @@ describe("Подписка на изменения состояния (onTransit
     test("Корректное отслеживание цепочки изменений состояний", async () => {
       const collapses: { from: string; to: string }[] = []
 
-      particle.onTransition((prevState, nextState) => collapses.push({ from: prevState, to: nextState }))
+      meta.onTransition((prevState, nextState) => collapses.push({ from: prevState as string, to: nextState as string }))
 
       // Переход в RUNNING
-      particle.update({ url: "https://api.example.com", responseTime: 3000, errorCode: 0 })
+      meta.update({ url: "https://api.example.com", responseTime: 3000, errorCode: 0 })
       await Bun.sleep(10)
       // Переход в ERROR
-      particle.update({ responseTime: 4000, errorCode: 500 })
+      meta.update({ responseTime: 4000, errorCode: 500 })
       await Bun.sleep(10)
       // Переход обратно в IDLE
-      particle.update({ url: "https://api.example.com", responseTime: 1000, errorCode: 0 })
+      meta.update({ url: "https://api.example.com", responseTime: 1000, errorCode: 0 })
 
       expect(collapses).toEqual([
         { from: "IDLE", to: "RUNNING" },

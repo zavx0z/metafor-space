@@ -1,9 +1,8 @@
 import type { ContextData, ContextDefinition, PartialContextData } from "./context"
 import type { CoreData, CoreDefinition } from "./core"
-import type { Meta } from "./index"
 import type { Transitions } from "./transitions"
 import type { ReactionType } from "./reaction"
-import type { OnTransitionCallBack, OnUpdateCallBack } from "./meta"
+import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta"
 /**
  Опции создания частицы в коллбеке create
 
@@ -42,7 +41,7 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
     isolated?: boolean
   }
   /** Начальные данные ядра */
-  core?: CoreData<I>
+  core?: CoreData<I> | Record<string, any>
   /**
      Опции отладки
 
@@ -64,7 +63,7 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
   /** Опции визуализации графа */
   graph?: boolean
   /** Обработчик смены состояния */
-  onTransition?: OnTransitionCallBack<S, C, I>
+  onTransition?: CreateOnTransitionCallBack<S, C, I>
   /** Обработчик обновления контекста */
   onUpdate?: OnUpdateCallBack<C>
 }

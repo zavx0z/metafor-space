@@ -11,9 +11,8 @@ describe("View", () => {
     .context((t) => ({
       param: t.boolean({ default: false }),
     }))
-    .transitions([])
     .core()
-    .actions({})
+    .transitions([])
     .view({
       render: ({ html, update, context }) =>
         html`<button @click=${() => update({ param: !context.param })}>${context.param ? "true" : "false"}</button>`,

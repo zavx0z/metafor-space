@@ -36,7 +36,7 @@ export type Snapshot<C extends Record<string, any>, S> = {
  Сообщение для обмена данными между частицами
 
  @property meta - Метаданные сообщения
- @property meta.particle - Имя частицы
+ @property meta.meta - Имя частицы
  @property meta.func - Имя функции
  @property meta.target - Цель функции
  @property meta.timestamp - Время отправки сообщения
@@ -47,7 +47,7 @@ export type Snapshot<C extends Record<string, any>, S> = {
  */
 export type BroadcastMessage = {
   meta: {
-    particle: string
+    meta: string
     func: string
     target: string
     timestamp: number
@@ -149,6 +149,22 @@ export type OnTransition<S extends string, C extends ContextDefinition, I extend
  */
 export type OnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
   preview: S | undefined,
+  current: S | undefined
+) => void
+
+/**
+ * Коллбек обрабатывающий изменения состояний
+ *
+ * @template S - Тип состояний
+ * @template C - Тип контекста
+ * @template I - Тип действий
+ *
+ * @param preview - Предыдущее состояние
+ * @param current - Текущее состояние
+ * @param meta - Мета
+ */
+export type CreateOnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
+  preview: S | undefined,
   current: S | undefined,
-  meta?: Meta<S, C, I>
+  meta: Meta<S, C, I>
 ) => void

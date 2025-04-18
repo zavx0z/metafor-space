@@ -3,100 +3,93 @@ import { MetaFor } from "@metafor/space"
 
 describe("null триггер", () => {
   test("Должен выполнить переход когда число null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: null } }] }])
       .core()
-      .actions({})
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ size: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ size: null })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Значение не nullable а триггер ожидает null (вывод предупреждения валидатора)", () => {
-    let particle
+    let meta
     const template = MetaFor("NullTest").states("ОЖИДАНИЕ", "ДОБАВИТЬ")
 
-    particle = template
+    meta = template
       .context((t) => ({ size: t.number({ nullable: true }) }))
+      .core()
       .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: null } }] }])
-      .core()
-      .actions({})
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ size: null })
+    meta.update({ size: null })
     // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
 
-    particle = template
+    meta = template
       .context((t) => ({ name: t.string({ nullable: false, default: "" }) }))
+      .core()
       .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { name: null } }] }])
-      .core()
-      .actions({})
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ name: null })
+    meta.update({ name: null })
     // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
 
-    particle = template
+    meta = template
       .context((t) => ({ active: t.boolean({ nullable: false, default: false }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .core()
-      .actions({})
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ active: null })
+    meta.update({ active: null })
     // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
 
-    particle = template
+    meta = template
       .context((t) => ({ status: t.enum("active", "inactive")({ nullable: false, default: "active" }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { status: null } }] }])
       .core()
-      .actions({})
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { status: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ status: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    meta.update({ status: null })
+    // expect(meta.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
   })
 
   test("Должен выполнить переход когда строка null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ name: t.string({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { name: null } }] }])
       .core()
-      .actions({})
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { name: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ name: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ name: null })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Должен выполнить переход когда boolean null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ active: t.boolean({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .core()
-      .actions({})
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ active: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ active: null })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Должен выполнить переход когда enum null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ status: t.enum("active", "inactive")({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { status: null } }] }])
       .core()
-      .actions({})
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { status: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ status: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ status: null })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 })
 
 describe("isNull триггер", () => {
   test("Должен выполнить переход когда значение меняется с null на не-null и соответствует условиям", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
+      .core()
       .transitions([
         {
           from: "ОЖИДАНИЕ",
@@ -108,9 +101,6 @@ describe("isNull триггер", () => {
           ],
         },
       ])
-      .core()
-      .actions({})
-      .reactions([])
       .create({
         state: "ОЖИДАНИЕ",
         context: {
@@ -119,14 +109,15 @@ describe("isNull триггер", () => {
         // debug: true
       })
 
-    particle.update({ size: 10 })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ size: 10 })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Не должен выполнять переход когда значение null, но триггер требует не-null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
+      .core()
       .transitions([
         {
           from: "ОЖИДАНИЕ",
@@ -140,9 +131,6 @@ describe("isNull триггер", () => {
           ],
         },
       ])
-      .core()
-      .actions({})
-      .reactions([])
       .create({
         state: "ОЖИДАНИЕ",
         context: {
@@ -150,29 +138,28 @@ describe("isNull триггер", () => {
         },
       })
 
-    expect(particle.state).toBe("ОЖИДАНИЕ")
+    expect(meta.state).toBe("ОЖИДАНИЕ")
   })
 
   test("Должен выполнить переход когда значение null и триггер ожидает {isNull: true}", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: true } } }] }])
       .core()
-      .actions({})
-      .reactions([])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: true } } }] }])
       .create({
         state: "ОЖИДАНИЕ",
         context: {},
       })
-    particle.update({ size: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ size: null })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Не должен выполнять переход когда значение не-null, но триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
+      .core()
       .transitions([
         {
           from: "ОЖИДАНИЕ",
@@ -186,9 +173,6 @@ describe("isNull триггер", () => {
           ],
         },
       ])
-      .core()
-      .actions({})
-      .reactions([])
       .create({
         state: "ОЖИДАНИЕ",
         context: {
@@ -196,13 +180,14 @@ describe("isNull триггер", () => {
         },
       })
 
-    expect(particle.state).toBe("ОЖИДАНИЕ")
+    expect(meta.state).toBe("ОЖИДАНИЕ")
   })
 
   test("Должен обрабатывать множественные условия с isNull false", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
+      .core()
       .transitions([
         {
           from: "ОЖИДАНИЕ",
@@ -216,45 +201,38 @@ describe("isNull триггер", () => {
           ],
         },
       ])
-      .core()
-      .actions({})
-      .reactions([])
       .create({
         state: "ОЖИДАНИЕ",
         context: {},
       })
-    particle.update({ size: 10 })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ size: 10 })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Не должен выполнять переход когда одно из множественных условий не выполняется", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
+      .core()
       .transitions([
         /* FIXME: валидатор не должен пропускать такой триггер */
         { from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: false, gt: 5, lt: 15 } } }] },
       ])
-      .core()
-      .actions({})
-      .reactions([])
       .create({ state: "ОЖИДАНИЕ", context: { size: 20 } })
-    expect(particle.state).toBe("ОЖИДАНИЕ")
+    expect(meta.state).toBe("ОЖИДАНИЕ")
   })
 
   test("Должен обрабатывать обновление значения с не-null на null", () => {
-    const particle = MetaFor("NullTest")
+    const meta = MetaFor("NullTest")
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: true } } }] }])
       .core()
-      .actions({})
-      .reactions([])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: { isNull: true } } }] }])
       .create({
         state: "ОЖИДАНИЕ",
         context: { size: 10 },
       })
-    particle.update({ size: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({ size: null })
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 })

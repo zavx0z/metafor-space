@@ -13,6 +13,9 @@ describe("Конструктор MetaFor", () => {
       email: t.string({ title: "Email", nullable: true }),
       password: t.string({ title: "Пароль", nullable: true }),
     }))
+    .core(() => ({
+      password: "123456",
+    }))
     .transitions([
       {
         from: "АНОНИМНЫЙ",
@@ -20,16 +23,10 @@ describe("Конструктор MetaFor", () => {
       },
       {
         from: "АВТОРИЗАЦИЯ",
-        action: "login",
+        action: ({ update }) => update({ nickname }),
         to: [{ state: "АВТОРИЗОВАН", when: { nickname: { isNull: false } } }],
       },
     ])
-    .core(()=>({
-      password: "123456",
-    }))
-    .actions({
-      login: ({ update }) => update({ nickname }),
-    })
 
   test("view", () =>
     expect(Object.hasOwn(userMeta, "view"), "Функция-конструктор представления должна быть присутствовать").toBe(true))

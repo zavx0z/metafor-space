@@ -173,7 +173,6 @@ describe("core", () => {
               meta.context.integrityMaintained = false // Сигнализируем о проблеме
             }
           },
-          sharedObject: /**@type {{ [key: string]: string }}**/ {},
         }))
         .transitions([])
         .create({ state: "INITIAL", core: { sharedObject } })

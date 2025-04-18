@@ -187,7 +187,7 @@ export class Meta {
       this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
       this.channel.postMessage(
         /** @type {import('./types/meta.js').BroadcastMessage} */ ({
-          meta: { particle: this.id, func: funcName, target: srcName, timestamp: Date.now() },
+          meta: { meta: this.id, func: funcName, target: srcName, timestamp: Date.now() },
           patch: { path: `/context`, op: "replace", value: updCtx },
         })
       )
