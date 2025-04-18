@@ -3,24 +3,13 @@ import { MetaFor } from "@metafor/space"
 
 describe("core", () => {
   describe("обработка нажатия и отпускания пробела", () => {
-    const particle = MetaFor("core-test1")
+    const meta = MetaFor("core-test1")
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({ boolean }) => ({
         actionUpdate: boolean({ title: "Обновление контекста из action", nullable: true }),
         isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
       }))
-      .transitions([
-        {
-          from: "ОЖИДАНИЕ",
-          to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }],
-          action: "init",
-        },
-        {
-          from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
-          to: [{ state: "ОЖИДАНИЕ", when: { isSpacePressed: false } }],
-        },
-      ])
-      .core(({ update }) => ({
+      .core(({ update, context }) => ({
         handleKeyDown: (code: string) => {
           if (code === "Space") {
             update({ isSpacePressed: true, actionUpdate: false })
@@ -29,44 +18,49 @@ describe("core", () => {
         handleKeyUp(code: string) {
           if (code === "Space") {
             update({ isSpacePressed: false })
+            console.log(context)
           }
         },
       }))
-      .actions({
-        init: ({ update }) => {
-          update({ actionUpdate: true })
+      .transitions([
+        {
+          from: "ОЖИДАНИЕ",
+          to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }],
+          action: ({ update }) => update({ actionUpdate: true }),
         },
-      })
+        {
+          from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          to: [{ state: "ОЖИДАНИЕ", when: { isSpacePressed: false } }],
+        },
+      ])
       .create({
         state: "ОЖИДАНИЕ",
       })
     test("Проверяем начальное состояние", () => {
-      expect(particle.context.isSpacePressed).toBe(false)
-      expect(particle.context.actionUpdate).toBe(true)
-      expect(particle.state).toBe("ОЖИДАНИЕ")
+      expect(meta.context.isSpacePressed).toBe(false)
+      expect(meta.context.actionUpdate).toBe(true)
+      expect(meta.state).toBe("ОЖИДАНИЕ")
     })
     test("Эмулируем нажатие пробела", () => {
-      particle.core.handleKeyDown("Space", "Other")
-      expect(particle.context.isSpacePressed).toBe(true)
-      expect(particle.state).toBe("ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
+      meta.core.handleKeyDown("Space", "Other")
+      expect(meta.context.isSpacePressed).toBe(true)
+      expect(meta.state).toBe("ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
     })
     test("Эмулируем отпускание пробела", () => {
-      particle.core.handleKeyUp("Space")
-      expect(particle.context.isSpacePressed).toBe(false)
-      expect(particle.state).toBe("ОЖИДАНИЕ")
+      meta.core.handleKeyUp("Space")
+      console.log(meta.context.isSpacePressed, meta.state)
+      expect(meta.context.isSpacePressed).toBe(false)
+      expect(meta.state).toBe("ОЖИДАНИЕ")
     })
   })
 
   test.todo("Кто вызывает обновление контекста, какие параметры контекста обновляет и с какими значениями")
   test("Волатильность параметров", () => {
-    const particle = MetaFor("core-test2")
+    const meta = MetaFor("core-test2")
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({ boolean }) => ({
         isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
       }))
-      .transitions([
-        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }] },
-      ])
       .core(({ update }) => {
         // Создаем объект с общим состоянием
         const coreState = { parameter: true }
@@ -79,21 +73,17 @@ describe("core", () => {
           parameter: coreState.parameter,
         }
       })
-      .actions({})
-      .reactions([])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.core.handleKeyDown("Space")
-    expect(particle.context.isSpacePressed).toBe(true)
+    meta.core.handleKeyDown("Space")
+    expect(meta.context.isSpacePressed).toBe(true)
   })
-  test("Доступ внутри ядра ко всем входящим в состав частицы функциям и объектам", () => {
-    const particle = MetaFor("core-test3")
+  test("Доступ внутри ядра ко всем входящим в состав meta функциям и объектам", () => {
+    const meta = MetaFor("core-test3")
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({ boolean }) => ({
         isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
       }))
-      .transitions([
-        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }] },
-      ])
       .core(({ update }) => ({
         /** Используем стрелочную функцию, которая замкнет coreState */
         handleKeyDown(code: string) {
@@ -103,40 +93,43 @@ describe("core", () => {
         },
         parameter: true,
       }))
-      .actions({})
-      .reactions([])
+      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: { isSpacePressed: true } }] }])
       .create({ state: "ОЖИДАНИЕ" })
-    particle.core.handleKeyDown("Space")
-    expect(particle.context.isSpacePressed).toBe(true)
+    meta.core.handleKeyDown("Space")
+    expect(meta.context.isSpacePressed).toBe(true)
   })
-  test("Доступ внутри ядра к контексту частицы", () => {
-    const particle = MetaFor("core-test4")
+  test("Доступ внутри ядра к контексту meta", () => {
+    const meta = MetaFor("core-test4")
       .states("ОЖИДАНИЕ")
       .context(({ number }) => ({
         parameter: number({
           default: 0,
         }),
       }))
-      .transitions([])
       .core(({ context }) => ({
         parameter: context.parameter,
       }))
-      .actions({})
-      .reactions([])
+      .transitions([])
       .create({ state: "ОЖИДАНИЕ" })
-    expect(particle.core.parameter).toBe(0)
+    expect(meta.core.parameter).toBe(0)
   })
 })
 
 describe("core", () => {
   describe("Взаимодействие с общими данными через core", () => {
     test("Данные в core доступны для модификации без замены", () => {
-      //@ts-ignore
-      const sharedArray = []
-      const particle = MetaFor("core-shared-data-test")
+      const sharedArray: object[] = []
+      const meta = MetaFor("core-shared-data-test")
         .states("INITIAL", "MODIFIED")
         .context(({ boolean }) => ({
           isUpdated: boolean({ title: "Обновлено ли", default: false }),
+        }))
+        .core(({ update }) => ({
+          addData: (value: object) => {
+            sharedArray.push(value)
+            update({ isUpdated: true })
+          },
+          getData: () => sharedArray,
         }))
         .transitions([
           {
@@ -144,36 +137,26 @@ describe("core", () => {
             to: [{ state: "MODIFIED", when: { isUpdated: true } }],
           },
         ])
-        .core(({ update }) => ({
-          //@ts-ignore
-          addData: (value) => {
-            sharedArray.push(value)
-            update({ isUpdated: true })
-          }, //@ts-ignore
-          getData: () => sharedArray,
-        }))
-        .actions({})
-        .reactions([]) //@ts-ignore
         .create({ state: "INITIAL", core: { sharedArray } })
 
-      particle.core.addData(42)
-      particle.core.addData(100)
+      meta.core.addData(42)
+      meta.core.addData(100)
 
-      expect(particle.context.isUpdated).toBe(true)
-      expect(particle.state).toBe("MODIFIED")
-      expect(particle.core.getData()).toEqual([42, 100])
+      expect(meta.context.isUpdated).toBe(true)
+      expect(meta.state).toBe("MODIFIED")
+      expect(meta.core.getData()).toEqual([42, 100])
     })
   })
 
   describe("Защита данных в core", () => {
     test("Данные в core остаются неизменяемыми при попытке модификации структуры", () => {
-      const sharedObject = { key: "value" }
-      const particle = MetaFor("core-protection-test")
+      const sharedObject: { [key: string]: string } = { key: "value" }
+
+      const meta = MetaFor("core-protection-test")
         .states("INITIAL")
         .context(({ boolean }) => ({
           integrityMaintained: boolean({ title: "Сохранена ли целостность", default: true }),
         }))
-        .transitions([])
         .core(() => ({
           updateKey: () => {
             try {
@@ -184,43 +167,40 @@ describe("core", () => {
           },
           modifyStructure: () => {
             try {
-              //@ts-ignore
-              delete sharedObject.key //@ts-ignore Попытка модификации структуры
-              sharedObject.newKey = "newValue" // Попытка добавить новое свойство
+              delete sharedObject.key // Попытка модификации структуры
+              sharedObject['newKey'] = "newValue" // Попытка добавить новое свойство
             } catch {
-              particle.context.integrityMaintained = false // Сигнализируем о проблеме
+              meta.context.integrityMaintained = false // Сигнализируем о проблеме
             }
           },
+          sharedObject: /**@type {{ [key: string]: string }}**/ {},
         }))
-        .actions({})
-        .reactions([]) //@ts-ignore
+        .transitions([])
         .create({ state: "INITIAL", core: { sharedObject } })
 
-      particle.core.updateKey()
+      meta.core.updateKey()
       expect(sharedObject.key).toBe("newValue") // Изменение значения допустимо
 
-      particle.core.modifyStructure()
+      meta.core.modifyStructure()
       expect("key" in sharedObject).toBe(false) // Свойство удалено
-      //@ts-ignore
       expect(sharedObject.newKey).toBe("newValue") // Новое свойство добавлено
     })
   })
   describe("обновление ядра внутри через self ", () => {
     test("обновление ядра внутри через self", () => {
-      const particle = MetaFor("core-test5")
+      const meta = MetaFor("core-test5")
         .states("INITIAL")
         .context(() => ({}))
-        .transitions([])
         .core(({ self }) => ({
           coreParameter: 0,
           update: () => {
             self.coreParameter = 1
           },
         }))
-        .actions({})
+        .transitions([])
         .create({ state: "INITIAL" })
-      particle.core.update()
-      expect(particle.core.coreParameter).toEqual(1)
+      meta.core.update()
+      expect(meta.core.coreParameter).toEqual(1)
     })
   })
 })

@@ -140,17 +140,15 @@ export class Meta {
 
   /** Проверка триггеров и выполнение действия */
   #transition() {
-    const transitions = this.transitions.find((t) => t.from === this.state)
-    if (transitions) {
-      for (const transition of transitions.to) {
+    const transitionFrom = this.transitions.find((t) => t.from === this.state)
+    if (transitionFrom) {
+      for (const transition of transitionFrom.to) {
         if (Object.keys(transition.when).length === 0) break
         if (matchTrigger(transition.when, this.context, this.types)) {
-          const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
-
-          this.process = true
           this.$state.setValue(transition.state)
-
+          const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
           if (!actionDefinition?.action) break
+          this.process = true
           this.#runAction(actionDefinition.action)
         }
       }
@@ -278,13 +276,13 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/** @type {import("./types").MetaFor} */
+/** @type {import("./types").MetaFor} */ // prettier-ignore
 export function MetaFor(tag, conf = {}) {
   const { development, description } = conf
   if (development) {
     import("./core/validator/index.js")
     setDevChannel(new BroadcastChannel("validator"))
-    // todo: добавить проверку имени частицы
+    // todo: добавить проверку имени
   }
   return {
     states(...states) {
@@ -296,9 +294,7 @@ export function MetaFor(tag, conf = {}) {
             number: (params) => ({ type: "number", ...params }),
             boolean: (params) => ({ type: "boolean", ...params }),
             array: (params) => ({ type: "array", ...params }),
-            enum:
-              (...values) =>
-              (params = {}) => ({ type: "enum", values, ...params }),
+            enum: (...values) => (params = {}) => ({ type: "enum", values, ...params })
           })
           development &&
             import("./core/validator/index.js").then((module) =>
@@ -317,76 +313,32 @@ export function MetaFor(tag, conf = {}) {
                   }
                   return {
                     reactions: (reactions = []) => ({
-                      create: (options) => {
-                        return createMeta({
-                          development,
-                          description,
-                          tag,
-                          options,
-                          states,
-                          contextDefinition,
-                          transitions,
-                          coreDefinition,
-                          reactions,
-                        })
-                      },
+                      create: (options) => createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions }),
                       view: (view) => {
                         return {
                           create: (options) => {
-                            const particle = createMeta({
-                              development,
-                              description,
-                              tag,
-                              options,
-                              states,
-                              contextDefinition,
-                              transitions,
-                              coreDefinition,
-                              reactions,
-                            })
+                            const meta = createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions })
 
                             if (view.isolated === undefined) view.isolated = true
                             if (options.view?.isolated === false) view.isolated = false
-                            import("./core/web/component.js").then((module) => module.default({ view, particle }))
+                            import("./core/web/component.js").then((module) => module.default({ view, particle: meta }))
 
-                            return particle
+                            return meta
                           },
                         }
                       },
                     }),
-                    create: (options) => {
-                      return createMeta({
-                        development,
-                        description,
-                        tag,
-                        options,
-                        states,
-                        contextDefinition,
-                        transitions,
-                        coreDefinition,
-                        reactions: [],
-                      })
-                    },
+                    create: (options) =>  createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions: [] }) ,
                     view: (view) => {
                       return {
                         create: (options) => {
-                          const particle = createMeta({
-                            development,
-                            description,
-                            tag,
-                            options,
-                            states,
-                            contextDefinition,
-                            transitions,
-                            coreDefinition,
-                            reactions: [],
-                          })
+                          const meta = createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions: [] })
 
                           if (view.isolated === undefined) view.isolated = true
                           if (options.view?.isolated === false) view.isolated = false
-                          import("./core/web/component.js").then((module) => module.default({ view, particle }))
+                          import("./core/web/component.js").then((module) => module.default({ view, particle: meta }))
 
-                          return particle
+                          return meta
                         },
                       }
                     },
@@ -417,6 +369,15 @@ const createMeta = ({development, description, tag, options, states, contextDefi
   if (debug) import("./core/debug.js").then((module) => module.default(particle, debug))
   return particle
 }
+/**
+ @template {string} S - состояние
+ @template {import('./types/context').ContextDefinition} C - контекст
+ @template {Record<string, any>} I - ядро
+ 
+ @param {import("./types").Meta<S, C, I>} meta
+ @param {import("./types/view").ViewDefinition<I, C, S>} view 
+ */
+const createView = (meta, view) => {}
 
 /**
  @template {import('./types/context').ContextDefinition} C
