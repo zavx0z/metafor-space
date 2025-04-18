@@ -98,8 +98,7 @@ export class Meta {
       return wrappedCore
     })())
     //@ts-ignore присваивание свойству ядра переданного объекта, массива или карты
-    Object.entries(coreData || {}).forEach(
-      ([key, value]) =>
+    Object.entries(coreData || {}).forEach( ([key, value]) =>
         this.core[key] !== undefined && //@ts-ignore
         (this.core[key] = Array.isArray(value)
           ? value //@ts-ignore
@@ -120,7 +119,7 @@ export class Meta {
     }
     // TODO: при восстановлении входить в состояние без вызова действия
     this.channel.postMessage({
-      meta: { particle: this.id, func: "constructor", target: "particle", timestamp: Date.now() },
+      meta: { meta: this.id, func: "constructor", target: "meta", timestamp: Date.now() },
       patch: { path: "/", op: "add", value: this.snapshot() },
     })
 
@@ -145,11 +144,12 @@ export class Meta {
       for (const transition of transitionFrom.to) {
         if (Object.keys(transition.when).length === 0) break
         if (conditions(transition.when, this.context, this.types)) {
-          this.$state.setValue(transition.state)
           const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
-          if (!actionDefinition?.action) break
-          this.process = true
-          this.#runAction(actionDefinition.action)
+          if (actionDefinition?.action) {
+            this.process = true
+            this.$state.setValue(transition.state)
+            this.#runAction(actionDefinition.action)
+          } else this.$state.setValue(transition.state)
         }
       }
     }
@@ -235,7 +235,7 @@ export class Meta {
           state: toState.state,
           when: toState.when,
         })),
-        action: typeof t.action === "string" ? t.action : undefined,
+        action: undefined,
       })),
     }
   }
