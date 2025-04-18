@@ -84,7 +84,7 @@
     "test:sync": "bun test tests/sync.spec.ts",
     "test:extract": "bun test tests/extract.spec.ts",
     "test:pipe": "bun test tests/pipe.spec.ts",
-    "test:trigger:lock": "bun test tests/triggerLock.spec.ts",
+    "test:transitions:lock": "bun test tests/transitions.lock.spec.ts",
     "test:view": "bun test tests/view.spec.ts"
   }
 }

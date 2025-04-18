@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { MetaFor } from "@metafor/space"
 
-test("блокировка условий перед входом в новое состояние", async () => {
+test("Блокировка переходов перед входом в новое состояние", async () => {
   let value = -1
 
   const meta = MetaFor("test-sync")
@@ -12,13 +12,12 @@ test("блокировка условий перед входом в новое 
     .core()
     .transitions([
       {
-        action: ({ update }) => {
-          update({ value: 11 })
-        },
         from: "INIT",
+        action: ({ update }) => update({ value: 11 }),
         to: [{ state: "PROCESS", when: { value: { gt: 10 } } }],
       },
       {
+        from: "PROCESS",
         action: ({ update }) => {
           update({ value: 15 })
           const end = Date.now() + 500
@@ -26,7 +25,6 @@ test("блокировка условий перед входом в новое 
             // Блокируем поток
           }
         },
-        from: "PROCESS",
         to: [
           { state: "DONE", when: { value: { gt: 14 } } },
           { state: "INIT", when: { value: { lt: 4 } } },
@@ -39,7 +37,7 @@ test("блокировка условий перед входом в новое 
         console.log(newState)
         if (newState === "PROCESS") {
           console.log(newState, meta.context.value)
-          meta.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке условий
+          meta.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
           value = meta.context.value
         }
       },
@@ -49,7 +47,7 @@ test("блокировка условий перед входом в новое 
   expect(meta.state).toBe("DONE")
 })
 
-test("блокировка условий для асинхронного действия", async () => {
+test("Блокировка переходов для асинхронного действия", async () => {
   const meta = MetaFor("test-async")
     .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
@@ -63,12 +61,7 @@ test("блокировка условий для асинхронного дей
           await new Promise((resolve) => setTimeout(resolve, 10))
           update({ value: 15 }) // Это не должно вызвать переход
         },
-        to: [
-          {
-            state: "DONE",
-            when: { value: { gt: 10 } },
-          },
-        ],
+        to: [{ state: "DONE", when: { value: { gt: 10 } } }],
       },
     ])
     .create({ state: "INIT" })
@@ -79,10 +72,10 @@ test("блокировка условий для асинхронного дей
     await result
     expect(meta.process).toBe(false)
   }
-  expect(meta.state).toBe("INIT") // Проверяем что условие заблокировано во время действия
+  expect(meta.state).toBe("INIT") // Проверяем что переходы заблокированы во время действия
 })
 
-test("снятие блокировки после действия", async () => {
+test("Снятие блокировки после действия", async () => {
   const meta = MetaFor("test-lock")
     .states("INIT", "DONE")
     .context((t) => ({
@@ -96,12 +89,7 @@ test("снятие блокировки после действия", async () =
           await new Promise((resolve) => setTimeout(resolve, 50))
           update({ value: 15 })
         },
-        to: [
-          {
-            state: "DONE",
-            when: { value: { gt: 10 } },
-          },
-        ],
+        to: [{ state: "DONE", when: { value: { gt: 10 } } }],
       },
     ])
     .create({ state: "INIT", context: { value: 2 } })
