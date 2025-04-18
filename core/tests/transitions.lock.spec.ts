@@ -36,9 +36,7 @@ test("Блокировка переходов перед входом в нов�
     .create({
       state: "INIT",
       onTransition: async (_, newState, meta) => {
-        console.log(newState)
         if (newState === "PROCESS") {
-          console.log(newState, meta.context.value)
           meta.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
           value = meta.context.value
         }

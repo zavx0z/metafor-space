@@ -42,7 +42,7 @@ describe("update", async () => {
     expect(messages[1]).toMatchObject({
       meta: {
         meta: "test",
-        func: "actionInit",
+        func: "unknown",
         target: "action",
         timestamp: expect.any(Number),
       },
@@ -62,7 +62,7 @@ describe("update", async () => {
     expect(messages[3]).toMatchObject({
       meta: {
         meta: "test",
-        func: "actionDouble",
+        func: "unknown",
         target: "action",
         timestamp: expect.any(Number),
       },

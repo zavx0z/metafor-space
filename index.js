@@ -166,7 +166,7 @@ export class Meta {
   #runAction(action) {
     const result = action({
       context: this.context,
-      update: (ctx) => this.#updateContext({ context: ctx, srcName: "action", funcName: action.name }),
+      update: (ctx) => this.#updateContext({ context: ctx, srcName: "action" }),
       core: this.core,
     })
     const finallyFn = () => (this.process = false)

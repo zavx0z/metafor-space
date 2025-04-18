@@ -24,7 +24,7 @@ describe("Синхронизация core и context", async () => {
     })
 
   let count = 50
-  const delay = 100
+  const delay = 20
   const interval = setInterval(() => {
     meta.core.pushData(count)
     count--
