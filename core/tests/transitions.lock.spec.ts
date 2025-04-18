@@ -13,7 +13,9 @@ test("Блокировка переходов перед входом в нов�
     .transitions([
       {
         from: "INIT",
-        action: ({ update }) => update({ value: 11 }),
+        action: ({ update }) => {
+          update({value: 11})
+        },
         to: [{ state: "PROCESS", when: { value: { gt: 10 } } }],
       },
       {

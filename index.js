@@ -15,6 +15,15 @@ export class Meta {
     return this.$state?.value()
   }
 
+  get process() {
+    return this.#process
+  }
+
+  set process(value) {
+    this.#process = value
+    if (!value) this.update(this.context)
+  }
+
   /** @param {import('./types/meta').MetaConstructor<S, C, I>} params */ // prettier-ignore
   constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, core, coreData, reactions, onTransition, onUpdate, destroy }) {
     this.channel = channel
@@ -129,22 +138,13 @@ export class Meta {
     } else this.#transition()
   }
 
-  get process() {
-    return this.#process
-  }
-
-  set process(value) {
-    this.#process = value
-    if (!value) this.update(this.context)
-  }
-
-  /** Проверка триггеров и выполнение действия */
+  /** Проверка условий перехода и выполнение действия */
   #transition() {
     const transitionFrom = this.transitions.find((t) => t.from === this.state)
     if (transitionFrom) {
       for (const transition of transitionFrom.to) {
         if (Object.keys(transition.when).length === 0) break
-        if (matchTrigger(transition.when, this.context, this.types)) {
+        if (conditions(transition.when, this.context, this.types)) {
           this.$state.setValue(transition.state)
           const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
           if (!actionDefinition?.action) break
@@ -155,7 +155,7 @@ export class Meta {
     }
   }
 
-  /**  Обновление контекста из внешнего источника (core, reaction)
+  /**   Обновление контекста из внешнего источника (core, reaction)
    * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста */
   _updateExternal = ({ context, srcName = "core", funcName = "unknown" }) => {
     const updCtx = this.#updateContext({ context, srcName, funcName })
@@ -258,7 +258,9 @@ export class Meta {
       },
       onChange: (listener) => {
         listeners.add(listener)
-        return () => listeners.delete(listener)
+        return () => {
+          listeners.delete(listener)
+        }
       },
       clear: listeners.clear,
     }
@@ -266,8 +268,7 @@ export class Meta {
 }
 
 let devChannel = null
-/**
- Установка канала для разработки
+/** Установка канала для разработки
  @param {BroadcastChannel} channel - Канал для разработки
  */
 const setDevChannel = (channel) => {
@@ -369,25 +370,16 @@ const createMeta = ({development, description, tag, options, states, contextDefi
   if (debug) import("./core/debug.js").then((module) => module.default(particle, debug))
   return particle
 }
-/**
- @template {string} S - состояние
- @template {import('./types/context').ContextDefinition} C - контекст
- @template {Record<string, any>} I - ядро
- 
- @param {import("./types").Meta<S, C, I>} meta
- @param {import("./types/view").ViewDefinition<I, C, S>} view 
- */
-const createView = (meta, view) => {}
 
 /**
  @template {import('./types/context').ContextDefinition} C
- @param {import('./types/transitions').When<C>} trigger
+ @param {import('./types/transitions').When<C>} when
  @param {import('./types/context').ContextData<C>} context
  @param {import('./types/context').ContextDefinition} types
  */
-export function matchTrigger(trigger, context, types) {
-  for (const key in trigger) {
-    const condition = trigger[key]
+export function conditions(when, context, types) {
+  for (const key in when) {
+    const condition = when[key]
     const value = context[key]
     const contextParam = types[key]
     const contextParamType = contextParam?.type
