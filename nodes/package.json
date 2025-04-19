@@ -1,6 +1,6 @@
 {
   "name": "@metafor/nodes",
-  "module": "index.ts",
+  "module": "nodes.js",
   "type": "module",
   "private": true,
   "devDependencies": {

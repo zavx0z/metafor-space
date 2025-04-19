@@ -1,5 +1,6 @@
 import { MetaFor } from "../../index.js"
 import ELK from "elkjs"
+import "../nodes.js"
 
 const elk = new ELK()
 

@@ -251,6 +251,15 @@ MetaFor("rules", {
       to: [],
     },
   ])
+  // .view({
+  //   render: ({html, context}) => html`
+  //   <div>
+  //     <h1>Create cursor rules</h1>
+  //     <p>Version: ${context.version}</p>
+  //     <p>Project name: ${context.projectName}</p>
+  //   </div>
+  //   `
+  // })
   .create({
     state: "подписка на отмену",
     onUpdate: (value) => {
