@@ -1,8 +1,9 @@
 import { MetaFor } from "../../index.js"
-import ELK from "elkjs"
-import "../nodes.js"
+import { Nodes } from "../nodes.js"
 
-const elk = new ELK()
+const nodes = Nodes.create({
+  state: "ожидание патча",
+})
 
 const meta = MetaFor("nodes", {
   description: "Nodes",
@@ -12,7 +13,8 @@ const meta = MetaFor("nodes", {
   .context((t) => ({
     status: t.enum("start", "end")({ title: "Status", default: "start" }),
   }))
-  .core()
+  .core(() => ({
+  }))
   .transitions([
     {
       from: "начало",

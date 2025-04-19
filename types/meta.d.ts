@@ -1,7 +1,7 @@
 import type { ContextData, ContextDefinition } from "./context"
 import type { Transitions } from "./transitions"
 import type { CoreData, CoreDefinition } from "./core"
-import type { ReactionType } from "./reaction"
+import type {  Reactions } from "./reaction"
 import type { Meta } from "./index"
 import type { CreateOnTransitionCallBack } from "./create"
 
@@ -100,7 +100,7 @@ export type MetaConstructor<S extends string, C extends ContextDefinition, I ext
   contextData: ContextData<C>
   core: CoreDefinition<I, C>
   coreData: CoreData<I>
-  reactions: ReactionType<C, I>
+  reactions:  Reactions<C, I>
   onTransition?: CreateOnTransitionCallBack<S, C, I>
   onUpdate?: OnUpdateCallBack<C>
   destroy?: (particle: Meta<S, C, I>) => void

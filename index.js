@@ -106,7 +106,7 @@ export class Meta {
     )
     this.channel.onmessage = ({ data: { meta, patch } }) => {
       this.reactions.forEach((reaction) => {
-        if (reaction.particle && reaction.particle === meta.name) {
+        if (reactionFilter(reaction, patch)) {
           reaction.action({
             patch,
             context: this.context,
@@ -352,6 +352,23 @@ export function MetaFor(tag, conf = {}) {
       }
     },
   }
+}
+
+/**
+ * Фильтр реакций
+ *
+ * @template {import("./types/context").ContextDefinition} C
+ * @template {import("./types/core").CoreObj} I
+ *
+ * @param {import("./types/reaction").Reaction<C, I>} reaction
+ * @param {import("./types/meta").Patch} patch
+ * @returns {boolean}
+ */
+const reactionFilter = (reaction, patch) => {
+  if (reaction.path === patch.path && reaction.op === patch.op) return true
+  if (reaction.op === patch.op) return true
+  if (Object.keys(reaction).length === 1 && "action" in reaction) return true
+  return false
 }
 
 /**

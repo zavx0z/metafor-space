@@ -1,7 +1,7 @@
 import type { ContextData, ContextDefinition, PartialContextData } from "./context"
 import type { CoreData, CoreDefinition } from "./core"
 import type { Transitions } from "./transitions"
-import type { ReactionType } from "./reaction"
+import type {  Reactions } from "./reaction"
 import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta"
 /**
  Опции создания частицы в коллбеке create
@@ -100,5 +100,5 @@ export type FabricCallbackCreateFuncHelper<
   contextDefinition: ContextDefinition
   transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
-  reactions: ReactionType<C, I>
+  reactions:  Reactions<C, I>
 }

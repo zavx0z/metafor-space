@@ -1,7 +1,7 @@
 import type { ContextData, ContextDefinition, ContextTypes, UpdateParameters } from "./context"
 import type { Transitions } from "./transitions"
 import type { Core, CoreDefinition, CoreObj } from "./core"
-import type { ReactionType } from "./reaction"
+import type {  Reactions } from "./reaction"
 import type { ViewDefinition } from "./view"
 import type { CreateParams } from "./create"
 import type { MetaConstructor, Snapshot, OnUpdate, OnTransition } from "./meta"
@@ -47,7 +47,7 @@ export declare function MetaFor(
     context: <C extends ContextDefinition>( context: (types: ContextTypes) => C ) => {
       core: <I extends CoreObj>( core: CoreDefinition<I, C> = () => Object.create({}) ) => {
         transitions: (transitions: Transitions<S, C, I>) => {
-          reactions: (reactions: ReactionType<C, I>) => {
+          reactions: (reactions:  Reactions<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
               create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
             }
@@ -101,7 +101,7 @@ export declare class Meta<S extends string, C extends Record<string, any>, I ext
   types: Record<string, any>
   transitions: Transitions<S, C, I>
   core: Core<I>
-  reactions: ReactionType<C, I>
+  reactions:  Reactions<C, I>
   channel: BroadcastChannel
   process: boolean
   component: Element
