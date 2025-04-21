@@ -3,7 +3,7 @@
   "module": "html.js",
   "type": "module",
   "scripts": {
-    "test": "bun test html/tests",
+    "test": "bun test tests",
     "test[watch]": "bun test html/tests --watch",
     "test:html[watch]": "bun test tests/html --watch",
     "test:html:marker": "bun test tests/html/marker.spec.ts",

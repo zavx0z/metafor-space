@@ -1,4 +1,4 @@
-import {makeExpectRender} from "@pkg/fixtures/expectExtend.ts"
+import {makeExpectRender} from "../fixtures/expectExtend.ts"
 import {html} from "../../html.js"
 import {beforeAll, describe, test} from "bun:test"
 import {map} from "../../directives/map.js"

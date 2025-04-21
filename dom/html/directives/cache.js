@@ -24,7 +24,7 @@ import {
  * @returns {TemplateStringsArray} Массив строк шаблона.
  */
 const getStringsFromTemplateResult = result =>
-  isCompiledTemplateResult(result) ? result["_$atomType$"].h : result.strings
+  isCompiledTemplateResult(result) ? result["_$htmlType$"].h : result.strings
 
 class CacheDirective extends Directive {
   /**

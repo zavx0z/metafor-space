@@ -55,7 +55,7 @@ export interface DirectiveClass {
  * возвращает объект DirectiveResult, который захватывает аргументы.
  */
 export interface DirectiveResult<C extends DirectiveClass = DirectiveClass> {
-  ["_$atomDirective$"]: C
+  ["_$htmlDirective$"]: C
   /** @internal */
   values: DirectiveParameters<InstanceType<C>>
 }

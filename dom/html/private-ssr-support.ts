@@ -60,7 +60,7 @@ export const _$LH = {
   },
   setDirectiveClass(value: DirectiveResult, directiveClass: DirectiveClass) {
     // Это свойство должно остаться неминифицированным.
-    value["_$atomDirective$"] = directiveClass
+    value["_$htmlDirective$"] = directiveClass
   },
   getAttributePartCommittedValue: (part: AttributePart, value: unknown, index: number | undefined) => {
     // Используйте сеттер части для разрешения директив/конкатенации нескольких частей

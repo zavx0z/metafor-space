@@ -55,7 +55,7 @@ export class UnsafeHTMLDirective extends Directive {
       // Приведение к известному набору целых чисел, удовлетворяющих ResultType,
       // чтобы нам не пришлось экспортировать ResultType и возможно поощрять
       // такой паттерн. Это свойство должно оставаться неминифицированным.
-      ["_$atomType$"]: /**@type {1 | 2}*/ (/**@type {typeof UnsafeHTMLDirective}*/ (this.constructor).resultType),
+      ["_$htmlType$"]: /**@type {1 | 2}*/ (/**@type {typeof UnsafeHTMLDirective}*/ (this.constructor).resultType),
       strings: /**@type {TemplateStringsArray} */ (strings),
       values: []
     })

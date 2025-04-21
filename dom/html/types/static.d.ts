@@ -15,7 +15,7 @@ export type Brand = symbol
 
 export interface StaticValue {
   /** Значение для интерполяции как есть в шаблон */
-  _$atomStatic$: string
+  _$htmlStatic$: string
 
   /**
    * Значение, которое не может быть декодировано из обычного JSON,

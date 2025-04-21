@@ -46,8 +46,8 @@ export const isTemplateResult: IsTemplateResult = (
 ): value is UncompiledTemplateResult =>
   type === undefined
     ? // Это свойство должно оставаться неминифицированным.
-    (value as UncompiledTemplateResult)?.['_$atomType$'] !== undefined
-    : (value as UncompiledTemplateResult)?.['_$atomType$'] === type
+    (value as UncompiledTemplateResult)?.['_$htmlType$'] !== undefined
+    : (value as UncompiledTemplateResult)?.['_$htmlType$'] === type
 
 /**
  * Проверяет, является ли значение CompiledTemplateResult.
@@ -55,7 +55,7 @@ export const isTemplateResult: IsTemplateResult = (
 export const isCompiledTemplateResult = (
   value: unknown
 ): value is CompiledTemplateResult => {
-  return (value as CompiledTemplateResult)?.['_$atomType$']?.h != null
+  return (value as CompiledTemplateResult)?.['_$htmlType$']?.h != null
 }
 
 /**
@@ -63,14 +63,14 @@ export const isCompiledTemplateResult = (
  */
 export const isDirectiveResult = (value: unknown): value is DirectiveResult =>
   // Это свойство должно оставаться неминифицированным.
-  (value as DirectiveResult)?.['_$atomDirective$'] !== undefined
+  (value as DirectiveResult)?.['_$htmlDirective$'] !== undefined
 
 /**
  * Получает класс Directive для DirectiveResult
  */
 export const getDirectiveClass = (value: unknown): DirectiveClass | undefined =>
   // Это свойство должно оставаться неминифицированным.
-  (value as DirectiveResult)?.['_$atomDirective$']
+  (value as DirectiveResult)?.['_$htmlDirective$']
 
 
 const createMarker = () => document.createComment('')

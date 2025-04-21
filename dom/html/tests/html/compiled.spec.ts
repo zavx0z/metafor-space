@@ -26,7 +26,7 @@ describe("скомпилированные шаблоны", () => {
     }
     assertRender(
       {
-        ["_$atomType$"]: _$atom_template_1,
+        ["_$htmlType$"]: _$atom_template_1,
         values: ["A"]
       },
       "A"
@@ -40,7 +40,7 @@ describe("скомпилированные шаблоны", () => {
       parts: [{type: 2, index: 1}]
     }
     const result = {
-      ["_$atomType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$atom_template_1,
       values: ["A"]
     }
     assertRender(result, "<div>A</div>")
@@ -61,7 +61,7 @@ describe("скомпилированные шаблоны", () => {
       ]
     }
     const result = {
-      ["_$atomType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$atom_template_1,
       values: ["A"]
     }
     assertRender(result, '<div foo="A"></div>')
@@ -75,7 +75,7 @@ describe("скомпилированные шаблоны", () => {
       parts: [{type: 6, index: 0}]
     }
     const result = {
-      ["_$atomType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$atom_template_1,
       values: [ref(r)]
     }
     assertRender(result, "<div></div>")
@@ -90,7 +90,7 @@ describe("скомпилированные шаблоны", () => {
       parts: [{type: 2, index: 1}]
     }
     const result = {
-      ["_$atomType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$atom_template_1,
       values: ["A"]
     }
     expect(() => render(result, container)).toThrow()

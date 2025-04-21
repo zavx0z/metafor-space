@@ -67,7 +67,7 @@ describe("cache directive", () => {
     }
     const renderCached = (condition: any, v: string) =>
       render(
-        html` ${cache( condition ? { _$atomType$: _$lit_template_1, values: [v] } : { _$atomType$: _$lit_template_2, values: [v] } )} `,
+        html` ${cache( condition ? { _$htmlType$: _$lit_template_1, values: [v] } : { _$htmlType$: _$lit_template_2, values: [v] } )} `,
         container
       ) // prettier-ignore
 

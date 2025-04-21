@@ -38,7 +38,7 @@ describe("styleMap", () => {
     // Получаем класс StyleMapDirective косвенно, так как он не экспортируется
     const result = styleMap({})
     // Это свойство должно остаться неминифицированным
-    const StyleMapDirective = result["_$atomDirective$"]
+    const StyleMapDirective = result["_$htmlDirective$"]
 
     // Расширяем StyleMapDirective, чтобы мы могли протестировать его метод render()
     class TestStyleMapDirective extends StyleMapDirective {

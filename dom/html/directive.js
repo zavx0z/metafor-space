@@ -43,7 +43,7 @@ export const PartType = {
 export const directive =
   c =>
   (...values) => ({
-    ["_$atomDirective$"]: c,
+    ["_$htmlDirective$"]: c,
     values
   })
 

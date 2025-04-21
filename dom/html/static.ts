@@ -7,7 +7,7 @@ const brand: Brand = Symbol.for("")
 /** Безопасно извлекает строковую часть из StaticValue */
 const unwrapStaticValue = (value: unknown): string | undefined => {
   if ((value as Partial<StaticValue>)?.r !== brand) return undefined
-  return (value as Partial<StaticValue>)?.["_$atomStatic$"]
+  return (value as Partial<StaticValue>)?.["_$htmlStatic$"]
 }
 
 /**
@@ -24,10 +24,10 @@ const unwrapStaticValue = (value: unknown): string | undefined => {
  * Статические значения можно изменять, но это вызовет полный перерендер,
  * так как фактически создается новый шаблон.
  */
-export const unsafeStatic = (value: string): StaticValue => ({["_$atomStatic$"]: value, r: brand})
+export const unsafeStatic = (value: string): StaticValue => ({["_$htmlStatic$"]: value, r: brand})
 
 const textFromStatic = (value: StaticValue) => {
-  if (value["_$atomStatic$"] !== undefined) return value["_$atomStatic$"]
+  if (value["_$htmlStatic$"] !== undefined) return value["_$htmlStatic$"]
   throw new Error(
     `Значение, переданное в функцию 'literal', должно быть результатом 'literal': ${value}. 
     Используйте 'unsafeStatic' для передачи не литеральных значений, но позаботьтесь о безопасности страницы.`
@@ -49,7 +49,7 @@ const textFromStatic = (value: StaticValue) => {
  * так как фактически создается новый шаблон.
  */
 export const literal = (strings: TemplateStringsArray, ...values: unknown[]): StaticValue => ({
-  ["_$atomStatic$"]: values.reduce(
+  ["_$htmlStatic$"]: values.reduce(
     (acc, v, idx) => acc + textFromStatic(v as StaticValue) + strings[idx + 1],
     strings[0]
   ) as string,

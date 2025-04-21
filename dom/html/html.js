@@ -189,7 +189,7 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
   let currentDirective = attributeIndex !== undefined ? parent.__directives?.[attributeIndex] : parent.__directive
 
   const nextDirectiveConstructor = /** @type {import("./types/directives.js").DirectiveClass | undefined} */ (
-    isPrimitive(value) ? undefined : /** @type {DirectiveResult} */ (value)["_$atomDirective$"]
+    isPrimitive(value) ? undefined : /** @type {DirectiveResult} */ (value)["_$htmlDirective$"]
   )
 
   if (currentDirective?.constructor !== nextDirectiveConstructor) {
@@ -372,13 +372,13 @@ const setSanitizer = (newSanitizer) => {
 /** @type {(_node: Node, _name: string, _type: "property" | "attribute") => (value: unknown) => unknown} */
 const createSanitizer = (node, name, type) => sanitizerFactoryInternal(node, name, type)
 
-/** @type {import("./").TagFunction} */
-const tag = type => (strings, ...values) => ({_$atomType$: type, strings, values}) // prettier-ignore
-/**@type {import("./").html} */
+/** @type {import("./html").TagFunction} */
+const tag = type => (strings, ...values) => ({_$htmlType$: type, strings, values}) // prettier-ignore
+/**@type {import("./html").html} */
 export const html = tag(HTML_RESULT)
-/**@type {import("./").SVGElement} */
+/**@type {import("./html").SVGElement} */
 export const svg = tag(SVG_RESULT)
-/**@type {import("./").MathML} */
+/**@type {import("./html").mathml} */
 export const mathml = tag(MATHML_RESULT)
 
 export class Template {
@@ -389,7 +389,7 @@ export class Template {
    * @param {UncompiledTemplateResult} params - Массив строк шаблона
    * @param {RenderOptions} [options = {}] - Опции рендеринга
    */
-  constructor({ strings, ["_$atomType$"]: type }, options = {}) {
+  constructor({ strings, ["_$htmlType$"]: type }, options = {}) {
     /** @type {Node | null} */ let node
     let nodeIndex = 0
     let attrNameIndex = 0
@@ -736,7 +736,7 @@ export class ChildPart {
       } else if (value !== this._$committedValue && value !== noChange) {
         this._commitText(value)
       }
-    } else if (/** @type {TemplateResult<any>} */ (value)["_$atomType$"] !== undefined) {
+    } else if (/** @type {TemplateResult<any>} */ (value)["_$htmlType$"] !== undefined) {
       this._commitTemplateResult(/** @type {TemplateResult<any>} */ (value))
     } else if (/** @type {Node} */ (value).nodeType !== undefined) {
       if (DEV_MODE && this.options?.host === value) {
@@ -842,9 +842,9 @@ export class ChildPart {
    * @param {TemplateResult<any> | CompiledTemplateResult} result - Шаблон или скомпилированный шаблон
    */
   _commitTemplateResult(result) {
-    const { values, ["_$atomType$"]: type } = result
-    // Если $atomType$ является числом, result является простым TemplateResult и мы получаем
-    // шаблон из кэша шаблонов. Если нет, result является CompiledTemplateResult и _$atomType$
+    const { values, ["_$htmlType$"]: type } = result
+    // Если $htmlType$ является числом, result является простым TemplateResult и мы получаем
+    // шаблон из кэша шаблонов. Если нет, result является CompiledTemplateResult и _$htmlType$
     // является CompiledTemplate, и нам нужно создать <template> элемент в первый раз, когда мы его видим.
     let template
     if (typeof type === "number") {

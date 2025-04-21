@@ -1,6 +1,6 @@
 import {render, html} from "../../html"
 import {beforeEach, describe, expect, test} from "bun:test"
-import {stripExpressionMarkers} from "@pkg/fixtures/expectExtend"
+import {stripExpressionMarkers} from "../fixtures/expectExtend"
 
 describe(`don't render simple spoof template results`, () => {
   let container: HTMLDivElement
@@ -9,7 +9,7 @@ describe(`don't render simple spoof template results`, () => {
   })
   test(`don't render simple spoof template results`, () => {
     const spoof = {
-      ["_$atomType$"]: 1,
+      ["_$htmlType$"]: 1,
       strings: ["<div>spoofed string</div>"],
       values: []
     }

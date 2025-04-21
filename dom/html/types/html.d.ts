@@ -15,13 +15,13 @@ export type ResultType = typeof HTML_RESULT | typeof SVG_RESULT | typeof MATHML_
  * обновить DOM, вам нужно будет рендерить `TemplateResult`. 
  */
 export type UncompiledTemplateResult<T extends ResultType = ResultType> = {
-  ["_$atomType$"]: T
+  ["_$htmlType$"]: T
   strings: TemplateStringsArray
   values: unknown[]
 }
 
 /**
- * Это шаблонный результат, который может быть либо нескомпилированным, либо скомпилированным.
+ * Это шаблонный результат, который может быть либо нескопированным, либо скомпилированным.
  *
  * В будущем TemplateResult будет этот тип. Если вы хотите явно отметить, что шаблонный результат потенциально скомпилирован, вы можете ссылаться на этот
  * тип, и он будет продолжать вести себя так же через следующую основную версию @pkg/html. Это может быть полезно для кода, который хочет подготовиться к следующей
@@ -61,7 +61,7 @@ export interface CompiledTemplateResult {
   // Это фабрика, чтобы сделать инициализацию шаблона ленивой
   // и позволить ShadyRenderOptions scope быть переданным.
   // Это свойство должно оставаться неминифицированным.
-  ["_$atomType$"]: CompiledTemplate
+  ["_$htmlType$"]: CompiledTemplate
   values: unknown[]
 }
 

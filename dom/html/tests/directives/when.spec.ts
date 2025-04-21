@@ -1,7 +1,7 @@
 import {describe, beforeEach, test} from "bun:test"
 import {html} from "../../html.js"
 import {when} from "../../directives/when.js"
-import {makeExpectRender} from "@metafor/fixtures/expectExtend.js"
+import {makeExpectRender} from "../fixtures/expectExtend.js"
 
 describe("when", () => {
   let container: HTMLDivElement

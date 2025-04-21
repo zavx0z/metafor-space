@@ -2,7 +2,7 @@ import type { ResultType, TemplateResult } from "./types/html"
 
 export declare const nothing = typeof Symbol.for("nothing")
 
-  /**
+/**
  * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.
  */
 export type TagFunction = <T extends ResultType>(
@@ -50,7 +50,7 @@ export declare function html(strings: TemplateStringsArray, ...values: unknown[]
  *
  * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<2>}
  */
-export type SVGElement = (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<2>
+export declare function svg(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<2>
 
 /**
  * Интерпретирует литерал шаблона как MathML-фрагмент, который может эффективно отрисовываться и обновлять контейнер.
@@ -78,7 +78,7 @@ export type SVGElement = (strings: TemplateStringsArray, ...values: unknown[]) =
  * @param {T} type
  * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<3>}
  */
-export type MathML = (strings: TemplateStringsArray, ...values: any[]) => TemplateResult<3>
+export declare function mathml(strings: TemplateStringsArray, ...values: any[]): TemplateResult<3>
 
 /**
  * Устанавливает значение объекта Ref или вызывает callback-функцию ref с привязанным
