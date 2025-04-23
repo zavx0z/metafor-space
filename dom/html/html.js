@@ -34,7 +34,7 @@ const trustedTypes = /** @type { TrustedTypePolicyFactory} */ (/** @type {any} *
  * innerHTML до того, как в него будут добавлены недоверенные выражения.
  * Поэтому он считается безопасным по построению.
  */
-export const policy = trustedTypes ? trustedTypes.createPolicy("atom-html", { createHTML: (s) => s }) : undefined
+export const policy = trustedTypes ? trustedTypes.createPolicy("meta-html", { createHTML: (s) => s }) : undefined
 /** @type {(_node: Node, _name: string, _type: "property" | "attribute") => (value: unknown) => unknown} */
 export const noopSanitizer = (_node, _name, _type) => (value) => value
 /** @type {(value: unknown) => boolean} */
@@ -45,13 +45,13 @@ export const isArray = Array.isArray
 export const isIterable = (value) =>
   isArray(value) || typeof (/** @type {any} */ (value)?.[Symbol.iterator]) === "function"
 /** Добавляется к имени атрибута, чтобы пометить атрибут как привязанный, чтобы мы могли легко его найти. */
-export const boundAttributeSuffix = "$atom$"
+export const boundAttributeSuffix = "$html$"
 /**
  * Этот маркер используется во многих синтаксических позициях в HTML, поэтому он должен быть
  * допустимым именем элемента и атрибута. Пока не поддерживаются динамические имена,
  * но это как минимум гарантирует, что дерево разбора ближе к намерению шаблона.
  */
-export const marker = `atom$${Math.random().toFixed(9).slice(2)}$`
+export const marker = `html$${Math.random().toFixed(9).slice(2)}$`
 /** Строка, используемая для определения, является ли комментарий маркерным комментарием */
 export const markerMatch = "?" + marker
 /**
@@ -376,7 +376,7 @@ const createSanitizer = (node, name, type) => sanitizerFactoryInternal(node, nam
 const tag = type => (strings, ...values) => ({_$htmlType$: type, strings, values}) // prettier-ignore
 /**@type {import("./html").html} */
 export const html = tag(HTML_RESULT)
-/**@type {import("./html").SVGElement} */
+/**@type {import("./html").svg} */
 export const svg = tag(SVG_RESULT)
 /**@type {import("./html").mathml} */
 export const mathml = tag(MATHML_RESULT)
@@ -1230,13 +1230,13 @@ export class ElementPart {
  * @param {RenderOptions} options - См. документацию {@linkcode RenderOptions} для параметров.
  */
 export const render = (value, container, options = {}) => {
-  // TODO: Выдать более понятное сообщение об ошибке, чем Uncaught TypeError: Cannot read properties of null (reading '_$atomPart$') которое выглядит как внутренняя ошибка @pkg.
+  // TODO: Выдать более понятное сообщение об ошибке, чем Uncaught TypeError: Cannot read properties of null (reading '_$htmlPart$') которое выглядит как внутренняя ошибка @pkg.
   if (container == null) throw new TypeError(`Контейнер для рендеринга не может быть ${container}`)
   const partOwnerNode = /** @type {any} */ (options?.renderBefore ?? container)
-  let part = /** @type {any} */ (partOwnerNode)["_$atomPart$"]
+  let part = /** @type {any} */ (partOwnerNode)["_$htmlPart$"]
   if (part === undefined) {
     const endNode = options?.renderBefore ?? null
-    partOwnerNode["_$atomPart$"] = part = new ChildPart(
+    partOwnerNode["_$htmlPart$"] = part = new ChildPart(
       container.insertBefore(createMarker(), endNode),
       endNode,
       undefined,

@@ -2,10 +2,10 @@ import {expect} from "bun:test"
 import {render} from "../../html.js"
 
 /** Удаляет комментарии выражений из предоставленной html-строки. */
-export const stripExpressionComments = (html: string) => html.replace(/<!--\?atom\$[0-9]+\$-->|<!--\??-->/g, "")
+export const stripExpressionComments = (html: string) => html.replace(/<!--\?html\$[0-9]+\$-->|<!--\??-->/g, "")
 /** Удаляет маркеры выражений из предоставленной html-строки. */
 export const stripExpressionMarkers = (html: string) =>
-  html.replace(/<!--\?atom\$[0-9]+\$-->|<!--\??-->|atom\$[0-9]+\$/g, "")
+  html.replace(/<!--\?html\$[0-9]+\$-->|<!--\??-->|html\$[0-9]+\$/g, "")
 
 /** Удаляет все пробельные символы */
 export const stripWhitespace = (str: unknown) => {

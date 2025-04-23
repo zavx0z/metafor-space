@@ -1,5 +1,6 @@
 import { MetaFor } from "../index.js"
 import ELK from "elkjs"
+import { map } from "../dom/html/directives/map.js"
 
 export const Nodes = MetaFor("nodes", {
   description: "Nodes",
@@ -47,20 +48,23 @@ export const Nodes = MetaFor("nodes", {
       action: ({ context, patch, update }) => {
         console.log(patch)
         update({ nodes: [...context.nodes, patch.value] })
-        console.log(context.nodes)
       },
     },
   ])
   .view({
-    render: ({ html, update }) => html`
+    render: ({ html, update, context }) => html`
       <div>
         <h1>Nodes</h1>
         <button @click=${() => update({ op: "add" })}>Add</button>
         <button @click=${() => update({ op: "remove" })}>Remove</button>
+        ${map(context.nodes, (item) => {
+          html`<p>${item.id}</p>`
+        })}
       </div>
     `,
     style: ({ css }) => css`
-      h1 {
+      h1,
+      p {
         color: red;
       }
     `,

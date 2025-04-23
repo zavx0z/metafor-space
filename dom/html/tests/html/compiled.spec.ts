@@ -20,13 +20,13 @@ describe("скомпилированные шаблоны", () => {
 
   test("только текст", () => {
     // Скомпилированный шаблон для html`${'A'}`
-    const _$atom_template_1: CompiledTemplate = {
+    const _$html_template_1: CompiledTemplate = {
       h: branding_tag`<!---->`,
       parts: [{type: 2, index: 0}]
     }
     assertRender(
       {
-        ["_$htmlType$"]: _$atom_template_1,
+        ["_$htmlType$"]: _$html_template_1,
         values: ["A"]
       },
       "A"
@@ -35,12 +35,12 @@ describe("скомпилированные шаблоны", () => {
 
   test("текстовое выражение", () => {
     // Скомпилированный шаблон для html`<div>${'A'}</div>`
-    const _$atom_template_1: CompiledTemplate = {
+    const _$html_template_1: CompiledTemplate = {
       h: branding_tag`<div><!----></div>`,
       parts: [{type: 2, index: 1}]
     }
     const result = {
-      ["_$htmlType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$html_template_1,
       values: ["A"]
     }
     assertRender(result, "<div>A</div>")
@@ -48,7 +48,7 @@ describe("скомпилированные шаблоны", () => {
 
   test("выражение атрибута", () => {
     // Скомпилированный шаблон для html`<div foo=${'A'}></div>`
-    const _$atom_template_1: CompiledTemplate = {
+    const _$html_template_1: CompiledTemplate = {
       h: branding_tag`<div></div>`,
       parts: [
         {
@@ -61,7 +61,7 @@ describe("скомпилированные шаблоны", () => {
       ]
     }
     const result = {
-      ["_$htmlType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$html_template_1,
       values: ["A"]
     }
     assertRender(result, '<div foo="A"></div>')
@@ -70,12 +70,12 @@ describe("скомпилированные шаблоны", () => {
   test.skip("выражение элемента", () => {
     const r = createRef()
     // Скомпилированный шаблон для html`<div ${ref(r)}></div>`
-    const _$atom_template_1: CompiledTemplate = {
+    const _$html_template_1: CompiledTemplate = {
       h: branding_tag`<div></div>`,
       parts: [{type: 6, index: 0}]
     }
     const result = {
-      ["_$htmlType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$html_template_1,
       values: [ref(r)]
     }
     assertRender(result, "<div></div>")
@@ -85,12 +85,12 @@ describe("скомпилированные шаблоны", () => {
   })
 
   test(`выбросить ошибку если не брендировано`, () => {
-    const _$atom_template_1: CompiledTemplate = {
+    const _$html_template_1: CompiledTemplate = {
       h: ["<div><!----></div>"] as unknown as TemplateStringsArray,
       parts: [{type: 2, index: 1}]
     }
     const result = {
-      ["_$htmlType$"]: _$atom_template_1,
+      ["_$htmlType$"]: _$html_template_1,
       values: ["A"]
     }
     expect(() => render(result, container)).toThrow()

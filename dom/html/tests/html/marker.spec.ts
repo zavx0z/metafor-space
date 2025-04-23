@@ -660,7 +660,7 @@ describe("вставка маркера", () => {
     // Удаляем только текст маркера (а не весь комментарий,
     // как это делает stripExpressionMarkers), чтобы тест работал
     // как в runtime, так и в скомпилированных шаблонах.
-    expect(container.innerHTML.replace(/atom\$[0-9]+\$/g, "")).toMatchStringHTML("<!----><!---->")
+    expect(container.innerHTML.replace(/html\$[0-9]+\$/g, "")).toMatchStringHTML("<!----><!---->")
   })
 
   test("комментарий с содержимым похожим на атрибут", () => {

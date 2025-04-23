@@ -9,7 +9,7 @@ export type TagFunction = <T extends ResultType>(
   type: T
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
 
-export declare function render(result: TemplateResult<1>, container: HTMLElement): void
+export declare function render(result: TemplateResult<1> | TemplateResult<2> | TemplateResult<3>, container: HTMLElement): void
 
 /**
  * Интерпретирует литерал шаблона как HTML-шаблон, который может эффективно отрисовываться и обновлять контейнер.
