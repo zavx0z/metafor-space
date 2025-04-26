@@ -44,8 +44,8 @@ class ClassMapDirective extends Directive {
     )
   }
 /**
-   * @param {import('../html.js').AttributePart} part - Часть, к которой прикреплена директива.
-   * @param {import('../types/directives.js').DirectiveParameters<this>} classInfo - Объект ClassInfo, содержащий имена классов и их значения.
+   * @param {import('../html').AttributePart} part - Часть, к которой прикреплена директива.
+   * @param {import('../types/directives').DirectiveParameters<this>} classInfo - Объект ClassInfo, содержащий имена классов и их значения.
    */
    update(part, [classInfo]) {
     // Запоминаем динамические классы при первом рендере

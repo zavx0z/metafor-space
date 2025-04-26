@@ -115,27 +115,7 @@ export const doubleQuoteAttrEndRegex = /"/g
  * поэтому нам нужно искать в их текстовом контенте строки маркеров.
  */
 export const rawTextElement = /^(?:script|style|textarea|title)$/i
-/**
- * Сигнальное значение, которое указывает ChildPart полностью очистить свое содержимое.
- *
- * ```ts
- * const button = html`${
- *  user.isAdmin
- *    ? html`<button>DELETE</button>`
- *    : nothing
- * }`;
- * ```
- *
- * Рекомендуется использовать `nothing` вместо других ложных значений, так как это обеспечивает
- * согласованное поведение между различными контекстами привязки выражений.
- *
- * В дочерних выражениях `undefined`, `null`, `''` и `nothing` ведут себя одинаково
- * и не отрисовывают узлы. В выражениях атрибутов `nothing` _удаляет_ атрибут,
- * в то время как `undefined` и `null` отрисуют пустую строку. В выражениях свойств
- * `nothing` становится `undefined`.
- */
 export const nothing = Symbol.for("nothing")
-/** Символ, который сигнализирует, что значение было обработано директивой и не должно быть записано в DOM. */
 export const noChange = Symbol.for("noChange")
 /**
  * Кэш подготовленных шаблонов, ключей по массиву TemplateStringsArray и не учитывая конкретный тег шаблона.
@@ -961,10 +941,7 @@ export class AttributePart {
   /** @type {HTMLElement} */ element
   /** @type {string} */ name
   /** @type {RenderOptions | undefined} */ options
-  /** Если этот атрибут часть представляет собой интерполяцию, это содержит статические строки интерполяции.
-   * Для однозначных, полных привязок это undefined.
-   * @type {ReadonlyArray<string> | undefined} */
-  strings
+  /** @type {ReadonlyArray<string> | undefined} */ strings
   /** @type {unknown | Array<unknown>} */ _$committedValue = nothing
   /** @type {Set<Disconnectable> | undefined} */ _$disconnectableChildren
   /** @type {ValueSanitizer | undefined} */ _sanitizer
