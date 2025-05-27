@@ -20,7 +20,7 @@ describe("repeat", () => {
   describe("keyed", () => {
     test("renders a list", () => {
       // prettier-ignore
-      const r = html`${repeat([1, 2, 3], (i) => i, (i: number) => html`
+      const r = html`${repeat([1, 2, 3], (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`;
       render(r, container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers(`
@@ -32,7 +32,7 @@ describe("repeat", () => {
     test("renders a list twice", () => {
       const t = (items: any[]) =>
         // prettier-ignore
-        html`${repeat(items, (i) => i, (i: number) => html`
+        html`${repeat(items, (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`
 
       render(t([0, 1, 2]), container)
@@ -55,7 +55,7 @@ describe("repeat", () => {
     test("shuffles are stable", () => {
       let items: number[] = [0, 1, 2]
       // prettier-ignore
-      const t = () => html`${repeat(items, (i) => i, (i: number) => html`
+      const t = () => html`${repeat(items, (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`;
       render(t(), container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers(`
@@ -78,7 +78,7 @@ describe("repeat", () => {
     test("shuffles a list with additions", () => {
       let items = [0, 1, 2, 3, 4]
       // prettier-ignore
-      const t = () => html`${repeat(items, (i) => i, (i: number) => html`
+      const t = () => html`${repeat(items, (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`;
       render(t(), container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers(`
@@ -106,7 +106,7 @@ describe("repeat", () => {
     test("swaps are stable", () => {
       const t = (items: number[]) =>
         // prettier-ignore
-        html`${repeat(items, (i) => i, (i: number) => html`
+        html`${repeat(items, (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`
 
       let items = [0, 1, 2, 3, 4]
@@ -135,7 +135,7 @@ describe("repeat", () => {
     test("can re-render after swap", () => {
       const t = (items: number[]) =>
         // prettier-ignore
-        html`${repeat(items, (i) => i, (i: number) => html`
+        html`${repeat(items, (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`
 
       let items = [0, 1, 2]

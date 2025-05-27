@@ -1,4 +1,5 @@
-import type {Disconnectable, ResultType, TemplateResult} from "./types/html"
+import type {Disconnectable, RenderOptions, ResultType, TemplateResult} from "./types/html"
+import type {SanitizerFactory} from "./types/global";
 // import type { Directive } from "./directive"
 // import type { PartInfo } from "./types/directives"
 // import type { Disconnectable } from "./types/html"
@@ -75,11 +76,33 @@ export type TagFunction = <T extends ResultType>(
     type: T
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
 
+/**
+ * Отображает значение @pkg/html TemplateResult, в контейнере.
+ *
+ * Этот пример отображает текст "Привет, Атом!" внутри тега параграфа,
+ * добавляя его в контейнер `document.body`.
+ *
+ * ```js
+ * import {html, render} from '@pkg/html';
+ *
+ * const name = "Атом";
+ * render(html`<p>Привет, ${name}!</p>`, document.body);
+ * ```
+ *
+ * @param {unknown} value - Любое [отображаемое значение].
+ * Обычно {@linkcode TemplateResult}, созданное путем вычисления тега шаблона
+ * как {@linkcode html} или {@linkcode svg}.
+ * @param container - DOM-контейнер для отображения.
+ * Первый рендеринг добавит отображаемое значение в контейнер,
+ * а последующие рендеры будут эффективно обновлять отображаемое значение,
+ * если тот же тип результата был ранее отображен там.
+ * @param [options] - См. документацию {@linkcode RenderOptions} для параметров.
+ */
 export declare function render(
-    result: TemplateResult<1> | TemplateResult<2> | TemplateResult<3>,
-    container: HTMLElement,
-    options?: RenderOptions
-): void
+    value: any,
+    container: HTMLElement | DocumentFragment,
+    options?: RenderOptions,
+): ChildPart
 
 /**
  * Интерпретирует литерал шаблона как HTML-шаблон, который может эффективно отрисовываться и обновлять контейнер.
@@ -368,11 +391,17 @@ export declare class AttributePart {
      Для однозначных, полных привязок это undefined.
      */
     strings?: ReadonlyArray<string>
-    // _$committedValue: unknown | unknown[]
+    _$committedValue: unknown | unknown[]
     // _$disconnectableChildren?: Set<Disconnectable>
     // _sanitizer?: (value: unknown) => unknown
     // _$parent: Disconnectable
-
+    /**
+     * @param element - Элемент
+     * @param name - Имя
+     * @param strings - Строки
+     * @param parent - Родитель
+     * @param options - Опции
+     */
     constructor(
         element: HTMLElement,
         name: string,
@@ -383,11 +412,31 @@ export declare class AttributePart {
 
     get tagName(): string
 
-    // get _$isConnected(): boolean
+    /**
+     * Устанавливает значение этой части путем разрешения значения из возможно нескольких
+     * значений и статических строк и фиксирует его в DOM.
+     * Если эта часть однозначная, `this._strings` будет undefined, и метод
+     * будет вызван с одним аргументом значения. Если эта часть
+     * многозначная, `this._strings` будет определен, и метод вызывается
+     * с массивом значений владеющего TemplateInstance части и смещением
+     * в массиве значений, с которого следует читать значения.
+     * Метод перегружен таким образом, чтобы исключить короткоживущие срезы массива
+     * значений экземпляра шаблона и обеспечить быстрый путь для однозначных
+     * частей.
+     *
+     * @param  value - Значение части или массив значений для многозначных частей
+     * @param directiveParent - Экземпляр директивы, которая вызывает этот метод
+     * @param [valueIndex=0] - индекс для начала чтения значений. `undefined` для однозначных частей
+     * @param [noCommit] - заставляет часть не фиксировать свое значение в DOM. Используется
+     *   при гидратации для подготовки частей атрибутов с их первым отрендеренным значением,
+     *   но не устанавливает атрибут, а в SSR для no-op DOM операции и
+     *   захвата значения для сериализации.
+     */
+    _$setValue(value: unknown | unknown[], directiveParent?: DirectiveParent, valueIndex?: number = 0, noCommit?: boolean): void
 
-    // _$setValue(value: unknown | unknown[], directiveParent?: DirectiveParent, valueIndex?: number, noCommit?: boolean): void
+    _commitValue(value: unknown): void
 
-    // _commitValue(value: unknown): void
+    get _$isConnected(): boolean
 }
 
 /** Часть для свойств. */
@@ -400,6 +449,7 @@ export declare class PropertyPart extends AttributePart {
 /** Часть для булевых атрибутов. */
 export declare class BooleanAttributePart extends AttributePart {
     type: typeof BOOLEAN_ATTRIBUTE_PART
+
 
     _commitValue(value: unknown): void
 }
@@ -426,6 +476,10 @@ export declare class ElementPart {
     get _$isConnected(): boolean
 
     _$setValue(value: unknown): void
+
+    _$parent: Disconnectable | undefined
+    options: RenderOptions | undefined
+    element: Element
 }
 
 // /**

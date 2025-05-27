@@ -69,7 +69,7 @@ export class RefDirective extends AsyncDirective {
   }
 
   /**
-   * @param {import("../types/html").ElementPart} part
+   * @param {import("../html").ElementPart} part
    * @param {[RefOrCallback<T>]} args
    * @returns {typeof nothing}
    */

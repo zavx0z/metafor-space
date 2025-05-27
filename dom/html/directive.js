@@ -34,6 +34,7 @@ export const PartType = {
  * @callback DirectiveCallback
  * @param {...DirectiveParameters<InstanceType<C>>} values
  */
+
 /**
  * Создает пользовательскую функцию директивы из класса Directive. Эта
  * функция имеет те же параметры, что и метод render() директивы.
@@ -42,12 +43,10 @@ export const PartType = {
  * @param {C} c
  * @returns {(...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>}
  */
-export const directive =
-    c =>
-        (...values) => ({
-            ["_$htmlDirective$"]: c,
-            values
-        })
+export const directive = c => (...values) => ({
+    ["_$htmlDirective$"]: c,
+    values: /** @type {DirectiveParameters<InstanceType<typeof c>>} */ (values)
+})
 
 /**
  * Базовый класс для создания пользовательских директив. Пользователи должны расширять этот класс,

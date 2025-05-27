@@ -912,24 +912,10 @@ export class AttributePart {
     }
 
     /**
-     * Устанавливает значение этой части путем разрешения значения из возможно нескольких
-     * значений и статических строк и фиксирует его в DOM.
-     * Если эта часть однозначная, `this._strings` будет undefined, и метод
-     * будет вызван с одним аргументом значения. Если эта часть
-     * многозначная, `this._strings` будет определен, и метод вызывается
-     * с массивом значений владеющего TemplateInstance части и смещением
-     * в массиве значений, с которого следует читать значения.
-     * Метод перегружен таким образом, чтобы исключить короткоживущие срезы массива
-     * значений экземпляра шаблона и обеспечить быстрый путь для однозначных
-     * частей.
-     *
-     * @param {unknown | Array<unknown>} value - Значение части или массив значений для многозначных частей
-     * @param {DirectiveParent} directiveParent - Экземпляр директивы, которая вызывает этот метод
-     * @param {number} [valueIndex=0] - индекс для начала чтения значений. `undefined` для однозначных частей
-     * @param {boolean} [noCommit] - заставляет часть не фиксировать свое значение в DOM. Используется
-     *   при гидратации для подготовки частей атрибутов с их первым отрендеренным значением,
-     *   но не устанавливает атрибут, а в SSR для no-op DOM операции и
-     *   захвата значения для сериализации.
+     * @param {unknown | Array<unknown>} value
+     * @param {DirectiveParent} directiveParent
+     * @param {number} [valueIndex=0]
+     * @param {boolean} [noCommit]
      */
     _$setValue(value, directiveParent = this, valueIndex = 0, noCommit) {
         const strings = this.strings
@@ -1123,32 +1109,15 @@ export class ElementPart {
 }
 
 /**
- * Отображает значение @pkg/html TemplateResult, в контейнере.
- *
- * Этот пример отображает текст "Привет, Атом!" внутри тега параграфа,
- * добавляя его в контейнер `document.body`.
- *
- * ```js
- * import {html, render} from '@pkg/html';
- *
- * const name = "Атом";
- * render(html`<p>Привет, ${name}!</p>`, document.body);
- * ```
- *
- * @param {unknown} value - Любое [отображаемое значение].
- * Обычно {@linkcode TemplateResult}, созданное путем вычисления тега шаблона
- * как {@linkcode html} или {@linkcode svg}.
- * @param {HTMLElement|DocumentFragment} container - DOM-контейнер для отображения.
- * Первый рендеринг добавит отображаемое значение в контейнер,
- * а последующие рендеры будут эффективно обновлять отображаемое значение,
- * если тот же тип результата был ранее отображен там.
- * @param {RenderOptions} options - См. документацию {@linkcode RenderOptions} для параметров.
+ * @param {unknown} value
+ * @param {HTMLElement|DocumentFragment} container
+ * @param {RenderOptions} options
  */
 export const render = (value, container, options = {}) => {
     // TODO: Выдать более понятное сообщение об ошибке, чем Uncaught TypeError: Cannot read properties of null (reading '_$htmlPart$') которое выглядит как внутренняя ошибка @pkg.
     if (container == null) throw new TypeError(`Контейнер для рендеринга не может быть ${container}`)
     const partOwnerNode = /** @type {any} */ (options?.renderBefore ?? container)
-    let part = /** @type {any} */ (partOwnerNode)["_$htmlPart$"]
+    let part =partOwnerNode["_$htmlPart$"]
     if (part === undefined) {
         const endNode = options?.renderBefore ?? null
         partOwnerNode["_$htmlPart$"] = part = new ChildPart(
