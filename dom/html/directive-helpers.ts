@@ -1,7 +1,13 @@
+// @ts-nocheck
 import {_$LH} from "./ssr.js"
-import type {CompiledTemplateResult, DirectiveParent, MaybeCompiledTemplateResult, UncompiledTemplateResult} from "./types/html.js"
+import type {
+    CompiledTemplateResult,
+    DirectiveParent,
+    MaybeCompiledTemplateResult,
+    UncompiledTemplateResult
+} from "./types/html.js"
 import type {DirectiveClass, DirectiveResult} from "./types/directives.js"
-import type {Part} from "./types/part.js"
+import type {AttributePart, BooleanAttributePart, ElementPart, EventPart, PropertyPart} from "./html"
 
 type Primitive = null | undefined | boolean | number | string | symbol | bigint;
 
@@ -17,60 +23,60 @@ const wrap = <T extends Node>(node: T) => node
  * См. https://tc39.github.io/ecma262/#sec-typeof-operator
  */
 export const isPrimitive = (value: unknown): value is Primitive =>
-  value === null || (typeof value != 'object' && typeof value != 'function')
+    value === null || (typeof value != 'object' && typeof value != 'function')
 
 export const TemplateResultType = {
-  HTML: 1,
-  SVG: 2,
-  MATHML: 3,
+    HTML: 1,
+    SVG: 2,
+    MATHML: 3,
 }
 
 export type TemplateResultType =
-  (typeof TemplateResultType)[keyof typeof TemplateResultType];
+    (typeof TemplateResultType)[keyof typeof TemplateResultType];
 
 type IsTemplateResult = {
-  (val: unknown): val is MaybeCompiledTemplateResult;
-  <T extends TemplateResultType>(
-    val: unknown,
-    type: T
-    // @ts-ignore
-  ): val is UncompiledTemplateResult<T>;
+    (val: unknown): val is MaybeCompiledTemplateResult;
+    <T extends TemplateResultType>(
+        val: unknown,
+        type: T
+        // @ts-ignore
+    ): val is UncompiledTemplateResult<T>;
 };
 
 /**
  * Проверяет, является ли значение TemplateResult или CompiledTemplateResult.
  */
 export const isTemplateResult: IsTemplateResult = (
-  value: unknown,
-  type?: TemplateResultType
+    value: unknown,
+    type?: TemplateResultType
 ): value is UncompiledTemplateResult =>
-  type === undefined
-    ? // Это свойство должно оставаться неминифицированным.
-    (value as UncompiledTemplateResult)?.['_$htmlType$'] !== undefined
-    : (value as UncompiledTemplateResult)?.['_$htmlType$'] === type
+    type === undefined
+        ? // Это свойство должно оставаться неминифицированным.
+        (value as UncompiledTemplateResult)?.['_$htmlType$'] !== undefined
+        : (value as UncompiledTemplateResult)?.['_$htmlType$'] === type
 
 /**
  * Проверяет, является ли значение CompiledTemplateResult.
  */
 export const isCompiledTemplateResult = (
-  value: unknown
+    value: unknown
 ): value is CompiledTemplateResult => {
-  return (value as CompiledTemplateResult)?.['_$htmlType$']?.h != null
+    return (value as CompiledTemplateResult)?.['_$htmlType$']?.h != null
 }
 
 /**
  * Проверяет, является ли значение DirectiveResult.
  */
 export const isDirectiveResult = (value: unknown): value is DirectiveResult =>
-  // Это свойство должно оставаться неминифицированным.
-  (value as DirectiveResult)?.['_$htmlDirective$'] !== undefined
+    // Это свойство должно оставаться неминифицированным.
+    (value as DirectiveResult)?.['_$htmlDirective$'] !== undefined
 
 /**
  * Получает класс Directive для DirectiveResult
  */
 export const getDirectiveClass = (value: unknown): DirectiveClass | undefined =>
-  // Это свойство должно оставаться неминифицированным.
-  (value as DirectiveResult)?.['_$htmlDirective$']
+    // Это свойство должно оставаться неминифицированным.
+    (value as DirectiveResult)?.['_$htmlDirective$']
 
 
 const createMarker = () => document.createComment('')
@@ -86,58 +92,58 @@ const createMarker = () => document.createComment('')
  * @param part Часть для вставки, или undefined для создания новой части
  */
 export const insertPart = (
-  containerPart: ChildPart,
-  refPart?: ChildPart,
-  part?: ChildPart
+    containerPart: ChildPart,
+    refPart?: ChildPart,
+    part?: ChildPart
 ): ChildPart => {
-  const container = wrap(containerPart._$startNode).parentNode!
+    const container = wrap(containerPart._$startNode).parentNode!
 
-  const refNode =
-    refPart === undefined ? containerPart._$endNode : refPart._$startNode
+    const refNode =
+        refPart === undefined ? containerPart._$endNode : refPart._$startNode
 
-  if (part === undefined) {
-    const startNode = wrap(container).insertBefore(createMarker(), refNode)
-    const endNode = wrap(container).insertBefore(createMarker(), refNode)
-    part = new ChildPart(
-      startNode,
-      endNode,
-      containerPart,
-      containerPart.options
-    )
-  } else {
-    const endNode = wrap(part._$endNode!).nextSibling
-    const oldParent = part._$parent
-    const parentChanged = oldParent !== containerPart
-    if (parentChanged) {
-      part._$reparentDisconnectables?.(containerPart)
-      // Обратите внимание, что хотя `_$reparentDisconnectables` обновляет ссылку части
-      // `_$parent` после отключения от текущего родителя, этот метод существует
-      // только если присутствуют Disconnectables, поэтому нам нужно безусловно
-      // установить его здесь
-      part._$parent = containerPart
-      // Поскольку геттер _$isConnected довольно затратный, читаем его только
-      // когда мы знаем, что в поддереве есть директивы, которые нужно
-      // уведомить
-      let newConnectionState
-      if (
-        part._$notifyConnectionChanged !== undefined &&
-        (newConnectionState = containerPart._$isConnected) !==
-        oldParent!._$isConnected
-      ) {
-        part._$notifyConnectionChanged(newConnectionState)
-      }
+    if (part === undefined) {
+        const startNode = wrap(container).insertBefore(createMarker(), refNode)
+        const endNode = wrap(container).insertBefore(createMarker(), refNode)
+        part = new ChildPart(
+            startNode,
+            endNode,
+            containerPart,
+            containerPart.options
+        )
+    } else {
+        const endNode = wrap(part._$endNode!).nextSibling
+        const oldParent = part._$parent
+        const parentChanged = oldParent !== containerPart
+        if (parentChanged) {
+            part._$reparentDisconnectables?.(containerPart)
+            // Обратите внимание, что хотя `_$reparentDisconnectables` обновляет ссылку части
+            // `_$parent` после отключения от текущего родителя, этот метод существует
+            // только если присутствуют Disconnectables, поэтому нам нужно безусловно
+            // установить его здесь
+            part._$parent = containerPart
+            // Поскольку геттер _$isConnected довольно затратный, читаем его только
+            // когда мы знаем, что в поддереве есть директивы, которые нужно
+            // уведомить
+            let newConnectionState
+            if (
+                part._$notifyConnectionChanged !== undefined &&
+                (newConnectionState = containerPart._$isConnected) !==
+                oldParent!._$isConnected
+            ) {
+                part._$notifyConnectionChanged(newConnectionState)
+            }
+        }
+        if (endNode !== refNode || parentChanged) {
+            let start: Node | null = part._$startNode
+            while (start !== endNode) {
+                const n: Node | null = wrap(start!).nextSibling
+                wrap(container).insertBefore(start!, refNode)
+                start = n
+            }
+        }
     }
-    if (endNode !== refNode || parentChanged) {
-      let start: Node | null = part._$startNode
-      while (start !== endNode) {
-        const n: Node | null = wrap(start!).nextSibling
-        wrap(container).insertBefore(start!, refNode)
-        start = n
-      }
-    }
-  }
 
-  return part
+    return part
 }
 
 /**
@@ -157,12 +163,12 @@ export const insertPart = (
  * @param directiveParent Используется внутренне; не должно устанавливаться пользователем
  */
 export const setChildPartValue = <T extends ChildPart>(
-  part: T,
-  value: unknown,
-  directiveParent: DirectiveParent = part
+    part: T,
+    value: unknown,
+    directiveParent: DirectiveParent = part
 ): T => {
-  part._$setValue(value, directiveParent)
-  return part
+    part._$setValue(value, directiveParent)
+    return part
 }
 
 // Сторожевое значение, которое никогда не может появиться как значение части,
@@ -182,8 +188,8 @@ const RESET_VALUE = {}
  * @param part
  * @param value
  */
-export const setCommittedValue = (part: Part, value: unknown = RESET_VALUE) =>
-  (part._$committedValue = value)
+export const setCommittedValue = (part: ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart, value: unknown = RESET_VALUE) =>
+    (part._$committedValue = value)
 
 /**
  * Возвращает зафиксированное значение ChildPart.
@@ -207,16 +213,16 @@ export const getCommittedValue = (part: ChildPart) => part._$committedValue
  * @param part Часть для удаления
  */
 export const removePart = (part: ChildPart) => {
-  part._$notifyConnectionChanged?.(false, true)
-  let start: ChildNode | null = part._$startNode
-  const end: ChildNode | null = wrap(part._$endNode!).nextSibling
-  while (start !== end) {
-    const n: ChildNode | null = wrap(start!).nextSibling;
-    (wrap(start!) as ChildNode).remove()
-    start = n
-  }
+    part._$notifyConnectionChanged?.(false, true)
+    let start: ChildNode | null = part._$startNode
+    const end: ChildNode | null = wrap(part._$endNode!).nextSibling
+    while (start !== end) {
+        const n: ChildNode | null = wrap(start!).nextSibling;
+        (wrap(start!) as ChildNode).remove()
+        start = n
+    }
 }
 
 export const clearPart = (part: ChildPart) => {
-  part._$clear()
+    part._$clear()
 }

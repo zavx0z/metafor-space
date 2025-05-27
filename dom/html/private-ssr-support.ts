@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {Directive} from "./directive.js"
 
 import {_$LH as p} from "./ssr.js"

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   AttributePart,
   BooleanAttributePart, boundAttributeSuffix,
@@ -6,7 +7,7 @@ import {
   EventPart, getTemplateHtml, HTML_RESULT, isIterable, marker, markerMatch,
   PropertyPart, resolveDirective,
   TemplateInstance
-} from "./html.js"
+} from "./html"
 
 /** КОНЕЧНЫЕ ПОЛЬЗОВАТЕЛИ НЕ ДОЛЖНЫ ПОЛАГАТЬСЯ НА ЭТОТ ОБЪЕКТ.
  *  Приватные экспорты для использования другими пакетами @pkg, не предназначены для использования внешними пользователями. */

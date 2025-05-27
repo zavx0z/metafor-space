@@ -1,9 +1,9 @@
 /**
- * @typedef {import("./types/html.js").Disconnectable} Disconnectable
- * @typedef {import("./types/part.js").Part} Part
- * @typedef {import("./types/directives.js").PartInfo} PartInfo
- * @typedef {import("./html.js").AttributePart} AttributePart
- * @typedef {import("./html.js").ChildPart} ChildPart
+ * @typedef {import("./types/html").Disconnectable} Disconnectable
+ * @typedef {import("./types/part").Part} Part
+ * @typedef {import("./types/part").ChildPart} ChildPart
+ * @typedef {import("./types/directives").PartInfo} PartInfo
+ * @typedef {import("./html").AttributePart} AttributePart
  *
  * @typedef {Disconnectable & {
  *    _$disconnectableChildren?: Set<Disconnectable>;

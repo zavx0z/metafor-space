@@ -1,4 +1,4 @@
-import {ATTRIBUTE_PART, AttributePart, BooleanAttributePart, CHILD_PART, type ChildPart, COMMENT_PART, ELEMENT_PART, ElementPart, EventPart, PropertyPart} from "../html.js"
+import {ATTRIBUTE_PART, AttributePart, CHILD_PART, type ChildPart, COMMENT_PART, ELEMENT_PART} from "../html.js"
 
 type AttributeTemplatePart = {
   readonly type: typeof ATTRIBUTE_PART
@@ -23,8 +23,6 @@ type CommentTemplatePart = {
  * TemplatePart представляет динамическую часть в шаблоне до его создания. Когда шаблон создается, части создаются из TemplateParts.
  */
 export type TemplatePart = ChildTemplatePart | AttributeTemplatePart | ElementTemplatePart | CommentTemplatePart
-export type Part = ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart
-export {type ChildPart, type AttributePart, type PropertyPart, type BooleanAttributePart, type ElementPart, type EventPart}
 
 /**
  * `ChildPart` верхнего уровня, возвращаемый из `render`, который управляет состоянием

@@ -1,4 +1,4 @@
-import type { ResultType, TemplateResult } from "./types/html"
+import type {Disconnectable, ResultType, TemplateResult} from "./types/html"
 // import type { Directive } from "./directive"
 // import type { PartInfo } from "./types/directives"
 // import type { Disconnectable } from "./types/html"
@@ -27,7 +27,7 @@ export declare const nothing = typeof Symbol.for("nothing")
 /** Символ, который сигнализирует, что значение было обработано директивой и не должно быть записано в DOM. */
 export declare const noChange = typeof Symbol.for("noChange")
 
-// export declare const DEV_MODE: boolean
+export declare const DEV_MODE: boolean
 // export declare const policy: TrustedTypePolicy | undefined
 // export declare const noopSanitizer: (node: Node, name: string, type: "property" | "attribute") => (value: unknown) => unknown
 // export declare const isPrimitive: (value: unknown) => boolean
@@ -72,13 +72,13 @@ export declare const noChange = typeof Symbol.for("noChange")
  * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.
  */
 export type TagFunction = <T extends ResultType>(
-  type: T
+    type: T
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
 
 export declare function render(
-  result: TemplateResult<1> | TemplateResult<2> | TemplateResult<3>,
-  container: HTMLElement,
-  options?: RenderOptions
+    result: TemplateResult<1> | TemplateResult<2> | TemplateResult<3>,
+    container: HTMLElement,
+    options?: RenderOptions
 ): void
 
 /**
@@ -143,10 +143,6 @@ export declare function svg(strings: TemplateStringsArray, ...values: unknown[])
  * При использовании недопустимо возвращать MathML-фрагмент из метода
  * `render()`, так как MathML-фрагмент будет содержаться в теневом DOM элемента
  * и, следовательно, не будет правильно размещен внутри HTML-элемента `<math>`.
- *
- * @template T
- * @param {T} type
- * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<3>}
  */
 export declare function mathml(strings: TemplateStringsArray, ...values: any[]): TemplateResult<3>
 
@@ -243,145 +239,194 @@ export type Reference = <T extends Element>(ref: (el: Element | undefined) => vo
 //   static createElement(html: TrustedHTML, _options?: RenderOptions): HTMLTemplateElement
 // }
 
-// /**
-//  * Экземпляр шаблона.
-//  */
-// export declare class TemplateInstance {
-//   _$parts: (ChildPart | AttributePart | ElementPart)[]
-//   _$disconnectableChildren?: Set<Disconnectable>
-
-//   constructor(template: Template, parent: ChildPart)
-
-//   get parentNode(): Node
-
-//   get _$isConnected(): boolean
-
-//   _clone(options?: RenderOptions): DocumentFragment
-
-//   _update(values: unknown[]): void
-// }
-
-// /**
-//  * Часть для дочерних элементов.
-//  */
-// export declare class ChildPart {
-//   type: typeof CHILD_PART
-//   _$committedValue: unknown
-//   _textSanitizer?: (value: unknown) => unknown
-//   _$parent?: Disconnectable
-//   _$disconnectableChildren?: Set<Disconnectable>
-//   _$notifyConnectionChanged?: (isConnected: boolean, removeFromParent?: boolean, from?: number) => void
-//   _$reparentDisconnectables?: (parent: Disconnectable) => void
-
-//   constructor(startNode: ChildNode, endNode: ChildNode | null, parent?: TemplateInstance | ChildPart, options?: RenderOptions)
-
-//   get _$isConnected(): boolean
-
-//   get parentNode(): Node
-
-//   get startNode(): Node
-
-//   get endNode(): Node | null
-
-//   _$setValue(value: unknown, directiveParent?: DirectiveParent): void
-
-//   _insert<T extends Node>(node: T): T
-
-//   _commitNode(value: Node): void
-
-//   _commitText(value: unknown): void
-
-//   _commitTemplateResult(result: TemplateResult<any> | CompiledTemplateResult): void
-
-//   _$getTemplate(result: UncompiledTemplateResult): Template
-
-//   _commitIterable(value: Iterable<unknown>): void
-
-//   _$clear(start?: ChildNode | null, from?: number): void
-
-//   setConnected(isConnected: boolean): void
-// }
-
 /**
- * Часть для атрибутов.
+ * Экземпляр шаблона.
  */
-export declare class AttributePart {
-  type: typeof ATTRIBUTE_PART
-  element: HTMLElement
-  name: string
-  options?: RenderOptions
-  /**
-   * Если этот атрибут часть представляет собой интерполяцию, это содержит статические строки интерполяции.
-   * Для однозначных, полных привязок это undefined.
-   */
-  strings?: ReadonlyArray<string>
-  // _$committedValue: unknown | unknown[]
-  // _$disconnectableChildren?: Set<Disconnectable>
-  // _sanitizer?: (value: unknown) => unknown
-  // _$parent: Disconnectable
+export declare class TemplateInstance {
+    _$parts: (ChildPart | AttributePart | ElementPart)[]
+    _$disconnectableChildren?: Set<Disconnectable>
 
-  constructor(
-    element: HTMLElement,
-    name: string,
-    strings: ReadonlyArray<string>,
-    parent: Disconnectable,
-    options?: RenderOptions
-  )
+    constructor(template: Template, parent: ChildPart)
 
-  get tagName(): string
+    get parentNode(): Node
 
-  // get _$isConnected(): boolean
+    get _$isConnected(): boolean
 
-  // _$setValue(value: unknown | unknown[], directiveParent?: DirectiveParent, valueIndex?: number, noCommit?: boolean): void
+    _clone(options?: RenderOptions): DocumentFragment
 
-  // _commitValue(value: unknown): void
+    _update(values: unknown[]): void
 }
 
-// /**
-//  * Часть для свойств.
-//  */
-// export declare class PropertyPart extends AttributePart {
-//   type: typeof PROPERTY_PART
+/**
+ * Часть для дочерних элементов.
+ */
+export declare class ChildPart {
+    type: CHILD_PART
+    // _$parent?: Disconnectable
+    // _$disconnectableChildren?: Set<Disconnectable>
 
-//   _commitValue(value: unknown): void
-// }
+    _$committedValue: unknown
+    _textSanitizer: ValueSanitizer | undefined
+    _$parent: Disconnectable | undefined
+    _$disconnectableChildren: Set<Disconnectable> | undefined
+    _$notifyConnectionChanged?: (isConnected: boolean, removeFromParent?: boolean, from?: number) => void
+    _$reparentDisconnectables?: (parent: Disconnectable) => void
 
-// /**
-//  * Часть для булевых атрибутов.
-//  */
-// export declare class BooleanAttributePart extends AttributePart {
-//   type: typeof BOOLEAN_ATTRIBUTE_PART
+    /**
+     * ChildParts, которые не находятся на верхнем уровне, всегда создаются с родителем;
+     * только RootChildNode 's не будут, поэтому они возвращают локальное состояние isConnected
+     */
+    get _$isConnected(): boolean
 
-//   _commitValue(value: unknown): void
-// }
+    constructor(startNode: ChildNode, endNode: ChildNode | null, parent?: TemplateInstance | ChildPart, options?: RenderOptions)
 
-// /**
-//  * Часть для событий.
-//  */
-// export declare class EventPart extends AttributePart {
-//   type: typeof EVENT_PART
+    /**
+     * Родительский узел, в который часть рендерит свое содержимое.
+     *
+     * Содержимое ChildPart состоит из диапазона смежных дочерних узлов
+     * `.parentNode`, возможно ограниченных 'маркерными узлами' (`.startNode` и
+     * `.endNode`).
+     *
+     * - Если и `.startNode`, и `.endNode` не равны null, то содержимое части
+     * состоит из всех узлов между `.startNode` и `.endNode`, не включая их.
+     *
+     * - Если `.startNode` не равен null, но `.endNode` равен null, то содержимое
+     * части состоит из всех узлов после `.startNode`, включая последний дочерний
+     * узел `.parentNode`. Если `.endNode` не равен null, то `.startNode` всегда
+     * будет не равен null.
+     *
+     * - Если и `.endNode`, и `.startNode` равны null, то содержимое части
+     * состоит из всех дочерних узлов `.parentNode`.
+     */
+    get parentNode(): Node
 
-//   constructor(element: HTMLElement, name: string, strings: ReadonlyArray<string>, parent: Disconnectable, options?: RenderOptions)
+    /**
+     * Маркерный узел, ведущий часть, если таковые имеются. См. `.parentNode` для более подробной информации.
+     */
+    get startNode(): ChildNode
 
-//   _$setValue(newListener: unknown, directiveParent?: DirectiveParent): void
+    /**
+     * Маркерный узел, завершающий часть, если таковые имеются. См. `.parentNode` для более подробной информации.
+     */
+    get endNode(): ChildNode | null
 
-//   handleEvent(event: Event): void
-// }
+    _$setValue(value: unknown, directiveParent: DirectiveParent): void
 
-// /**
-//  * Часть для элементов.
-//  */
-// export declare class ElementPart {
-//   type: typeof ELEMENT_PART
-//   _$committedValue: undefined
-//   _$disconnectableChildren?: Set<Disconnectable>
+    /** @private**/
+    _insert<T extends Node>(node: T): T
 
-//   constructor(element: Element, parent: Disconnectable, options?: RenderOptions)
+    /** @private**/
+    _commitNode(value: Node): void
 
-//   get _$isConnected(): boolean
+    /** @private
+     @param {unknown} value - Значение
+     **/
+    _commitText(value: unknown): void
 
-//   _$setValue(value: unknown): void
-// }
+    /**
+     @private
+     @param result - Шаблон или скомпилированный шаблон
+     **/
+    _commitTemplateResult(result: TemplateResult<any> | CompiledTemplateResult): void
+
+    /**
+     Переопределяется через `HtmlPolyfillSupport` для обеспечения платформенной поддержки.
+     @internal
+     @param {UncompiledTemplateResult} result - Нескомпилированный шаблон
+     */
+    _$getTemplate(result: UncompiledTemplateResult): Template
+
+    /** @private**/
+    _commitIterable(value: Iterable<unknown>): void
+
+    /**
+     Удаляет узлы, содержащиеся в этой части, из DOM.
+     @param start - Начальный узел, с которого начинается очистка, для очистки подмножества DOM части (используется при усечении итерируемых объектов).
+     @param from - Когда указан `start`, индекс в итерируемом объекте, с которого удаляются ChildParts, используется для отключения директив в этих частях.
+     */
+    _$clear(start?: ChildNode | null, from?: number): void
+
+    /**
+     Реализация `isConnected` для RootPart. Обратите внимание, что этот метод
+     должен вызываться только для `RootPart` (объект `ChildPart`, возвращаемый из
+     вызова `render()` верхнего уровня). Он не имеет эффекта для не-корневых ChildParts.
+
+     @param {boolean} isConnected - Устанавливаемое значение
+     @internal
+     */
+    setConnected(isConnected: boolean): void
+}
+
+/** Часть для атрибутов. */
+export declare class AttributePart {
+    type: typeof ATTRIBUTE_PART
+    element: HTMLElement
+    name: string
+    options?: RenderOptions
+    /**
+     Если этот атрибут часть представляет собой интерполяцию, это содержит статические строки интерполяции.
+     Для однозначных, полных привязок это undefined.
+     */
+    strings?: ReadonlyArray<string>
+    // _$committedValue: unknown | unknown[]
+    // _$disconnectableChildren?: Set<Disconnectable>
+    // _sanitizer?: (value: unknown) => unknown
+    // _$parent: Disconnectable
+
+    constructor(
+        element: HTMLElement,
+        name: string,
+        strings: ReadonlyArray<string>,
+        parent: Disconnectable,
+        options?: RenderOptions
+    )
+
+    get tagName(): string
+
+    // get _$isConnected(): boolean
+
+    // _$setValue(value: unknown | unknown[], directiveParent?: DirectiveParent, valueIndex?: number, noCommit?: boolean): void
+
+    // _commitValue(value: unknown): void
+}
+
+/** Часть для свойств. */
+export declare class PropertyPart extends AttributePart {
+    type: typeof PROPERTY_PART
+
+    _commitValue(value: unknown): void
+}
+
+/** Часть для булевых атрибутов. */
+export declare class BooleanAttributePart extends AttributePart {
+    type: typeof BOOLEAN_ATTRIBUTE_PART
+
+    _commitValue(value: unknown): void
+}
+
+/** Часть для событий. */
+export declare class EventPart extends AttributePart {
+    type: typeof EVENT_PART
+
+    constructor(element: HTMLElement, name: string, strings: ReadonlyArray<string>, parent: Disconnectable, options?: RenderOptions)
+
+    _$setValue(newListener: unknown, directiveParent?: DirectiveParent): void
+
+    handleEvent(event: Event): void
+}
+
+/** Часть для элементов. */
+export declare class ElementPart {
+    type: typeof ELEMENT_PART
+    _$committedValue: undefined
+    _$disconnectableChildren?: Set<Disconnectable>
+
+    constructor(element: Element, parent: Disconnectable, options?: RenderOptions)
+
+    get _$isConnected(): boolean
+
+    _$setValue(value: unknown): void
+}
 
 // /**
 //  * Очищает фабрику санитизации. Используется только во внутренних тестах, не является частью публичного API.

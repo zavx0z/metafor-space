@@ -1,31 +1,33 @@
 /**
- * @typedef {import("./types/directives.js").DirectiveClass} DirectiveClass
- * @typedef {import("./types/directives.js").PartInfo} PartInfo
- * @typedef {import("./types/directives.js").ChildPartInfo} ChildPartInfo
- * @typedef {import("./types/directives.js").AttributePartInfo} AttributePartInfo
- * @typedef {import("./types/directives.js").ElementPartInfo} ElementPartInfo
- * @typedef {import("./types/html.js").Disconnectable} Disconnectable
- * @typedef {import("./types/part.js").ChildPart} ChildPart
- * @typedef {import("./types/part.js").AttributePart} AttributePart
- * @typedef {import("./types/part.js").ElementPart} ElementPart
- * @typedef {import("./types/part.js").Part} Part
+ * @typedef {import("./types/directives").DirectiveClass} DirectiveClass
+ * @typedef {import("./types/directives").PartInfo} PartInfo
+ * @typedef {import("./types/directives").ChildPartInfo} ChildPartInfo
+ * @typedef {import("./types/directives").AttributePartInfo} AttributePartInfo
+ * @typedef {import("./types/directives").ElementPartInfo} ElementPartInfo
+ * @typedef {import("./types/html").Disconnectable} Disconnectable
+ * @typedef {import("./html").ChildPart} ChildPart
+ * @typedef {import("./html").AttributePart} AttributePart
+ * @typedef {import("./html").ElementPart} ElementPart
+ * @typedef {import("./html").PropertyPart} PropertyPart
+ * @typedef {import("./html").BooleanAttributePart} BooleanAttributePart
+ * @typedef {import("./html").EventPart} EventPart
  */
 /**
  * @template {DirectiveClass} C
- * @typedef {import("./types/directives.js").DirectiveResult<C>} DirectiveResult
+ * @typedef {import("./types/directives").DirectiveResult<C>} DirectiveResult
  */
 /**
  * @template {Directive} C
- * @typedef {import("./types/directives.js").DirectiveParameters<C>} DirectiveParameters
+ * @typedef {import("./types/directives").DirectiveParameters<C>} DirectiveParameters
  */
 
 export const PartType = {
-  ATTRIBUTE: 1,
-  CHILD: 2,
-  PROPERTY: 3,
-  BOOLEAN_ATTRIBUTE: 4,
-  EVENT: 5,
-  ELEMENT: 6
+    ATTRIBUTE: 1,
+    CHILD: 2,
+    PROPERTY: 3,
+    BOOLEAN_ATTRIBUTE: 4,
+    EVENT: 5,
+    ELEMENT: 6
 }
 /**
  * @template {DirectiveClass} C
@@ -41,11 +43,11 @@ export const PartType = {
  * @returns {(...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>}
  */
 export const directive =
-  c =>
-  (...values) => ({
-    ["_$htmlDirective$"]: c,
-    values
-  })
+    c =>
+        (...values) => ({
+            ["_$htmlDirective$"]: c,
+            values
+        })
 
 /**
  * Базовый класс для создания пользовательских директив. Пользователи должны расширять этот класс,
@@ -53,48 +55,50 @@ export const directive =
  * `directive`.
  */
 export class Directive {
-  __part = /** @type {ChildPart | AttributePart | ElementPart} */ (/** @type {unknown} */ (null))
-  /** @type {number | undefined} */ __attributeIndex
-  /** @type {Directive | undefined} */ __directive
-  /** @type {Disconnectable} */ _$parent = /** @type {Disconnectable} */ (/** @type {unknown} */ (null))
-  /** @type {Set<Disconnectable> | undefined} */ _$disconnectableChildren
-  
-  /** @param {PartInfo} _partInfo */
-  constructor(_partInfo) {}
+    __part = /** @type {ChildPart | AttributePart | ElementPart} */ (/** @type {unknown} */ (null))
+    /** @type {number | undefined} */ __attributeIndex
+    /** @type {Directive | undefined} */ __directive
+    /** @type {Disconnectable} */ _$parent = /** @type {Disconnectable} */ (/** @type {unknown} */ (null))
+    /** @type {Set<Disconnectable> | undefined} */ _$disconnectableChildren
 
-  get _$isConnected() {
-    return this._$parent._$isConnected
-  }
+    /** @param {PartInfo} _partInfo */
+    constructor(_partInfo) {
+    }
 
-  /**
-   * @param {Part} part
-   * @param {Disconnectable} parent
-   * @param {number | undefined} attributeIndex
-   */
-  _$initialize(part, parent, attributeIndex) {
-    this.__part = part
-    this._$parent = parent
-    this.__attributeIndex = attributeIndex
-  }
+    get _$isConnected() {
+        return this._$parent._$isConnected
+    }
 
-  /**
-   * @param {Part} part
-   * @param {unknown[]} props
-   */
-  _$resolve(part, props) {
-    return this.update(part, props)
-  }
+    /**
+     * @param { ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart} part
+     * @param {Disconnectable} parent
+     * @param {number | undefined} attributeIndex
+     */
+    _$initialize(part, parent, attributeIndex) {
+        this.__part = part
+        this._$parent = parent
+        this.__attributeIndex = attributeIndex
+    }
 
-  /**
-   * @param {...unknown} props
-   */
-  render(...props) {}
+    /**
+     * @param { ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart} part
+     * @param {unknown[]} props
+     */
+    _$resolve(part, props) {
+        return this.update(part, props)
+    }
 
-  /**
-   * @param {Part} part
-   * @param {unknown[]} props
-   */
-  update(part, props) {
-    return this.render(...props)
-  }
+    /**
+     * @param {...unknown} props
+     */
+    render(...props) {
+    }
+
+    /**
+     * @param { ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart} part
+     * @param {unknown[]} props
+     */
+    update(part, props) {
+        return this.render(...props)
+    }
 }
