@@ -21,7 +21,7 @@ class GuardDirective extends Directive {
   }
   /**
    * @param {import("../html.js").Part} _part
-   * @param {import("../types/directives.js").DirectiveParameters<this>} params
+   * @param {import("../types/directive.ts").DirectiveParameters<this>} params
    * @returns
    */
   update(_part, params) {

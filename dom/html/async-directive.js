@@ -1,6 +1,6 @@
 /**
  * @typedef {import("./types/html").Disconnectable} Disconnectable
- * @typedef {import("./types/directives").PartInfo} PartInfo
+ * @typedef {import("./types/directive.ts").PartInfo} PartInfo
  * @typedef {import("./html").AttributePart} AttributePart
  @typedef {import("./html").ChildPart} ChildPart
  @typedef {import("./html").PropertyPart} PropertyPart

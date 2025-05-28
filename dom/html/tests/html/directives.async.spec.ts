@@ -3,7 +3,7 @@ import {html, noChange, nothing, render} from "../../html.js"
 import type {CompiledTemplateResult, RenderOptions, TemplateResult} from "../../types/html.js"
 import type {Part} from "../../types/part.js"
 import {AsyncDirective, Directive, directive} from "../../async-directive.js"
-import type {PartInfo} from "../../types/directives.js"
+import type {PartInfo} from "../../types/directive.ts"
 import {repeat} from "../../directives/repeat.js"
 
 describe("async directives", () => {

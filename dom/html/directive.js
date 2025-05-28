@@ -1,9 +1,9 @@
 /**
- * @typedef {import("./types/directives").DirectiveClass} DirectiveClass
- * @typedef {import("./types/directives").PartInfo} PartInfo
- * @typedef {import("./types/directives").ChildPartInfo} ChildPartInfo
- * @typedef {import("./types/directives").AttributePartInfo} AttributePartInfo
- * @typedef {import("./types/directives").ElementPartInfo} ElementPartInfo
+ * @typedef {import("./directive").DirectiveClass} DirectiveClass
+ * @typedef {import("./directive").PartInfo} PartInfo
+ * @typedef {import("./directive").ChildPartInfo} ChildPartInfo
+ * @typedef {import("./directive").AttributePartInfo} AttributePartInfo
+ * @typedef {import("./directive").ElementPartInfo} ElementPartInfo
  * @typedef {import("./types/html").Disconnectable} Disconnectable
  * @typedef {import("./html").ChildPart} ChildPart
  * @typedef {import("./html").AttributePart} AttributePart
@@ -12,14 +12,25 @@
  * @typedef {import("./html").BooleanAttributePart} BooleanAttributePart
  * @typedef {import("./html").EventPart} EventPart
  */
+
+/** @template {DirectiveClass} C
+ * @typedef {import("./directive").DirectiveResult<C>} DirectiveResult */
+
+/** @template {Directive} C
+ * @typedef {import("./directive").DirectiveParameters<C>} DirectiveParameters */
+
 /**
+ * Создает пользовательскую функцию директивы из класса Directive. Эта
+ * функция имеет те же параметры, что и метод render() директивы.
+ *
  * @template {DirectiveClass} C
- * @typedef {import("./types/directives").DirectiveResult<C>} DirectiveResult
+ * @param {C} c
+ * @returns {(...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>}
  */
-/**
- * @template {Directive} C
- * @typedef {import("./types/directives").DirectiveParameters<C>} DirectiveParameters
- */
+export const directive = c => (...values) => ({
+    ["_$htmlDirective$"]: c,
+    values: values
+})
 
 export const PartType = {
     ATTRIBUTE: 1,
@@ -34,19 +45,6 @@ export const PartType = {
  * @callback DirectiveCallback
  * @param {...DirectiveParameters<InstanceType<C>>} values
  */
-
-/**
- * Создает пользовательскую функцию директивы из класса Directive. Эта
- * функция имеет те же параметры, что и метод render() директивы.
- *
- * @template {DirectiveClass} C
- * @param {C} c
- * @returns {(...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>}
- */
-export const directive = c => (...values) => ({
-    ["_$htmlDirective$"]: c,
-    values: /** @type {DirectiveParameters<InstanceType<typeof c>>} */ (values)
-})
 
 /**
  * Базовый класс для создания пользовательских директив. Пользователи должны расширять этот класс,

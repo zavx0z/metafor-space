@@ -9,7 +9,7 @@ class TemplateContentDirective extends Directive {
   _previousTemplate
 
   /**
-   * @param {import("../types/directives.js").PartInfo} partInfo
+   * @param {import("../types/directive.ts").PartInfo} partInfo
    */
   constructor(partInfo) {
     super(partInfo)

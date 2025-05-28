@@ -1,9 +1,9 @@
 // @ts-nocheck
-import {Directive} from "./directive.js"
+import {Directive} from "./types/directive.js"
 
 import {_$LH as p} from "./ssr.js"
 import {type AttributePart, BooleanAttributePart, ChildPart, ElementPart, EventPart, noChange, PropertyPart, TemplateInstance} from "./html.js"
-import type {DirectiveClass, DirectiveResult, PartInfo} from "./types/directives.js"
+import type {DirectiveClass, DirectiveResult, PartInfo} from "./directives"
 import type {Part} from "./types/part.js"
 import type {Disconnectable} from "./types/html.js"
 

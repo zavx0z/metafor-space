@@ -1,7 +1,7 @@
 import {html, render, svg} from '../../html.js'
 import { classMap} from '../../directives/class-map.js'
 import {beforeAll, describe, expect, test} from 'bun:test'
-import type {ClassInfo} from "../../types/directives.js"
+import type {ClassInfo} from "../../types/directive.ts"
 
 describe('classMap directive', () => {
   let container: HTMLDivElement

@@ -6,7 +6,7 @@ import type {
     MaybeCompiledTemplateResult,
     UncompiledTemplateResult
 } from "./types/html.js"
-import type {DirectiveClass, DirectiveResult} from "./types/directives.js"
+import type {DirectiveClass, DirectiveResult} from "./directives"
 import type {AttributePart, BooleanAttributePart, ElementPart, EventPart, PropertyPart} from "./html"
 
 type Primitive = null | undefined | boolean | number | string | symbol | bigint;

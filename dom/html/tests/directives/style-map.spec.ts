@@ -1,10 +1,10 @@
 import {AttributePart, html, render} from "../../html.js"
-import {directive} from "../../directive.js"
+import {directive} from "../../types/directive.js"
 import {styleMap} from "../../directives/style-map.js"
 // import {styleMap} from "../../metafor/directives/style-map.ts"
 
 import {beforeEach, describe, expect, test} from "bun:test"
-import type {StyleInfo} from "../../types/directives.js"
+import type {StyleInfo} from "../../types/directive.ts"
 const ua = window.navigator.userAgent
 const isChrome41 = ua.indexOf("Chrome/41") > 0
 const isIE = ua.indexOf("Trident/") > 0

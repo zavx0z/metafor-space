@@ -1,7 +1,7 @@
 import {type ChildPart, noChange} from '../html.js'
 import {AsyncDirective, directive} from '../async-directive.js'
 import {forAwaitOf, Pauser, PseudoWeakRef} from './private-async-helpers.js'
-import type {DirectiveParameters} from "../types/directives.js"
+import type {DirectiveParameters} from "../types/directive.ts"
 
 type Mapper<T> = (v: T, index?: number) => unknown;
 

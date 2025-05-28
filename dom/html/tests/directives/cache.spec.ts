@@ -2,7 +2,7 @@ import {describe, test, beforeAll, expect} from "bun:test"
 import {html, render, nothing} from "../../html.js"
 import {cache} from "../../directives/cache.js"
 
-import {directive} from "../../directive.js"
+import {directive} from "../../types/directive.js"
 
 // For compiled template tests
 import {_$LH} from "../../private-ssr-support.js"

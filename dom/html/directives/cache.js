@@ -40,7 +40,7 @@ class CacheDirective extends Directive {
    */
   _value
 
-  /** @param {import('../types/directives.js').PartInfo} partInfo - Информация о части. */
+  /** @param {import("../types/directive.ts").PartInfo} partInfo - Информация о части. */
   constructor(partInfo) {
     super(partInfo)
   }

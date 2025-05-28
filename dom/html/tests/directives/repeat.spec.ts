@@ -217,7 +217,7 @@ describe("repeat", () => {
     test("can remove the first item", () => {
       let items = [0, 1, 2]
       // prettier-ignore
-      const t = () => html`${repeat(items, (i) => i, (i: number) => html`
+      const t = () => html`${repeat(items, (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`;
 
       render(t(), container)

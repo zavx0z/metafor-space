@@ -4,7 +4,7 @@ import {noChange, nothing} from "../html.js"
 import { isSingleExpression } from "./utils.js"
 
 class LiveDirective extends Directive {
-  /** @param {import("../types/directives.js").PartInfo} partInfo - Информация о части */
+  /** @param {import("../types/directive.ts").PartInfo} partInfo - Информация о части */
   constructor(partInfo) {
     super(partInfo)
     if (
@@ -28,7 +28,7 @@ class LiveDirective extends Directive {
 
   /**
    * @param {import("../html.js").AttributePart} part - Часть
-   * @param {import("../types/directives.js").DirectiveParameters<this>} value - Значение
+   * @param {import("../types/directive.ts").DirectiveParameters<this>} value - Значение
    * */
   update(part, [value]) {
     if (value === noChange || value === nothing) {

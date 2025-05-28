@@ -18,7 +18,7 @@ class Keyed extends Directive {
   /**
    *
    * @param {import("../types/part.js").ChildPart} part
-   * @param {import("../types/directives.js").DirectiveParameters<this>} param1
+   * @param {import("../types/directive.ts").DirectiveParameters<this>} param1
    * @returns
    */
   update(part, [k, v]) {

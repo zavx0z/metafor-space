@@ -1,5 +1,4 @@
 import type {Disconnectable, RenderOptions, ResultType, TemplateResult} from "./types/html"
-import type {SanitizerFactory} from "./types/global";
 // import type { Directive } from "./directive"
 // import type { PartInfo } from "./types/directives"
 // import type { Disconnectable } from "./types/html"
@@ -541,7 +540,13 @@ export declare class ElementPart {
 //   readonly ctor?: typeof AttributePart
 //   readonly strings?: ReadonlyArray<string>
 // }
-
+export type Part =
+    | ChildPart
+    | AttributePart
+    | PropertyPart
+    | BooleanAttributePart
+    | ElementPart
+    | EventPart
 // // Добавляем тип для RefDirective
 // export interface RefDirective {
 //   (ref: (el: Element | undefined) => void): unknown

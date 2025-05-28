@@ -1,7 +1,7 @@
 /**
  * @typedef {import("./types/index").TagEndRegex} TagEndRegex
- * @typedef {import("./types/directives").DirectiveResult} DirectiveResult
- * @typedef {import("./types/directives").PartInfo} PartInfo
+ * @typedef {import("./types/directive.ts").DirectiveResult} DirectiveResult
+ * @typedef {import("./types/directive.ts").PartInfo} PartInfo
  * @typedef {import("./types/part").RootPart} RootPart
  * @typedef {import("./types/part").TemplatePart} TemplatePart
  *
@@ -14,7 +14,7 @@
  * @typedef {import("./types/html").ResultType} ResultType
  * @typedef {import("./types/html").UncompiledTemplateResult} UncompiledTemplateResult
  *
- * @typedef {import("./directive").Directive} Directive
+ * @typedef {import("./types/directive.ts").Directive} Directive
  * @typedef {import("trusted-types/lib").TrustedHTML} TrustedHTML
  * @typedef {import("trusted-types/lib").TrustedTypesWindow} TrustedTypesWindow
  */
@@ -167,7 +167,7 @@ function resolveDirective(part, value, parent = /** @type {DirectiveParent} */ (
     if (value === noChange) return value
     let currentDirective = attributeIndex !== undefined ? parent.__directives?.[attributeIndex] : parent.__directive
 
-    const nextDirectiveConstructor = /** @type {import("./types/directives.js").DirectiveClass | undefined} */ (
+    const nextDirectiveConstructor = /** @type {import("./types/directive.ts").DirectiveClass | undefined} */ (
         isPrimitive(value) ? undefined : /** @type {DirectiveResult} */ (value)["_$htmlDirective$"]
     )
 
