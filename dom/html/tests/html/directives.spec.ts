@@ -1,8 +1,8 @@
 import {AttributePart, ChildPart, html, noChange, nothing, render, PropertyPart, BooleanAttributePart, ElementPart, EventPart} from "../../html.js"
 import {beforeEach, describe, expect, test} from "bun:test"
-import {type AttributePartInfo, Directive, directive, PartType} from "../../types/directive.js"
+import {type AttributePartInfo, Directive, directive, PartType} from "../../directive.js"
 import {until} from "../../directives/until.js"
-import type {DirectiveParameters, PartInfo} from "../../types/directive.ts"
+import type {DirectiveParameters, PartInfo} from "../../directive.ts"
 import {repeat} from "../../directives/repeat.js"
 import type {CompiledTemplateResult, RenderOptions, TemplateResult, } from "../../types/html.js"
 

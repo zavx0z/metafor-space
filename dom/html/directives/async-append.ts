@@ -1,7 +1,7 @@
-import {directive, PartType} from "../types/directive.js"
+import {directive, PartType} from "../directive.js"
 import {AsyncReplaceDirective} from "./async-replace.js"
 import {clearPart, insertPart, setChildPartValue} from "../directive-helpers.js"
-import type {DirectiveParameters, PartInfo} from "../types/directive.ts"
+import type {DirectiveParameters, PartInfo} from "../directive.ts"
 import type {ChildPart} from "../html.js"
 
 class AsyncAppendDirective extends AsyncReplaceDirective {

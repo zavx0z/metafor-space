@@ -128,6 +128,16 @@ export interface Disconnectable {
  */
 export type IsSingleExpression = (part: PartInfo) => boolean
 
+/**
+ * Набор пар ключ-значение CSS свойств и их значений.
+ *
+ * Ключ должен быть либо валидным именем CSS свойства в виде строки, как
+ * `'background-color'`, либо валидным JavaScript именем в camelCase для
+ * CSSStyleDeclaration, как `backgroundColor`.
+ */
+export interface StyleInfo {
+    [name: string]: string | number | undefined | null;
+}
 
 /**
  * Создает пользовательскую функцию директивы из класса Directive. Эта

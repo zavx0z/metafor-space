@@ -162,7 +162,7 @@ export function trustFromTemplateString(tsa, stringFromTSA) {
  * @param {number} [attributeIndex] - Индекс атрибута
  * @returns {unknown}
  */
-function resolveDirective(part, value, parent = /** @type {DirectiveParent} */ (part), attributeIndex) {
+export function resolveDirective(part, value, parent = /** @type {DirectiveParent} */ (part), attributeIndex) {
     // Выходим раньше, если значение явно noChange, это означает, что любая вложенная директива остается прикрепленной и не выполняется.
     if (value === noChange) return value
     let currentDirective = attributeIndex !== undefined ? parent.__directives?.[attributeIndex] : parent.__directive
@@ -205,7 +205,7 @@ function resolveDirective(part, value, parent = /** @type {DirectiveParent} */ (
  *     чтобы избежать полей объектов, так как этот код используется с неминифицированным SSR
  *     кодом)
  */
-const getTemplateHtml = (strings, type) => {
+export const getTemplateHtml = (strings, type) => {
     // Вставляем маркеры в HTML-шаблон для представления позиции привязок.
     // Следующий код сканирует строки шаблона, чтобы определить синтаксическую позицию привязок.
     // Они могут находиться в текстовой позиции:
