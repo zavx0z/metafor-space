@@ -1,6 +1,6 @@
 /**
- * @typedef {import('../types/part.js').ChildPart} ChildPart
- * @typedef {import('../types/part.js').Part} Part
+ * @typedef {import('../html').ChildPart} ChildPart
+ * @typedef {import('../html').Part} Part
  * @typedef {import('../types/part.js').RootPart} RootPart
  * @typedef {import('../types/html.js').TemplateResult} TemplateResult
  * @typedef {import('../types/html.js').CompiledTemplateResult} CompiledTemplateResult
@@ -40,7 +40,7 @@ class CacheDirective extends Directive {
    */
   _value
 
-  /** @param {import("../types/directive.ts").PartInfo} partInfo - Информация о части. */
+  /** @param {import("../directive").PartInfo} partInfo - Информация о части. */
   constructor(partInfo) {
     super(partInfo)
   }

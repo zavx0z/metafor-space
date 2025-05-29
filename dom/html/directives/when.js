@@ -12,9 +12,9 @@
  * @returns {C extends Falsy ? (F | string) : T} Результат выполнения trueCase или falseCase
  */
 export function when(condition, trueCase, falseCase) {
-  return /** @type {C extends Falsy ? (F | string) : T} */ (
-    condition
-      ? trueCase(/** @type {Exclude<C, Falsy>} */ (condition))
-      : falseCase?.(/** @type {Extract<C, Falsy>} */ (condition))
-  )
+    return /** @type {C extends Falsy ? (F | string) : T} */ (
+        condition
+            ? trueCase(/** @type {Exclude<C, Falsy>} */ (condition))
+            : falseCase?.(/** @type {Extract<C, Falsy>} */ (condition))
+    )
 }

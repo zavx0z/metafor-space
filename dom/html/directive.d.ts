@@ -140,6 +140,13 @@ export interface StyleInfo {
 }
 
 /**
+ * Набор ключ-значение для имен классов и их значений (истинных или ложных).
+ */
+export interface ClassInfo {
+    readonly [name: string]: string | boolean | number;
+}
+
+/**
  * Создает пользовательскую функцию директивы из класса Directive. Эта
  * функция имеет те же параметры, что и метод render() директивы.
  *

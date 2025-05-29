@@ -21,7 +21,7 @@ const _infinity = 0x3fffffff
  */
 export class UntilDirective extends AsyncDirective {
   /**
-   * @param {import("../types/directive.ts").PartInfo} part
+   * @param {import("../directive.ts").PartInfo} part
    */
   constructor(part) {
     super(part)

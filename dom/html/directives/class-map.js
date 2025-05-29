@@ -17,7 +17,7 @@ class ClassMapDirective extends Directive {
    */
   _staticClasses
 
-  /** @param {import("../types/directive.ts").PartInfo} partInfo - Информация о части, к которой прикреплена директива. */
+  /** @param {import("../directive.ts").PartInfo} partInfo - Информация о части, к которой прикреплена директива. */
   constructor(partInfo) {
     super(partInfo)
     if ( partInfo.type !== PartType.ATTRIBUTE ||
@@ -32,7 +32,7 @@ class ClassMapDirective extends Directive {
       )
     }
   }
-  /** @param {import("../types/directive.ts").ClassInfo} classInfo - Объект ClassInfo, содержащий имена классов и их значения. */
+  /** @param {import("../directive.ts").ClassInfo} classInfo - Объект ClassInfo, содержащий имена классов и их значения. */
   render(classInfo) {
     // Добавляем пробелы для обеспечения разделения со статическими классами
     return (
@@ -45,7 +45,7 @@ class ClassMapDirective extends Directive {
   }
 /**
    * @param {import('../html').AttributePart} part - Часть, к которой прикреплена директива.
-   * @param {import('../types/directive.ts').DirectiveParameters<this>} classInfo - Объект ClassInfo, содержащий имена классов и их значения.
+   * @param {import('../directive.ts').DirectiveParameters<this>} classInfo - Объект ClassInfo, содержащий имена классов и их значения.
    */
    update(part, [classInfo]) {
     // Запоминаем динамические классы при первом рендере

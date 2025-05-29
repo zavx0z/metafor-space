@@ -1,2 +1,2 @@
-/** @type {import("../types/directive.ts").IsSingleExpression} */ // @ts-ignore
+/** @type {import("../directive.ts").IsSingleExpression} */ // @ts-ignore
 export const isSingleExpression = part => part.strings === undefined 
