@@ -1,11 +1,15 @@
-import {AttributePart, ChildPart, html, noChange, nothing, render, PropertyPart, BooleanAttributePart, ElementPart, EventPart} from "./html.js"
 import {beforeEach, describe, expect, test} from "bun:test"
-import {type AttributePartInfo, directive, PartType} from "./directive.js"
-import {until} from "./directives/until.js"
-import type {DirectiveParameters, PartInfo} from "./directive.d.ts"
-import {repeat} from "./directives/repeat.js"
-import type {CompiledTemplateResult, RenderOptions, TemplateResult, } from "./types/html.js"
-import {Directive} from "./directive.t.ts";
+
+import {render, html} from "./html"
+import {noChange, nothing} from "./html"
+import {ChildPart, EventPart, ElementPart, AttributePart, PropertyPart, BooleanAttributePart} from "./html"
+import type {RenderOptions, CompiledTemplateResult, TemplateResult} from "./types/html"
+
+import {directive, Directive, PartType} from "./directive"
+import type {AttributePartInfo, DirectiveParameters, PartInfo} from "./directive"
+
+import {until} from "./directives/until"
+import {repeat} from "./directives/repeat"
 
 
 describe("директивы", () => {
@@ -34,7 +38,7 @@ describe("директивы", () => {
 
     const fireEvent = directive(FireEventDirective)
 
-    // A stateful directive
+    // Директива с состоянием
     class CountDirective extends Directive {
         count = 0
 
@@ -52,20 +56,16 @@ describe("директивы", () => {
     test("отрисовка директив в ChildParts", () => {
         class TestDirective extends Directive {
             render(v: string) {
-                return html`
-                    TEST:${v}
-                `
+                return html` TEST:${v} `
             }
         }
 
         const testDirective = directive(TestDirective)
 
-        render(
-            html`
-                <div>${testDirective("A")}</div>
-            `,
-            container
-        )
+        render(html`
+            <div>${testDirective("A")}</div>
+        `, container)
+
         assertContent("<div>TEST:A</div>")
     })
 
@@ -83,12 +83,10 @@ describe("директивы", () => {
                 }
             }
         )
-        render(
-            html`
-                <div>${testDirective("test")}</div>
-            `,
-            container
-        )
+        render(html`
+            <div>${testDirective("test")}</div>
+        `, container)
+
         expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>test</div>")
         expect(partInfo!.type).toBe(PartType.CHILD)
     })
@@ -106,37 +104,20 @@ describe("директивы", () => {
 
             override update(part: ChildPart, [parentId, done]: DirectiveParameters<this>) {
                 this.part = part
-                // eslint-disable-next-line
                 currentDirective = this
                 try {
                     const {parentNode, startNode, endNode} = part
-
-                    if (endNode !== null) {
-                        expect(startNode).not.toBeNull()
-                    }
-
-                    if (startNode === null) {
-                        // The part covers all children in `parentNode`.
+                    if (endNode !== null) expect(startNode).not.toBeNull()
+                    if (startNode === null) {// Часть охватывает всех потомков в `parentNode`.
                         expect(parentNode.childNodes.length).toBe(0)
                         expect(endNode).toBeNull()
-                    } else if (endNode === null) {
-                        // The part covers all siblings following `startNode`.
-                        expect(startNode.nextSibling).toBeNull()
-                    } else {
-                        // The part covers all siblings between `startNode` and `endNode`.
-                        expect(startNode.nextSibling).toBe(endNode)
-                    }
-
-                    if (parentId !== undefined) {
-                        expect((parentNode as HTMLElement).id).toBe(parentId)
-                    }
+                    } else if (endNode === null) expect(startNode.nextSibling).toBeNull() // Часть охватывает всех соседних элементов после `startNode`.
+                    else expect(startNode.nextSibling).toBe(endNode) // Часть охватывает всех соседних элементов между `startNode` и `endNode`.
+                    if (parentId !== undefined) expect((parentNode as HTMLElement).id).toBe(parentId)
                     done?.()
                 } catch (e) {
-                    if (done === undefined) {
-                        throw e
-                    } else {
-                        done(e)
-                    }
+                    if (done === undefined) throw e
+                    else done(e)
                 }
 
                 return nothing
@@ -147,8 +128,7 @@ describe("директивы", () => {
 
         test("когда директива является единственным дочерним элементом", () => {
             const makeTemplate = (content: unknown) => html`
-                <div>${content}</div>
-            `
+                <div>${content}</div> `
 
             // Отрисовываем дважды, чтобы вызвать `update`
             render(makeTemplate(checkPart()), container)
@@ -156,10 +136,8 @@ describe("директивы", () => {
         })
 
         test("когда директива является последним дочерним элементом", () => {
-            const makeTemplate = (content: unknown) =>
-                html`
-                    <div>Earlier sibling. ${content}</div>
-                `
+            const makeTemplate = (content: unknown) => html`
+                <div>Earlier sibling. ${content}</div> `
 
             // Отрисовываем дважды, чтобы вызвать `update`
             render(makeTemplate(checkPart()), container)
@@ -167,10 +145,8 @@ describe("директивы", () => {
         })
 
         test("когда директива не является последним дочерним элементом", () => {
-            const makeTemplate = (content: unknown) =>
-                html`
-                    <div>Earlier sibling. ${content} Later sibling.</div>
-                `
+            const makeTemplate = (content: unknown) => html`
+                <div>Earlier sibling. ${content} Later sibling.</div> `
 
             // Отрисовываем дважды, чтобы вызвать `update`
             render(makeTemplate(checkPart()), container)
@@ -180,8 +156,7 @@ describe("директивы", () => {
         test("parentNode части является логическим родителем в DOM", async () => {
             let resolve: () => void
             let reject: (e: unknown) => void
-            // Этот Promise завершается, когда директива until() вызывает директиву
-            // в asyncCheckDiv
+            // Этот Promise завершается, когда директива until() вызывает директиву в asyncCheckDiv
             const asyncCheckDivRendered = new Promise<void>((res, rej) => {
                 resolve = res
                 reject = rej
@@ -193,38 +168,11 @@ describe("директивы", () => {
                 html`
                     ${checkPart("container")}
                     <div id="div">
-                        ${checkPart("div")}
-                        ${html`
-                            x ${checkPart("div")} x
-                        `}
-                        ${html`
-                            x
-                            ${html`
-                                x ${checkPart("div")} x
-                            `}
-                            x
-                        `}
-                        ${html`
-                            x
-                            ${html`
-                                x ${[checkPart("div"), checkPart("div")]} x
-                            `}
-                            x
-                        `}
-                        ${html`
-                            x
-                            ${html`
-                                x ${[[checkPart("div"), checkPart("div")]]} x
-                            `}
-                            x
-                        `}
-                        ${html`
-                            x
-                            ${html`
-                                x ${[[repeat([checkPart("div"), checkPart("div")], v => v)]]} x
-                            `}
-                            x
-                        `}
+                        ${checkPart("div")} ${html` x ${checkPart("div")} x `}
+                        ${html` x ${html` x ${checkPart("div")} x `} x `}
+                        ${html` x ${html` x ${[checkPart("div"), checkPart("div")]} x `} x `}
+                        ${html` x ${html` x ${[[checkPart("div"), checkPart("div")]]} x `} x `}
+                        ${html` x ${html` x ${[[repeat([checkPart("div"), checkPart("div")], (v) => v)]]} x `} x `}
                         ${until(asyncCheckDiv)}
                     </div>
                 `
@@ -234,10 +182,7 @@ describe("директивы", () => {
         })
 
         test("когда parentNode равен null", async () => {
-            const template = () =>
-                html`
-                    ${checkPart("container")}
-                `
+            const template = () => html` ${checkPart("container")} `
 
             // Отрисовываем шаблон для создания экземпляра директивы
             render(template(), container)
@@ -252,10 +197,7 @@ describe("директивы", () => {
         test("parentNode части корректен при отрисовке во фрагменте документа", async () => {
             const fragment = document.createDocumentFragment()
             ;(fragment as unknown as { id: string }).id = "fragment"
-            const makeTemplate = () =>
-                html`
-                    ${checkPart("fragment")}
-                `
+            const makeTemplate = () => html` ${checkPart("fragment")} `
 
             // Отрисовываем дважды, чтобы вызвать `update`
             render(makeTemplate(), fragment)
@@ -265,12 +207,8 @@ describe("директивы", () => {
 
     test("директивы сохраняют состояние", () => {
         const go = (v: string) => {
-            render(
-                html`
-                    <div>${count(v)}</div>
-                `,
-                container
-            )
+            render(html`
+                <div>${count(v)}</div>`, container)
         }
         go("A")
         assertContent("<div>A:1</div>")
@@ -298,12 +236,8 @@ describe("директивы", () => {
 
         const update = directive(TestUpdateDirective)
         const go = (v: boolean) => {
-            render(
-                html`
-                    <div>${update(v)}</div>
-                `,
-                container
-            )
+            render(html`
+                <div>${update(v)}</div>`, container)
         }
         go(true)
         assertContent("<div>true</div>")
@@ -313,8 +247,7 @@ describe("директивы", () => {
 
     test("отрисовка директив в AttributeParts", () => {
         const go = () => html`
-            <div foo=${count("A")}></div>
-        `
+            <div foo=${count("A")}></div>`
         render(go(), container)
         expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div foo="A:1"></div>')
         render(go(), container)
@@ -323,8 +256,7 @@ describe("директивы", () => {
 
     test("отрисовка нескольких директив в AttributeParts", () => {
         const go = () => html`
-            <div foo="a:${count("A")}:b:${count("B")}"></div>
-        `
+            <div foo="a:${count("A")}:b:${count("B")}"></div>`
         render(go(), container)
         expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div foo="a:A:1:b:B:1"></div>')
         render(go(), container)
@@ -345,12 +277,8 @@ describe("директивы", () => {
                 }
             }
         )
-        render(
-            html`
-                <div title="a ${testDirective(1)} b"></div>
-            `,
-            container
-        )
+        render(html`
+            <div title="a ${testDirective(1)} b"></div> `, container)
         expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div title="a 1 b"></div>')
         if (partInfo!.type === PartType.ATTRIBUTE) {
             const attrPart = partInfo! as AttributePartInfo
@@ -363,12 +291,8 @@ describe("директивы", () => {
     })
 
     test("отрисовка директив в PropertyParts", () => {
-        render(
-            html`
-                <div .foo=${count("A")}></div>
-            `,
-            container
-        )
+        render(html`
+            <div .foo=${count("A")}></div> `, container)
         expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
         expect((container.firstElementChild as any).foo).toBe("A:1")
     })
@@ -387,12 +311,8 @@ describe("директивы", () => {
                 }
             }
         )
-        render(
-            html`
-                <div .title="a ${testDirective(1)} b"></div>
-            `,
-            container
-        )
+        render(html`
+            <div .title="a ${testDirective(1)} b"></div> `, container)
         expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div title="a 1 b"></div>')
         if (partInfo!.type === PartType.PROPERTY) {
             const attrPart = partInfo! as AttributePartInfo
@@ -416,10 +336,8 @@ describe("директивы", () => {
                 }
             }
         )
-        const template = (value: string) =>
-            html`
-                <div @click=${handle(value)}></div>
-            `
+        const template = (value: string) => html`
+            <div @click=${handle(value)}></div>`
         render(template("A"), container)
         expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
         ;(container.firstElementChild as HTMLDivElement).click()
@@ -438,12 +356,8 @@ describe("директивы", () => {
         const listener = (e: Event) => {
             event = e
         }
-        render(
-            html`
-                <div @test-event=${listener} b=${fireEvent()}></div>
-            `,
-            container
-        )
+        render(html`
+            <div @test-event=${listener} b=${fireEvent()}></div> `, container)
         expect(event).toBeDefined()
     })
 
@@ -453,23 +367,15 @@ describe("директивы", () => {
             event = e
         }
         debugger
-        render(
-            html`
-                <div @test-event=${listener} ${fireEvent()}></div>
-            `,
-            container
-        )
+        render(html`
+            <div @test-event=${listener} ${fireEvent()}></div> `, container)
         expect(event).toBeDefined()
     })
 
     test("отрисовка директив в ElementParts", () => {
         const log: string[] = []
-        assertRender(
-            html`
-                <div ${count("x", log)}></div>
-            `,
-            `<div></div>`
-        )
+        assertRender(html`
+            <div ${count("x", log)}></div> `, `<div></div>`)
         expect(log).toEqual(["x:1"])
 
         log.length = 0
@@ -492,27 +398,18 @@ describe("директивы", () => {
         expect(log).toEqual(["x:1"])
 
         log.length = 0
-        assertRender(
-            html`
-                <div a=${"a"} ${count("x", log)} b=${"b"}></div>
-            `,
-            `<div a="a" b="b"></div>`
-        )
+        assertRender(html`
+            <div a=${"a"} ${count("x", log)} b=${"b"}></div> `, `<div a="a" b="b"></div>`)
         expect(log).toEqual(["x:1"])
 
         log.length = 0
-        assertRender(
-            html`
-                <div ${count("x", log)} ${count("y", log)}></div>
-            `,
-            `<div></div>`
-        )
+        assertRender(html`
+            <div ${count("x", log)} ${count("y", log)}></div> `, `<div></div>`)
         expect(log).toEqual(["x:1", "y:1"])
 
         log.length = 0
         const template = html`
-            <div ${count("x", log)} a=${"a"} ${count("y", log)}></div>
-        `
+            <div ${count("x", log)} a=${"a"} ${count("y", log)}></div> `
         assertRender(template, `<div a="a"></div>`)
         expect(log).toEqual(["x:1", "y:1"])
         log.length = 0
@@ -526,62 +423,39 @@ describe("директивы", () => {
             const listener = () => {
             }
 
-            render(
-                html`
-                    <div @click=${listener}></div>
-                `,
-                container
-            )
-            render(
-                html`
-                    <div @click="${listener}"></div>
-                `,
-                container
-            )
+            render(html`
+                <div @click=${listener}></div>
+            `, container)
+            render(html`
+                <div @click="${listener}"></div>
+            `, container)
 
-            expect(() => {
-                render(
-                    html`
-                        <div @click="EXTRA_TEXT${listener}"></div>
-                    `,
-                    container
-                )
-            }).toThrow()
-            expect(() => {
-                render(
-                    html`
-                        <div @click="${listener}EXTRA_TEXT"></div>
-                    `,
-                    container
-                )
-            }).toThrow()
-            expect(() => {
-                render(
-                    html`
-                        <div @click="${listener}${listener}"></div>
-                    `,
-                    container
-                )
-            }).toThrow()
-            expect(() => {
-                render(
-                    html`
-                        <div @click="${listener}EXTRA_TEXT${listener}"></div>
-                    `,
-                    container
-                )
-            }).toThrow()
+            expect(
+                () => render(html`
+                    <div @click="EXTRA_TEXT${listener}"></div>
+                `, container)
+            ).toThrow()
+            expect(
+                () => render(html`
+                    <div @click="${listener}EXTRA_TEXT"></div>
+                `, container)
+            ).toThrow()
+            expect(
+                () => render(html`
+                    <div @click="${listener}${listener}"></div> `, container)
+            ).toThrow()
+            expect(
+                () => render(html`
+                    <div @click="${listener}EXTRA_TEXT${listener}"></div>
+                `, container)
+            ).toThrow()
         })
 
         test("выражения внутри шаблона вызывают ошибку в режиме разработки", () => {
             // top level
             expect(() => {
-                render(
-                    html`
-                        <template>${"test"}</template>
-                    `,
-                    container
-                )
+                render(html`
+                    <template>${"test"}</template> `, container)
             }).toThrow()
 
             // inside template result
@@ -663,12 +537,7 @@ describe("директивы", () => {
 
         test("дублирующиеся атрибуты вызывают ошибку", () => {
             expect(() => {
-                render(
-                    html`
-                        <input ?disabled=${true} ?disabled=${false} fooAttribute=${"potato"}/>
-                    `,
-                    container
-                )
+                render(html` <input ?disabled=${true} ?disabled=${false} fooAttribute=${"potato"}/> `, container)
             }, `Detected duplicate attribute bindings. This occurs if your template has duplicate attributes on an element tag. For example "<input ?disabled=\${true} ?disabled=\${false}>" contains a duplicate "disabled" attribute. The error was detected in the following template: \n\`<input ?disabled=\${...} ?disabled=\${...} fooAttribute=\${...}>\``)
         })
 
@@ -686,100 +555,83 @@ describe("директивы", () => {
 
         test("выражения внутри вложенных шаблонов вызывают ошибку в режиме разработки", () => {
             // top level
-            expect(() => {
-                render(
-                    html`
-                        <template>
-                            <template>${"test"}</template>
-                        </template>
-                    `,
-                    container
-                )
-            }).toThrow()
+            expect(
+                () => render(html`
+                    <template>
+                        <template>${"test"}</template>
+                    </template>
+                `, container)
+            ).toThrow()
 
             // inside template result
-            expect(() => {
-                render(
-                    html`
-                        <template>
-                            <div>
-                                <template>${"test"}</template>
-                        </template></div>`,
-                    container
-                )
-            }).toThrow()
+            expect(
+                () => render(html`
+                    <template>
+                        <div>
+                            <template>${"test"}</template>
+                    </template></div>
+                `, container)
+            ).toThrow()
 
             // child part deep inside
-            expect(() => {
-                render(
-                    html`
+            expect(
+                () => render(html`
+                    <template>
                         <template>
-                            <template>
+                            <div>
                                 <div>
                                     <div>
-                                        <div>
-                                            <div>${"test"}</div>
-                                        </div>
+                                        <div>${"test"}</div>
                                     </div>
                                 </div>
-                            </template>
-                        </template>
-                    `,
-                    container
-                )
-            }).toThrow()
-
-            // attr part deep inside
-            expect(() => {
-                render(
-                    html`
-                        <template>
-                            <template>
-                                <div>
-                                    <div>
-                                        <div>
-                                            <div class="${"test"}"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </template>
-                    `,
-                    container
-                )
-            }).toThrow()
-
-            // attr part deep inside
-            expect(() => {
-                render(
-                    html`
-                        <template>
-                            <template>
-                                <div>
-                                    <div>
-                                        <div>
-                                            <div ${"test"}></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </template>
-                    `,
-                    container
-                )
-            }).toThrow()
-
-            // атрибут на элементе в порядке
-            render(
-                html`
-                    <template id=${"test"}>
-                        <template>
-                            <div>Статическое содержимое допустимо</div>
+                            </div>
                         </template>
                     </template>
-                `,
-                container
-            )
+                `, container)
+            ).toThrow()
+
+            // attr part deep inside
+            expect(
+                () => render(html`
+                    <template>
+                        <template>
+                            <div>
+                                <div>
+                                    <div>
+                                        <div class="${"test"}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                `, container)
+            ).toThrow()
+
+            // attr part deep inside
+            expect(
+                () => render(html`
+                    <template>
+                        <template>
+                            <div>
+                                <div>
+                                    <div>
+                                        <div ${"test"}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                `, container)
+            ).toThrow()
+
+            // атрибут на элементе в порядке
+            render(html`
+                <template id=${"test"}>
+                    <template>
+                        <div>Статическое содержимое допустимо</div>
+                    </template>
+                </template>
+            `, container)
         })
     }
 
@@ -794,7 +646,10 @@ describe("директивы", () => {
                 return `${(this.host as HTMLInputElement)?.value}:${v}`
             }
 
-            override update(part: AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart, props: [v: string]) {
+            override update(
+                part: AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart,
+                props: [v: string]
+            ) {
                 this.host ??= part.options!.host as HTMLInputElement
                 return this.render(...props)
             }
@@ -802,13 +657,9 @@ describe("директивы", () => {
 
         const hostDirective = directive(HostDirective)
 
-        render(
-            html`
-                <div attr=${hostDirective("attr")}>${hostDirective("node")}</div>
-            `,
-            container,
-            {host: hostEl}
-        )
+        render(html`
+            <div attr=${hostDirective("attr")}>${hostDirective("node")}</div>
+        `, container, {host: hostEl})
         assertContent('<div attr="host:attr">host:node</div>')
     })
 
@@ -839,10 +690,9 @@ describe("директивы", () => {
 
         test("вложенные директивы в ChildPart", () => {
             bDirectiveCount = 0
-            const template = (bool: boolean, v: unknown) =>
-                html`
-                    <div>${aNothingDirective(bool, bDirective(v))}</div>
-                `
+            const template = (bool: boolean, v: unknown) => html`
+                <div>${aNothingDirective(bool, bDirective(v))}</div>
+            `
             assertRender(template(true, "X"), `<div>[B:0:X]</div>`)
             assertRender(template(true, "Y"), `<div>[B:1:Y]</div>`)
             assertRender(template(false, "X"), `<div></div>`)
@@ -852,10 +702,9 @@ describe("директивы", () => {
 
         test("вложенные директивы в AttributePart", () => {
             bDirectiveCount = 0
-            const template = (bool: boolean, v: unknown) =>
-                html`
-                    <div a=${aNothingDirective(bool, bDirective(v))}></div>
-                `
+            const template = (bool: boolean, v: unknown) => html`
+                <div a=${aNothingDirective(bool, bDirective(v))}></div>
+            `
             assertRender(template(true, "X"), `<div a="[B:0:X]"></div>`)
             assertRender(template(true, "Y"), `<div a="[B:1:Y]"></div>`)
             assertRender(template(false, "X"), `<div></div>`)
@@ -874,10 +723,9 @@ describe("директивы", () => {
 
             test("вложенные директивы в ChildPart", () => {
                 bDirectiveCount = 0
-                const template = (bool: boolean, v: unknown) =>
-                    html`
-                        <div>${aNoChangeDirective(bool, bDirective(v))}</div>
-                    `
+                const template = (bool: boolean, v: unknown) => html`
+                    <div>${aNoChangeDirective(bool, bDirective(v))}</div>
+                `
                 assertRender(template(true, "X"), `<div>[B:0:X]</div>`)
                 assertRender(template(true, "Y"), `<div>[B:1:Y]</div>`)
                 assertRender(template(false, "X"), `<div>[B:1:Y]</div>`)
@@ -888,10 +736,9 @@ describe("директивы", () => {
 
             test("вложенные директивы в AttributePart", () => {
                 bDirectiveCount = 0
-                const template = (bool: boolean, v: unknown) =>
-                    html`
-                        <div a=${aNoChangeDirective(bool, bDirective(v))}></div>
-                    `
+                const template = (bool: boolean, v: unknown) => html`
+                    <div a=${aNoChangeDirective(bool, bDirective(v))}></div>
+                `
                 assertRender(template(true, "X"), `<div a="[B:0:X]"></div>`)
                 assertRender(template(true, "Y"), `<div a="[B:1:Y]"></div>`)
                 assertRender(template(false, "X"), `<div a="[B:1:Y]"></div>`)

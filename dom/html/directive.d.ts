@@ -3,6 +3,14 @@ import {Directive} from "./directive.t.ts";
 export {Directive}
 
 /**
+ * Создает пользовательскую функцию директивы из класса Directive. Эта
+ * функция имеет те же параметры, что и метод render() директивы.
+ *
+ * @param c
+ */
+export declare function directive<C extends DirectiveClass>(c: C): (...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>
+
+/**
  * Сгенерированная функция директивы не вычисляет директиву, а просто
  * возвращает объект DirectiveResult, который захватывает аргументы.
  */
@@ -96,11 +104,3 @@ export interface StyleInfo {
 export interface ClassInfo {
     readonly [name: string]: string | boolean | number;
 }
-
-/**
- * Создает пользовательскую функцию директивы из класса Directive. Эта
- * функция имеет те же параметры, что и метод render() директивы.
- *
- * @param c
- */
-export declare function directive<C extends DirectiveClass>(c: C): (...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>
