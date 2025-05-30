@@ -1,6 +1,7 @@
 import {type AttributePart, noChange} from '../html.js'
-import {directive, Directive, PartType,} from '../directive.js'
+import {directive, PartType,} from '../directive.js'
 import type {DirectiveParameters, PartInfo, StyleInfo} from "../directive.ts"
+import {Directive} from "../directive.t.ts";
 
 const important = 'important'
 // Ведущий пробел важен

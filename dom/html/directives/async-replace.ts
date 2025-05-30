@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {type ChildPart, noChange} from '../html.js'
 import {AsyncDirective, directive} from '../async-directive.js'
 import {forAwaitOf, Pauser, PseudoWeakRef} from './private-async-helpers.js'

@@ -1,10 +1,11 @@
-import {AttributePart, ChildPart, html, noChange, nothing, render, PropertyPart, BooleanAttributePart, ElementPart, EventPart} from "../../html.js"
+import {AttributePart, ChildPart, html, noChange, nothing, render, PropertyPart, BooleanAttributePart, ElementPart, EventPart} from "./html.js"
 import {beforeEach, describe, expect, test} from "bun:test"
-import {type AttributePartInfo, Directive, directive, PartType} from "../../directive.js"
-import {until} from "../../directives/until.js"
-import type {DirectiveParameters, PartInfo} from "../../directive.ts"
-import {repeat} from "../../directives/repeat.js"
-import type {CompiledTemplateResult, RenderOptions, TemplateResult, } from "../../types/html.js"
+import {type AttributePartInfo, directive, PartType} from "./directive.js"
+import {until} from "./directives/until.js"
+import type {DirectiveParameters, PartInfo} from "./directive.d.ts"
+import {repeat} from "./directives/repeat.js"
+import type {CompiledTemplateResult, RenderOptions, TemplateResult, } from "./types/html.js"
+import {Directive} from "./directive.t.ts";
 
 
 describe("директивы", () => {

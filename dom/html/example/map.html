@@ -14,9 +14,10 @@
 
         render(html`
             <h1>Map</h1>
-            <ul>${[1, 2, 3, 4].map(i => html`
-                <li>${i}</li>
-            `)}
+            <ul>
+                ${["one", "two", "three"].map(i => html`
+                    <li>${i}</li>
+                `)}
             </ul>
         `, document.body)
     </script>
