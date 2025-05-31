@@ -1,4 +1,4 @@
-import type {Directive} from "./directive.ts"
+import type {Directive} from "../directive.d.ts"
 import {HTML_RESULT, MATHML_RESULT, SVG_RESULT, type Template} from "../html"
 
 export type ResultType = typeof HTML_RESULT | typeof SVG_RESULT | typeof MATHML_RESULT
