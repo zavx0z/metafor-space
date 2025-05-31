@@ -1,4 +1,5 @@
 declare module "bun:test" {
+  //@ts-ignore
   interface Matchers<R> {
     /** Проверяет, что строка соответствует ожидаемой строке, игнорируя пробельные символы. */
     toMatchStringHTML(expected: string): R

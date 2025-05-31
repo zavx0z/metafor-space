@@ -8,10 +8,10 @@ import {
   type RenderOptions,
   type TemplateResult,
   type Part,
-} from "../../html.js"
-import {AsyncDirective, Directive, directive} from "../../async-directive.js"
-import type {PartInfo} from "../../directive"
-import {repeat} from "../../directives/repeat.js"
+} from "./html.js"
+import {AsyncDirective, Directive, directive} from "./async-directive.js"
+import type {PartInfo} from "./directive"
+import {repeat} from "./directives/repeat.js"
 
 describe("async directives", () => {
   let container: HTMLDivElement
