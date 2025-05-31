@@ -1,9 +1,5 @@
-import type {ValueSanitizer} from "./html.t.ts";
-import type {Directive} from "./directive.t.ts";
-// import type { Directive } from "./directive"
-// import type { PartInfo } from "./types/directives"
-// import type { Disconnectable } from "./types/html"
-// import type { ChildPart, AttributePart, ElementPart, RootPart } from "./types/part"
+import type {ValueSanitizer} from "./html.t.ts"
+import type {Directive} from "./directive.t.ts"
 
 export declare const DEV_MODE: boolean
 // export declare const policy: TrustedTypePolicy | undefined
@@ -186,9 +182,7 @@ export interface Disconnectable {
   _$isConnected: boolean
 }
 
-/**
- * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.
- */
+/** Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата. */
 export type TagFunction = <T extends ResultType>(
   type: T
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
@@ -286,76 +280,7 @@ export declare function svg(strings: TemplateStringsArray, ...values: unknown[])
  */
 export declare function mathml(strings: TemplateStringsArray, ...values: any[]): TemplateResult<3>
 
-// /**
-//  * Создает безопасный HTML из строки шаблона.
-//  * @param tsa - Массив строк шаблона
-//  * @param stringFromTSA - Строка из массива строк шаблона
-//  * @returns TrustedHTML
-//  */
-// export declare function trustFromTemplateString(tsa: TemplateStringsArray, stringFromTSA: string): TrustedHTML
-
-// /**
-//  * Разрешает директиву для части.
-//  * @param part - Часть
-//  * @param value - Значение
-//  * @param parent - Родитель
-//  * @param attributeIndex - Индекс атрибута
-//  * @returns Разрешенное значение
-//  */
-// export declare function resolveDirective(
-//   part: ChildPart | AttributePart | ElementPart,
-//   value: unknown,
-//   parent?: DirectiveParent,
-//   attributeIndex?: number
-// ): unknown
-
-// /**
-//  * Получает HTML шаблона.
-//  * @param strings - Массив строк шаблона
-//  * @param type - Тип результата
-//  * @returns Массив, содержащий [html, attrNames]
-//  */
-// export declare function getTemplateHtml(
-//   strings: TemplateStringsArray,
-//   type: ResultType
-// ): [TrustedHTML, string[]]
-
-// /**
-//  * Устанавливает глобально фабрику санитизации.
-//  * @param newSanitizer - Новая фабрика санитизации
-//  */
-// export declare function setSanitizer(
-//   newSanitizer: (node: Node, name: string, type: "property" | "attribute") => (value: unknown) => unknown
-// ): void
-
-// /**
-//  * Создает санитизатор для узла.
-//  * @param node - Узел
-//  * @param name - Имя
-//  * @param type - Тип
-//  * @returns Функция санитизации
-//  */
-// export declare function createSanitizer(
-//   node: Node,
-//   name: string,
-//   type: "property" | "attribute"
-// ): (value: unknown) => unknown
-
-// /**
-//  * Класс шаблона.
-//  */
-// export declare class Template {
-//   el: HTMLTemplateElement
-//   parts: TemplatePart[]
-
-//   constructor(params: UncompiledTemplateResult, options?: RenderOptions)
-
-//   static createElement(html: TrustedHTML, _options?: RenderOptions): HTMLTemplateElement
-// }
-
-/**
- * Экземпляр шаблона.
- */
+/** Экземпляр шаблона. */
 export declare class TemplateInstance {
   _$parts: (ChildPart | AttributePart | ElementPart)[]
   _$disconnectableChildren?: Set<Disconnectable>
@@ -374,7 +299,7 @@ export declare class TemplateInstance {
 /**
  * Часть для дочерних элементов.
  */
-export declare class ChildPart {
+export declare class ChildPart implements Disconnectable {
   type: typeof CHILD_PART
   // _$parent?: Disconnectable
   // _$disconnectableChildren?: Set<Disconnectable>
@@ -647,7 +572,6 @@ export type Part =
 // export interface RefDirective {
 //   (ref: (el: Element | undefined) => void): unknown
 // }
-export {noChange, nothing} from "./html.t.ts"
 type AttributeTemplatePart = {
   readonly type: typeof ATTRIBUTE_PART
   readonly index: number
@@ -668,7 +592,8 @@ type CommentTemplatePart = {
   readonly index: number
 }
 /**
- * TemplatePart представляет динамическую часть в шаблоне до его создания. Когда шаблон создается, части создаются из TemplateParts.
+ * TemplatePart представляет динамическую часть в шаблоне до его создания.
+ * Когда шаблон создается, части создаются из TemplateParts.
  */
 export type TemplatePart = ChildTemplatePart | AttributeTemplatePart | ElementTemplatePart | CommentTemplatePart
 
@@ -716,3 +641,58 @@ export interface RootPart extends ChildPart {
  *    * (') за которым следует любой символ, кроме (').
  */
 export type TagEndRegex = RegExp
+export {noChange, nothing} from "./html.t.ts"
+// /**
+//  * Создает безопасный HTML из строки шаблона.
+//  * @param tsa - Массив строк шаблона
+//  * @param stringFromTSA - Строка из массива строк шаблона
+//  * @returns TrustedHTML
+//  */
+// export declare function trustFromTemplateString(tsa: TemplateStringsArray, stringFromTSA: string): TrustedHTML
+
+// /**
+//  * Разрешает директиву для части.
+//  * @param part - Часть
+//  * @param value - Значение
+//  * @param parent - Родитель
+//  * @param attributeIndex - Индекс атрибута
+//  * @returns Разрешенное значение
+//  */
+// export declare function resolveDirective(
+//   part: ChildPart | AttributePart | ElementPart,
+//   value: unknown,
+//   parent?: DirectiveParent,
+//   attributeIndex?: number
+// ): unknown
+
+// /**
+//  * Получает HTML шаблона.
+//  * @param strings - Массив строк шаблона
+//  * @param type - Тип результата
+//  * @returns Массив, содержащий [html, attrNames]
+//  */
+// export declare function getTemplateHtml(
+//   strings: TemplateStringsArray,
+//   type: ResultType
+// ): [TrustedHTML, string[]]
+
+// /**
+//  * Устанавливает глобально фабрику санитизации.
+//  * @param newSanitizer - Новая фабрика санитизации
+//  */
+// export declare function setSanitizer(
+//   newSanitizer: (node: Node, name: string, type: "property" | "attribute") => (value: unknown) => unknown
+// ): void
+
+// /**
+//  * Создает санитизатор для узла.
+//  * @param node - Узел
+//  * @param name - Имя
+//  * @param type - Тип
+//  * @returns Функция санитизации
+//  */
+// export declare function createSanitizer(
+//   node: Node,
+//   name: string,
+//   type: "property" | "attribute"
+// ): (value: unknown) => unknown
