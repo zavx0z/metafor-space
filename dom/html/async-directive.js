@@ -1,5 +1,5 @@
 /**
- * @typedef {import("./types/html").Disconnectable} Disconnectable
+ * @typedef {import("./html").Disconnectable} Disconnectable
  * @typedef {import("./directive").PartInfo} PartInfo
  * @typedef {import("./html").AttributePart} AttributePart
  @typedef {import("./html").ChildPart} ChildPart

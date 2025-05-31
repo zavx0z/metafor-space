@@ -1,4 +1,4 @@
-/**@typedef {import("../types/html.js").TemplateResult} TemplateResult*/
+/**@typedef {import("../html.js").TemplateResult} TemplateResult*/
 /**@typedef {import("../directive.ts").PartInfo} PartInfo*/
 import {nothing, noChange} from "../html.js"
 import {directive, Directive, PartType} from "../directive.js"

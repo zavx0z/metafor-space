@@ -4,7 +4,7 @@
  * @typedef {import("./directive").ChildPartInfo} ChildPartInfo
  * @typedef {import("./directive").AttributePartInfo} AttributePartInfo
  * @typedef {import("./directive").ElementPartInfo} ElementPartInfo
- * @typedef {import("./types/html").Disconnectable} Disconnectable
+ * @typedef {import("./html").Disconnectable} Disconnectable
  * @typedef {import("./html").ChildPart} ChildPart
  * @typedef {import("./html").AttributePart} AttributePart
  * @typedef {import("./html").ElementPart} ElementPart

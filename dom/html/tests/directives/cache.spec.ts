@@ -1,5 +1,5 @@
 import {beforeAll, describe, expect, test} from "bun:test"
-import {html, nothing, render} from "../../html.js"
+import {type CompiledTemplate, html, nothing, render} from "../../html.js"
 import {cache} from "../../directives/cache.js"
 
 import {directive} from "../../directive.js"
@@ -7,7 +7,6 @@ import {directive} from "../../directive.js"
 // For compiled template tests
 import {_$LH} from "../../private-ssr-support.js"
 import {AsyncDirective} from "../../async-directive.js"
-import type {CompiledTemplate} from "../../types/html.js"
 
 const branding_tag = (s: TemplateStringsArray) => s
 

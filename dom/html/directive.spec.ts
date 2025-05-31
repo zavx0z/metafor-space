@@ -1,8 +1,15 @@
 import {beforeEach, describe, expect, test} from "bun:test"
 
-import {render, html, noChange, nothing} from "./html"
+import {
+    render,
+    html,
+    noChange,
+    nothing,
+    type RenderOptions,
+    type CompiledTemplateResult,
+    type TemplateResult
+} from "./html"
 import {ChildPart, EventPart, ElementPart, AttributePart, PropertyPart, BooleanAttributePart} from "./html"
-import type {RenderOptions, CompiledTemplateResult, TemplateResult} from "./types/html"
 
 import {directive, Directive, PartType} from "./directive"
 import type {AttributePartInfo, DirectiveParameters, PartInfo} from "./directive"

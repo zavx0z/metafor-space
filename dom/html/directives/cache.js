@@ -2,8 +2,8 @@
  * @typedef {import('../html').ChildPart} ChildPart
  * @typedef {import('../html').Part} Part
  * @typedef {import('../types/part.js').RootPart} RootPart
- * @typedef {import('../types/html.js').TemplateResult} TemplateResult
- * @typedef {import('../types/html.js').CompiledTemplateResult} CompiledTemplateResult
+ * @typedef {import('../html.js').TemplateResult} TemplateResult
+ * @typedef {import('../html.js').CompiledTemplateResult} CompiledTemplateResult
  */
 import {nothing, render} from "../html.js"
 import {directive, Directive} from "../directive.js"

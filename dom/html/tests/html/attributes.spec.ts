@@ -1,7 +1,13 @@
 import {describe, test, expect, beforeEach} from "bun:test"
-import {render, html, noChange, nothing} from "../../html"
-import type {CompiledTemplateResult, RenderOptions} from "../../types/html"
-import type {TemplateResult} from "../../types/html"
+import {
+  render,
+  html,
+  noChange,
+  nothing,
+  type RenderOptions,
+  type CompiledTemplateResult,
+  type TemplateResult
+} from "../../html"
 
 describe("attributes", () => {
   let container: HTMLDivElement

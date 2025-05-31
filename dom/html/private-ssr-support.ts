@@ -5,7 +5,7 @@ import {_$LH as p} from "./ssr.js"
 import {
   type AttributePart,
   BooleanAttributePart,
-  ChildPart,
+  ChildPart, type Disconnectable,
   ElementPart,
   EventPart,
   noChange,
@@ -14,7 +14,6 @@ import {
 } from "./html.js"
 import type {DirectiveClass, DirectiveResult, PartInfo} from "./directives"
 import type {Part} from "./types/part.js"
-import type {Disconnectable} from "./types/html.js"
 
 // Содержит либо минифицированное, либо неминифицированное имя метода `_$resolve` директивы
 let resolveMethodName: Extract<keyof Directive, "_$resolve"> | null = null

@@ -1,6 +1,5 @@
 import {describe, expect, test} from "bun:test"
-import {render, svg} from "../html"
-import type {SVGTemplateResult, TemplateResult} from "../types/html"
+import {render, svg, type SVGTemplateResult, type TemplateResult} from "../html"
 
 describe("svg", () => {
   test("renders SVG", () => {

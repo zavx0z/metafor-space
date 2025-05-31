@@ -6,21 +6,21 @@
  @typedef {import("./types/part").TemplatePart} TemplatePart
  @typedef {import("./types/index").TagEndRegex} TagEndRegex
  *
- @typedef {import("./types/html").CompiledTemplate} CompiledTemplate
- @typedef {import("./types/html").CompiledTemplateResult} CompiledTemplateResult
- @typedef {import("./types/html").DirectiveParent} DirectiveParent
- @typedef {import("./types/html").Disconnectable} Disconnectable
- @typedef {import("./types/html").EventListenerWithOptions} EventListenerWithOptions
- @typedef {import("./types/html").RenderOptions} RenderOptions
- @typedef {import("./types/html").ResultType} ResultType
- @typedef {import("./types/html").UncompiledTemplateResult} UncompiledTemplateResult
+ @typedef {import("./html").CompiledTemplate} CompiledTemplate
+ @typedef {import("./html").CompiledTemplateResult} CompiledTemplateResult
+ @typedef {import("./html").DirectiveParent} DirectiveParent
+ @typedef {import("./html").Disconnectable} Disconnectable
+ @typedef {import("./html").EventListenerWithOptions} EventListenerWithOptions
+ @typedef {import("./html").RenderOptions} RenderOptions
+ @typedef {import("./html").ResultType} ResultType
+ @typedef {import("./html").UncompiledTemplateResult} UncompiledTemplateResult
  *
  @typedef {import("trusted-types/lib").TrustedHTML} TrustedHTML
  @typedef {import("trusted-types/lib").TrustedTypesWindow} TrustedTypesWindow
  */
 /**
  @template {ResultType} T
- @typedef {import("./types/html").TemplateResult<T>} TemplateResult
+ @typedef {import("./html").TemplateResult<T>} TemplateResult
  */
 export const DEV_MODE = true
 // Позволяет минификаторам переименовывать ссылки на globalThis

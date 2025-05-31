@@ -1,6 +1,5 @@
-import {html as coreHtml, mathml as coreMathml, svg as coreSvg} from "./html.js"
+import {html as coreHtml, mathml as coreMathml, svg as coreSvg, type TemplateResult} from "./html.js"
 import type {Brand, StaticValue} from "./types/static.js"
-import type {TemplateResult} from "./types/html.js"
 
 const brand: Brand = Symbol.for("")
 

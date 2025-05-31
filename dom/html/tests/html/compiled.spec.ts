@@ -1,6 +1,11 @@
-import type {CompiledTemplate, CompiledTemplateResult, RenderOptions, TemplateResult} from "../../types/html.js"
 import {beforeEach, describe, expect, test} from "bun:test"
-import {AttributePart, render} from "../../html.js"
+import {
+  AttributePart,
+  type CompiledTemplate,
+  type CompiledTemplateResult,
+  render,
+  type RenderOptions, type TemplateResult
+} from "../../html.js"
 import {createRef, ref} from "../../directives/ref.js"
 
 describe("скомпилированные шаблоны", () => {

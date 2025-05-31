@@ -1,6 +1,13 @@
 import {beforeEach, describe, expect, test} from "bun:test"
-import {html, noChange, nothing, render} from "../../html.js"
-import type {CompiledTemplateResult, RenderOptions, TemplateResult} from "../../types/html.js"
+import {
+  type CompiledTemplateResult,
+  html,
+  noChange,
+  nothing,
+  render,
+  type RenderOptions,
+  type TemplateResult
+} from "../../html.js"
 import type {Part} from "../../types/part.js"
 import {AsyncDirective, Directive, directive} from "../../async-directive.js"
 import type {PartInfo} from "../../types/directive.ts"

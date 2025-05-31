@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, test} from "bun:test"
-import {html, nothing} from "../../html.js"
+import {type CompiledTemplateResult, html, nothing, type RenderOptions, type TemplateResult} from "../../html.js"
 import {render} from "../../html.js"
-import type {CompiledTemplateResult, RenderOptions, TemplateResult} from "../../types/html.js"
 
 // У нас нет прямого доступа к DEV_MODE, но это достаточно хороший прокси.
 const DEV_MODE = render.setSanitizer != null

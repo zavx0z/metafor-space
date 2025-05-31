@@ -1,5 +1,5 @@
-import type {Disconnectable, RenderOptions, ResultType, TemplateResult} from "./types/html"
 import type {ValueSanitizer} from "./html.t.ts";
+import type {Directive} from "./directive.t.ts";
 // import type { Directive } from "./directive"
 // import type { PartInfo } from "./types/directives"
 // import type { Disconnectable } from "./types/html"
@@ -49,11 +49,140 @@ export declare const COMMENT_PART: 7
 // export declare const templateCache: WeakMap<TemplateStringsArray, Template>
 // export declare const walker: TreeWalker
 
+export type ResultType = typeof HTML_RESULT | typeof SVG_RESULT | typeof MATHML_RESULT
+/**
+ * Тип возвращаемого значения функций тегов шаблона {@linkcode html} и {@linkcode svg}
+ *
+ * Объект `TemplateResult` содержит всю информацию о шаблоне
+ * выражении, необходимую для его рендеринга: строки шаблона, значения выражений,
+ * и тип шаблона (html или svg).
+ *
+ * Объекты `TemplateResult` не создают DOM самостоятельно. Чтобы создать или
+ * обновить DOM, вам нужно будет рендерить `TemplateResult`.
+ */
+export type UncompiledTemplateResult<T extends ResultType = ResultType> = {
+  ["_$htmlType$"]: T
+  strings: TemplateStringsArray
+  values: unknown[]
+}
+/**
+ * Это шаблонный результат, который может быть либо нескопированным, либо скомпилированным.
+ *
+ * В будущем TemplateResult будет этот тип. Если вы хотите явно отметить, что шаблонный результат потенциально скомпилирован, вы можете ссылаться на этот
+ * тип, и он будет продолжать вести себя так же через следующую основную версию @pkg/html. Это может быть полезно для кода, который хочет подготовиться к следующей
+ * основной версии @pkg/html.
+ */
+export type MaybeCompiledTemplateResult<T extends ResultType = ResultType> =
+  | UncompiledTemplateResult<T>
+  | CompiledTemplateResult
+/**
+ * Тип возвращаемого значения функций тегов шаблона {@linkcode html} и {@linkcode svg}.
+ *
+ * Объект `TemplateResult` содержит всю информацию о шаблоне
+ * выражении, необходимое для его рендеринга: строки шаблона, значения выражений,
+ * и тип шаблона (html или svg).
+ *
+ * Объекты `TemplateResult` не создают DOM самостоятельно. Чтобы создать или
+ * обновить DOM, вам нужно будет рендерить `TemplateResult`.
+ *
+ * MaybeCompiledTemplateResult, так что код получит ошибки типа, если он предполагает,
+ * что шаблоны @pkg/html не скомпилированы. Когда работает с одним из них, используйте
+ * либо {@linkcode CompiledTemplateResult}, либо {@linkcode UncompiledTemplateResult} явно.
+ */
+export type TemplateResult<T extends ResultType = ResultType> = UncompiledTemplateResult<T>
+export type HTMLTemplateResult = TemplateResult<typeof HTML_RESULT>
+export type SVGTemplateResult = TemplateResult<typeof SVG_RESULT>
+export type MathMLTemplateResult = TemplateResult<typeof MATHML_RESULT>
+
+/**
+ * Интерфейс, описывающий результат скомпилированного шаблона.
+ *
+ */
+export interface CompiledTemplateResult {
+  // Это фабрика, чтобы сделать инициализацию шаблона ленивой
+  // и позволить ShadyRenderOptions scope быть переданным.
+  // Это свойство должно оставаться неминифицированным.
+  ["_$htmlType$"]: CompiledTemplate
+  values: unknown[]
+}
+
+export interface Template {
+
+}
+
+export interface CompiledTemplate extends Omit<Template, "el"> {
+  // Переопределен el как необязательный. Инициализируем его при первом рендеринге
+  el?: HTMLTemplateElement
+  // Подготовленная HTML-строка для создания элемента шаблона.
+  // Тип является TemplateStringsArray, чтобы гарантировать, что значение пришло из
+  // исходного кода, предотвращая атаку внедрения JSON.
+  h: TemplateStringsArray
+}
+
+/**
+ * DirectiveParent - тип, описывающий классы с полями для директив:
+ *
+ * Используется в функции resolveDirective.
+ *
+ * @property _$parent - родительский элемент директивы (опционально)
+ * @property _$isConnected - флаг, указывающий, подключен ли элемент к DOM
+ * @property __directive - одиночная директива (опционально)
+ * @property __directives - массив директив (опционально)
+ */
+export interface DirectiveParent {
+  _$parent?: DirectiveParent;
+  _$isConnected: boolean;
+  __directive?: Directive;
+  __directives?: (Directive | undefined)[];
+}
+
+/**
+ * Объект, указывающий параметры для контроля рендеринга @pkg/html. Обратите внимание, что
+ * хотя `render` может быть вызван несколько раз на одном и том же `container` (и
+ * `renderBefore` узел ссылки) для эффективного обновления содержимого,
+ * только параметры, переданные при первом рендеринге, учитываются в течение
+ * всего времени рендеринга для этой уникальной комбинации `container` + `renderBefore`.
+ */
+export interface RenderOptions {
+  /** Объект для использования в качестве `this` для обработчиков событий. Часто
+   * полезно установить это значение равным хосту компонента, который рендерит шаблон. */
+  host?: object
+  /** DOM узел перед которым будет отрисован контент в контейнере. */
+  renderBefore?: ChildNode | null
+  /** Узел, используемый для клонирования шаблона (`importNode` будет вызван на этом узле).
+   * Это контролирует `ownerDocument` отрисованного DOM, а также любой наследуемый контекст.
+   * По умолчанию используется глобальный `document`. */
+  creationScope?: { importNode(node: Node, deep?: boolean): Node }
+  /**
+   * Начальное состояние подключения для верхнего уровня части, которая отрисовывается.
+   * Если не установлен параметр `isConnected`, `AsyncDirective`s будут подключены по умолчанию.
+   * Установите значение `false`, если начальный рендеринг происходит в отключенном дереве
+   * и `AsyncDirective`s должны увидеть `isConnected === false` для их начального рендеринга.
+   * Метод `part.setConnected()` должен быть использован после начального рендеринга, чтобы изменить состояние подключения части.
+   */
+  isConnected?: boolean
+}
+
+export type EventListenerWithOptions = EventListenerOrEventListenerObject & Partial<AddEventListenerOptions>
+
+export interface Disconnectable {
+  _$parent?: Disconnectable
+  _$disconnectableChildren?: Set<Disconnectable>
+  // Вместо хранения состояния подключения на экземплярах, Disconnectables рекурсивно
+  // получают состояние подключения от RootPart, к которому они подключены, через
+  // геттеры вверх по дереву Disconnectable через ссылки _$parent. Это перекладывает
+  // стоимость отслеживания состояния isConnected на `AsyncDirectives` и избавляет
+  // от необходимости передавать всем Disconnectables (частям, экземплярам шаблонов и
+  // директивам) их состояние подключения каждый раз при его изменении, что было бы
+  // затратно для деревьев без AsyncDirectives.
+  _$isConnected: boolean
+}
+
 /**
  * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.
  */
 export type TagFunction = <T extends ResultType>(
-    type: T
+  type: T
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
 
 /**
@@ -79,9 +208,9 @@ export type TagFunction = <T extends ResultType>(
  * @param [options] - См. документацию {@linkcode RenderOptions} для параметров.
  */
 export declare function render(
-    value: any,
-    container: HTMLElement | DocumentFragment,
-    options?: RenderOptions,
+  value: any,
+  container: HTMLElement | DocumentFragment,
+  options?: RenderOptions,
 ): ChildPart
 
 /**
@@ -220,220 +349,224 @@ export declare function mathml(strings: TemplateStringsArray, ...values: any[]):
  * Экземпляр шаблона.
  */
 export declare class TemplateInstance {
-    _$parts: (ChildPart | AttributePart | ElementPart)[]
-    _$disconnectableChildren?: Set<Disconnectable>
+  _$parts: (ChildPart | AttributePart | ElementPart)[]
+  _$disconnectableChildren?: Set<Disconnectable>
 
-    constructor(template: Template, parent: ChildPart)
+  constructor(template: Template, parent: ChildPart)
 
-    get parentNode(): Node
+  get parentNode(): Node
 
-    get _$isConnected(): boolean
+  get _$isConnected(): boolean
 
-    _clone(options?: RenderOptions): DocumentFragment
+  _clone(options?: RenderOptions): DocumentFragment
 
-    _update(values: unknown[]): void
+  _update(values: unknown[]): void
 }
 
 /**
  * Часть для дочерних элементов.
  */
 export declare class ChildPart {
-    type: CHILD_PART
-    // _$parent?: Disconnectable
-    // _$disconnectableChildren?: Set<Disconnectable>
+  type: typeof CHILD_PART
+  // _$parent?: Disconnectable
+  // _$disconnectableChildren?: Set<Disconnectable>
 
-    _$committedValue: unknown
-    _textSanitizer: ValueSanitizer | undefined
-    _$parent: Disconnectable | undefined
-    _$disconnectableChildren: Set<Disconnectable> | undefined
-    _$notifyConnectionChanged?: (isConnected: boolean, removeFromParent?: boolean, from?: number) => void
-    _$reparentDisconnectables?: (parent: Disconnectable) => void
+  _$committedValue: unknown
+  _textSanitizer: ValueSanitizer | undefined
+  _$parent: Disconnectable | undefined
+  _$disconnectableChildren: Set<Disconnectable> | undefined
+  _$notifyConnectionChanged?: (isConnected: boolean, removeFromParent?: boolean, from?: number) => void
+  _$reparentDisconnectables?: (parent: Disconnectable) => void
 
-    /**
-     * ChildParts, которые не находятся на верхнем уровне, всегда создаются с родителем;
-     * только RootChildNode 's не будут, поэтому они возвращают локальное состояние isConnected
-     */
-    get _$isConnected(): boolean
+  /**
+   * ChildParts, которые не находятся на верхнем уровне, всегда создаются с родителем;
+   * только RootChildNode 's не будут, поэтому они возвращают локальное состояние isConnected
+   */
+  get _$isConnected(): boolean
 
-    constructor(startNode: ChildNode, endNode: ChildNode | null, parent?: TemplateInstance | ChildPart, options?: RenderOptions)
+  constructor(startNode: ChildNode, endNode: ChildNode | null, parent?: TemplateInstance | ChildPart, options?: RenderOptions)
 
-    /**
-     * Родительский узел, в который часть рендерит свое содержимое.
-     *
-     * Содержимое ChildPart состоит из диапазона смежных дочерних узлов
-     * `.parentNode`, возможно ограниченных 'маркерными узлами' (`.startNode` и
-     * `.endNode`).
-     *
-     * - Если и `.startNode`, и `.endNode` не равны null, то содержимое части
-     * состоит из всех узлов между `.startNode` и `.endNode`, не включая их.
-     *
-     * - Если `.startNode` не равен null, но `.endNode` равен null, то содержимое
-     * части состоит из всех узлов после `.startNode`, включая последний дочерний
-     * узел `.parentNode`. Если `.endNode` не равен null, то `.startNode` всегда
-     * будет не равен null.
-     *
-     * - Если и `.endNode`, и `.startNode` равны null, то содержимое части
-     * состоит из всех дочерних узлов `.parentNode`.
-     */
-    get parentNode(): Node
+  /**
+   * Родительский узел, в который часть рендерит свое содержимое.
+   *
+   * Содержимое ChildPart состоит из диапазона смежных дочерних узлов
+   * `.parentNode`, возможно ограниченных 'маркерными узлами' (`.startNode` и
+   * `.endNode`).
+   *
+   * - Если и `.startNode`, и `.endNode` не равны null, то содержимое части
+   * состоит из всех узлов между `.startNode` и `.endNode`, не включая их.
+   *
+   * - Если `.startNode` не равен null, но `.endNode` равен null, то содержимое
+   * части состоит из всех узлов после `.startNode`, включая последний дочерний
+   * узел `.parentNode`. Если `.endNode` не равен null, то `.startNode` всегда
+   * будет не равен null.
+   *
+   * - Если и `.endNode`, и `.startNode` равны null, то содержимое части
+   * состоит из всех дочерних узлов `.parentNode`.
+   */
+  get parentNode(): Node
 
-    /**
-     * Маркерный узел, ведущий часть, если таковые имеются. См. `.parentNode` для более подробной информации.
-     */
-    get startNode(): ChildNode
+  /**
+   * Маркерный узел, ведущий часть, если таковые имеются. См. `.parentNode` для более подробной информации.
+   */
+  get startNode(): ChildNode
 
-    /**
-     * Маркерный узел, завершающий часть, если таковые имеются. См. `.parentNode` для более подробной информации.
-     */
-    get endNode(): ChildNode | null
+  /**
+   * Маркерный узел, завершающий часть, если таковые имеются. См. `.parentNode` для более подробной информации.
+   */
+  get endNode(): ChildNode | null
 
-    _$setValue(value: unknown, directiveParent: DirectiveParent): void
+  _$setValue(value: unknown, directiveParent: DirectiveParent): void
 
-    /** @private**/
-    _insert<T extends Node>(node: T): T
+  /** @private**/
+  _insert<T extends Node>(node: T): T
 
-    /** @private**/
-    _commitNode(value: Node): void
+  /** @private**/
+  _commitNode(value: Node): void
 
-    /** @private
-     @param {unknown} value - Значение
-     **/
-    _commitText(value: unknown): void
+  /** @private
+   @param {unknown} value - Значение
+   **/
+  _commitText(value: unknown): void
 
-    /**
-     @private
-     @param result - Шаблон или скомпилированный шаблон
-     **/
-    _commitTemplateResult(result: TemplateResult<any> | CompiledTemplateResult): void
+  /**
+   @private
+   @param result - Шаблон или скомпилированный шаблон
+   **/
+  _commitTemplateResult(result: TemplateResult<any> | CompiledTemplateResult): void
 
-    /**
-     Переопределяется через `HtmlPolyfillSupport` для обеспечения платформенной поддержки.
-     @internal
-     @param {UncompiledTemplateResult} result - Нескомпилированный шаблон
-     */
-    _$getTemplate(result: UncompiledTemplateResult): Template
+  /**
+   Переопределяется через `HtmlPolyfillSupport` для обеспечения платформенной поддержки.
+   @internal
+   @param {UncompiledTemplateResult} result - Нескомпилированный шаблон
+   */
+  _$getTemplate(result: UncompiledTemplateResult): Template
 
-    /** @private**/
-    _commitIterable(value: Iterable<unknown>): void
+  /** @private**/
+  _commitIterable(value: Iterable<unknown>): void
 
-    /**
-     Удаляет узлы, содержащиеся в этой части, из DOM.
-     @param start - Начальный узел, с которого начинается очистка, для очистки подмножества DOM части (используется при усечении итерируемых объектов).
-     @param from - Когда указан `start`, индекс в итерируемом объекте, с которого удаляются ChildParts, используется для отключения директив в этих частях.
-     */
-    _$clear(start?: ChildNode | null, from?: number): void
+  /**
+   Удаляет узлы, содержащиеся в этой части, из DOM.
+   @param start - Начальный узел, с которого начинается очистка, для очистки подмножества DOM части (используется при усечении итерируемых объектов).
+   @param from - Когда указан `start`, индекс в итерируемом объекте, с которого удаляются ChildParts, используется для отключения директив в этих частях.
+   */
+  _$clear(start?: ChildNode | null, from?: number): void
 
-    /**
-     Реализация `isConnected` для RootPart. Обратите внимание, что этот метод
-     должен вызываться только для `RootPart` (объект `ChildPart`, возвращаемый из
-     вызова `render()` верхнего уровня). Он не имеет эффекта для не-корневых ChildParts.
+  /**
+   Реализация `isConnected` для RootPart. Обратите внимание, что этот метод
+   должен вызываться только для `RootPart` (объект `ChildPart`, возвращаемый из
+   вызова `render()` верхнего уровня). Он не имеет эффекта для не-корневых ChildParts.
 
-     @param {boolean} isConnected - Устанавливаемое значение
-     @internal
-     */
-    setConnected(isConnected: boolean): void
+   @param {boolean} isConnected - Устанавливаемое значение
+   @internal
+   */
+  setConnected(isConnected: boolean): void
 }
 
 /** Часть для атрибутов. */
-export declare class AttributePart {
-    type: typeof ATTRIBUTE_PART
-    element: HTMLElement
-    name: string
+export declare class AttributePart implements Disconnectable {
+  readonly type:
+    | typeof ATTRIBUTE_PART
+    | typeof PROPERTY_PART
+    | typeof BOOLEAN_ATTRIBUTE_PART
+    | typeof EVENT_PART
+  element: HTMLElement
+  name: string
+  options?: RenderOptions
+  /**
+   Если этот атрибут часть представляет собой интерполяцию, это содержит статические строки интерполяции.
+   Для однозначных, полных привязок это undefined.
+   */
+  strings?: ReadonlyArray<string>
+  _$committedValue: unknown | unknown[]
+  // _$disconnectableChildren?: Set<Disconnectable>
+  // _sanitizer?: (value: unknown) => unknown
+  // _$parent: Disconnectable
+  /**
+   * @param element - Элемент
+   * @param name - Имя
+   * @param strings - Строки
+   * @param parent - Родитель
+   * @param options - Опции
+   */
+  constructor(
+    element: HTMLElement,
+    name: string,
+    strings: ReadonlyArray<string>,
+    parent: Disconnectable,
     options?: RenderOptions
-    /**
-     Если этот атрибут часть представляет собой интерполяцию, это содержит статические строки интерполяции.
-     Для однозначных, полных привязок это undefined.
-     */
-    strings?: ReadonlyArray<string>
-    _$committedValue: unknown | unknown[]
-    // _$disconnectableChildren?: Set<Disconnectable>
-    // _sanitizer?: (value: unknown) => unknown
-    // _$parent: Disconnectable
-    /**
-     * @param element - Элемент
-     * @param name - Имя
-     * @param strings - Строки
-     * @param parent - Родитель
-     * @param options - Опции
-     */
-    constructor(
-        element: HTMLElement,
-        name: string,
-        strings: ReadonlyArray<string>,
-        parent: Disconnectable,
-        options?: RenderOptions
-    )
+  )
 
-    get tagName(): string
+  get tagName(): string
 
-    /**
-     * Устанавливает значение этой части путем разрешения значения из возможно нескольких
-     * значений и статических строк и фиксирует его в DOM.
-     * Если эта часть однозначная, `this._strings` будет undefined, и метод
-     * будет вызван с одним аргументом значения. Если эта часть
-     * многозначная, `this._strings` будет определен, и метод вызывается
-     * с массивом значений владеющего TemplateInstance части и смещением
-     * в массиве значений, с которого следует читать значения.
-     * Метод перегружен таким образом, чтобы исключить короткоживущие срезы массива
-     * значений экземпляра шаблона и обеспечить быстрый путь для однозначных
-     * частей.
-     *
-     * @param  value - Значение части или массив значений для многозначных частей
-     * @param directiveParent - Экземпляр директивы, которая вызывает этот метод
-     * @param [valueIndex=0] - индекс для начала чтения значений. `undefined` для однозначных частей
-     * @param [noCommit] - заставляет часть не фиксировать свое значение в DOM. Используется
-     *   при гидратации для подготовки частей атрибутов с их первым отрендеренным значением,
-     *   но не устанавливает атрибут, а в SSR для no-op DOM операции и
-     *   захвата значения для сериализации.
-     */
-    _$setValue(value: unknown | unknown[], directiveParent?: DirectiveParent, valueIndex?: number = 0, noCommit?: boolean): void
+  /**
+   * Устанавливает значение этой части путем разрешения значения из возможно нескольких
+   * значений и статических строк и фиксирует его в DOM.
+   * Если эта часть однозначная, `this._strings` будет undefined, и метод
+   * будет вызван с одним аргументом значения. Если эта часть
+   * многозначная, `this._strings` будет определен, и метод вызывается
+   * с массивом значений владеющего TemplateInstance части и смещением
+   * в массиве значений, с которого следует читать значения.
+   * Метод перегружен таким образом, чтобы исключить короткоживущие срезы массива
+   * значений экземпляра шаблона и обеспечить быстрый путь для однозначных
+   * частей.
+   *
+   * @param  value - Значение части или массив значений для многозначных частей
+   * @param directiveParent - Экземпляр директивы, которая вызывает этот метод
+   * @param [valueIndex=0] - индекс для начала чтения значений. `undefined` для однозначных частей
+   * @param [noCommit] - заставляет часть не фиксировать свое значение в DOM. Используется
+   *   при гидратации для подготовки частей атрибутов с их первым отрендеренным значением,
+   *   но не устанавливает атрибут, а в SSR для no-op DOM операции и
+   *   захвата значения для сериализации.
+   */
+  _$setValue(value: unknown | unknown[], directiveParent?: DirectiveParent, valueIndex?: number, noCommit?: boolean): void
 
-    _commitValue(value: unknown): void
+  _commitValue(value: unknown): void
 
-    get _$isConnected(): boolean
+  get _$isConnected(): boolean
 }
 
 /** Часть для свойств. */
 export declare class PropertyPart extends AttributePart {
-    type: typeof PROPERTY_PART
+  override readonly type: typeof PROPERTY_PART
 
-    _commitValue(value: unknown): void
+  _commitValue(value: unknown): void
 }
 
 /** Часть для булевых атрибутов. */
 export declare class BooleanAttributePart extends AttributePart {
-    type: typeof BOOLEAN_ATTRIBUTE_PART
+  type: typeof BOOLEAN_ATTRIBUTE_PART
 
 
-    _commitValue(value: unknown): void
+  _commitValue(value: unknown): void
 }
 
 /** Часть для событий. */
 export declare class EventPart extends AttributePart {
-    type: typeof EVENT_PART
+  type: typeof EVENT_PART
 
-    constructor(element: HTMLElement, name: string, strings: ReadonlyArray<string>, parent: Disconnectable, options?: RenderOptions)
+  constructor(element: HTMLElement, name: string, strings: ReadonlyArray<string>, parent: Disconnectable, options?: RenderOptions)
 
-    _$setValue(newListener: unknown, directiveParent?: DirectiveParent): void
+  _$setValue(newListener: unknown, directiveParent?: DirectiveParent): void
 
-    handleEvent(event: Event): void
+  handleEvent(event: Event): void
 }
 
 /** Часть для элементов. */
 export declare class ElementPart {
-    type: typeof ELEMENT_PART
-    _$committedValue: undefined
-    _$disconnectableChildren?: Set<Disconnectable>
+  type: typeof ELEMENT_PART
+  _$committedValue: undefined
+  _$disconnectableChildren?: Set<Disconnectable>
 
-    constructor(element: Element, parent: Disconnectable, options?: RenderOptions)
+  constructor(element: Element, parent: Disconnectable, options?: RenderOptions)
 
-    get _$isConnected(): boolean
+  get _$isConnected(): boolean
 
-    _$setValue(value: unknown): void
+  _$setValue(value: unknown): void
 
-    _$parent: Disconnectable | undefined
-    options: RenderOptions | undefined
-    element: Element
+  _$parent: Disconnectable | undefined
+  options: RenderOptions | undefined
+  element: Element
 }
 
 // /**
@@ -496,12 +629,12 @@ export declare class ElementPart {
 //   readonly strings?: ReadonlyArray<string>
 // }
 export type Part =
-    | ChildPart
-    | AttributePart
-    | PropertyPart
-    | BooleanAttributePart
-    | ElementPart
-    | EventPart
+  | ChildPart
+  | AttributePart
+  | PropertyPart
+  | BooleanAttributePart
+  | ElementPart
+  | EventPart
 // // Добавляем тип для RefDirective
 // export interface RefDirective {
 //   (ref: (el: Element | undefined) => void): unknown

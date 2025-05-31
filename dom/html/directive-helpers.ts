@@ -1,13 +1,15 @@
 // @ts-nocheck
 import {_$LH} from "./ssr.js"
-import type {
-    CompiledTemplateResult,
-    DirectiveParent,
-    MaybeCompiledTemplateResult,
-    UncompiledTemplateResult
-} from "./types/html.js"
 import type {DirectiveClass, DirectiveResult} from "./directives"
-import type {AttributePart, BooleanAttributePart, ElementPart, EventPart, PropertyPart} from "./html"
+import type {
+  AttributePart,
+  BooleanAttributePart,
+  CompiledTemplateResult,
+  DirectiveParent,
+  ElementPart,
+  EventPart, MaybeCompiledTemplateResult,
+  PropertyPart, UncompiledTemplateResult
+} from "./html"
 
 type Primitive = null | undefined | boolean | number | string | symbol | bigint;
 
