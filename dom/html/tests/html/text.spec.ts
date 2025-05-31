@@ -1,6 +1,5 @@
 import {beforeEach, describe, expect, test} from "bun:test"
-import {html, noChange} from "../../html.js"
-import { nothing} from "../../html.js"
+import {html, noChange, nothing} from "../../html.js"
 import {render} from "../../html.js"
 
 describe("text", () => {

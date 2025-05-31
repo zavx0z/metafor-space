@@ -1,5 +1,5 @@
 import { afterAll } from "bun:test"
-import { type BroadcastMessage } from "../index"
+import { type BroadcastMessage } from "../metafor"
 
 export const messagesFixture = (options?: {
   particle: string

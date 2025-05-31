@@ -40,7 +40,7 @@
 }
 //   "typedocOptions": {
 //     "entryPoints": [
-//       "./types/index.d.ts"
+//       "./types/metafor.d.ts"
 //     ],
 //     "plugin": [
 //       "typedoc-plugin-include-example"

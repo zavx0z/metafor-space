@@ -1,5 +1,5 @@
 import {describe, test, expect, beforeEach} from "bun:test"
-import {noChange, render, html, nothing} from "../../html"
+import {render, html, noChange, nothing} from "../../html"
 import type {CompiledTemplateResult, RenderOptions} from "../../types/html"
 import type {TemplateResult} from "../../types/html"
 

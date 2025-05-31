@@ -1,5 +1,3 @@
-import type {DirectiveClass, DirectiveParameters, DirectiveResult} from "./directive.ts"
-import type {RepeatDirectiveFn} from "./directives/repeat.ts"
 import type {TemplateResult} from "./html";
 
 declare global {
@@ -51,43 +49,5 @@ declare global {
      * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<1>}
      */
     export type HTML = (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<1>
-
-    /**
-     * Создает пользовательскую функцию директивы из класса Directive. Эта
-     * функция имеет те же параметры, что и метод render() директивы.
-     */
-    function directive<C extends DirectiveClass>(c: C): (...values: DirectiveParameters<InstanceType<C>>) => DirectiveResult<C>
-    /**
-     * Директива, которая повторяет последовательность значений (обычно `TemplateResults`),
-     * сгенерированных из итерируемого объекта, и эффективно обновляет эти элементы
-     * при изменении итератора на основе предоставленных пользователем `keys`,
-     * ассоциированных с каждым элементом.
-     *
-     * Заметьте, что если предоставлена функция `keyFn`, сохраняется строгая привязка ключей к DOM,
-     * что означает, что предыдущий DOM для данного ключа перемещается в новую позицию при необходимости,
-     * и DOM никогда не будет повторно использован с другими значениями ключей (для новых ключей всегда
-     * создаётся новый DOM). Это, как правило, наиболее эффективный способ использования `repeat`,
-     * поскольку он минимизирует лишние операции вставки и удаления.
-     *
-     * Функция `keyFn` принимает два параметра: элемент и его индекс, и возвращает уникальное значение ключа.
-     *
-     * ```js
-     * html`
-     *   <ol>
-     *     ${repeat(this.items, (item) => item.id, (item, index) => {
-     *       return html`<li>${index}: ${item.name}</li>`;
-     *     })}
-     *   </ol>
-     * `
-     * ```
-     *
-     * **Важно**: Если предоставляется функция `keyFn`, ключи *обязаны* быть уникальными для всех элементов
-     * в данном вызове `repeat`. Поведение в случае, если два или более элемента имеют одинаковый ключ,
-     * не определено.
-     *
-     * Если `keyFn` не предоставлена, эта директива будет работать аналогично маппингу элементов на значения,
-     * и DOM будет переиспользоваться для потенциально разных элементов.
-     */
-    const repeat: RepeatDirectiveFn
 }
 export {}

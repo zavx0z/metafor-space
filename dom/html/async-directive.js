@@ -1,6 +1,6 @@
 /**
  * @typedef {import("./types/html").Disconnectable} Disconnectable
- * @typedef {import("./types/directive.ts").PartInfo} PartInfo
+ * @typedef {import("./directive").PartInfo} PartInfo
  * @typedef {import("./html").AttributePart} AttributePart
  @typedef {import("./html").ChildPart} ChildPart
  @typedef {import("./html").PropertyPart} PropertyPart
@@ -29,17 +29,17 @@ export {Directive, directive}
  * @return {boolean} True, если найдены дочерние элементы для уведомления
  */
 const notifyChildrenConnectedChanged = (parent, isConnected) => {
-    const children = parent._$disconnectableChildren
-    if (children === undefined) {
-        return false
-    }
-    for (const obj of children) {
-        // Используем необязательный вызов, чтобы вызвать метод, если он есть
-        /** @type {import("./async-directive.js").AsyncDirective} */ (obj)["_$notifyDirectiveConnectionChanged"]?.(isConnected, false)
-        // Рекурсивно уведомляем дочерние объекты
-        notifyChildrenConnectedChanged(obj, isConnected)
-    }
-    return true
+  const children = parent._$disconnectableChildren
+  if (children === undefined) {
+    return false
+  }
+  for (const obj of children) {
+    // Используем необязательный вызов, чтобы вызвать метод, если он есть
+    /** @type {import("./async-directive.js").AsyncDirective} */ (obj)["_$notifyDirectiveConnectionChanged"]?.(isConnected, false)
+    // Рекурсивно уведомляем дочерние объекты
+    notifyChildrenConnectedChanged(obj, isConnected)
+  }
+  return true
 }
 
 /**
@@ -49,18 +49,18 @@ const notifyChildrenConnectedChanged = (parent, isConnected) => {
  * @param {ExtendedDisconnectable} obj Объект для удаления из родительского списка
  */
 const removeDisconnectableFromParent = (obj) => {
-    let parent, children
-    do {
-        parent = obj._$parent
-        if (parent === undefined) {
-            break
-        }
-        children = parent._$disconnectableChildren
-        if (children) {
-            children.delete(obj)
-        }
-        obj = parent
-    } while (children && children.size === 0)
+  let parent, children
+  do {
+    parent = obj._$parent
+    if (parent === undefined) {
+      break
+    }
+    children = parent._$disconnectableChildren
+    if (children) {
+      children.delete(obj)
+    }
+    obj = parent
+  } while (children && children.size === 0)
 }
 
 /**
@@ -69,18 +69,18 @@ const removeDisconnectableFromParent = (obj) => {
  * @param {ExtendedDisconnectable} obj Объект для добавления к родителю
  */
 const addDisconnectableToParent = (obj) => {
-    for (let parent; (parent = obj._$parent); obj = parent) {
-        let children = parent._$disconnectableChildren
-        if (children === undefined) {
-            parent._$disconnectableChildren = new Set()
-            children = parent._$disconnectableChildren
-        } else if (children.has(obj)) {
-            // Если родитель уже содержит этого потомка, прерываем процесс
-            break
-        }
-        children.add(obj)
-        installDisconnectAPI(/** @type {ChildPart & ExtendedDisconnectable} */ (parent))
+  for (let parent; (parent = obj._$parent); obj = parent) {
+    let children = parent._$disconnectableChildren
+    if (children === undefined) {
+      parent._$disconnectableChildren = new Set()
+      children = parent._$disconnectableChildren
+    } else if (children.has(obj)) {
+      // Если родитель уже содержит этого потомка, прерываем процесс
+      break
     }
+    children.add(obj)
+    installDisconnectAPI(/** @type {ChildPart & ExtendedDisconnectable} */ (parent))
+  }
 }
 
 /**
@@ -90,13 +90,13 @@ const addDisconnectableToParent = (obj) => {
  * @param {ExtendedDisconnectable} newParent Новый родитель для ChildPart
  */
 function reparentDisconnectables(newParent) {
-    if (this._$disconnectableChildren !== undefined) {
-        removeDisconnectableFromParent(this)
-        this._$parent = newParent
-        addDisconnectableToParent(this)
-    } else {
-        this._$parent = newParent
-    }
+  if (this._$disconnectableChildren !== undefined) {
+    removeDisconnectableFromParent(this)
+    this._$parent = newParent
+    addDisconnectableToParent(this)
+  } else {
+    this._$parent = newParent
+  }
 }
 
 /**
@@ -108,30 +108,30 @@ function reparentDisconnectables(newParent) {
  * @param {number} [fromPartIndex=0] Индекс начала для усечения
  */
 function notifyChildPartConnectedChanged(
-    isConnected,
-    isClearingValue = false,
-    fromPartIndex = 0
+  isConnected,
+  isClearingValue = false,
+  fromPartIndex = 0
 ) {
-    const value = this._$committedValue
-    const children = this._$disconnectableChildren
-    if (children === undefined || children.size === 0) {
-        return
+  const value = this._$committedValue
+  const children = this._$disconnectableChildren
+  if (children === undefined || children.size === 0) {
+    return
+  }
+  if (isClearingValue) {
+    if (Array.isArray(value)) {
+      // Если значение – итерируемый объект, отключаем его части начиная с fromPartIndex
+      for (let i = fromPartIndex; i < value.length; i++) {
+        notifyChildrenConnectedChanged(value[i], false)
+        removeDisconnectableFromParent(/** @type {ExtendedDisconnectable} */ (value[i]))
+      }
+    } else if (value != null) {
+      // Если значение – TemplateInstance, отключаем его целиком
+      notifyChildrenConnectedChanged(/** @type {ExtendedDisconnectable} */ (value), false)
+      removeDisconnectableFromParent(/** @type {ExtendedDisconnectable} */ (value))
     }
-    if (isClearingValue) {
-        if (Array.isArray(value)) {
-            // Если значение – итерируемый объект, отключаем его части начиная с fromPartIndex
-            for (let i = fromPartIndex; i < value.length; i++) {
-                notifyChildrenConnectedChanged(value[i], false)
-                removeDisconnectableFromParent(/** @type {ExtendedDisconnectable} */ (value[i]))
-            }
-        } else if (value != null) {
-            // Если значение – TemplateInstance, отключаем его целиком
-            notifyChildrenConnectedChanged(/** @type {ExtendedDisconnectable} */ (value), false)
-            removeDisconnectableFromParent(/** @type {ExtendedDisconnectable} */ (value))
-        }
-    } else {
-        notifyChildrenConnectedChanged(this, isConnected)
-    }
+  } else {
+    notifyChildrenConnectedChanged(this, isConnected)
+  }
 }
 
 /**
@@ -140,85 +140,90 @@ function notifyChildPartConnectedChanged(
  * @param {ChildPart & ExtendedDisconnectable} obj Объект для установки API отключения
  */
 const installDisconnectAPI = (obj) => {
-    if (obj.type == PartType.CHILD) {
-        obj._$notifyConnectionChanged = obj._$notifyConnectionChanged || notifyChildPartConnectedChanged
-        obj._$reparentDisconnectables = obj._$reparentDisconnectables || reparentDisconnectables
-    }
+  if (obj.type == PartType.CHILD) {
+    obj._$notifyConnectionChanged = obj._$notifyConnectionChanged || notifyChildPartConnectedChanged
+    obj._$reparentDisconnectables = obj._$reparentDisconnectables || reparentDisconnectables
+  }
 }
 
 /**
  * Директива, которая отслеживает подключение/отключение.
  */
 export class AsyncDirective extends Directive {
-    /**
-     * Состояние подключения для этой директивы.
-     * @type {boolean}
-     */
-    isConnected = false
+  /**
+   * Состояние подключения для этой директивы.
+   * @type {boolean}
+   */
+  isConnected = false
 
-    /**
-     * Список отключаемых потомков.
-     * @type {Set<Disconnectable>|undefined}
-     */
-    _$disconnectableChildren = undefined
+  /**
+   * Список отключаемых потомков.
+   * @type {Set<Disconnectable>|undefined}
+   */
+  _$disconnectableChildren = undefined
 
-    /**
-     * Инициализирует директиву с внутренними полями.
-     *
-     * @param {ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart} part Часть, к которой привязывается директива
-     * @param {ExtendedDisconnectable} parent Родительский объект
-     * @param {number|undefined} attributeIndex Индекс атрибута (если применимо)
-     */
-    _$initialize(part, parent, attributeIndex) {
-        super._$initialize(part, parent, attributeIndex)
-        addDisconnectableToParent(this)
-        this.isConnected = part._$isConnected ?? false
+  /**
+   * Инициализирует директиву с внутренними полями.
+   *
+   * @param {ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart} part Часть, к которой привязывается директива
+   * @param {ExtendedDisconnectable} parent Родительский объект
+   * @param {number|undefined} attributeIndex Индекс атрибута (если применимо)
+   */
+  _$initialize(part, parent, attributeIndex) {
+    super._$initialize(part, parent, attributeIndex)
+    addDisconnectableToParent(this)
+    this.isConnected = part._$isConnected ?? false
+  }
+
+  /**
+   * Уведомляет директиву об изменении состояния подключения.
+   *
+   * @param {boolean} isConnected Новое состояние подключения
+   * @param {boolean} [isClearingDirective=true] Флаг очистки директивы
+   */
+  _$notifyDirectiveConnectionChanged(isConnected, isClearingDirective = true) {
+    if (isConnected !== this.isConnected) {
+      this.isConnected = isConnected
+      if (isConnected) {
+        this.reconnected?.()
+      } else {
+        this.disconnected?.()
+      }
     }
-
-    /**
-     * Уведомляет директиву об изменении состояния подключения.
-     *
-     * @param {boolean} isConnected Новое состояние подключения
-     * @param {boolean} [isClearingDirective=true] Флаг очистки директивы
-     */
-    _$notifyDirectiveConnectionChanged(isConnected, isClearingDirective = true) {
-        if (isConnected !== this.isConnected) {
-            this.isConnected = isConnected
-            if (isConnected) {
-                this.reconnected?.()
-            } else {
-                this.disconnected?.()
-            }
-        }
-        if (isClearingDirective) {
-            notifyChildrenConnectedChanged(this, isConnected)
-            removeDisconnectableFromParent(this)
-        }
+    if (isClearingDirective) {
+      notifyChildrenConnectedChanged(this, isConnected)
+      removeDisconnectableFromParent(this)
     }
+  }
 
-    /**
-     * Устанавливает значение директивы вне обычного цикла обновления.
-     *
-     * @param {unknown} value Значение для установки
-     */
-    setValue(value) {
-        if (isSingleExpression(this.__part)) {
-            this.__part._$setValue(value, this)
-        } else {
-            if (DEV_MODE && this.__attributeIndex === undefined) {
-                throw new Error(`Ожидалось, что this.__attributeIndex будет числом`)
-            }
-            // Приводим _committedValue к массиву
-            const committedValue = /** @type {Array<unknown>} */ (this.__part._$committedValue)
-            const newValues = [...committedValue]
-            newValues[/** @type {number} */ (this.__attributeIndex)] = value
-            this.__part._$setValue(newValues, this)
-        }
+  /**
+   * Устанавливает значение директивы вне обычного цикла обновления.
+   *
+   * @param {unknown} value Значение для установки
+   */
+  setValue(value) {
+    if (isSingleExpression(this.__part)) {
+      this.__part._$setValue(value, this)
+    } else {
+      if (DEV_MODE && this.__attributeIndex === undefined) {
+        throw new Error(`Ожидалось, что this.__attributeIndex будет числом`)
+      }
+      // Приводим _committedValue к массиву
+      const committedValue = /** @type {Array<unknown>} */ (this.__part._$committedValue)
+      const newValues = [...committedValue]
+      newValues[/** @type {number} */ (this.__attributeIndex)] = value
+      this.__part._$setValue(newValues, this)
     }
+  }
 
-    disconnected() {
-    }
+  disconnected() {
+  }
 
-    reconnected() {
-    }
+  reconnected() {
+  }
+
+  /** @param {...unknown} props */
+  render(...props) {
+  }
+
 }

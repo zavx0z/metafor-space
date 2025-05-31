@@ -1,4 +1,4 @@
-import { Meta } from "../index.js"
+import { Meta } from "../metafor.js"
 
 /**
  @param {Record<string, any>} snapshot
@@ -18,7 +18,7 @@ export function validateSnapshot(snapshot) {
  @template {Record<string, unknown>} I
 
  @param {Record<string, any>} snapshot
- @returns {import('../index.js').Meta<S, C, I>}
+ @returns {import('../metafor.js').Meta<S, C, I>}
  */
 export function ParticleFromSnapshot(snapshot) {
   validateSnapshot(snapshot)

@@ -23,11 +23,11 @@
     "html template",
     "actor system"
   ],
-  "main": "index.js",
-  "module": "index.js",
-  "types": "index.d.ts",
+  "main": "metafor.js",
+  "module": "metafor.js",
+  "types": "metafor.d.ts",
   "files": [
-    "index.js",
+    "metafor.js",
     "types/*.d.ts",
     "validator",
     "types",
@@ -41,8 +41,8 @@
   ],
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "default": "./index.js"
+      "types": "./metafor.d.ts",
+      "default": "./metafor.js"
     },
     "./validator": "./validator/index.js",
     "./core/web/component": "./core/web/component.js"

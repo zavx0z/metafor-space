@@ -1,4 +1,4 @@
-import { MetaFor } from "../index.js"
+import { MetaFor } from "../metafor.js"
 import ELK from "elkjs"
 import { map } from "../dom/html/directives/map.js"
 

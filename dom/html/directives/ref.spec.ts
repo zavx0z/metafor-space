@@ -1,7 +1,7 @@
 import {describe, test, expect, beforeAll} from "bun:test"
-import {html, render} from "../../html.js"
-import {ref, createRef} from "../../directives/ref.js"
-import type {RefOrCallback} from "../../directives/ref.js"
+import {html, render} from "../html.js"
+import {ref, createRef} from "./ref.js"
+import type {RefOrCallback} from "./ref.t.ts"
 
 describe("ref", () => {
   let container: HTMLDivElement

@@ -5,7 +5,7 @@
  * @template {string} S - состояние частицы
  * @template {Record<string, any>} I - ядро частицы
  *
- * @param {import('../../index.js').MetaForParticle<S, C, I>} particle - Экземпляр частицы
+ * @param {import('../../metafor.js').MetaForParticle<S, C, I>} particle - Экземпляр частицы
  * @returns {Promise<HTMLElement>} Компонент графа
  */
 export default async function (particle) {

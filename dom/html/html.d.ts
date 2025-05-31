@@ -4,29 +4,6 @@ import type {Disconnectable, RenderOptions, ResultType, TemplateResult} from "./
 // import type { Disconnectable } from "./types/html"
 // import type { ChildPart, AttributePart, ElementPart, RootPart } from "./types/part"
 
-/**
- * Сигнальное значение, которое указывает ChildPart полностью очистить свое содержимое.
- *
- * ```ts
- * const button = html`${
- *  user.isAdmin
- *    ? html`<button>DELETE</button>`
- *    : nothing
- * }`;
- * ```
- *
- * Рекомендуется использовать `nothing` вместо других ложных значений, так как это обеспечивает
- * согласованное поведение между различными контекстами привязки выражений.
- *
- * В дочерних выражениях `undefined`, `null`, `''` и `nothing` ведут себя одинаково
- * и не отрисовывают узлы. В выражениях атрибутов `nothing` _удаляет_ атрибут,
- * в то время как `undefined` и `null` отрисуют пустую строку. В выражениях свойств
- * `nothing` становится `undefined`.
- */
-export declare const nothing = typeof Symbol.for("nothing")
-/** Символ, который сигнализирует, что значение было обработано директивой и не должно быть записано в DOM. */
-export declare const noChange = typeof Symbol.for("noChange")
-
 export declare const DEV_MODE: boolean
 // export declare const policy: TrustedTypePolicy | undefined
 // export declare const noopSanitizer: (node: Node, name: string, type: "property" | "attribute") => (value: unknown) => unknown
@@ -38,9 +15,11 @@ export declare const DEV_MODE: boolean
 // export declare const markerMatch: string
 // export declare const nodeMarker: string
 // export declare const createMarker: () => Comment
-// export declare const HTML_RESULT: 1
-// export declare const SVG_RESULT: 2
-// export declare const MATHML_RESULT: 3
+
+export declare const HTML_RESULT: 1
+export declare const SVG_RESULT: 2
+export declare const MATHML_RESULT: 3
+
 // export declare const ATTRIBUTE_PART: 1
 // export declare const CHILD_PART: 2
 // export declare const PROPERTY_PART: 3
@@ -167,32 +146,6 @@ export declare function svg(strings: TemplateStringsArray, ...values: unknown[])
  * и, следовательно, не будет правильно размещен внутри HTML-элемента `<math>`.
  */
 export declare function mathml(strings: TemplateStringsArray, ...values: any[]): TemplateResult<3>
-
-/**
- * Устанавливает значение объекта Ref или вызывает callback-функцию ref с привязанным
- * к ней элементом.
- *
- * Объект Ref действует как контейнер для ссылки на элемент. Callback-функция ref -
- * это функция, которая принимает элемент в качестве единственного аргумента.
- *
- * Директива ref устанавливает значение объекта Ref или вызывает callback-функцию ref
- * во время рендеринга, если связанный элемент изменился.
- *
- * Примечание: Если callback-функция ref рендерится в другую позицию элемента или
- * удаляется при последующем рендеринге, она сначала будет вызвана с `undefined`,
- * а затем с новым элементом, к которому она была привязана (если таковой имеется).
- *
- * @example
- * // Использование объекта Ref
- * const inputRef = createRef();
- * render(html`<input ${ref(inputRef)}>`, container);
- * inputRef.value.focus();
- *
- * // Использование callback-функции
- * const callback = (inputElement) => inputElement.focus();
- * render(html`<input ${ref(callback)}>`, container);
- */
-export type Reference = <T extends Element>(ref: (el: Element | undefined) => void) => RefDirective
 
 // /**
 //  * Создает безопасный HTML из строки шаблона.
@@ -551,3 +504,5 @@ export type Part =
 // export interface RefDirective {
 //   (ref: (el: Element | undefined) => void): unknown
 // }
+export {noChange} from "./html.t.ts";
+export {nothing} from "./html.t.ts";

@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, test} from "bun:test"
 
-import {render, html} from "./html"
-import {noChange, nothing} from "./html"
+import {render, html, noChange, nothing} from "./html"
 import {ChildPart, EventPart, ElementPart, AttributePart, PropertyPart, BooleanAttributePart} from "./html"
 import type {RenderOptions, CompiledTemplateResult, TemplateResult} from "./types/html"
 

@@ -85,9 +85,7 @@ export class Directive {
         return this.update(part, props)
     }
 
-    /**
-     * @param {...unknown} props
-     */
+    /** @param {...unknown} props */
     render(...props) {
     }
 

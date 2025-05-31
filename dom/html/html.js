@@ -1,37 +1,37 @@
 /**
- * @typedef {import("./types/index").TagEndRegex} TagEndRegex
- * @typedef {import("./types/directive.ts").DirectiveResult} DirectiveResult
- * @typedef {import("./types/directive.ts").PartInfo} PartInfo
- * @typedef {import("./types/part").RootPart} RootPart
- * @typedef {import("./types/part").TemplatePart} TemplatePart
+ @typedef {import("./directive").DirectiveResult} DirectiveResult
+ @typedef {import("./directive").PartInfo} PartInfo
+ @typedef {import("./directive").Directive} Directive
+ @typedef {import("./types/part").RootPart} RootPart
+ @typedef {import("./types/part").TemplatePart} TemplatePart
+ @typedef {import("./types/index").TagEndRegex} TagEndRegex
  *
- * @typedef {import("./types/html").CompiledTemplate} CompiledTemplate
- * @typedef {import("./types/html").CompiledTemplateResult} CompiledTemplateResult
- * @typedef {import("./types/html").DirectiveParent} DirectiveParent
- * @typedef {import("./types/html").Disconnectable} Disconnectable
- * @typedef {import("./types/html").EventListenerWithOptions} EventListenerWithOptions
- * @typedef {import("./types/html").RenderOptions} RenderOptions
- * @typedef {import("./types/html").ResultType} ResultType
- * @typedef {import("./types/html").UncompiledTemplateResult} UncompiledTemplateResult
+ @typedef {import("./types/html").CompiledTemplate} CompiledTemplate
+ @typedef {import("./types/html").CompiledTemplateResult} CompiledTemplateResult
+ @typedef {import("./types/html").DirectiveParent} DirectiveParent
+ @typedef {import("./types/html").Disconnectable} Disconnectable
+ @typedef {import("./types/html").EventListenerWithOptions} EventListenerWithOptions
+ @typedef {import("./types/html").RenderOptions} RenderOptions
+ @typedef {import("./types/html").ResultType} ResultType
+ @typedef {import("./types/html").UncompiledTemplateResult} UncompiledTemplateResult
  *
- * @typedef {import("./types/directive.ts").Directive} Directive
- * @typedef {import("trusted-types/lib").TrustedHTML} TrustedHTML
- * @typedef {import("trusted-types/lib").TrustedTypesWindow} TrustedTypesWindow
+ @typedef {import("trusted-types/lib").TrustedHTML} TrustedHTML
+ @typedef {import("trusted-types/lib").TrustedTypesWindow} TrustedTypesWindow
  */
 /**
- * @template {ResultType} T
- * @typedef {import("./types/html").TemplateResult<T>} TemplateResult
+ @template {ResultType} T
+ @typedef {import("./types/html").TemplateResult<T>} TemplateResult
  */
 export const DEV_MODE = true
 // Позволяет минификаторам переименовывать ссылки на globalThis
 const global = globalThis
 const trustedTypes = /** @type { TrustedTypePolicyFactory} */ (/** @type {any} */ (global).trustedTypes)
 /**
- * TrustedTypePolicy для HTML, которая объявляется с помощью функции тега шаблона html.
+ TrustedTypePolicy для HTML, которая объявляется с помощью функции тега шаблона html.
  *
- * Этот HTML является константой, написанной разработчиком, и парсится с помощью
- * innerHTML до того, как в него будут добавлены недоверенные выражения.
- * Поэтому он считается безопасным по построению.
+ Этот HTML является константой, написанной разработчиком, и парсится с помощью
+ innerHTML до того, как в него будут добавлены недоверенные выражения.
+ Поэтому он считается безопасным по построению.
  */
 export const policy = trustedTypes ? trustedTypes.createPolicy("meta-html", {createHTML: (s) => s}) : undefined
 /** @type {(_node: Node, _name: string, _type: "property" | "attribute") => (value: unknown) => unknown} */
@@ -46,17 +46,17 @@ export const isIterable = (value) =>
 /** Добавляется к имени атрибута, чтобы пометить атрибут как привязанный, чтобы мы могли легко его найти. */
 export const boundAttributeSuffix = "$html$"
 /**
- * Этот маркер используется во многих синтаксических позициях в HTML, поэтому он должен быть
- * допустимым именем элемента и атрибута. Пока не поддерживаются динамические имена,
- * но это как минимум гарантирует, что дерево разбора ближе к намерению шаблона.
+ Этот маркер используется во многих синтаксических позициях в HTML, поэтому он должен быть
+ допустимым именем элемента и атрибута. Пока не поддерживаются динамические имена,
+ но это как минимум гарантирует, что дерево разбора ближе к намерению шаблона.
  */
 export const marker = `html$${Math.random().toFixed(9).slice(2)}$`
 /** Строка, используемая для определения, является ли комментарий маркерным комментарием */
 export const markerMatch = "?" + marker
 /**
- * Текст, используемый для вставки маркерного узла комментария.
- * Мы используем синтаксис инструкции по обработке,
- * потому что он немного меньше, но парсится как узел комментария.
+ Текст, используемый для вставки маркерного узла комментария.
+ Мы используем синтаксис инструкции по обработке,
+ потому что он немного меньше, но парсится как узел комментария.
  */
 export const nodeMarker = `<${markerMatch}>`
 export const d = /** @type {Document} */ (
@@ -82,14 +82,15 @@ export const BOOLEAN_ATTRIBUTE_PART = 4
 export const EVENT_PART = 5
 export const ELEMENT_PART = 6
 export const COMMENT_PART = 7
+
 export const SPACE_CHAR = `[ \t\n\f\r]`
 export const ATTR_VALUE_CHAR = `[^ \t\n\f\r"'\`<>=]`
 export const NAME_CHAR = `[^\\s"'>=/]`
 /**
- * Конец текста это: `<` за которым следует:
- * - [начало комментария]
- * - или [тег]
- * - или [динамическая привязка тега]
+ Конец текста это: `<` за которым следует:
+ - [начало комментария]
+ - или [тег]
+ - или [динамическая привязка тега]
  */
 export const textEndRegex = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g
 export const COMMENT_START = 1
@@ -109,28 +110,28 @@ export const QUOTE_CHAR = 3
 export const singleQuoteAttrEndRegex = /'/g
 export const doubleQuoteAttrEndRegex = /"/g
 /**
- * Соответствует необработанным текстовым элементам.
- * Комментарии не анализируются в необработанных текстовых элементах,
- * поэтому нам нужно искать в их текстовом контенте строки маркеров.
+ Соответствует необработанным текстовым элементам.
+ Комментарии не анализируются в необработанных текстовых элементах,
+ поэтому нам нужно искать в их текстовом контенте строки маркеров.
  */
 export const rawTextElement = /^(?:script|style|textarea|title)$/i
 export const nothing = Symbol.for("nothing")
 export const noChange = Symbol.for("noChange")
 /**
- * Кэш подготовленных шаблонов, ключей по массиву TemplateStringsArray и не учитывая конкретный тег шаблона.
- * Это означает, что теги шаблонов не могут быть динамическими - они должны быть статическими и равными html, svg, или attr.
- * Это ограничение упрощает поиск в кэше, который находится на горячем пути рендеринга.
+ Кэш подготовленных шаблонов, ключей по массиву TemplateStringsArray и не учитывая конкретный тег шаблона.
+ Это означает, что теги шаблонов не могут быть динамическими - они должны быть статическими и равными html, svg, или attr.
+ Это ограничение упрощает поиск в кэше, который находится на горячем пути рендеринга.
  *
- * @type {WeakMap<TemplateStringsArray, Template>}
+ @type {WeakMap<TemplateStringsArray, Template>}
  */
 export const templateCache = new WeakMap()
 export const walker = d.createTreeWalker(d, 129 /* NodeFilter.SHOW_{ELEMENT|COMMENT} */)
 
 /**
  *
- * @param {TemplateStringsArray} tsa
- * @param {string} stringFromTSA
- * @returns {TrustedHTML}
+ @param {TemplateStringsArray} tsa
+ @param {string} stringFromTSA
+ @returns {TrustedHTML}
  */
 export function trustFromTemplateString(tsa, stringFromTSA) {
     // Проверка безопасности для предотвращения подмены результатов шаблонов.
@@ -156,18 +157,18 @@ export function trustFromTemplateString(tsa, stringFromTSA) {
 }
 
 /**
- * @param {ChildPart | AttributePart | ElementPart} part - Часть
- * @param {unknown} value - Значение
- * @param {DirectiveParent} [parent=part] - Родитель
- * @param {number} [attributeIndex] - Индекс атрибута
- * @returns {unknown}
+ @param {ChildPart | AttributePart | ElementPart} part - Часть
+ @param {unknown} value - Значение
+ @param {DirectiveParent} [parent=part] - Родитель
+ @param {number} [attributeIndex] - Индекс атрибута
+ @returns {unknown}
  */
 export function resolveDirective(part, value, parent = /** @type {DirectiveParent} */ (part), attributeIndex) {
     // Выходим раньше, если значение явно noChange, это означает, что любая вложенная директива остается прикрепленной и не выполняется.
     if (value === noChange) return value
     let currentDirective = attributeIndex !== undefined ? parent.__directives?.[attributeIndex] : parent.__directive
 
-    const nextDirectiveConstructor = /** @type {import("./types/directive.ts").DirectiveClass | undefined} */ (
+    const nextDirectiveConstructor = /** @type {import("./directive").DirectiveClass | undefined} */ (
         isPrimitive(value) ? undefined : /** @type {DirectiveResult} */ (value)["_$htmlDirective$"]
     )
 
@@ -194,14 +195,14 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
 }
 
 /**
- * Возвращает HTML-строку для заданного массива строк шаблона и типа результата (HTML или SVG),
- * а также имена чувствительных к регистру привязанных атрибутов в порядке шаблона.
- * HTML содержит маркеры комментариев, обозначающие `ChildPart`s
- * и суффиксы на привязанных атрибутах, обозначающие `AttributeParts`.
+ Возвращает HTML-строку для заданного массива строк шаблона и типа результата (HTML или SVG),
+ а также имена чувствительных к регистру привязанных атрибутов в порядке шаблона.
+ HTML содержит маркеры комментариев, обозначающие `ChildPart`s
+ и суффиксы на привязанных атрибутах, обозначающие `AttributeParts`.
  *
- * @param {TemplateStringsArray} strings - Массив строк шаблона
- * @param {ResultType} type - HTML или SVG
- * @return {[TrustedHTML, string[]]} Массив, содержащий `[html, attrNames]` (массив, возвращенный для краткости,
+ @param {TemplateStringsArray} strings - Массив строк шаблона
+ @param {ResultType} type - HTML или SVG
+ @return {[TrustedHTML, string[]]} Массив, содержащий `[html, attrNames]` (массив, возвращенный для краткости,
  *     чтобы избежать полей объектов, так как этот код используется с неминифицированным SSR
  *     кодом)
  */
@@ -337,8 +338,8 @@ export const getTemplateHtml = (strings, type) => {
 let sanitizerFactoryInternal = noopSanitizer
 
 /**
- * Устанавливает глобально фабрику санитизации.
- * @param {SanitizerFactory} newSanitizer
+ Устанавливает глобально фабрику санитизации.
+ @param {SanitizerFactory} newSanitizer
  */
 const setSanitizer = (newSanitizer) => {
     if (sanitizerFactoryInternal !== noopSanitizer) {
@@ -365,8 +366,8 @@ export class Template {
     /** @type {Array<TemplatePart>} */ parts = []
 
     /**
-     * @param {UncompiledTemplateResult} params - Массив строк шаблона
-     * @param {RenderOptions} [options = {}] - Опции рендеринга
+     @param {UncompiledTemplateResult} params - Массив строк шаблона
+     @param {RenderOptions} [options = {}] - Опции рендеринга
      */
     constructor({strings, ["_$htmlType$"]: type}, options = {}) {
         /** @type {Node | null} */ let node
@@ -393,13 +394,13 @@ export class Template {
                 if (DEV_MODE) {
                     const tag = element.localName
                     /**
-                     * Предупреждает, если в элементе `<textarea>` присутствует выражение.
-                     * Выбрасывает исключение для элемента `<template>`, так как привязки
-                     * внутри него не поддерживаются.
+                     Предупреждает, если в элементе `<textarea>` присутствует выражение.
+                     Выбрасывает исключение для элемента `<template>`, так как привязки
+                     внутри него не поддерживаются.
                      *
-                     * Проверка выполняется путём поиска в `innerHTML` специального маркера,
-                     * указывающего на наличие привязки. Таким образом удаётся отследить случаи,
-                     * когда выражения внутри `<textarea>` превращаются в текстовые узлы.
+                     Проверка выполняется путём поиска в `innerHTML` специального маркера,
+                     указывающего на наличие привязки. Таким образом удаётся отследить случаи,
+                     когда выражения внутри `<textarea>` превращаются в текстовые узлы.
                      */
                     if (/^(?:textarea|template)$/i.test(tag) && element.innerHTML.includes(marker)) {
                         const m = `Выражения не поддерживаются внутри элементов \`${tag}\`. `
@@ -504,10 +505,10 @@ export class Template {
     }
 
     /**
-     * Переопределяется через `HtmlPolyfillSupport` для предоставления платформенной поддержки.
-     * @param {TrustedHTML} html - HTML
-     * @param {RenderOptions} _options - Опции рендеринга
-     * @returns {HTMLTemplateElement}
+     Переопределяется через `HtmlPolyfillSupport` для предоставления платформенной поддержки.
+     @param {TrustedHTML} html - HTML
+     @param {RenderOptions} _options - Опции рендеринга
+     @returns {HTMLTemplateElement}
      */
     static createElement(html, _options) {
         const el = d.createElement("template")
@@ -522,8 +523,8 @@ export class TemplateInstance {
     /** @type {Set<Disconnectable>|undefined} */ _$disconnectableChildren = undefined
 
     /**
-     * @param {Template} template - Шаблон
-     * @param {ChildPart} parent - Родитель
+     @param {Template} template - Шаблон
+     @param {ChildPart} parent - Родитель
      */
     constructor(template, parent) {
         this._$template = template
@@ -540,9 +541,9 @@ export class TemplateInstance {
     }
 
     /**
-     * Этот метод отделен от конструктора, потому что нам нужно вернуть DocumentFragment и мы не хотим хранить его с полем экземпляра.
-     * @param {RenderOptions} options - Опции рендеринга
-     * @returns {DocumentFragment}
+     Этот метод отделен от конструктора, потому что нам нужно вернуть DocumentFragment и мы не хотим хранить его с полем экземпляра.
+     @param {RenderOptions} options - Опции рендеринга
+     @returns {DocumentFragment}
      */
     _clone(options) {
         const {el: {content}, parts} = this._$template // prettier-ignore
@@ -620,10 +621,10 @@ export class ChildPart {
     }
 
     /**
-     * @param {ChildNode} startNode - Начальный узел
-     * @param {ChildNode | null} endNode - Конечный узел
-     * @param {TemplateInstance | ChildPart} [parent] - Родитель
-     * @param {RenderOptions} options - Опции рендеринга
+     @param {ChildNode} startNode - Начальный узел
+     @param {ChildNode | null} endNode - Конечный узел
+     @param {TemplateInstance | ChildPart} [parent] - Родитель
+     @param {RenderOptions} options - Опции рендеринга
      */
     constructor(startNode, endNode, parent, options = {}) {
         this._$startNode = startNode
@@ -656,8 +657,8 @@ export class ChildPart {
     }
 
     /**
-     * @param {unknown} value - Значение
-     * @param {DirectiveParent} directiveParent - Родитель директивы
+     @param {unknown} value - Значение
+     @param {DirectiveParent} directiveParent - Родитель директивы
      */
     _$setValue(value, directiveParent = /** @type {DirectiveParent} */ (this)) {
         if (DEV_MODE && this.parentNode === null) {
@@ -708,9 +709,9 @@ export class ChildPart {
     }
 
     /**
-     * @template {Node} T
-     * @param {T} node - Узел
-     * @returns {T}
+     @template {Node} T
+     @param {T} node - Узел
+     @returns {T}
      */
     _insert(node) {
         return /** @type {any} */ (this._$startNode.parentNode).insertBefore(node, this._$endNode)
@@ -851,8 +852,8 @@ export class ChildPart {
     }
 
     /**
-     * @param {ChildNode | null} start
-     * @param {number} [from]
+     @param {ChildNode | null} start
+     @param {number} [from]
      */
     _$clear(start = this._$startNode.nextSibling, from) {
         this._$notifyConnectionChanged?.(false, true, from)
@@ -894,11 +895,11 @@ export class AttributePart {
     }
 
     /**
-     * @param {HTMLElement} element - Элемент
-     * @param {string} name - Имя
-     * @param {ReadonlyArray<string>} strings - Строки
-     * @param {Disconnectable} parent - Родитель
-     * @param {RenderOptions | undefined} options - Опции
+     @param {HTMLElement} element - Элемент
+     @param {string} name - Имя
+     @param {ReadonlyArray<string>} strings - Строки
+     @param {Disconnectable} parent - Родитель
+     @param {RenderOptions | undefined} options - Опции
      */
     constructor(element, name, strings, parent, options) {
         this.element = element
@@ -912,10 +913,10 @@ export class AttributePart {
     }
 
     /**
-     * @param {unknown | Array<unknown>} value
-     * @param {DirectiveParent} directiveParent
-     * @param {number} [valueIndex=0]
-     * @param {boolean} [noCommit]
+     @param {unknown | Array<unknown>} value
+     @param {DirectiveParent} directiveParent
+     @param {number} [valueIndex=0]
+     @param {boolean} [noCommit]
      */
     _$setValue(value, directiveParent = this, valueIndex = 0, noCommit) {
         const strings = this.strings
@@ -954,8 +955,8 @@ export class AttributePart {
     }
 
     /**
-     * @internal
-     * @param {unknown} value - Значение
+     @internal
+     @param {unknown} value - Значение
      */
     _commitValue(value) {
         if (value === nothing) {
@@ -971,14 +972,14 @@ export class AttributePart {
 
 export class PropertyPart extends AttributePart {
     /**
-     * @readonly
-     * @type {typeof PROPERTY_PART}
+     @readonly
+     @type {typeof PROPERTY_PART}
      */
     type = PROPERTY_PART
 
     /**
-     * @internal
-     * @param {unknown} value - Значение
+     @internal
+     @param {unknown} value - Значение
      */
     _commitValue(value) {
         if (this._sanitizer === undefined) this._sanitizer = sanitizerFactoryInternal(this.element, this.name, "property")
@@ -990,14 +991,14 @@ export class PropertyPart extends AttributePart {
 
 export class BooleanAttributePart extends AttributePart {
     /**
-     * @readonly
-     * @type {typeof BOOLEAN_ATTRIBUTE_PART}
+     @readonly
+     @type {typeof BOOLEAN_ATTRIBUTE_PART}
      */
     type = BOOLEAN_ATTRIBUTE_PART
 
     /**
-     * @internal
-     * @param {unknown} value - Значение
+     @internal
+     @param {unknown} value - Значение
      */
     _commitValue(value) {
         this.element.toggleAttribute(this.name, !!value && value !== nothing)
@@ -1005,25 +1006,25 @@ export class BooleanAttributePart extends AttributePart {
 }
 
 /**
- * Управляет слушателем событий через add/removeEventListener.
+ Управляет слушателем событий через add/removeEventListener.
  *
- * Эта часть работает, добавляя себя в качестве слушателя событий элемента,
- * а затем делегируя переданному значению. Это уменьшает количество вызовов
- * add/removeEventListener, если слушатель часто меняется, например, когда
- * встроенная функция используется как слушатель.
+ Эта часть работает, добавляя себя в качестве слушателя событий элемента,
+ а затем делегируя переданному значению. Это уменьшает количество вызовов
+ add/removeEventListener, если слушатель часто меняется, например, когда
+ встроенная функция используется как слушатель.
  *
- * Поскольку параметры события передаются при добавлении слушателей, мы должны
- * добавлять и удалять часть как слушателя при изменении параметров события.
+ Поскольку параметры события передаются при добавлении слушателей, мы должны
+ добавлять и удалять часть как слушателя при изменении параметров события.
  */
 export class EventPart extends AttributePart {
     /** @type {typeof EVENT_PART} */ type = EVENT_PART
 
     /**
-     * @param {HTMLElement} element - Элемент
-     * @param {string} name - Имя
-     * @param {ReadonlyArray<string>} strings - Строки
-     * @param {Disconnectable} parent - Родитель
-     * @param {RenderOptions | undefined} options - Опции
+     @param {HTMLElement} element - Элемент
+     @param {string} name - Имя
+     @param {ReadonlyArray<string>} strings - Строки
+     @param {Disconnectable} parent - Родитель
+     @param {RenderOptions | undefined} options - Опции
      */
     constructor(element, name, strings, parent, options) {
         super(element, name, strings, parent, options)
@@ -1038,10 +1039,10 @@ export class EventPart extends AttributePart {
     }
 
     /**
-     * EventPart не использует базовую реализацию _$setValue/_resolveValue, так как проверка изменений более сложная.
-     * @internal
-     * @param {unknown} newListener - Новое значение
-     * @param {DirectiveParent} directiveParent - Родитель
+     EventPart не использует базовую реализацию _$setValue/_resolveValue, так как проверка изменений более сложная.
+     @internal
+     @param {unknown} newListener - Новое значение
+     @param {DirectiveParent} directiveParent - Родитель
      */
     _$setValue(newListener, directiveParent = this) {
         newListener = resolveDirective(this, newListener, directiveParent, 0) ?? nothing
@@ -1088,9 +1089,9 @@ export class ElementPart {
     _$disconnectableChildren = undefined
 
     /**
-     * @param {Element} element - Элемент
-     * @param {Disconnectable} parent - Родитель
-     * @param {RenderOptions | undefined} options - Опции
+     @param {Element} element - Элемент
+     @param {Disconnectable} parent - Родитель
+     @param {RenderOptions | undefined} options - Опции
      */
     constructor(element, parent, options) {
         this.element = element
@@ -1109,9 +1110,9 @@ export class ElementPart {
 }
 
 /**
- * @param {unknown} value
- * @param {HTMLElement|DocumentFragment} container
- * @param {RenderOptions} options
+ @param {unknown} value
+ @param {HTMLElement|DocumentFragment} container
+ @param {RenderOptions} options
  */
 export const render = (value, container, options = {}) => {
     // TODO: Выдать более понятное сообщение об ошибке, чем Uncaught TypeError: Cannot read properties of null (reading '_$htmlPart$') которое выглядит как внутренняя ошибка @pkg.

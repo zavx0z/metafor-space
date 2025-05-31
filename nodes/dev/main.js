@@ -1,4 +1,4 @@
-import { MetaFor } from "../../index.js"
+import { MetaFor } from "../../metafor.js"
 import { Nodes } from "../nodes.js"
 
 const nodes = Nodes.create({

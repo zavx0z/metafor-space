@@ -17,7 +17,7 @@
       "name": "create-metafor",
       "version": "0.0.10",
       "bin": {
-        "create-metafor": "./index.js",
+        "create-metafor": "./metafor.js",
       },
       "dependencies": {
         "chalk": "^5.3.0",
@@ -37,7 +37,7 @@
       "name": "create-rules",
       "version": "0.0.59",
       "bin": {
-        "create-rules": "./index.js",
+        "create-rules": "./metafor.js",
       },
       "dependencies": {
         "concat-md": "^0.5.1",
