@@ -1,69 +1,41 @@
 /**
- @typedef {import("./directive").DirectiveResult} DirectiveResult
- @typedef {import("./directive").PartInfo} PartInfo
- @typedef {import("./directive").Directive} Directive
- @typedef {import("./html").RootPart} RootPart
- @typedef {import("./html").TemplatePart} TemplatePart
- @typedef {import("./html").TagEndRegex} TagEndRegex
- *
- @typedef {import("./html").CompiledTemplate} CompiledTemplate
- @typedef {import("./html").CompiledTemplateResult} CompiledTemplateResult
  @typedef {import("./html").DirectiveParent} DirectiveParent
  @typedef {import("./html").Disconnectable} Disconnectable
  @typedef {import("./html").EventListenerWithOptions} EventListenerWithOptions
  @typedef {import("./html").RenderOptions} RenderOptions
- @typedef {import("./html").ResultType} ResultType
  @typedef {import("./html").UncompiledTemplateResult} UncompiledTemplateResult
- *
  @typedef {import("trusted-types/lib").TrustedHTML} TrustedHTML
- @typedef {import("trusted-types/lib").TrustedTypesWindow} TrustedTypesWindow
  */
 /**
- @template {ResultType} T
+ @template {import("./html").ResultType} T
  @typedef {import("./html").TemplateResult<T>} TemplateResult
  */
 export const DEV_MODE = true
-// Позволяет минификаторам переименовывать ссылки на globalThis
-const global = globalThis
+const global = globalThis // Позволяет минификаторам переименовывать ссылки на globalThis
 const trustedTypes = /** @type { TrustedTypePolicyFactory} */ (/** @type {any} */ (global).trustedTypes)
-/**
- TrustedTypePolicy для HTML, которая объявляется с помощью функции тега шаблона html.
- *
+/** TrustedTypePolicy для HTML, которая объявляется с помощью функции тега шаблона html.
  Этот HTML является константой, написанной разработчиком, и парсится с помощью
  innerHTML до того, как в него будут добавлены недоверенные выражения.
- Поэтому он считается безопасным по построению.
- */
-export const policy = trustedTypes ? trustedTypes.createPolicy("meta-html", {createHTML: (s) => s}) : undefined
+ Поэтому он считается безопасным по построению. */
+const policy = trustedTypes ? trustedTypes.createPolicy("meta-html", {createHTML: (s) => s}) : undefined
 /** @type {(_node: Node, _name: string, _type: "property" | "attribute") => (value: unknown) => unknown} */
-export const noopSanitizer = (_node, _name, _type) => (value) => value
+const noopSanitizer = (_node, _name, _type) => (value) => value
 /** @type {(value: unknown) => boolean} */
-export const isPrimitive = (value) => value === null || (typeof value != "object" && typeof value != "function")
-export const isArray = Array.isArray
+const isPrimitive = (value) => value === null || (typeof value != "object" && typeof value != "function")
+const isArray = Array.isArray
 /** @type {(value: unknown) => boolean} */
 export const isIterable = (value) => isArray(value) || typeof (/** @type {any} */ (value)?.[Symbol.iterator]) === "function"
-/** Добавляется к имени атрибута, чтобы пометить атрибут как привязанный, чтобы мы могли легко его найти. */
-const boundAttributeSuffix = "$html$"
-/**
- Этот маркер используется во многих синтаксических позициях в HTML, поэтому он должен быть
- допустимым именем элемента и атрибута. Пока не поддерживаются динамические имена,
- но это как минимум гарантирует, что дерево разбора ближе к намерению шаблона.
- */
-const marker = `html$${Math.random().toFixed(9).slice(2)}$`
-/** Строка, используемая для определения, является ли комментарий маркерным комментарием */
-const markerMatch = "?" + marker
-/**
- Текст, используемый для вставки маркерного узла комментария.
- Мы используем синтаксис инструкции по обработке,
- потому что он немного меньше, но парсится как узел комментария.
- */
-export const nodeMarker = `<${markerMatch}>`
-export const d = /** @type {Document} */ (global.document === undefined ? {
+export const boundAttributeSuffix = /** @type {import("./html.t").boundAttributeSuffix} */ "$html$"
+export const marker = /** @type{import("./html.t").marker} */ `html$${Math.random().toFixed(9).slice(2)}$`
+export const markerMatch = /** @type {import("./html.t").markerMatch} */ "?" + marker
+const nodeMarker = /** @type {import("./html.t").nodeMarker} */ `<${markerMatch}>`
+const d = /** @type {Document} */ (global.document === undefined ? {
   createTreeWalker() {
     return {}
   }
 } : document)
 /** Создает динамический маркер. Мы никогда не будем искать их в DOM. */
-export const createMarker = () => d.createComment("")
+const createMarker = () => d.createComment("")
 export const HTML_RESULT = 1
 export const SVG_RESULT = 2
 export const MATHML_RESULT = 3
@@ -79,19 +51,14 @@ export const COMMENT_PART = 7
 export const SPACE_CHAR = `[ \t\n\f\r]`
 export const ATTR_VALUE_CHAR = `[^ \t\n\f\r"'\`<>=]`
 export const NAME_CHAR = `[^\\s"'>=/]`
-/**
- Конец текста это: `<` за которым следует:
- - [начало комментария]
- - или [тег]
- - или [динамическая привязка тега]
- */
-export const textEndRegex = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g
+
+export const textEndRegex = /** @type {import("./html.t").textEndRegex} */ /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g
 export const COMMENT_START = 1
 export const TAG_NAME = 2
 export const DYNAMIC_TAG_NAME = 3
-export const commentEndRegex = /-->/g
+const commentEndRegex = /-->/g
 /** Комментарии, которые не начинаются с <!--, например </{, могут заканчиваться одним символом `>` */
-export const comment2EndRegex = />/g
+const comment2EndRegex = />/g
 export const tagEndRegex = new RegExp(
   `>|${SPACE_CHAR}(?:(${NAME_CHAR}+)(${SPACE_CHAR}*=${SPACE_CHAR}*(?:${ATTR_VALUE_CHAR}|("|')|))|$)`,
   "g"
@@ -102,22 +69,10 @@ export const SPACES_AND_EQUALS = 2
 export const QUOTE_CHAR = 3
 export const singleQuoteAttrEndRegex = /'/g
 export const doubleQuoteAttrEndRegex = /"/g
-/**
- Соответствует необработанным текстовым элементам.
- Комментарии не анализируются в необработанных текстовых элементах,
- поэтому нам нужно искать в их текстовом контенте строки маркеров.
- */
-export const rawTextElement = /^(?:script|style|textarea|title)$/i
+const rawTextElement = /** @type {import("./html.t").rawTextElement} */ /^(?:script|style|textarea|title)$/i
 export const nothing = Symbol.for("nothing")
 export const noChange = Symbol.for("noChange")
-/**
- Кэш подготовленных шаблонов, ключей по массиву TemplateStringsArray и не учитывая конкретный тег шаблона.
- Это означает, что теги шаблонов не могут быть динамическими - они должны быть статическими и равными html, svg, или attr.
- Это ограничение упрощает поиск в кэше, который находится на горячем пути рендеринга.
- *
- @type {WeakMap<TemplateStringsArray, Template>}
- */
-export const templateCache = new WeakMap()
+const templateCache = /** @type {import("./html.t").templateCache} */ new WeakMap()
 export const walker = d.createTreeWalker(d, 129 /* NodeFilter.SHOW_{ELEMENT|COMMENT} */)
 
 /**
@@ -162,7 +117,7 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
   let currentDirective = attributeIndex !== undefined ? parent.__directives?.[attributeIndex] : parent.__directive
 
   const nextDirectiveConstructor = /** @type {import("./directive").DirectiveClass | undefined} */ (
-    isPrimitive(value) ? undefined : /** @type {DirectiveResult} */ (value)["_$htmlDirective$"]
+    isPrimitive(value) ? undefined : /** @type {import("./directive").DirectiveResult} */ (value)["_$htmlDirective$"]
   )
 
   if (currentDirective?.constructor !== nextDirectiveConstructor) {
@@ -170,7 +125,7 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
     currentDirective && currentDirective["_$notifyDirectiveConnectionChanged"]?.(false)
     if (nextDirectiveConstructor === undefined) currentDirective = undefined
     else {
-      currentDirective = new nextDirectiveConstructor(/** @type {PartInfo} */ (part))
+      currentDirective = new nextDirectiveConstructor(/** @type {import("./directive").PartInfo} */ (part))
       currentDirective._$initialize(/** @type {import("./html").Part}**/(part), parent, attributeIndex)
     }
     if (attributeIndex !== undefined) {
@@ -180,7 +135,7 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
   if (currentDirective !== undefined)
     value = resolveDirective(
       part,
-      currentDirective._$resolve(/**@type{import("./html").Part}**/(part), /** @type {DirectiveResult} */ (value).values),
+      currentDirective._$resolve(/**@type{import("./html").Part}**/(part), /** @type {import("./directive").DirectiveResult} */ (value).values),
       currentDirective,
       attributeIndex
     )
@@ -188,7 +143,7 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
 }
 
 /**@type {import("./html.t").getTemplateHtml}**/
-const getTemplateHtml = (strings, type) => {
+export const getTemplateHtml = (strings, type) => {
   // Вставляем маркеры в HTML-шаблон для представления позиции привязок.
   // Следующий код сканирует строки шаблона, чтобы определить синтаксическую позицию привязок.
   // Они могут находиться в текстовой позиции:
@@ -312,15 +267,12 @@ const getTemplateHtml = (strings, type) => {
 
   const htmlResult =
     html + (strings[l] || "<?>") + (type === SVG_RESULT ? "</svg>" : type === MATHML_RESULT ? "</math>" : "")
-  // Возвращается как массив для краткости
   return [trustFromTemplateString(strings, htmlResult), attrNames]
 }
 let sanitizerFactoryInternal = noopSanitizer
 
-/**
- Устанавливает глобально фабрику санитизации.
- @param {import("./html.t").SanitizerFactory} newSanitizer
- */
+/** Устанавливает глобально фабрику санитизации.
+ @param {import("./html.t").SanitizerFactory} newSanitizer */
 const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(
@@ -343,7 +295,7 @@ export const mathml = tag(MATHML_RESULT)
 
 export class Template {
   /** @type {HTMLTemplateElement} */ el
-  /** @type {Array<TemplatePart>} */ parts = []
+  /** @type {Array<import("./html").TemplatePart>} */ parts = []
 
   /**
    @param {UncompiledTemplateResult} params - Массив строк шаблона
@@ -400,7 +352,7 @@ export class Template {
                 index: nodeIndex,
                 name: m[2],
                 strings: statics,
-                //@ts-ignore
+                // @ts-ignore FIXME ctor
                 ctor:
                   m[1] === "."
                     ? PropertyPart
@@ -612,7 +564,7 @@ export class ChildPart {
     this._$endNode = endNode
     this._$parent = parent
     this.options = options
-    // Обратите внимание, что __isConnected используется только для RootParts (т.е. Когда нет _$parent);
+    // __isConnected используется только для RootParts (т.е. Когда нет _$parent);
     // значение для не корневых частей не важно, но проверка наличия родителя потребовала бы больше кода
     this.__isConnected = options?.isConnected ?? true
   }
@@ -666,18 +618,8 @@ export class ChildPart {
       this._commitTemplateResult(/** @type {TemplateResult<any>} */ (value))
     } else if (/** @type {Node} */ (value).nodeType !== undefined) {
       if (DEV_MODE && this.options?.host === value) {
-        this._commitText(
-          `[вероятная ошибка: шаблон отрисовал свой host внутри себя ` +
-          `(обычно возникает при написании \${this} в шаблоне)]`
-        )
-        console.warn(
-          `Attempted to render the template host`,
-          value,
-          `внутри себя. Это почти всегда ошибка, и в режиме разработки `,
-          `мы отображаем предупреждающий текст. Однако в продакшене мы `,
-          `отрисуем его, что обычно приводит к ошибке, а иногда `,
-          `к исчезновению элемента из DOM.`
-        )
+        this._commitText("[вероятная ошибка: шаблон отрисовал свой host внутри себя (обычно возникает при написании \${this} в шаблоне)]")
+        console.warn(`Attempted to render the template host ${value} внутри себя. Это почти всегда ошибка, и в режиме разработки мы отображаем предупреждающий текст. Однако в продакшене мы отрисуем его, что обычно приводит к ошибке, а иногда к исчезновению элемента из DOM.`)
         return
       }
       this._commitNode(/** @type {Node} */ (value))
@@ -756,7 +698,7 @@ export class ChildPart {
     this._$committedValue = value
   }
 
-  /** @param {TemplateResult<any> | CompiledTemplateResult} result - Шаблон или скомпилированный шаблон */
+  /** @param {TemplateResult<any> | import("./html").CompiledTemplateResult} result - Шаблон или скомпилированный шаблон */
   _commitTemplateResult(result) {
     const {values, ["_$htmlType$"]: type} = result
     // Если $htmlType$ является числом, result является простым TemplateResult и мы получаем
