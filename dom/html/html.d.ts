@@ -2,21 +2,11 @@ import type {ValueSanitizer} from "./html.t.ts"
 import type {Directive} from "./directive.t.ts"
 
 export declare const DEV_MODE: boolean
-// export declare const policy: TrustedTypePolicy | undefined
-// export declare const noopSanitizer: (node: Node, name: string, type: "property" | "attribute") => (value: unknown) => unknown
-// export declare const isPrimitive: (value: unknown) => boolean
-// export declare const isArray: (value: unknown) => boolean
-// export declare const isIterable: (value: unknown) => boolean
-// export declare const boundAttributeSuffix: string
-// export declare const marker: string
-// export declare const markerMatch: string
-// export declare const nodeMarker: string
-// export declare const createMarker: () => Comment
-
+/** Типы TemplateResult */
 export declare const HTML_RESULT: 1
 export declare const SVG_RESULT: 2
 export declare const MATHML_RESULT: 3
-
+/** Типы TemplatePart (ВАЖНО: эти значения должны совпадать со значениями в PartType) */
 export declare const ATTRIBUTE_PART: 1
 export declare const CHILD_PART: 2
 export declare const PROPERTY_PART: 3
@@ -24,26 +14,6 @@ export declare const BOOLEAN_ATTRIBUTE_PART: 4
 export declare const EVENT_PART: 5
 export declare const ELEMENT_PART: 6
 export declare const COMMENT_PART: 7
-
-// export declare const SPACE_CHAR: string
-// export declare const ATTR_VALUE_CHAR: string
-// export declare const NAME_CHAR: string
-// export declare const textEndRegex: RegExp
-// export declare const COMMENT_START: 1
-// export declare const TAG_NAME: 2
-// export declare const DYNAMIC_TAG_NAME: 3
-// export declare const commentEndRegex: RegExp
-// export declare const comment2EndRegex: RegExp
-// export declare const tagEndRegex: RegExp
-// export declare const ENTIRE_MATCH: 0
-// export declare const ATTRIBUTE_NAME: 1
-// export declare const SPACES_AND_EQUALS: 2
-// export declare const QUOTE_CHAR: 3
-// export declare const singleQuoteAttrEndRegex: RegExp
-// export declare const doubleQuoteAttrEndRegex: RegExp
-// export declare const rawTextElement: RegExp
-// export declare const templateCache: WeakMap<TemplateStringsArray, Template>
-// export declare const walker: TreeWalker
 
 export type ResultType = typeof HTML_RESULT | typeof SVG_RESULT | typeof MATHML_RESULT
 /**
@@ -502,65 +472,6 @@ export declare class ElementPart {
   element: Element
 }
 
-// /**
-//  * Очищает фабрику санитизации. Используется только во внутренних тестах, не является частью публичного API.
-//  */
-// export declare function _testOnlyClearSanitizerFactoryDoNotCallOrElse(): void
-
-// // Добавляем типы для RenderOptions, которые используются в render
-// export interface RenderOptions {
-//   /** Объект для использования в качестве `this` для обработчиков событий. Часто
-//    * полезно установить это значение равным хосту компонента, который рендерит шаблон. */
-//   host?: object
-//   /** DOM узел перед которым будет отрисован контент в контейнере. */
-//   renderBefore?: ChildNode | null
-//   /** Узел, используемый для клонирования шаблона (`importNode` будет вызван на этом узле).
-//    * Это контролирует `ownerDocument` отрисованного DOM, а также любой наследуемый контекст.
-//    * По умолчанию используется глобальный `document`. */
-//   creationScope?: { importNode(node: Node, deep?: boolean): Node }
-//   /**
-//    * Начальное состояние подключения для верхнего уровня части, которая отрисовывается.
-//    * Если не установлен параметр `isConnected`, `AsyncDirective`s будут подключены по умолчанию.
-//    * Установите значение `false`, если начальный рендеринг происходит в отключенном дереве
-//    * и `AsyncDirective`s должны увидеть `isConnected === false` для их начального рендеринга.
-//    * Метод `part.setConnected()` должен быть использован после начального рендеринга, чтобы изменить состояние подключения части.
-//    */
-//   isConnected?: boolean
-// }
-
-// // Добавляем типы для UncompiledTemplateResult и CompiledTemplateResult
-// export interface UncompiledTemplateResult<T extends ResultType = ResultType> {
-//   ["_$htmlType$"]: T
-//   strings: TemplateStringsArray
-//   values: unknown[]
-// }
-
-// export interface CompiledTemplateResult {
-//   ["_$htmlType$"]: CompiledTemplate
-//   values: unknown[]
-// }
-
-// export interface CompiledTemplate extends Omit<Template, "el"> {
-//   el?: HTMLTemplateElement
-//   h: TemplateStringsArray
-// }
-
-// // Добавляем тип для DirectiveParent
-// export interface DirectiveParent {
-//   _$parent?: DirectiveParent
-//   _$isConnected: boolean
-//   __directive?: Directive
-//   __directives?: (Directive | undefined)[]
-// }
-
-// // Добавляем тип для TemplatePart
-// export type TemplatePart = {
-//   readonly type: typeof ATTRIBUTE_PART | typeof CHILD_PART | typeof ELEMENT_PART | typeof COMMENT_PART
-//   readonly index: number
-//   readonly name?: string
-//   readonly ctor?: typeof AttributePart
-//   readonly strings?: ReadonlyArray<string>
-// }
 export type Part =
   | ChildPart
   | AttributePart
@@ -568,15 +479,14 @@ export type Part =
   | BooleanAttributePart
   | ElementPart
   | EventPart
-// // Добавляем тип для RefDirective
-// export interface RefDirective {
-//   (ref: (el: Element | undefined) => void): unknown
-// }
+
 type AttributeTemplatePart = {
   readonly type: typeof ATTRIBUTE_PART
   readonly index: number
   readonly name: string
   readonly ctor: typeof AttributePart
+    | typeof PropertyPart
+    | typeof BooleanAttributePart
   readonly strings: ReadonlyArray<string>
 }
 type ChildTemplatePart = {
@@ -642,57 +552,3 @@ export interface RootPart extends ChildPart {
  */
 export type TagEndRegex = RegExp
 export {noChange, nothing} from "./html.t.ts"
-// /**
-//  * Создает безопасный HTML из строки шаблона.
-//  * @param tsa - Массив строк шаблона
-//  * @param stringFromTSA - Строка из массива строк шаблона
-//  * @returns TrustedHTML
-//  */
-// export declare function trustFromTemplateString(tsa: TemplateStringsArray, stringFromTSA: string): TrustedHTML
-
-// /**
-//  * Разрешает директиву для части.
-//  * @param part - Часть
-//  * @param value - Значение
-//  * @param parent - Родитель
-//  * @param attributeIndex - Индекс атрибута
-//  * @returns Разрешенное значение
-//  */
-// export declare function resolveDirective(
-//   part: ChildPart | AttributePart | ElementPart,
-//   value: unknown,
-//   parent?: DirectiveParent,
-//   attributeIndex?: number
-// ): unknown
-
-// /**
-//  * Получает HTML шаблона.
-//  * @param strings - Массив строк шаблона
-//  * @param type - Тип результата
-//  * @returns Массив, содержащий [html, attrNames]
-//  */
-// export declare function getTemplateHtml(
-//   strings: TemplateStringsArray,
-//   type: ResultType
-// ): [TrustedHTML, string[]]
-
-// /**
-//  * Устанавливает глобально фабрику санитизации.
-//  * @param newSanitizer - Новая фабрика санитизации
-//  */
-// export declare function setSanitizer(
-//   newSanitizer: (node: Node, name: string, type: "property" | "attribute") => (value: unknown) => unknown
-// ): void
-
-// /**
-//  * Создает санитизатор для узла.
-//  * @param node - Узел
-//  * @param name - Имя
-//  * @param type - Тип
-//  * @returns Функция санитизации
-//  */
-// export declare function createSanitizer(
-//   node: Node,
-//   name: string,
-//   type: "property" | "attribute"
-// ): (value: unknown) => unknown

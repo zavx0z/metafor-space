@@ -38,43 +38,36 @@ export const policy = trustedTypes ? trustedTypes.createPolicy("meta-html", {cre
 export const noopSanitizer = (_node, _name, _type) => (value) => value
 /** @type {(value: unknown) => boolean} */
 export const isPrimitive = (value) => value === null || (typeof value != "object" && typeof value != "function")
-/** @type {(value: unknown) => boolean} */
 export const isArray = Array.isArray
 /** @type {(value: unknown) => boolean} */
-export const isIterable = (value) =>
-  isArray(value) || typeof (/** @type {any} */ (value)?.[Symbol.iterator]) === "function"
+export const isIterable = (value) => isArray(value) || typeof (/** @type {any} */ (value)?.[Symbol.iterator]) === "function"
 /** Добавляется к имени атрибута, чтобы пометить атрибут как привязанный, чтобы мы могли легко его найти. */
-export const boundAttributeSuffix = "$html$"
+const boundAttributeSuffix = "$html$"
 /**
  Этот маркер используется во многих синтаксических позициях в HTML, поэтому он должен быть
  допустимым именем элемента и атрибута. Пока не поддерживаются динамические имена,
  но это как минимум гарантирует, что дерево разбора ближе к намерению шаблона.
  */
-export const marker = `html$${Math.random().toFixed(9).slice(2)}$`
+const marker = `html$${Math.random().toFixed(9).slice(2)}$`
 /** Строка, используемая для определения, является ли комментарий маркерным комментарием */
-export const markerMatch = "?" + marker
+const markerMatch = "?" + marker
 /**
  Текст, используемый для вставки маркерного узла комментария.
  Мы используем синтаксис инструкции по обработке,
  потому что он немного меньше, но парсится как узел комментария.
  */
 export const nodeMarker = `<${markerMatch}>`
-export const d = /** @type {Document} */ (
-  global.document === undefined
-    ? {
-      createTreeWalker() {
-        return {}
-      },
-    }
-    : document
-)
+export const d = /** @type {Document} */ (global.document === undefined ? {
+  createTreeWalker() {
+    return {}
+  }
+} : document)
 /** Создает динамический маркер. Мы никогда не будем искать их в DOM. */
 export const createMarker = () => d.createComment("")
-/** Типы TemplateResult */
 export const HTML_RESULT = 1
 export const SVG_RESULT = 2
 export const MATHML_RESULT = 3
-/** Типы TemplatePart (ВАЖНО: эти значения должны совпадать со значениями в PartType) */
+
 export const ATTRIBUTE_PART = 1
 export const CHILD_PART = 2
 export const PROPERTY_PART = 3
@@ -194,19 +187,8 @@ export function resolveDirective(part, value, parent = /** @type {DirectiveParen
   return value
 }
 
-/**
- Возвращает HTML-строку для заданного массива строк шаблона и типа результата (HTML или SVG),
- а также имена чувствительных к регистру привязанных атрибутов в порядке шаблона.
- HTML содержит маркеры комментариев, обозначающие `ChildPart`s
- и суффиксы на привязанных атрибутах, обозначающие `AttributeParts`.
- *
- @param {TemplateStringsArray} strings - Массив строк шаблона
- @param {ResultType} type - HTML или SVG
- @return {[TrustedHTML, string[]]} Массив, содержащий `[html, attrNames]` (массив, возвращенный для краткости,
-  *     чтобы избежать полей объектов, так как этот код используется с неминифицированным SSR
-  *     кодом)
- */
-export const getTemplateHtml = (strings, type) => {
+/**@type {import("./html.t").getTemplateHtml}**/
+const getTemplateHtml = (strings, type) => {
   // Вставляем маркеры в HTML-шаблон для представления позиции привязок.
   // Следующий код сканирует строки шаблона, чтобы определить синтаксическую позицию привязок.
   // Они могут находиться в текстовой позиции:
@@ -218,8 +200,7 @@ export const getTemplateHtml = (strings, type) => {
   // Массив, содержащий имена чувствительных к регистру привязанных атрибутов в порядке их частей.
   // ElementParts также отражаются в этом массиве как undefined, а не как строка,
   // чтобы отличать от привязки атрибутов.
-  /** @type {Array<string>} */
-  const attrNames = []
+  const attrNames = /** @type {Array<string>} */ []
   let html = type === SVG_RESULT ? "<svg>" : type === MATHML_RESULT ? "<math>" : ""
   // Когда мы внутри тега raw text (не в его текстовом содержимом),
   // regex будет все еще tagRegex, чтобы мы могли найти атрибуты,
@@ -306,7 +287,6 @@ export const getTemplateHtml = (strings, type) => {
         "unexpected parse state B"
       )
     }
-
     // У нас есть четыре случая:
     //  1. Мы находимся в позиции текста и не в элементе raw-text
     //     (regex === textEndRegex): вставляем маркер комментария.
@@ -420,6 +400,7 @@ export class Template {
                 index: nodeIndex,
                 name: m[2],
                 strings: statics,
+                //@ts-ignore
                 ctor:
                   m[1] === "."
                     ? PropertyPart
@@ -1060,26 +1041,19 @@ export class EventPart extends AttributePart {
 
     // Если новое значение не равно nothing и мы удалили слушателя, нам нужно добавить часть как слушателя.
     const shouldAddListener = newListener !== nothing && (oldListener === nothing || shouldRemoveListener)
-    if (shouldRemoveListener) {
-      // @ts-ignore
-      this.element.removeEventListener(this.name, this, oldListener)
-    }
-    if (shouldAddListener) {
-      // Внимание: IE11 и Chrome 41 не любят использовать слушатель в качестве
-      // объекта options. Нужно разобраться, как решить это в IE11 - возможно,
-      // пропатчить addEventListener?
-      // @ts-ignore
-      this.element.addEventListener(this.name, this, newListener)
-    }
+    // @ts-ignore
+    if (shouldRemoveListener) this.element.removeEventListener(this.name, this, oldListener)
+    // @ts-ignore
+    if (shouldAddListener) this.element.addEventListener(this.name, this, newListener)
     this._$committedValue = newListener
   }
 
   /** @param {Event} event - Событие */
   handleEvent(event) {
-    if (typeof this._$committedValue === "function") {
+    if (typeof this._$committedValue === "function")
       this._$committedValue.call(this.options?.host ?? this.element, event)
-      // @ts-ignore
-    } else this._$committedValue.handleEvent(event)
+    // @ts-ignore
+    else this._$committedValue.handleEvent(event)
   }
 }
 

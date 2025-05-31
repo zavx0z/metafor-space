@@ -1,3 +1,5 @@
+import type {ResultType} from "./html";
+
 /**
  * Сигнальное значение, которое указывает ChildPart полностью очистить свое содержимое.
  *
@@ -49,3 +51,15 @@ export type SanitizerFactory = (node: Node, name: string, type: "property" | "at
  */
 export type ValueSanitizer = (value: unknown) => unknown
 export type Primitive = null | undefined | boolean | number | string | symbol | bigint
+/**
+ Возвращает HTML-строку для заданного массива строк шаблона и типа результата (HTML или SVG),
+ а также имена чувствительных к регистру привязанных атрибутов в порядке шаблона.
+ HTML содержит маркеры комментариев, обозначающие `ChildPart`s
+ и суффиксы на привязанных атрибутах, обозначающие `AttributeParts`.
+ *
+ @param strings - Массив строк шаблона
+ @param type - HTML или SVG
+ @return Массив, содержащий `[html, attrNames]` (массив, возвращенный для краткости,
+  чтобы избежать полей объектов, так как этот код используется с неминифицированным SSR кодом)
+ */
+export type getTemplateHtml = (strings: TemplateStringsArray, type: ResultType) => [TrustedHTML, string[]]
