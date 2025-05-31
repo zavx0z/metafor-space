@@ -6,11 +6,11 @@ import {
   nothing,
   render,
   type RenderOptions,
-  type TemplateResult
+  type TemplateResult,
+  type Part,
 } from "../../html.js"
-import type {Part} from "../../types/part.js"
 import {AsyncDirective, Directive, directive} from "../../async-directive.js"
-import type {PartInfo} from "../../types/directive.ts"
+import type {PartInfo} from "../../directive"
 import {repeat} from "../../directives/repeat.js"
 
 describe("async directives", () => {

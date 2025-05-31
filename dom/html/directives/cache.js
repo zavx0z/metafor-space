@@ -1,7 +1,7 @@
 /**
  * @typedef {import('../html').ChildPart} ChildPart
  * @typedef {import('../html').Part} Part
- * @typedef {import('../types/part.js').RootPart} RootPart
+ * @typedef {import('../html').RootPart} RootPart
  * @typedef {import('../html.js').TemplateResult} TemplateResult
  * @typedef {import('../html.js').CompiledTemplateResult} CompiledTemplateResult
  */

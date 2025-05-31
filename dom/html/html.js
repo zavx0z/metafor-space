@@ -2,9 +2,9 @@
  @typedef {import("./directive").DirectiveResult} DirectiveResult
  @typedef {import("./directive").PartInfo} PartInfo
  @typedef {import("./directive").Directive} Directive
- @typedef {import("./types/part").RootPart} RootPart
- @typedef {import("./types/part").TemplatePart} TemplatePart
- @typedef {import("./types/index").TagEndRegex} TagEndRegex
+ @typedef {import("./html").RootPart} RootPart
+ @typedef {import("./html").TemplatePart} TemplatePart
+ @typedef {import("./html").TagEndRegex} TagEndRegex
  *
  @typedef {import("./html").CompiledTemplate} CompiledTemplate
  @typedef {import("./html").CompiledTemplateResult} CompiledTemplateResult

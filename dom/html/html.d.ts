@@ -106,8 +106,16 @@ export interface CompiledTemplateResult {
   values: unknown[]
 }
 
-export interface Template {
+export declare class Template {
+  el: HTMLTemplateElement
+  parts: Array<TemplatePart>
 
+  constructor(
+    {strings, ['_$htmlType$']: type}: UncompiledTemplateResult,
+    options?: RenderOptions
+  )
+
+  static createElement(html: TrustedHTML, _options?: RenderOptions): HTMLTemplateElement
 }
 
 export interface CompiledTemplate extends Omit<Template, "el"> {
@@ -640,3 +648,71 @@ export type Part =
 //   (ref: (el: Element | undefined) => void): unknown
 // }
 export {noChange, nothing} from "./html.t.ts"
+type AttributeTemplatePart = {
+  readonly type: typeof ATTRIBUTE_PART
+  readonly index: number
+  readonly name: string
+  readonly ctor: typeof AttributePart
+  readonly strings: ReadonlyArray<string>
+}
+type ChildTemplatePart = {
+  readonly type: typeof CHILD_PART
+  readonly index: number
+}
+type ElementTemplatePart = {
+  readonly type: typeof ELEMENT_PART
+  readonly index: number
+}
+type CommentTemplatePart = {
+  readonly type: typeof COMMENT_PART
+  readonly index: number
+}
+/**
+ * TemplatePart представляет динамическую часть в шаблоне до его создания. Когда шаблон создается, части создаются из TemplateParts.
+ */
+export type TemplatePart = ChildTemplatePart | AttributeTemplatePart | ElementTemplatePart | CommentTemplatePart
+
+/**
+ * `ChildPart` верхнего уровня, возвращаемый из `render`, который управляет состоянием
+ * подключения `AsyncDirective`, созданных во всем дереве под ним.
+ */
+export interface RootPart extends ChildPart {
+  /**
+   * Устанавливает состояние подключения для `AsyncDirective`, содержащихся в этом корневом ChildPart.
+   *
+   * @pkg/html не отслеживает автоматически подключенность отрендеренного DOM;
+   * поэтому вызывающая сторона `render` должна обеспечить вызов
+   * `part.setConnected(false)` до того, как объект part потенциально
+   * будет удален, чтобы гарантировать, что `AsyncDirective` имеют возможность освободить
+   * все удерживаемые ресурсы. Если `RootPart`, который был ранее
+   * отключен, впоследствии переподключается (и его `AsyncDirective` должны
+   * переподключиться), следует вызвать `setConnected(true)`.
+   *
+   * @param isConnected Должны ли директивы в этом дереве быть подключены
+   * или нет
+   */
+  setConnected(isConnected: boolean): void
+}
+
+/**
+ * Регулярное выражение tagEnd соответствует концу синтаксиса "внутри открывающего" тега.
+ * Оно либо соответствует `>`, либо последовательности, напоминающей атрибут, либо концу строки после пробела (позиция атрибута).
+ *
+ * См. атрибуты в спецификации HTML:
+ * https://www.w3.org/TR/html5/syntax.html#elements-attributes
+ *
+ * " \t\n\f\r" являются HTML-пробельными символами:
+ * https://infra.spec.whatwg.org/#ascii-whitespace
+ *
+ * Таким образом, атрибут это:
+ *  * Имя: любой символ, кроме пробельного символа, ("), ('), ">",
+ *    "=", or "/". Обратите внимание: это отличается от спецификации HTML, которая также исключает управляющие символы.
+ *  * За которым следуют ноль или более пробельных символов.
+ *  * За которым следует "=".
+ *  * За которым следуют ноль или более пробельных символов.
+ *  * За которым следует:
+ *    * Любой символ, кроме пробела, ('), ("), "<", ">", "=", (`), или
+ *    * (") за которым следует любой символ, кроме ("), или
+ *    * (') за которым следует любой символ, кроме (').
+ */
+export type TagEndRegex = RegExp

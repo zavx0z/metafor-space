@@ -10,10 +10,10 @@ import {
   EventPart,
   noChange,
   PropertyPart,
-  TemplateInstance
+  TemplateInstance,
+  type Part
 } from "./html.js"
 import type {DirectiveClass, DirectiveResult, PartInfo} from "./directives"
-import type {Part} from "./types/part.js"
 
 // Содержит либо минифицированное, либо неминифицированное имя метода `_$resolve` директивы
 let resolveMethodName: Extract<keyof Directive, "_$resolve"> | null = null
