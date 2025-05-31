@@ -157,7 +157,7 @@ export function trustFromTemplateString(tsa, stringFromTSA) {
 }
 
 /**
- @param {ChildPart | AttributePart | ElementPart} part - Часть
+ @param {import("./html").Part} part - Часть
  @param {unknown} value - Значение
  @param {DirectiveParent} [parent=part] - Родитель
  @param {number} [attributeIndex] - Индекс атрибута
@@ -339,7 +339,7 @@ let sanitizerFactoryInternal = noopSanitizer
 
 /**
  Устанавливает глобально фабрику санитизации.
- @param {SanitizerFactory} newSanitizer
+ @param {import("./html.t").SanitizerFactory} newSanitizer
  */
 const setSanitizer = (newSanitizer) => {
     if (sanitizerFactoryInternal !== noopSanitizer) {
@@ -609,7 +609,7 @@ export class ChildPart {
     // _$isConnected: boolean
 
     /** @type {unknown} */ _$committedValue = nothing
-    /** @type {ValueSanitizer | undefined} */ _textSanitizer
+    /** @type {import("./html.t").ValueSanitizer | undefined} */ _textSanitizer
     /** @type {Disconnectable | undefined} */ _$parent
     /** @type {Set<Disconnectable>|undefined} */ _$disconnectableChildren = undefined
     /** @type {((isConnected: boolean, removeFromParent?: boolean, from?: number) => void )| undefined} */ _$notifyConnectionChanged = undefined
@@ -883,7 +883,7 @@ export class AttributePart {
     /** @type {ReadonlyArray<string> | undefined} */ strings
     /** @type {unknown | Array<unknown>} */ _$committedValue = nothing
     /** @type {Set<Disconnectable> | undefined} */ _$disconnectableChildren
-    /** @type {ValueSanitizer | undefined} */ _sanitizer
+    /** @type {import("./html.t").ValueSanitizer | undefined} */ _sanitizer
     /** @type {Disconnectable} */ _$parent
 
     get tagName() {

@@ -1,4 +1,5 @@
 import type {Disconnectable, RenderOptions, ResultType, TemplateResult} from "./types/html"
+import type {ValueSanitizer} from "./html.t.ts";
 // import type { Directive } from "./directive"
 // import type { PartInfo } from "./types/directives"
 // import type { Disconnectable } from "./types/html"
@@ -505,37 +506,4 @@ export type Part =
 // export interface RefDirective {
 //   (ref: (el: Element | undefined) => void): unknown
 // }
-export {noChange} from "./html.t.ts";
-export {nothing} from "./html.t.ts";
-/**
- * Используется для санитизации любого значения перед записью в DOM. Может быть
- * использовано для реализации политики безопасности разрешенных и запрещенных значений
- * для предотвращения XSS-атак.
- *
- * Один из способов использования этого обработчика - проверка атрибутов и свойств
- * на соответствие списку полей высокого риска и требование, чтобы значения, записываемые
- * в такие поля, были экземплярами безопасного по построению класса. Safe HTML Types от
- * Closure является одной из реализаций этой техники
- * (https://github.com/google/safe-html-types/blob/master/doc/safehtml-types.md).
- * Полифил TrustedTypes в режиме только API также может быть использован как основа
- * для этой техники (https://github.com/WICG/trusted-types).
- *
- * @param node HTML-узел (обычно либо текстовый узел #text, либо Element),
- *     в который производится запись. Обратите внимание, что это только узел-пример,
- *     запись может производиться в другой экземпляр того же класса узла.
- * @param name Имя атрибута или свойства (например, 'href').
- * @param type Указывает, будет ли запись выполняться в свойство или узел.
- * @return Функция, которая будет санитизировать этот класс записей.
- */
-export type SanitizerFactory = (node: Node, name: string, type: "property" | "attribute") => ValueSanitizer
-
-/**
- * Функция санитизации значения, которые будут записаны в определенный тип DOM-приемника.
- * См. SanitizerFactory.
- * @param value Значение для санитизации. Будет фактическим значением, переданным в литерал шаблона @pkg/html, поэтому может быть любого типа.
- * @return Значение для записи в DOM. Обычно совпадает с входным значением, если только не требуется санитизация.
- */
-export type ValueSanitizer = (value: unknown) => unknown
-
-// https://tc39.github.io/ecma262/#sec-typeof-operator
-export type Primitive = null | undefined | boolean | number | string | symbol | bigint
+export {noChange, nothing} from "./html.t.ts"
