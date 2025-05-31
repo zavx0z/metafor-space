@@ -2,7 +2,7 @@ import type { ContextData, ContextDefinition } from "./context"
 import type { Transitions } from "./transitions"
 import type { CoreData, CoreDefinition } from "./core"
 import type {  Reactions } from "./reaction"
-import type { Meta } from "./index"
+import type { Meta } from "../index"
 import type { CreateOnTransitionCallBack } from "./create"
 
 /**

@@ -277,7 +277,7 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/** @type {import("./types").MetaFor} */ // prettier-ignore
+/** @type {import("./index.js").MetaFor} */ // prettier-ignore
 export function MetaFor(tag, conf = {}) {
   const { development, description } = conf
   if (development) {

@@ -1,20 +1,21 @@
-import type { ContextData, ContextDefinition, ContextTypes, UpdateParameters } from "./context"
-import type { Transitions } from "./transitions"
-import type { Core, CoreDefinition, CoreObj } from "./core"
-import type {  Reactions } from "./reaction"
-import type { ViewDefinition } from "./view"
-import type { CreateParams } from "./create"
-import type { MetaConstructor, Snapshot, OnUpdate, OnTransition } from "./meta"
+import type {ContextData, ContextDefinition, ContextTypes, UpdateParameters} from "./types/context"
+import type {Transitions} from "./types/transitions"
+import type {Core, CoreDefinition, CoreObj} from "./types/core"
+import type {Reactions} from "./types/reaction"
+import type {ViewDefinition} from "./types/view"
+import type {CreateParams} from "./types/create"
+import type {MetaConstructor, Snapshot, OnUpdate, OnTransition} from "./types/meta"
 
-export { BroadcastMessage } from "./meta"
+export {BroadcastMessage} from "./types/meta"
+
 /**
- 
- # MetaFor - мета для ... 
+
+ # MetaFor - мета для ...
 
  Создает класс/коллекцию Мета - которые порождают сущности - называемые meta.
 
- > Декларативное описание сущности и её поведения  
- 
+ > Декларативное описание сущности и её поведения
+
 
  ## Основные составляющие:
  - Состояния
@@ -29,12 +30,12 @@ export { BroadcastMessage } from "./meta"
  - Реакции на изменения других частиц
 
  > Meta (класс/коллекция) порождает meta (актор/сущность) при вызове метода create
-  
+
  @param tag - Имя частицы
  @param [conf] - Конфигурация частицы
  @param conf.description - Описание частицы
  @param conf.development - Режим разработки (подключена валидация)
- 
+
  @includeExample tests/metafor.spec.ts
  */ // prettier-ignore
 export declare function MetaFor(
@@ -43,11 +44,12 @@ export declare function MetaFor(
     description?: string
     development?: boolean
   }
-): { states: <S extends string>( ...states: S[] ) => {
-    context: <C extends ContextDefinition>( context: (types: ContextTypes) => C ) => {
-      core: <I extends CoreObj>( core: CoreDefinition<I, C> = () => Object.create({}) ) => {
+): {
+  states: <S extends string>(...states: S[]) => {
+    context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
+      core: <I extends CoreObj>(core: CoreDefinition<I, C>) => {
         transitions: (transitions: Transitions<S, C, I>) => {
-          reactions: (reactions:  Reactions<C, I>) => {
+          reactions: (reactions: Reactions<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
               create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
             }
@@ -101,7 +103,7 @@ export declare class Meta<S extends string, C extends Record<string, any>, I ext
   types: Record<string, any>
   transitions: Transitions<S, C, I>
   core: Core<I>
-  reactions:  Reactions<C, I>
+  reactions: Reactions<C, I>
   channel: BroadcastChannel
   process: boolean
   component: Element
