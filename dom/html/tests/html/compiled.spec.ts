@@ -72,7 +72,7 @@ describe("скомпилированные шаблоны", () => {
     assertRender(result, '<div foo="A"></div>')
   })
 
-  test.skip("выражение элемента", () => {
+  test("выражение элемента", () => {
     const r = createRef()
     // Скомпилированный шаблон для html`<div ${ref(r)}></div>`
     const _$html_template_1: CompiledTemplate = {

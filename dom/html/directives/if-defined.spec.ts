@@ -1,6 +1,6 @@
 import {beforeAll, describe, expect, test} from "bun:test"
-import {ifDefined} from "../../directives/if-defined.js"
-import {html, render} from "../../html.js"
+import {ifDefined} from "./if-defined.js"
+import {html, render} from "../html.js"
 
 describe("ifDefined directive", () => {
   let container: HTMLDivElement
@@ -182,11 +182,11 @@ describe("ifDefined directive", () => {
 
     go(undefined)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
-    expect(removeCount).toBe(1, "A")
+    expect(removeCount).toBe(1)
 
     go(undefined)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
-    expect(removeCount).toBe(1, "B")
+    expect(removeCount).toBe(1)
   })
 
   test("only sets node text value changed", async () => {

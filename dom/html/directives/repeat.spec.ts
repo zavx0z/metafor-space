@@ -1,6 +1,6 @@
 import {describe, expect, beforeAll, test} from "bun:test"
-import {html, render} from "../../html.js"
-import {repeat} from "../../directives/repeat.js"
+import {html, render} from "../html.js"
+import {repeat} from "./repeat.js"
 
 function assertItemIdentity(oldChildren: HTMLElement[], newChildren: HTMLElement[], newOrder: number[]) {
   newOrder.forEach((o, n) => {

@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, test} from "bun:test"
 import {type CompiledTemplateResult, html, nothing, type RenderOptions, type TemplateResult} from "../../html.js"
 import {render} from "../../html.js"
 
-// У нас нет прямого доступа к DEV_MODE, но это достаточно хороший прокси.
+// @ts-ignore У нас нет прямого доступа к DEV_MODE, но это достаточно хороший прокси.
 const DEV_MODE = render.setSanitizer != null
 
 /**
@@ -646,7 +646,7 @@ describe("вставка маркера", () => {
       expect(() => render(template, container)).toThrow()
     } else {
       render(template, container)
-      expect(container.innerHTML).oneOfMatchStringHTMLStripMarkers("<><!-- --></>")
+      expect(container.innerHTML).oneOfMatchStringHTMLStripMarkers(["<><!-- --></>"])
     }
   })
 

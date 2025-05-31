@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, test} from "bun:test"
-import {html, nothing, render} from "../../html.js"
-import {until} from "../../directives/until.js"
+import {html, nothing, render} from "../html.js"
+import {until} from "./until.js"
 
 /** Помощник для создания Promises, которые могут быть разрешены или отклонены после первоначального создания. */
 export class Deferred<T> {

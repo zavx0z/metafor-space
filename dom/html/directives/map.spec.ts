@@ -1,7 +1,7 @@
-import {makeExpectRender} from "../fixtures/expectExtend.ts"
-import {html} from "../../html.js"
+import {makeExpectRender} from "../tests/fixtures/expectExtend.ts"
+import {html} from "../html.js"
 import {beforeAll, describe, test} from "bun:test"
-import {map} from "../../directives/map.js"
+import {map} from "./map.js"
 
 describe('map', () => {
   let container: HTMLDivElement

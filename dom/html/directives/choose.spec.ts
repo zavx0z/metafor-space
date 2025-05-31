@@ -1,4 +1,4 @@
-import {choose} from "../../directives/choose.js"
+import {choose} from "./choose.js"
 import {test, describe, expect} from "bun:test"
 
 describe("choose", () => {
@@ -39,7 +39,7 @@ describe("choose", () => {
   })
 
   // Type-only regression test
-  test.skip("type-only: correctly infers type of possible cases from value", () => {
+  test("type-only: correctly infers type of possible cases from value", () => {
     type CheckoutStep = "register" | "delivery" | "payment"
     const step = "register" as CheckoutStep
     return choose(step, [

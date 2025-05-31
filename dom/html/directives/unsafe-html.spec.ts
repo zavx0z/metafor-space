@@ -1,7 +1,7 @@
-import {unsafeHTML} from "../../directives/unsafe-html.js"
+import {unsafeHTML} from "./unsafe-html.js"
 
 import {beforeEach, describe, expect, test} from "bun:test"
-import {html, noChange, nothing, render} from "../../html.js"
+import {html, noChange, nothing, render} from "../html.js"
 
 describe("unsafeHTML directive", () => {
   let container: HTMLElement

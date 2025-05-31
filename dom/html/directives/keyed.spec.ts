@@ -1,5 +1,5 @@
-import {keyed} from "../../directives/keyed.js"
-import {html, render} from "../../html.js"
+import {keyed} from "./keyed.js"
+import {html, render} from "../html.js"
 import {test, describe, expect, beforeAll} from "bun:test"
 
 describe("keyed directive", () => {

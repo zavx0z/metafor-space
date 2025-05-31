@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test"
-import {range} from "../../directives/range"
+import {range} from "./range"
 
 describe("range", () => {
   test("positive end", () => {

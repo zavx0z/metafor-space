@@ -1,5 +1,5 @@
-import {unsafeMathML} from "../../directives/unsafe-mathml.js"
-import {render, html, noChange, nothing} from "../../html.js"
+import {unsafeMathML} from "./unsafe-mathml.js"
+import {render, html, noChange, nothing} from "../html.js"
 import {describe, test, beforeAll, expect} from "bun:test"
 
 describe("unsafeMathML", () => {

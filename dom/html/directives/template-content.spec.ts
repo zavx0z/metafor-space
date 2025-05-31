@@ -1,5 +1,5 @@
-import {templateContent} from "../../directives/template-content.js"
-import {html, render} from "../../html.js"
+import {templateContent} from "./template-content.js"
+import {html, render} from "../html.js"
 import {describe, test, beforeAll, expect} from "bun:test"
 
 describe("templateContent", () => {

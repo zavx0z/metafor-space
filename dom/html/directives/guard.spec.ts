@@ -1,9 +1,9 @@
 import {beforeAll, describe, expect, test} from "bun:test"
-import {html, nothing, render} from '../../html.js'
-import {guard} from '../../directives/guard.js'
-import {directive} from "../../directive.js"
-import type {PartInfo} from "../../directive.ts"
-import {Directive} from "../../directive.t.ts";
+import {html, nothing, render} from '../html.js'
+import {guard} from './guard.js'
+import {directive} from "../directive.js"
+import type {PartInfo} from "../directive.d.ts"
+import {Directive} from "../directive.t.ts";
 
 describe('guard', () => {
   let container: HTMLDivElement

@@ -1,5 +1,5 @@
-import {unsafeSVG} from '../../directives/unsafe-svg.js';
-import {render, html, noChange, nothing} from '../../html.js';
+import {unsafeSVG} from './unsafe-svg.js';
+import {render, html, noChange, nothing} from '../html.js';
 import {describe, test, beforeAll, expect} from 'bun:test';
 
 describe('unsafeSVG', () => {

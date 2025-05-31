@@ -1,6 +1,6 @@
 import {beforeAll, describe, expect, test} from "bun:test"
-import {live} from "../../directives/live.js"
-import {html, noChange, nothing, render} from "../../html.js"
+import {live} from "./live.js"
+import {html, noChange, nothing, render} from "../html.js"
 
 class LiveTester extends HTMLElement {
   _x?: string

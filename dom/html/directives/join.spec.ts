@@ -1,8 +1,8 @@
 import {describe, test, beforeAll} from "bun:test"
-import {html} from "../../html.js"
+import {html} from "../html.js"
 
-import {join} from "../../directives/join.js"
-import {makeExpectRender} from "../fixtures/expectExtend.js"
+import {join} from "./join.js"
+import {makeExpectRender} from "../tests/fixtures/expectExtend.js"
 
 describe("join", () => {
   let container: HTMLDivElement
