@@ -20,13 +20,14 @@ export declare const HTML_RESULT: 1
 export declare const SVG_RESULT: 2
 export declare const MATHML_RESULT: 3
 
-// export declare const ATTRIBUTE_PART: 1
-// export declare const CHILD_PART: 2
-// export declare const PROPERTY_PART: 3
-// export declare const BOOLEAN_ATTRIBUTE_PART: 4
-// export declare const EVENT_PART: 5
-// export declare const ELEMENT_PART: 6
-// export declare const COMMENT_PART: 7
+export declare const ATTRIBUTE_PART: 1
+export declare const CHILD_PART: 2
+export declare const PROPERTY_PART: 3
+export declare const BOOLEAN_ATTRIBUTE_PART: 4
+export declare const EVENT_PART: 5
+export declare const ELEMENT_PART: 6
+export declare const COMMENT_PART: 7
+
 // export declare const SPACE_CHAR: string
 // export declare const ATTR_VALUE_CHAR: string
 // export declare const NAME_CHAR: string
