@@ -197,10 +197,10 @@ export declare function render(
  * если шаблон происходит из того же выражения, что и ранее отрисованный результат,
  * он эффективно обновляется вместо полной замены.
  *
- * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<1>}
+ * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<typeof HTML_RESULT>}
  */
-export declare function html(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<1>
-
+export declare function html(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<typeof HTML_RESULT>
+export type Html = (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<typeof HTML_RESULT>
 /**
  * Интерпретирует литерал шаблона как SVG-фрагмент, который может эффективно отрисовываться и обновлять контейнер.
  *

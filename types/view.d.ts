@@ -1,8 +1,8 @@
 import type {Meta} from "../metafor"
 import type {ContextData, ContextDefinition, Update} from "./context"
 import type {Core, CoreObj} from "./core"
-import type {html} from "html/html"
-import {ref} from "html/directives/ref"
+import type {Html, TemplateResult} from "../dom/html/html"
+import {ref} from "../dom/html/directives/ref"
 
 /**
  Структура условного блока для компонента
@@ -58,7 +58,7 @@ export type ComponentParams<I extends CoreObj, C extends ContextDefinition, S ex
  @property [isolated=true] - Флаг изолированного рендеринга
  */
 export type ViewDefinition<I extends Record<string, any>, C extends ContextDefinition, S extends string> = {
-  render: (params: ViewDefinitionParams<I, C, S>) => string
+  render: (params: ViewDefinitionParams<I, C, S>) => TemplateResult<1>
   onMount?: MountParams<I>
   onDestroy?: MountParams<I>
   style?: ({css}: { css: (strings: TemplateStringsArray, ...values: any[]) => CSSStyleSheet }) => void
@@ -91,6 +91,6 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
   context: ContextData<C>
   state: S
   core: Core<I>
-  html: typeof html
+  html: Html
   ref: typeof ref
 }

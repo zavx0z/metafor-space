@@ -57,9 +57,6 @@ export const Nodes = MetaFor("nodes", {
         <h1>Nodes</h1>
         <button @click=${() => update({ op: "add" })}>Add</button>
         <button @click=${() => update({ op: "remove" })}>Remove</button>
-        ${map(context.nodes, (item) => {
-          html`<p>${item.id}</p>`
-        })}
       </div>
     `,
     style: ({ css }) => css`
