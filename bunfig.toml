@@ -1,2 +1,2 @@
 [test]
-preload = ["./dom/happydom.ts", "./dom/html/tests/fixtures/expectExtend.ts"]
+preload = ["./fixtures/happydom.ts", "./html/tests/fixtures/expectExtend.ts"]

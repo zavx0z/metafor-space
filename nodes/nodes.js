@@ -1,6 +1,6 @@
 import {MetaFor} from "../metafor.js"
 import ELK from "elkjs"
-import {repeat} from "../dom/html/directives/repeat.js"
+import {repeat} from "../html/directives/repeat.js"
 
 export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
 ).states(

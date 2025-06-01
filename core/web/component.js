@@ -1,5 +1,5 @@
-import { html, render } from "../../dom/html/html.js"
-import { ref } from "../../dom/html/directives/ref.js"
+import { html, render } from "../../html/html.js"
+import { ref } from "../../html/directives/ref.js"
 
 
 /**

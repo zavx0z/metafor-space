@@ -1,8 +1,8 @@
 import type {Meta} from "../metafor"
 import type {ContextData, ContextDefinition, Update} from "./context"
 import type {Core, CoreObj} from "./core"
-import type {HtmlType, TemplateResult} from "../dom/html/html"
-import {ref} from "../dom/html/directives/ref"
+import type {HtmlType, TemplateResult} from "../html/html"
+import {ref} from "../html/directives/ref"
 
 /**
  Структура условного блока для компонента
