@@ -301,9 +301,9 @@ export type Part = | ChildPart | AttributePart | PropertyPart | BooleanAttribute
  */
 export declare class ChildPart implements Disconnectable {
   type: typeof CHILD_PART
-  // _$parent?: Disconnectable
-  // _$disconnectableChildren?: Set<Disconnectable>
-
+  readonly options: RenderOptions | undefined;
+  _$startNode: ChildNode
+  _$endNode: ChildNode | null
   _$committedValue: unknown
   _textSanitizer: ValueSanitizer | undefined
   _$parent: Disconnectable | undefined

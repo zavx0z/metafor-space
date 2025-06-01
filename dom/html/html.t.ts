@@ -50,7 +50,6 @@ export type SanitizerFactory = (node: Node, name: string, type: "property" | "at
  * @return Значение для записи в DOM. Обычно совпадает с входным значением, если только не требуется санитизация.
  */
 export type ValueSanitizer = (value: unknown) => unknown
-export type Primitive = null | undefined | boolean | number | string | symbol | bigint
 /**
  Возвращает HTML-строку для заданного массива строк шаблона и типа результата (HTML или SVG),
  а также имена чувствительных к регистру привязанных атрибутов в порядке шаблона.

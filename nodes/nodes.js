@@ -1,5 +1,6 @@
 import {MetaFor} from "../metafor.js"
 import ELK from "elkjs"
+import {repeat} from "../dom/html/directives/repeat.js"
 
 export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
 ).states(
@@ -54,6 +55,9 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
           <button @click=${() => update({op: "remove"})}>Remove</button>
           ${context.nodes.map(/**@param {{id: string}} i**/(i) => html`
               <div>${i.id}</div>
+          `)}
+          ${repeat(context.nodes, node => node.id, node => html`
+              <div>${node.id}</div>
           `)}
       </div>
   `,

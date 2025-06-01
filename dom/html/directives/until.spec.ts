@@ -29,12 +29,9 @@ describe("until directive", () => {
 
   test("renders a Promise when it resolves", async () => {
     const deferred = new Deferred<any>()
-    render(
-      html`
+    render(html`
         <div>${until(deferred.promise)}</div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     deferred.resolve("foo")
     await deferred.promise
@@ -43,14 +40,11 @@ describe("until directive", () => {
 
   test("renders non-Promises immediately", async () => {
     const defaultContent = html`
-      <span>loading...</span>
+        <span>loading...</span>
     `
-    render(
-      html`
+    render(html`
         <div>${until(deferred.promise, defaultContent)}</div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div><span>loading...</span></div>")
     deferred.resolve("foo")
     await deferred.promise
@@ -59,12 +53,9 @@ describe("until directive", () => {
 
   test("renders primitive low-priority content only once", async () => {
     const go = () =>
-      render(
-        html`
+      render(html`
           <div>${until(deferred.promise, "loading...")}</div>
-        `,
-        container
-      )
+      `, container)
 
     go()
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>loading...</div>")
@@ -78,19 +69,11 @@ describe("until directive", () => {
 
   test("renders non-primitive low-priority content only once", async () => {
     const go = () =>
-      render(
-        html`
+      render(html`
           <div>
-            ${until(
-              deferred.promise,
-              html`
-                loading...
-              `
-            )}
+              ${until(deferred.promise, html` loading... `)}
           </div>
-        `,
-        container
-      )
+      `, container)
 
     go()
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>loading...</div>")
@@ -103,10 +86,9 @@ describe("until directive", () => {
   })
 
   test("renders changing defaultContent", async () => {
-    const t = (d: any) =>
-      html`
+    const t = (d: any) => html`
         <div>${until(deferred.promise, d)}</div>
-      `
+    `
     render(t("A"), container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>A</div>")
 
@@ -120,12 +102,9 @@ describe("until directive", () => {
 
   test("отображает Promise в атрибут", async () => {
     const promise = Promise.resolve("foo")
-    render(
-      html`
+    render(html`
         <div test=${until(promise)}></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="foo"></div>')
@@ -133,12 +112,9 @@ describe("until directive", () => {
 
   test("отображает defaultContent в атрибут", async () => {
     const promise = Promise.resolve("foo")
-    render(
-      html`
+    render(html`
         <div test=${until(promise, "bar")}></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="bar"></div>')
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="foo"></div>')
@@ -146,12 +122,9 @@ describe("until directive", () => {
 
   test("отображает Promise в интерполированный атрибут", async () => {
     const promise = Promise.resolve("foo")
-    render(
-      html`
+    render(html`
         <div test="value:${until(promise)}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="value:"></div>')
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="value:foo"></div>')
@@ -159,12 +132,9 @@ describe("until directive", () => {
 
   test("отображает nothing fallback в интерполированный атрибут", async () => {
     const promise = Promise.resolve("foo")
-    render(
-      html`
+    render(html`
         <div test="value:${until(promise, nothing)}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="value:foo"></div>')
@@ -172,12 +142,9 @@ describe("until directive", () => {
 
   test("отображает defaultContent в интерполированный атрибут", async () => {
     const promise = Promise.resolve("foo")
-    render(
-      html`
+    render(html`
         <div test="value:${until(promise, "bar")}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="value:bar"></div>')
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test="value:foo"></div>')
@@ -185,12 +152,9 @@ describe("until directive", () => {
 
   test("отображает Promise в свойство", async () => {
     const promise = Promise.resolve("foo")
-    render(
-      html`
+    render(html`
         <div .test=${until(promise)}></div>
-      `,
-      container
-    )
+    `, container)
     const div = container.querySelector("div")
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     expect((div as any).test).toBeUndefined()
@@ -201,12 +165,9 @@ describe("until directive", () => {
 
   test("отображает Promise в булевом атрибуте", async () => {
     const promise = Promise.resolve(true)
-    render(
-      html`
+    render(html`
         <div ?test=${until(promise)}></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div test=""></div>')
@@ -217,33 +178,25 @@ describe("until directive", () => {
     const promise = Promise.resolve(() => {
       called = true
     })
-    render(
-      html`
+    render(html`
         <div @test=${until(promise)}></div>
-      `,
-      container
-    )
+    `, container)
     const div = container.querySelector("div")!
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     div.dispatchEvent(new CustomEvent("test"))
-    expect(called).toMatchStringHTML(false)
+    expect(called).toMatchStringHTML("false")
     await promise
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     div.dispatchEvent(new CustomEvent("test"))
-    expect(called).toMatchStringHTML(true)
+    expect(called).toMatchStringHTML("true")
   })
 
   test("отображает новый Promise над существующим Promise", async () => {
     const t = (v: any) =>
       html`
-        <div>
-          ${until(
-            v,
-            html`
-              <span>loading...</span>
-            `
-          )}
-        </div>
+          <div>
+              ${until(v, html`<span>loading...</span>`)}
+          </div>
       `
     render(t(deferred.promise), container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div><span>loading...</span></div>")
@@ -267,7 +220,7 @@ describe("until directive", () => {
 
     const t = (promise: any) =>
       html`
-        <div>${until(promise)}</div>
+          <div>${until(promise)}</div>
       `
 
     // First render, first Promise, no value
@@ -292,10 +245,9 @@ describe("until directive", () => {
     const deferred1 = new Deferred<any>()
     const deferred2 = new Deferred<any>()
 
-    const t = () =>
-      html`
+    const t = () => html`
         <div>${until(deferred1.promise, deferred2.promise)}</div>
-      `
+    `
 
     // Первый рендер с обеими Promise не разрешены
     render(t(), container)
@@ -316,10 +268,9 @@ describe("until directive", () => {
     const deferred1 = new Deferred<any>()
     const deferred2 = new Deferred<any>()
 
-    const t = () =>
-      html`
+    const t = () => html`
         <div>${until(deferred1.promise, deferred2.promise)}</div>
-      `
+    `
 
     // Первый рендер с обеими Promise не разрешены
     render(t(), container)
@@ -340,20 +291,19 @@ describe("until directive", () => {
     const promise1 = Promise.resolve("foo")
     const promise2 = Promise.resolve("bar")
 
-    const t = (p1: any, p2: any) =>
-      html`
+    const t = (p1: any, p2: any) => html`
         <div>${until(p1, p2)}</div>
-      `
+    `
 
     render(t(promise1, promise2), container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
     // Ждем микрозадачу, чтобы оба Promise then callbacks завершились
-    await 0
+    await Bun.sleep(0)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>foo</div>")
 
     render(t(promise2, promise1), container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>foo</div>")
-    await 0
+    await Bun.sleep(0)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>bar</div>")
   })
 
@@ -361,23 +311,22 @@ describe("until directive", () => {
     const deferred1 = new Deferred<any>()
     const promise2 = Promise.resolve("bar")
 
-    const t = (p1: any, p2: any) =>
-      html`
+    const t = (p1: any, p2: any) => html`
         <div>${until(p1, p2)}</div>
-      `
+    `
 
     // Первый рендер с высоким приоритетом значением
     render(t("string", promise2), container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>string</div>")
     // Ждем микрозадачу, чтобы оба Promise then callbacks завершились
-    await 0
+    await Bun.sleep(0)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>string</div>")
 
     // Затем рендер новых Promise с низким приоритетом Promise уже разрешен
     render(t(deferred1.promise, promise2), container)
     // Поскольку они являются Promise, ничего не происходит синхронно
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>string</div>")
-    await 0
+    await Bun.sleep(0)
     // Низко-приоритетный рендер
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>bar</div>")
     deferred1.resolve("foo")
@@ -390,10 +339,9 @@ describe("until directive", () => {
     const deferred1 = new Deferred<any>()
     const deferred2 = new Deferred<any>()
 
-    const t = (p1: any, p2: any) =>
-      html`
+    const t = (p1: any, p2: any) => html`
         <div>${until(p1, p2)}</div>
-      `
+    `
 
     // Первый рендер с обеими Promise не разрешены
     render(t(deferred1.promise, deferred2.promise), container)
@@ -415,75 +363,54 @@ describe("until directive", () => {
   })
 
   test("отображает литерал в ChildPart", () => {
-    render(
-      html`
+    render(html`
         ${until("a")}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("a")
   })
 
   test("отображает литерал в AttributePart", () => {
-    render(
-      html`
+    render(html`
         <div data-attr="${until("a")}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div data-attr="a"></div>')
   })
 
   test("отображает литералы в интерполированном AttributePart", () => {
-    render(
-      html`
+    render(html`
         <div data-attr="other ${until("a")} ${until("b")}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div data-attr="other a b"></div>')
   })
 
   test("отображает литерал в BooleanAttributePart", () => {
-    render(
-      html`
+    render(html`
         <div ?data-attr="${until("a")}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div data-attr=""></div>')
   })
 
   test("отображает литерал в EventPart", () => {
     let callCount = 0
-    render(
-      html`
+    render(html`
         <div @some-event="${until(() => callCount++)}"></div>
-      `,
-      container
-    )
+    `, container)
     const div = container.querySelector("div") as HTMLDivElement
     div.dispatchEvent(new Event("some-event"))
-    expect(callCount).toMatchStringHTML(1)
+    expect(callCount).toMatchStringHTML("1")
   })
 
   test("отображает литерал в PropertyPart", () => {
-    render(
-      html`
+    render(html`
         <div .someProp="${until("a")}"></div>
-      `,
-      container
-    )
+    `, container)
     expect((container.querySelector("div")! as any).someProp).toMatchStringHTML("a")
   })
 
   test("отображает Promise в ChildPart", async () => {
-    render(
-      html`
+    render(html`
         ${until(Promise.resolve("a"))}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("")
 
     await laterTask()
@@ -491,12 +418,9 @@ describe("until directive", () => {
   })
 
   test("отображает Promise в AttributePart", async () => {
-    render(
-      html`
+    render(html`
         <div data-attr="${until(Promise.resolve("a"))}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
 
     await laterTask()
@@ -504,12 +428,9 @@ describe("until directive", () => {
   })
 
   test("отображает Promises в интерполированном AttributePart", async () => {
-    render(
-      html`
+    render(html`
         <div data-attr="other ${until(Promise.resolve("a"))} ${until(Promise.resolve("b"))}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div data-attr="other  "></div>')
 
     await laterTask()
@@ -517,12 +438,9 @@ describe("until directive", () => {
   })
 
   test("отображает Promise в BooleanAttributePart", async () => {
-    render(
-      html`
+    render(html`
         <div ?data-attr="${until(Promise.resolve("a"))}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
 
     await laterTask()
@@ -530,12 +448,9 @@ describe("until directive", () => {
   })
 
   test("отображает Promise в PropertyPart", async () => {
-    render(
-      html`
+    render(html`
         <div .someProp="${until(Promise.resolve("a"))}"></div>
-      `,
-      container
-    )
+    `, container)
     expect((container.querySelector("div")! as any).someProp).toBeUndefined()
 
     await laterTask()
@@ -544,19 +459,16 @@ describe("until directive", () => {
 
   test("отображает Promise в EventPart", async () => {
     let callCount = 0
-    render(
-      html`
+    render(html`
         <div @some-event="${until(Promise.resolve(() => callCount++))}"></div>
-      `,
-      container
-    )
+    `, container)
     const div = container.querySelector("div") as HTMLDivElement
     div.dispatchEvent(new Event("some-event"))
-    expect(callCount).toMatchStringHTML(0)
+    expect(callCount).toMatchStringHTML("0")
 
     await laterTask()
     div.dispatchEvent(new Event("some-event"))
-    expect(callCount).toMatchStringHTML(1)
+    expect(callCount).toMatchStringHTML("1")
   })
 
   test("отображает promise-like в ChildPart", async () => {
@@ -566,12 +478,9 @@ describe("until directive", () => {
       }
     }
 
-    render(
-      html`
+    render(html`
         ${until(thenable)}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("")
 
     await laterTask()
@@ -585,12 +494,9 @@ describe("until directive", () => {
       }
     }
 
-    render(
-      html`
+    render(html`
         <div data-attr="${until(thenable)}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
 
     await laterTask()
@@ -610,12 +516,9 @@ describe("until directive", () => {
       }
     }
 
-    render(
-      html`
+    render(html`
         <div data-attr="other ${until(thenableA)} ${until(thenableB)}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers('<div data-attr="other  "></div>')
 
     await Bun.sleep(0)
@@ -629,12 +532,9 @@ describe("until directive", () => {
       }
     }
 
-    render(
-      html`
+    render(html`
         <div ?data-attr="${until(thenable)}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
 
     await laterTask()
@@ -648,12 +548,9 @@ describe("until directive", () => {
       }
     }
 
-    render(
-      html`
+    render(html`
         <div .someProp="${until(thenable)}"></div>
-      `,
-      container
-    )
+    `, container)
     expect((container.querySelector("div")! as any).someProp).toBeUndefined()
 
     await laterTask()
@@ -668,19 +565,16 @@ describe("until directive", () => {
       }
     }
 
-    render(
-      html`
+    render(html`
         <div @some-event="${until(thenable)}"></div>
-      `,
-      container
-    )
+    `, container)
     const div = container.querySelector("div") as HTMLDivElement
     div.dispatchEvent(new Event("some-event"))
-    expect(callCount).toMatchStringHTML(0)
+    expect(callCount).toMatchStringHTML("0")
 
     await laterTask()
     div.dispatchEvent(new Event("some-event"))
-    expect(callCount).toMatchStringHTML(1)
+    expect(callCount).toMatchStringHTML("1")
   })
 
   test("отображает аргументы позже, пока ранее разрешенные Promise не разрешатся", async () => {
@@ -689,12 +583,9 @@ describe("until directive", () => {
       resolvePromise = resolve
     })
 
-    render(
-      html`
+    render(html`
         ${until(promise, "default")}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("default")
 
     resolvePromise!("resolved value")
@@ -713,12 +604,9 @@ describe("until directive", () => {
       resolvePromiseB = resolve
     })
 
-    render(
-      html`
+    render(html`
         ${until(promiseA, promiseB, "default")}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("default")
 
     resolvePromiseA!("A")
@@ -741,12 +629,9 @@ describe("until directive", () => {
       resolvePromiseB = resolve
     })
 
-    render(
-      html`
+    render(html`
         ${until(promiseA, promiseB, "default")}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("default")
 
     resolvePromiseB!("B")
@@ -764,12 +649,9 @@ describe("until directive", () => {
       resolvePromise = resolve
     })
 
-    render(
-      html`
+    render(html`
         ${until("default", promise)}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("default")
 
     resolvePromise!("resolved value")
@@ -784,12 +666,9 @@ describe("until directive", () => {
         resolvePromise = resolve
       })
 
-      const part = render(
-        html`
+      const part = render(html`
           <div>${until(promise)}</div>
-        `,
-        container
-      )
+      `, container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
 
       part.setConnected(false)
@@ -808,12 +687,9 @@ describe("until directive", () => {
         resolvePromise = resolve
       })
 
-      const part = render(
-        html`
+      const part = render(html`
           <div>${until(promise)}</div>
-        `,
-        container
-      )
+      `, container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div></div>")
 
       part.setConnected(false)
@@ -837,7 +713,7 @@ describe("until directive", () => {
       })
 
       const template = (v: unknown) => html`
-        <div>${v}</div>
+          <div>${v}</div>
       `
 
       const part = render(template(""), container)
@@ -861,7 +737,7 @@ describe("until directive", () => {
       })
 
       const template = (v: unknown) => html`
-        <div>${v}</div>
+          <div>${v}</div>
       `
 
       const part = render(template("1"), container)
@@ -889,13 +765,10 @@ describe("until directive", () => {
         resolvePromise = resolve
       })
 
-      render(
-        html`
+      render(html`
           <div>${until(promise, "unresolved1")}</div>
           <span>${until(promise, "unresolved2")}</span>
-        `,
-        container
-      )
+      `, container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>unresolved1</div><span>unresolved2</span>")
 
       resolvePromise!("resolved")
