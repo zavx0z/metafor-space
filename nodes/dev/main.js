@@ -1,24 +1,23 @@
-import { MetaFor } from "../../metafor.js"
-import { Nodes } from "../nodes.js"
+import {MetaFor} from "../../metafor.js"
+import {Nodes} from "../nodes.js"
 
 const nodes = Nodes.create({
   state: "ожидание патча",
 })
 
-const meta = MetaFor("nodes", {
+MetaFor("nodes", {
   description: "Nodes",
   development: false,
 })
   .states("начало", "конец")
   .context((t) => ({
-    status: t.enum("start", "end")({ title: "Status", default: "start" }),
+    status: t.enum("start", "end")({title: "Status", default: "start"}),
   }))
-  .core(() => ({
-  }))
+  .core(() => ({}))
   .transitions([
     {
       from: "начало",
-      action: ({ context }) => {
+      action: ({context}) => {
         console.log(context)
       },
       to: [
