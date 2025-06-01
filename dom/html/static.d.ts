@@ -1,4 +1,4 @@
-import {html as coreHtml, mathml as coreMathml, svg as coreSvg} from "./html.js"
+import {html as coreHtml, HTML_RESULT, mathml as coreMathml, svg as coreSvg, type TemplateResult} from "./html.js"
 
 /**
  * Предотвращает атаки с внедрением JSON.
@@ -92,3 +92,5 @@ export declare function literal(
  * так как фактически создается новый шаблон.
  */
 export declare function unsafeStatic(value: string): StaticValue
+
+export declare function html(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<typeof HTML_RESULT>
