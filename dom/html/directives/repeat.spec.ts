@@ -17,8 +17,8 @@ describe("repeat", () => {
     container = document.createElement("div")
   })
 
-  describe("keyed", () => {
-    test("renders a list", () => {
+  describe("с ключами", () => {
+    test("отображает список", () => {
       // prettier-ignore
       const r = html`${repeat([1, 2, 3], (i) => i, (i) => html`
             <li>item: ${i}</li>`)}`;
@@ -29,7 +29,7 @@ describe("repeat", () => {
             <li>item: 3</li>`)
     })
 
-    test("renders a list twice", () => {
+    test("отображает список дважды", () => {
       const t = (items: any[]) =>
         // prettier-ignore
         html`${repeat(items, (i) => i, (i) => html`
@@ -52,7 +52,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, [0, 1, 2])
     })
 
-    test("shuffles are stable", () => {
+    test("перемешивание стабильно", () => {
       let items: number[] = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i) => html`
@@ -75,7 +75,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("shuffles a list with additions", () => {
+    test("перемешивает список с добавлениями", () => {
       let items = [0, 1, 2, 3, 4]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i) => html`
@@ -103,7 +103,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("swaps are stable", () => {
+    test("обмен местами стабилен", () => {
       const t = (items: number[]) =>
         // prettier-ignore
         html`${repeat(items, (i) => i, (i) => html`
@@ -132,7 +132,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can re-render after swap", () => {
+    test("может перерисовывать после обмена", () => {
       const t = (items: number[]) =>
         // prettier-ignore
         html`${repeat(items, (i) => i, (i) => html`
@@ -161,7 +161,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can insert an item at the beginning", () => {
+    test("может вставить элемент в начало", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -181,7 +181,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can insert an item at the end", () => {
+    test("может вставить элемент в конец", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -202,7 +202,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can replace with an empty list", () => {
+    test("может заменить пустым списком", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -214,7 +214,7 @@ describe("repeat", () => {
       expect(container.innerHTML).toMatchStringHTMLStripMarkers(``)
     })
 
-    test("can remove the first item", () => {
+    test("может удалить первый элемент", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i) => html`
@@ -237,7 +237,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can remove the last item", () => {
+    test("может удалить последний элемент", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -256,7 +256,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can remove a middle item", () => {
+    test("может удалить элемент из середины", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -275,7 +275,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can remove multiple middle items", () => {
+    test("может удалить несколько элементов из середины", () => {
       let items = [0, 1, 2, 3, 4, 5, 6]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -295,7 +295,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can move multiple middle items", () => {
+    test("может переместить несколько элементов из середины", () => {
       let items = [0, 1, 2, 3, 4, 5, 6]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -319,7 +319,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, items)
     })
 
-    test("can add multiple middle items", () => {
+    test("может добавить несколько элементов в середину", () => {
       let items = [0, 1, 2, 3, 4]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => i, (i: number) => html`
@@ -344,8 +344,8 @@ describe("repeat", () => {
     })
   })
 
-  describe("un-keyed", () => {
-    test("renders a list", () => {
+  describe("без ключей", () => {
+    test("отображает список", () => {
       // prettier-ignore
       const r = html`${repeat([0, 1, 2], (i: number) => html`
             <li>item: ${i}</li>`)}`;
@@ -356,7 +356,7 @@ describe("repeat", () => {
             <li>item: 2</li>`)
     })
 
-    test("shuffles a list", () => {
+    test("перемешивает список", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i: number) => html`
@@ -375,7 +375,7 @@ describe("repeat", () => {
             <li>item: 0</li>`)
     })
 
-    test("can replace with an empty list", () => {
+    test("может заменить пустым списком", () => {
       let items = [0, 1, 2]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => html`<li>item: ${i}</li>`)}`
@@ -386,7 +386,7 @@ describe("repeat", () => {
       expect(container.innerHTML).toMatchStringHTMLStripMarkers(``)
     })
 
-    test("re-renders a list", () => {
+    test("перерисовывает список", () => {
       const items = [0, 1, 2, 3, 4]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => html`<li>item: ${i}</li>`)}`
@@ -401,7 +401,7 @@ describe("repeat", () => {
             <li>item: 4</li>`)
     })
 
-    test("render objects as items with mutable update", () => {
+    test("отображает объекты как элементы с изменяемым обновлением", () => {
       const items = [{text: "0"}, {text: "1"}, {text: "2"}]
       // prettier-ignore
       const t = () => html`${repeat(items, (i) => html` <li>item: ${i.text}</li>`)}`
@@ -422,7 +422,7 @@ describe("repeat", () => {
       assertItemIdentity(children1, children2, [0, 1, 2])
     })
 
-    test("render objects as items with immutable update", () => {
+    test("отображает объекты как элементы с неизменяемым обновлением", () => {
       let items: {text: string}[] = [{text: "0"}, {text: "1"}, {text: "2"}]
       const t = () => html`${repeat(items, (i) => html`<li>item: ${i.text}</li>`)}`
       render(t(), container)
@@ -443,14 +443,14 @@ describe("repeat", () => {
     })
   })
 
-  describe("undefined behavior", () => {
-    // Note these tests are only meant to capture the current implementation's
-    // behavior, not to serve as a guarantee for repeat's behavior.
-    // Providing duplicate keys is officially not supported.  If these tests
-    // break due to implementation changes, feel free to update the expected
-    // results.
+  describe("неопределенное поведение", () => {
+    // Примечание: эти тесты предназначены только для фиксации текущего поведения реализации,
+    // а не для гарантии поведения repeat.
+    // Предоставление дублирующихся ключей официально не поддерживается.
+    // Если эти тесты сломаются из-за изменений в реализации,
+    // можно обновить ожидаемые результаты.
 
-    test("initial render of contiguous duplicate keys", () => {
+    test("начальное отображение последовательных дублирующихся ключей", () => {
       const t = (items: number[]) =>
         // prettier-ignore
         html`${repeat(items, (i) => i, (i: number) => html`
@@ -466,7 +466,7 @@ describe("repeat", () => {
             <li>item: 4</li>`)
     })
 
-    test("update contiguous duplicate keys (no order change)", () => {
+    test("обновление последовательных дублирующихся ключей (без изменения порядка)", () => {
       const t = (items: number[]) =>
         // prettier-ignore
         html`${repeat(items, (i) => i, (i: number) => html`
@@ -487,15 +487,15 @@ describe("repeat", () => {
             <li>item: 4</li>`)
       const children2 = Array.from(container.querySelectorAll("li"))
 
-      //   Parts for these dup'ed keys are maintained v  v
+      //   Части для этих дублирующихся ключей сохраняются v  v
       assertItemIdentity(children1, children2, [0, 1, 2, 3, 4, 5])
     })
 
-    test("initial render of duplicate keys with skip", () => {
-      const t = (items: number[]) =>
-        // prettier-ignore
-        html`${repeat(items, (i) => i, (i: number) => html`
-            <li>item: ${i}</li>`)}`
+    test("начальное отображение дублирующихся ключей с пропуском", () => {
+      const t = (items: number[]) => html`
+          ${repeat(items, (i) => i, (i: number) => html`
+              <li>item: ${i}</li>
+          `)}`
 
       render(t([0, 1, 42, 2, 42, 3, 4]), container)
       expect(container.innerHTML).toMatchStringHTMLStripMarkers(`
@@ -508,11 +508,11 @@ describe("repeat", () => {
             <li>item: 4</li>`)
     })
 
-    test("update duplicate keys with skip", () => {
-      const t = (items: number[]) =>
-        // prettier-ignore
-        html`${repeat(items, (i) => i, (i: number) => html`
-            <li>item: ${i}</li>`)}`
+    test("обновление дублирующихся ключей с пропуском", () => {
+      const t = (items: number[]) => html`
+      ${repeat(items, (i) => i, (i: number) => html`
+          <li>item: ${i}</li>
+      `)}`
 
       let items = [0, 1, 2, 3, 2, 4, 5]
       render(t(items), container)

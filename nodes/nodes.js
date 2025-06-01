@@ -53,7 +53,7 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
           <h1>Nodes</h1>
           <button @click=${() => update({op: "add"})}>Add</button>
           <button @click=${() => update({op: "remove"})}>Remove</button>
-          ${context.nodes.map(/**@param {{id: string}} i**/(i) => html`
+          ${context.nodes.map(/** @param {{id: string}} i */(i) => html`
               <div>${i.id}</div>
           `)}
           ${repeat(context.nodes, node => node.id, node => html`

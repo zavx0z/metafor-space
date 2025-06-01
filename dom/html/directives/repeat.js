@@ -226,17 +226,17 @@ class RepeatDirective extends Directive {
                 // `null` означает, что старая часть в хвосте уже была использована ниже; пропустить
                 oldTail--
             } else if (oldKeys[oldHead] === newKeys[newHead]) {
-                // Старый голова совпадает с новой головой; обновить на месте
+                // Старая голова совпадает с новой головой; обновить на месте
                 newParts[newHead] = setChildPartValue(oldParts[oldHead], newValues[newHead])
                 oldHead++
                 newHead++
             } else if (oldKeys[oldTail] === newKeys[newTail]) {
-                // Старый хвост совпадает с новой хвостом; обновить на месте
+                // Старый хвост совпадает с новым хвостом; обновить на месте
                 newParts[newTail] = setChildPartValue(oldParts[oldTail], newValues[newTail])
                 oldTail--
                 newTail--
             } else if (oldKeys[oldHead] === newKeys[newTail]) {
-                // Старый голова совпадает с новой хвостом; обновить и переместить в новую хвост
+                // Старая голова совпадает с новым хвостом; обновить и переместить в новую хвост
                 newParts[newTail] = setChildPartValue(oldParts[oldHead], newValues[newTail])
                 insertPart(containerPart, newParts[newTail + 1], oldParts[oldHead])
                 oldHead++
@@ -258,7 +258,7 @@ class RepeatDirective extends Directive {
                     removePart(oldParts[oldHead])
                     oldHead++
                 } else if (!newKeyToIndexMap.has(oldKeys[oldTail])) {
-                    // Старая хвост больше не в новом списке; удалить
+                    // Старый хвост больше не в новом списке; удалить
                     removePart(oldParts[oldTail])
                     oldTail--
                 } else {
