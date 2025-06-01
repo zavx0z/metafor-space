@@ -1,7 +1,7 @@
 import type {Meta} from "../metafor"
 import type {ContextData, ContextDefinition, Update} from "./context"
 import type {Core, CoreObj} from "./core"
-import type {Html, TemplateResult} from "../dom/html/html"
+import type {HtmlType, TemplateResult} from "../dom/html/html"
 import {ref} from "../dom/html/directives/ref"
 
 /**
@@ -91,6 +91,6 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
   context: ContextData<C>
   state: S
   core: Core<I>
-  html: Html
+  html: HtmlType
   ref: typeof ref
 }

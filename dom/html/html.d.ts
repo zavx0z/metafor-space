@@ -1,12 +1,109 @@
 import type {ValueSanitizer} from "./html.t.ts"
 import type {Directive} from "./directive.t.ts"
 
+/**
+ * Отображает значение @metafor/html TemplateResult, в контейнере.
+ *
+ * Этот пример отображает текст "Привет, Атом!" внутри тега параграфа,
+ * добавляя его в контейнер `document.body`.
+ *
+ * ```js
+ * import {html, render} from '@metafor/html';
+ *
+ * const name = "Атом";
+ * render(html`<p>Привет, ${name}!</p>`, document.body);
+ * ```
+ *
+ * @param {unknown} value - Любое [отображаемое значение].
+ * Обычно {@linkcode TemplateResult}, созданное путем вычисления тега шаблона
+ * как {@linkcode html} или {@linkcode svg}.
+ * @param container - DOM-контейнер для отображения.
+ * Первый рендеринг добавит отображаемое значение в контейнер,
+ * а последующие рендеры будут эффективно обновлять отображаемое значение,
+ * если тот же тип результата был ранее отображен там.
+ * @param [options] - См. документацию {@linkcode RenderOptions} для параметров.
+ */
+export declare function render(value: any, container: HTMLElement | DocumentFragment, options?: RenderOptions): ChildPart
+
+/**
+ * Интерпретирует литерал шаблона как HTML-шаблон, который может эффективно отрисовываться и обновлять контейнер.
+ *
+ * ```ts
+ * const header = (title: string) => html`<h1>${title}</h1>`;
+ * ```
+ *
+ * Тег `html` возвращает описание DOM для отрисовки в виде значения. Он является
+ * ленивым, то есть никакая работа не выполняется до момента рендеринга шаблона. При рендеринге,
+ * если шаблон происходит из того же выражения, что и ранее отрисованный результат,
+ * он эффективно обновляется вместо полной замены.
+ *
+ * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<typeof HTML_RESULT>}
+ */
+export declare function html(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<typeof HTML_RESULT>
+
+/**
+ * Интерпретирует литерал шаблона как SVG-фрагмент, который может эффективно отрисовываться и обновлять контейнер.
+ *
+ * ```ts
+ * const rect = svg`<rect width="10" height="10"></rect>`;
+ *
+ * const myImage = html`
+ *   <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+ *     ${rect}
+ *   </svg>`;
+ * ```
+ *
+ * Тег-функция `svg` должна использоваться только для SVG-фрагментов или элементов,
+ * которые должны находиться **внутри** HTML-элемента `<svg>`. Распространенная ошибка -
+ * размещение *элемента* `<svg>` в шаблоне с тегом-функцией `svg`. Элемент `<svg>`
+ * является HTML-элементом и должен использоваться в шаблоне с тегом-функцией {@linkcode html}.
+ *
+ * При использовании недопустимо возвращать SVG-фрагмент из метода
+ * `render()`, так как SVG-фрагмент будет содержаться в теневом DOM элемента
+ * и, следовательно, не будет правильно размещен внутри HTML-элемента `<svg>`.
+ *
+ * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<2>}
+ */
+export declare function svg(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<typeof SVG_RESULT>
+
+/**
+ * Интерпретирует литерал шаблона как MathML-фрагмент, который может эффективно отрисовываться и обновлять контейнер.
+ * @example
+ *
+ * ```ts
+ * const num = mathml`<mn>1</mn>`;
+ *
+ * const eq = html`
+ *   <math>
+ *     ${num}
+ *   </math>`;
+ * ```
+ *
+ * Тег-функция `mathml` должна использоваться только для MathML-фрагментов или элементов,
+ * которые должны находиться **внутри** HTML-элемента `<math>`. Распространенная ошибка -
+ * размещение *элемента* `<math>` в шаблоне с тегом-функцией `mathml`. Элемент `<math>`
+ * является HTML-элементом и должен использоваться в шаблоне с тегом-функцией {@linkcode html}.
+ *
+ * При использовании недопустимо возвращать MathML-фрагмент из метода
+ * `render()`, так как MathML-фрагмент будет содержаться в теневом DOM элемента
+ * и, следовательно, не будет правильно размещен внутри HTML-элемента `<math>`.
+ */
+export declare function mathml(strings: TemplateStringsArray, ...values: any[]): TemplateResult<typeof MATHML_RESULT>
+
+export type HtmlType = typeof html
+export type SvgType = typeof svg
+export type MathmlType = typeof mathml
+
 export declare const DEV_MODE: boolean
-/** Типы TemplateResult */
+/**
+ * Типы TemplateResult
+ */
 export declare const HTML_RESULT: 1
 export declare const SVG_RESULT: 2
 export declare const MATHML_RESULT: 3
-/** Типы TemplatePart (ВАЖНО: эти значения должны совпадать со значениями в PartType) */
+/**
+ * Типы TemplatePart (ВАЖНО: эти значения должны совпадать со значениями в PartType)
+ */
 export declare const ATTRIBUTE_PART: 1
 export declare const CHILD_PART: 2
 export declare const PROPERTY_PART: 3
@@ -152,105 +249,14 @@ export interface Disconnectable {
   _$isConnected: boolean
 }
 
-/** Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата. */
-export type TagFunction = <T extends ResultType>(
-  type: T
-) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
+/**
+ * Генерирует функцию тега шаблона, которая возвращает TemplateResult с заданным типом результата.
+ * */
+export type TagFunction = <T extends ResultType>(type: T) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
 
 /**
- * Отображает значение @metafor/html TemplateResult, в контейнере.
- *
- * Этот пример отображает текст "Привет, Атом!" внутри тега параграфа,
- * добавляя его в контейнер `document.body`.
- *
- * ```js
- * import {html, render} from '@metafor/html';
- *
- * const name = "Атом";
- * render(html`<p>Привет, ${name}!</p>`, document.body);
- * ```
- *
- * @param {unknown} value - Любое [отображаемое значение].
- * Обычно {@linkcode TemplateResult}, созданное путем вычисления тега шаблона
- * как {@linkcode html} или {@linkcode svg}.
- * @param container - DOM-контейнер для отображения.
- * Первый рендеринг добавит отображаемое значение в контейнер,
- * а последующие рендеры будут эффективно обновлять отображаемое значение,
- * если тот же тип результата был ранее отображен там.
- * @param [options] - См. документацию {@linkcode RenderOptions} для параметров.
+ * Экземпляр шаблона.
  */
-export declare function render(
-  value: any,
-  container: HTMLElement | DocumentFragment,
-  options?: RenderOptions,
-): ChildPart
-
-/**
- * Интерпретирует литерал шаблона как HTML-шаблон, который может эффективно отрисовываться и обновлять контейнер.
- *
- * ```ts
- * const header = (title: string) => html`<h1>${title}</h1>`;
- * ```
- *
- * Тег `html` возвращает описание DOM для отрисовки в виде значения. Он является
- * ленивым, то есть никакая работа не выполняется до момента рендеринга шаблона. При рендеринге,
- * если шаблон происходит из того же выражения, что и ранее отрисованный результат,
- * он эффективно обновляется вместо полной замены.
- *
- * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<typeof HTML_RESULT>}
- */
-export declare function html(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<typeof HTML_RESULT>
-export type Html = (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<typeof HTML_RESULT>
-/**
- * Интерпретирует литерал шаблона как SVG-фрагмент, который может эффективно отрисовываться и обновлять контейнер.
- *
- * ```ts
- * const rect = svg`<rect width="10" height="10"></rect>`;
- *
- * const myImage = html`
- *   <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
- *     ${rect}
- *   </svg>`;
- * ```
- *
- * Тег-функция `svg` должна использоваться только для SVG-фрагментов или элементов,
- * которые должны находиться **внутри** HTML-элемента `<svg>`. Распространенная ошибка -
- * размещение *элемента* `<svg>` в шаблоне с тегом-функцией `svg`. Элемент `<svg>`
- * является HTML-элементом и должен использоваться в шаблоне с тегом-функцией {@linkcode html}.
- *
- * При использовании недопустимо возвращать SVG-фрагмент из метода
- * `render()`, так как SVG-фрагмент будет содержаться в теневом DOM элемента
- * и, следовательно, не будет правильно размещен внутри HTML-элемента `<svg>`.
- *
- * @returns {(strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<2>}
- */
-export declare function svg(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<2>
-
-/**
- * Интерпретирует литерал шаблона как MathML-фрагмент, который может эффективно отрисовываться и обновлять контейнер.
- * @example
- *
- * ```ts
- * const num = mathml`<mn>1</mn>`;
- *
- * const eq = html`
- *   <math>
- *     ${num}
- *   </math>`;
- * ```
- *
- * Тег-функция `mathml` должна использоваться только для MathML-фрагментов или элементов,
- * которые должны находиться **внутри** HTML-элемента `<math>`. Распространенная ошибка -
- * размещение *элемента* `<math>` в шаблоне с тегом-функцией `mathml`. Элемент `<math>`
- * является HTML-элементом и должен использоваться в шаблоне с тегом-функцией {@linkcode html}.
- *
- * При использовании недопустимо возвращать MathML-фрагмент из метода
- * `render()`, так как MathML-фрагмент будет содержаться в теневом DOM элемента
- * и, следовательно, не будет правильно размещен внутри HTML-элемента `<math>`.
- */
-export declare function mathml(strings: TemplateStringsArray, ...values: any[]): TemplateResult<3>
-
-/** Экземпляр шаблона. */
 export declare class TemplateInstance {
   _$parts: (ChildPart | AttributePart | ElementPart)[]
   _$disconnectableChildren?: Set<Disconnectable>
@@ -265,6 +271,30 @@ export declare class TemplateInstance {
 
   _update(values: unknown[]): void
 }
+
+/**
+ * `ChildPart` верхнего уровня, возвращаемый из `render`, который управляет состоянием
+ * подключения `AsyncDirective`, созданных во всем дереве под ним.
+ */
+export interface RootPart extends ChildPart {
+  /**
+   * Устанавливает состояние подключения для `AsyncDirective`, содержащихся в этом корневом ChildPart.
+   *
+   * @metafor/html не отслеживает автоматически подключенность отрендеренного DOM;
+   * поэтому вызывающая сторона `render` должна обеспечить вызов
+   * `part.setConnected(false)` до того, как объект part потенциально
+   * будет удален, чтобы гарантировать, что `AsyncDirective` имеют возможность освободить
+   * все удерживаемые ресурсы. Если `RootPart`, который был ранее
+   * отключен, впоследствии переподключается (и его `AsyncDirective` должны
+   * переподключиться), следует вызвать `setConnected(true)`.
+   *
+   * @param isConnected Должны ли директивы в этом дереве быть подключены
+   * или нет
+   */
+  setConnected(isConnected: boolean): void
+}
+
+export type Part = | ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart
 
 /**
  * Часть для дочерних элементов.
@@ -366,7 +396,9 @@ export declare class ChildPart implements Disconnectable {
   setConnected(isConnected: boolean): void
 }
 
-/** Часть для атрибутов. */
+/**
+ * Часть для атрибутов.
+ */
 export declare class AttributePart implements Disconnectable {
   readonly type:
     | typeof ATTRIBUTE_PART
@@ -429,14 +461,18 @@ export declare class AttributePart implements Disconnectable {
   get _$isConnected(): boolean
 }
 
-/** Часть для свойств. */
+/**
+ * Часть для свойств.
+ */
 export declare class PropertyPart extends AttributePart {
   override readonly type: typeof PROPERTY_PART
 
   _commitValue(value: unknown): void
 }
 
-/** Часть для булевых атрибутов. */
+/**
+ * Часть для булевых атрибутов.
+ */
 export declare class BooleanAttributePart extends AttributePart {
   type: typeof BOOLEAN_ATTRIBUTE_PART
 
@@ -444,7 +480,9 @@ export declare class BooleanAttributePart extends AttributePart {
   _commitValue(value: unknown): void
 }
 
-/** Часть для событий. */
+/**
+ * Часть для событий.
+ */
 export declare class EventPart extends AttributePart {
   type: typeof EVENT_PART
 
@@ -455,7 +493,9 @@ export declare class EventPart extends AttributePart {
   handleEvent(event: Event): void
 }
 
-/** Часть для элементов. */
+/**
+ * Часть для элементов.
+ */
 export declare class ElementPart {
   type: typeof ELEMENT_PART
   _$committedValue: undefined
@@ -472,14 +512,11 @@ export declare class ElementPart {
   element: Element
 }
 
-export type Part =
-  | ChildPart
-  | AttributePart
-  | PropertyPart
-  | BooleanAttributePart
-  | ElementPart
-  | EventPart
-
+/**
+ * TemplatePart представляет динамическую часть в шаблоне до его создания.
+ * Когда шаблон создается, части создаются из TemplateParts.
+ */
+export type TemplatePart = ChildTemplatePart | AttributeTemplatePart | ElementTemplatePart | CommentTemplatePart
 type AttributeTemplatePart = {
   readonly type: typeof ATTRIBUTE_PART
   readonly index: number
@@ -500,33 +537,6 @@ type ElementTemplatePart = {
 type CommentTemplatePart = {
   readonly type: typeof COMMENT_PART
   readonly index: number
-}
-/**
- * TemplatePart представляет динамическую часть в шаблоне до его создания.
- * Когда шаблон создается, части создаются из TemplateParts.
- */
-export type TemplatePart = ChildTemplatePart | AttributeTemplatePart | ElementTemplatePart | CommentTemplatePart
-
-/**
- * `ChildPart` верхнего уровня, возвращаемый из `render`, который управляет состоянием
- * подключения `AsyncDirective`, созданных во всем дереве под ним.
- */
-export interface RootPart extends ChildPart {
-  /**
-   * Устанавливает состояние подключения для `AsyncDirective`, содержащихся в этом корневом ChildPart.
-   *
-   * @metafor/html не отслеживает автоматически подключенность отрендеренного DOM;
-   * поэтому вызывающая сторона `render` должна обеспечить вызов
-   * `part.setConnected(false)` до того, как объект part потенциально
-   * будет удален, чтобы гарантировать, что `AsyncDirective` имеют возможность освободить
-   * все удерживаемые ресурсы. Если `RootPart`, который был ранее
-   * отключен, впоследствии переподключается (и его `AsyncDirective` должны
-   * переподключиться), следует вызвать `setConnected(true)`.
-   *
-   * @param isConnected Должны ли директивы в этом дереве быть подключены
-   * или нет
-   */
-  setConnected(isConnected: boolean): void
 }
 
 /**
