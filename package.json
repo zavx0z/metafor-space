@@ -45,7 +45,8 @@
     "@happy-dom/global-registrator": "17.3.0",
     "@types/bun": "latest",
     "happy-dom": "^17.4.4",
-    "puppeteer": "^24.6.1"
+    "puppeteer": "^24.6.1",
+    "elkjs": "^0.10.0"
   },
   "peerDependencies": {
     "typescript": "^5.8.2"
