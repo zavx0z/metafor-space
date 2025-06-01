@@ -47,7 +47,7 @@ class CacheDirective extends Directive {
 
   /** @param {unknown} v - Значение. */
   render(v) {
-    // Возвращаем массив значения, чтобы побудить @pkg/html создать ChildPart
+    // Возвращаем массив значения, чтобы побудить @metafor/html создать ChildPart
     // для значения, которое мы можем переместить в кэш
     return [v]
   }

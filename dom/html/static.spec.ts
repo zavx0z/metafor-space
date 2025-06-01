@@ -1,90 +1,72 @@
 import {describe, expect, test} from "bun:test"
-import {render} from "../html.js"
-import {html, literal, unsafeStatic} from "../static.js"
+import {render} from "./html.js"
+import {html, literal, unsafeStatic} from "./static.js"
 
 
 describe("Статические", () => {
   const container = document.createElement("div")
 
   test("Статическая привязка текста", () => {
-    render(
-      html`
+    render(html`
         ${literal`<p>Hello</p>`}
-      `,
-      container
-    )
+    `, container)
     // Если бы это была динамическая привязка, теги были бы экранированы
     expect(container.innerHTML).toMatchStringHTMLStripComments("<p>Hello</p>")
   })
 
   test("Статическая привязка атрибута", () => {
-    render(
-      html`
+    render(html`
         <div class="${literal`cool`}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments('<div class="cool"></div>')
     // TODO: проверить, что это действительно статично. В настоящее время это невозможно с публичным API
   })
 
   test("Статическая привязка тега", () => {
     const tagName = literal`div`
-    render(html`<${tagName}>${"A"}</${tagName}>`, container)
+    render(html`
+        <${tagName}>${"A"}</${tagName}>
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments("<div>A</div>")
   })
 
   test("Статическая привязка атрибута", () => {
-    render(
-      html`
+    render(html`
         <div ${literal`foo`}="${"bar"}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments('<div foo="bar"></div>')
 
-    render(
-      html`
+    render(html`
         <div x-${literal`foo`}="${"bar"}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments('<div x-foo="bar"></div>')
   })
 
   test("Статическая привязка имени атрибута", () => {
-    render(
-      html`
+    render(html`
         <div ${literal`foo`}="${literal`bar`}"></div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments('<div foo="bar"></div>')
   })
 
   test("Динамическая привязка после статической привязки текста", () => {
-    render(
-      html`
+    render(html`
         ${literal`<p>Hello</p>`}${"<p>World</p>"}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments("<p>Hello</p>&lt;p&gt;World&lt;/p&gt;")
     // Убедиться, что `null` обрабатывается
-    render(
-      html`
+    render(html`
         ${literal`<p>Hello</p>`}${null}
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments("<p>Hello</p>")
   })
 
   test("Статические привязки индексируются статическими значениями", () => {
     // Шаблон с привязанным именем тега. Мы должны быть в состоянии перерендерить
-    // этот шаблон с разными именами тегов и иметь имена тегов обновлены.
+    // этот шаблон с разными именами тегов и иметь обновленные имена тегов.
     // Новые имена тегов будут действовать как разные шаблоны.
-    const t = (tag: string, text: string) => html` <${unsafeStatic(tag)}>${text}</${unsafeStatic(tag)}> `
+    const t = (tag: string, text: string) => html`
+        <${unsafeStatic(tag)}>${text}</${unsafeStatic(tag)}> `
     render(t("div", "abc"), container)
     expect(container.innerHTML).toMatchStringHTMLStripComments("<div>abc</div>")
     const div = container.querySelector("div")
@@ -119,46 +101,33 @@ describe("Статические", () => {
   test("Вставка статических значений в статические", () => {
     const start = literal`<${literal`sp${literal`an`}`}>`
     const end = literal`</${unsafeStatic("span")}>`
-    render(
-      html`
+    render(html`
         <div>a${start}b${end}c</div>
-      `,
-      container
-    )
+    `, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments("<div>a<span>b</span>c</div>")
   })
 
   test("Вставка нестатических значений в статические вызывает ошибку", () => {
-    expect(() => {
-      literal`a${literal`bar`}b${"shouldthrow"}`
-    }).toThrow()
+    expect(() => literal`a${literal`bar`}b${"shouldthrow"}`).toThrow()
   })
 
   describe("Небезопасный", () => {
     test("Статическая привязка тега", () => {
       const tagName = unsafeStatic("div")
-      render(
-        html`
-        <${tagName}>${"A"}</${tagName}>`,
-        container
-      )
+      render(html`
+          <${tagName}>${"A"}</${tagName}>
+      `, container)
       expect(container.innerHTML).toMatchStringHTMLStripComments("<div>A</div>")
     })
 
     test("Статическая привязка имени атрибута", () => {
-      render(
-        html`
+      render(html`
           <div ${unsafeStatic("foo")}="${"bar"}"></div>
-        `,
-        container
-      )
+      `, container)
       expect(container.innerHTML).toMatchStringHTMLStripComments('<div foo="bar"></div>')
-      render(
-        html`
+      render(html`
           <div x-${unsafeStatic("foo")}="${"bar"}"></div>
-        `,
-        container
-      )
+      `, container)
       expect(container.innerHTML).toMatchStringHTMLStripComments('<div x-foo="bar"></div>')
     })
   })
@@ -166,7 +135,7 @@ describe("Статические", () => {
   test("Не рендерить простое поддельное статическое значение", () => {
     const spoof = {["_$staticValue$"]: "foo", r: {}}
     const template = html`
-      <div>${spoof}</div>
+        <div>${spoof}</div>
     `
     render(template, container)
     expect(container.innerHTML).toMatchStringHTMLStripComments("<div>[object Object]</div>")
@@ -175,10 +144,10 @@ describe("Статические", () => {
   test("статический html не должен добавлять значение для использованного статического выражения", () => {
     const tagName = literal`div`
     const template = html`
-      <${tagName}>${"foo"}</${tagName}>`
+        <${tagName}>${"foo"}</${tagName}>`
     expect(template.values.length).toBe(1)
     const template2 = html`
-      <${tagName}>${"foo"}</${tagName}>${"bar"}`
+        <${tagName}>${"foo"}</${tagName}>${"bar"}`
     expect(template2.values.length).toBe(2)
   })
 })

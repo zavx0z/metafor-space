@@ -80,7 +80,7 @@ describe("unsafeMathML", () => {
       '<math xmlns="http://www.w3.org/1998/Math/MathML">aaa</math>'
     ])
 
-    // Modify instance directly. Since @pkg/html doesn't dirty check against
+    // Modify instance directly. Since @metafor/html doesn't dirty check against
     // actual DOM, but against previous part values, this modification should
     // persist through the next render if dirty checking works.
     const text = container.querySelector("math")!.childNodes[1] as Text

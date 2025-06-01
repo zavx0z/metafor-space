@@ -35,8 +35,8 @@ export type UncompiledTemplateResult<T extends ResultType = ResultType> = {
  * Это шаблонный результат, который может быть либо нескопированным, либо скомпилированным.
  *
  * В будущем TemplateResult будет этот тип. Если вы хотите явно отметить, что шаблонный результат потенциально скомпилирован, вы можете ссылаться на этот
- * тип, и он будет продолжать вести себя так же через следующую основную версию @pkg/html. Это может быть полезно для кода, который хочет подготовиться к следующей
- * основной версии @pkg/html.
+ * тип, и он будет продолжать вести себя так же через следующую основную версию @metafor/html. Это может быть полезно для кода, который хочет подготовиться к следующей
+ * основной версии @metafor/html.
  */
 export type MaybeCompiledTemplateResult<T extends ResultType = ResultType> =
   | UncompiledTemplateResult<T>
@@ -52,7 +52,7 @@ export type MaybeCompiledTemplateResult<T extends ResultType = ResultType> =
  * обновить DOM, вам нужно будет рендерить `TemplateResult`.
  *
  * MaybeCompiledTemplateResult, так что код получит ошибки типа, если он предполагает,
- * что шаблоны @pkg/html не скомпилированы. Когда работает с одним из них, используйте
+ * что шаблоны @metafor/html не скомпилированы. Когда работает с одним из них, используйте
  * либо {@linkcode CompiledTemplateResult}, либо {@linkcode UncompiledTemplateResult} явно.
  */
 export type TemplateResult<T extends ResultType = ResultType> = UncompiledTemplateResult<T>
@@ -111,7 +111,7 @@ export interface DirectiveParent {
 }
 
 /**
- * Объект, указывающий параметры для контроля рендеринга @pkg/html. Обратите внимание, что
+ * Объект, указывающий параметры для контроля рендеринга @metafor/html. Обратите внимание, что
  * хотя `render` может быть вызван несколько раз на одном и том же `container` (и
  * `renderBefore` узел ссылки) для эффективного обновления содержимого,
  * только параметры, переданные при первом рендеринге, учитываются в течение
@@ -158,13 +158,13 @@ export type TagFunction = <T extends ResultType>(
 ) => (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<T>
 
 /**
- * Отображает значение @pkg/html TemplateResult, в контейнере.
+ * Отображает значение @metafor/html TemplateResult, в контейнере.
  *
  * Этот пример отображает текст "Привет, Атом!" внутри тега параграфа,
  * добавляя его в контейнер `document.body`.
  *
  * ```js
- * import {html, render} from '@pkg/html';
+ * import {html, render} from '@metafor/html';
  *
  * const name = "Атом";
  * render(html`<p>Привет, ${name}!</p>`, document.body);
@@ -515,7 +515,7 @@ export interface RootPart extends ChildPart {
   /**
    * Устанавливает состояние подключения для `AsyncDirective`, содержащихся в этом корневом ChildPart.
    *
-   * @pkg/html не отслеживает автоматически подключенность отрендеренного DOM;
+   * @metafor/html не отслеживает автоматически подключенность отрендеренного DOM;
    * поэтому вызывающая сторона `render` должна обеспечить вызов
    * `part.setConnected(false)` до того, как объект part потенциально
    * будет удален, чтобы гарантировать, что `AsyncDirective` имеют возможность освободить

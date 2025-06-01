@@ -22,7 +22,7 @@
 Для серверного кода (typescript)
 
 ```typescript
-import { html, render } from "@pkg/html"
+import { html, render } from "@metafor/html"
 ```
 
 Для клиентского кода (без сборки)
@@ -51,7 +51,7 @@ html`<h1>Hello ${name}</h1>`
 Шаблоны не создают или обновляют DOM напрямую. Вместо этого они возвращают `TemplateResult`, который используется функцией `render()` для фактического обновления DOM:
 
 ```javascript
-import { html, render } from "@pkg/html"
+import { html, render } from "@metafor/html"
 
 const name = "world"
 const sayHi = html`<h1>Hello ${name}</h1>`
@@ -63,7 +63,7 @@ render(sayHi, document.body)
 Чтобы шаблон был динамическим, создайте функцию, которая возвращает `TemplateResult`. Вызывайте эту функцию каждый раз, когда данные изменяются:
 
 ```javascript
-import { html, render } from "@pkg/html/index"
+import { html, render } from "@metafor/html/index"
 
 // Определение функции шаблона
 const myTemplate = (name) => html`<div>Hello ${name}</div>`

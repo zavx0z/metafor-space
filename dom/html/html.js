@@ -276,7 +276,7 @@ let sanitizerFactoryInternal = noopSanitizer
 const setSanitizer = (newSanitizer) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(
-      "Попытка перезаписать существующую политику безопасности @pkg/html. setSanitizeDOMValueFactory должен быть вызван не более одного раза."
+      "Попытка перезаписать существующую политику безопасности @metafor/html. setSanitizeDOMValueFactory должен быть вызван не более одного раза."
     )
   }
   sanitizerFactoryInternal = newSanitizer

@@ -58,7 +58,7 @@ export const noVowels = str => str.replaceAll(/[aeiou]/gi, "x")
 2. Передайте ваш класс в фабрику directive(), чтобы создать функцию директивы, которая может использоваться в выражениях шаблонов Lit.
 
 ```javascript
-import {Directive, directive} from "@pkg/html/directive.js"
+import {Directive, directive} from "@metafor/html/directive.js"
 
 // Определение директивы
 class HelloDirective extends Directive {
@@ -248,8 +248,8 @@ class MyDirective extends Directive {
 `noChange`, чтобы сигнализировать, что вывод директивы не требует повторного рендеринга.
 
 ```typescript
-import {Directive} from "@pkg/html/directive.js"
-import {noChange} from "@pkg/html"
+import {Directive} from "@metafor/html/directive.js"
+import {noChange} from "@metafor/html"
 
 class CalculateDiff extends Directive {
   a?: string

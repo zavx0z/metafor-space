@@ -71,7 +71,7 @@ describe("unsafeHTML directive", () => {
     render(t(), container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<div>aaa</div>")
 
-    // Modify instance directly. Since @pkg/html doesn't dirty check against
+    // Modify instance directly. Since @metafor/html doesn't dirty check against
     // actual DOM, but against previous part values, this modification should
     // persist through the next render if dirty checking works.
     const text = container.querySelector("div")!.childNodes[1] as Text

@@ -23,7 +23,7 @@ describe("updates", () => {
     expect(text.textContent).toBe("aaa")
 
     // Set textContent manually (without disturbing the part marker node).
-    // Since @pkg/html doesn't dirty check against actual DOM, but again
+    // Since @metafor/html doesn't dirty check against actual DOM, but again
     // previous part values, this modification should persist through the
     // next render with the same value.
     text.lastChild!.textContent = "bbb"
