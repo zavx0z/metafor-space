@@ -247,7 +247,6 @@ export class Meta {
           state: toState.state,
           when: toState.when,
         })),
-        action: () => {},
       })),
     }
   }
