@@ -1,7 +1,11 @@
 /**
+ * @typedef {import("./types/context").ContextDefinition} ContextDefinition
+ * @typedef {import("./types/core").CoreObj} CoreObj
+ */
+/**
  @template {string} S - состояние
- @template {import("./types/context").ContextDefinition} C - контекст
- @template {Record<string, any>} I - ядро
+ @template {ContextDefinition} C - контекст
+ @template {CoreObj} I - ядро
  */
 export class Meta {
   title = ""
@@ -40,13 +44,14 @@ export class Meta {
       this.$state.clear()
       this.types = {}
       this.context = {}
-      this.core = /** @type {import("./types/core").Core<I>} */ ({})
+      this.core = {}
       this.transitions.length = 0
       this.reactions.length = 0
       this.#parsedCore = {}
       if (typeof destroy === "function") destroy(this)
     }
     this.states = states
+    /** @type {import('./types/context').ContextData<C>} */
     this.context = /** @type {import('./types/context').ContextData<C>} */ (
       Object.keys(contextDefinition).reduce((acc, key) => {
         const createValue = contextData && contextData[key]
@@ -56,7 +61,7 @@ export class Meta {
         else return { ...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined }
       }, {})
     )
-
+    /** @type{ContextDefinition}*/
     this.types = contextDefinition
     this.transitions = transitions || []
 
@@ -137,7 +142,9 @@ export class Meta {
     } else this.#transition()
   }
 
-  /** Проверка условий перехода и выполнение действия */
+  /**
+   * Проверка условий перехода и выполнение действия
+   */
   #transition() {
     const transitionFrom = this.transitions.find((t) => t.from === this.state)
     if (transitionFrom) {
@@ -155,14 +162,19 @@ export class Meta {
     }
   }
 
-  /**   Обновление контекста из внешнего источника (core, reaction)
-   * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста */
+  /**
+   * Обновление контекста из внешнего источника (core, reaction)
+   * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
+   */
   _updateExternal = ({ context, srcName = "core", funcName = "unknown" }) => {
     const updCtx = this.#updateContext({ context, srcName, funcName })
     if (updCtx && !this.process) this.#transition()
   }
 
-  /** @param {import('./types/actions').Action<C, I>} action */
+  /**
+   * Выполнение действия с последующим отключением блокировки переходов
+   * @param {import('./types/actions').Action<C, I>} action
+   */
   #runAction(action) {
     const result = action({
       context: this.context,
@@ -186,7 +198,7 @@ export class Meta {
     if (Object.keys(updCtx).length > 0) {
       this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
       this.channel.postMessage(
-        /** @type {import('./types/meta.js').BroadcastMessage} */ ({
+        /** @type {import('./types/meta').BroadcastMessage} */ ({
           meta: { meta: this.id, func: funcName, target: srcName, timestamp: Date.now() },
           patch: { path: `/context`, op: "replace", value: updCtx },
         })
@@ -212,13 +224,13 @@ export class Meta {
     }
   }
 
-  /** @type {import('./types/meta').OnTransition<S, C, I>}*/
+  /** @type {import('./types/meta').OnTransition<S>}*/
   onTransition = (cb) =>
     this.$state.onChange((oldValue, newValue) => {
       if (newValue !== undefined) cb(oldValue, newValue)
     })
 
-  /** @returns {import('./types/meta.js').Snapshot<C, S>} */
+  /** @returns {import('./types/meta').Snapshot<S, C, I>} */
   snapshot() {
     return {
       id: this.id,
@@ -235,20 +247,22 @@ export class Meta {
           state: toState.state,
           when: toState.when,
         })),
-        action: undefined,
+        action: () => {},
       })),
     }
   }
 
-  /** @type {import('./types/state').CreateSignal<S>} */
-  #createSignal(value) {
+  /**
+   * @param {S} state
+   * @returns {import('./types/state').Signal<S>}
+   */
+  #createSignal(state) {
     const listeners = new Set()
     return {
-      value: () => value,
       setValue: (next) => {
-        if (value !== next) {
-          const oldValue = value
-          value = next
+        if (state !== next) {
+          const oldValue = state
+          state = next
           listeners.forEach((listener) => listener(oldValue, next))
           this.channel.postMessage({
             meta: { particle: this.id, timestamp: Date.now() },
@@ -256,20 +270,22 @@ export class Meta {
           })
         }
       },
+      value: () => state,
       onChange: (listener) => {
         listeners.add(listener)
         return () => {
           listeners.delete(listener)
         }
       },
-      clear: listeners.clear,
+      clear: () => listeners.clear(),
     }
   }
 }
 
 let devChannel = null
-/** Установка канала для разработки
- @param {BroadcastChannel} channel - Канал для разработки
+/**
+ * Установка канала для разработки
+ * @param {BroadcastChannel} channel - Канал для разработки
  */
 const setDevChannel = (channel) => {
   devChannel = channel
@@ -277,7 +293,7 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/** @type {import("./metafor.js").MetaFor} */ // prettier-ignore
+/** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
   const { development, description } = conf
   if (development) {
@@ -340,25 +356,25 @@ export const MetaFor = (tag, conf = {}) => {
                           import("./core/web/component.js").then((module) => module.default({ view, particle: meta }))
 
                           return meta
-                        },
+                        }
                       }
-                    },
+                    }
                   }
-                },
+                }
               }
-            },
+            }
           }
-        },
+        }
       }
-    },
+    }
   }
 }
 
 /**
  * Фильтр реакций
  *
- * @template {import("./types/context").ContextDefinition} C
- * @template {import("./types/core").CoreObj} I
+ * @template {ContextDefinition} C
+ * @template {CoreObj} I
  *
  * @param {import("./types/reaction").Reaction<C, I>} reaction
  * @param {import("./types/meta").Patch} patch
@@ -367,16 +383,17 @@ export const MetaFor = (tag, conf = {}) => {
 const reactionFilter = (reaction, patch) => {
   if (reaction.path === patch.path && reaction.op === patch.op) return true
   if (reaction.op === patch.op) return true
-  if (Object.keys(reaction).length === 1 && "action" in reaction) return true
-  return false
+  return Object.keys(reaction).length === 1 && "action" in reaction;
 }
 
 /**
  @template {string} S - состояние
- @template {import('./types/context').ContextDefinition} C - контекст
- @template {Record<string, any>} I - ядро
+ @template {ContextDefinition} C - контекст
+ @template {CoreObj} I - ядро
+
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
- */ // prettier-ignore
+ @return {import("./metafor").Meta<S, C, I>}
+ */
 const createMeta = ({development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions=[]}) => {
   development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
@@ -385,14 +402,14 @@ const createMeta = ({development, description, tag, options, states, contextDefi
   particle.description = description || options.description || ""
   if (graph) particle.graph = () => import("./core/web/graph.js").then((module) => module.default(particle))
   if (debug) import("./core/debug.js").then((module) => module.default(particle, debug))
-  return particle
+  return /**@type {import("./metafor").Meta<S, C, I>} */ particle
 }
 
 /**
- @template {import('./types/context').ContextDefinition} C
+ @template {ContextDefinition} C
  @param {import('./types/transitions').When<C>} when
  @param {import('./types/context').ContextData<C>} context
- @param {import('./types/context').ContextDefinition} types
+ @param {ContextDefinition} types
  */
 export function conditions(when, context, types) {
   for (const key in when) {

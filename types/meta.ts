@@ -1,9 +1,8 @@
-import type { ContextData, ContextDefinition } from "./context"
-import type { Transitions } from "./transitions"
-import type { CoreData, CoreDefinition } from "./core"
-import type {  Reactions } from "./reaction"
+import type { ContextData, ContextDefinition } from "./context.ts"
+import type { Transitions } from "./transitions.ts"
+import type {CoreData, CoreDefinition, CoreObj} from "./core.ts"
+import type {  Reactions } from "./reaction.ts"
 import type { Meta } from "../metafor"
-import type { CreateOnTransitionCallBack } from "./create"
 
 /**
  Снимок состояния частицы
@@ -21,10 +20,10 @@ import type { CreateOnTransitionCallBack } from "./create"
  @property transitions - Переходы
  @property core - Ядро
  */
-export type Snapshot<C extends Record<string, any>, S> = {
+export type Snapshot<S extends string, C extends ContextDefinition, I extends CoreObj> = {
   id: string
-  title?: string
-  description?: string
+  title: string
+  description: string
   state: S
   states: readonly S[]
   context: ContextData<C>
@@ -100,7 +99,7 @@ export type MetaConstructor<S extends string, C extends ContextDefinition, I ext
   contextData: ContextData<C>
   core: CoreDefinition<I, C>
   coreData: CoreData<I>
-  reactions:  Reactions<C, I>
+  reactions: Reactions<C, I>
   onTransition?: CreateOnTransitionCallBack<S, C, I>
   onUpdate?: OnUpdateCallBack<C>
   destroy?: (particle: Meta<S, C, I>) => void
@@ -133,8 +132,8 @@ export type OnUpdateCallBack<C extends ContextDefinition> = (
  * @param cb - Коллбек
  * @returns - Функция для отписки от уведомлений
  */
-export type OnTransition<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
-  cb: OnTransitionCallBack<S, C, I>
+export type OnTransition<S extends string> = (
+  cb: OnTransitionCallBack<S>
 ) => () => void
 
 /**
@@ -148,7 +147,7 @@ export type OnTransition<S extends string, C extends ContextDefinition, I extend
  * @param current - Текущее состояние
  * @param meta - Мета
  */
-export type OnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
+export type OnTransitionCallBack<S extends string> = (
   preview: S | undefined,
   current: S | undefined
 ) => void

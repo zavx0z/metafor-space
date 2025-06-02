@@ -1,12 +1,12 @@
-import type {ContextData, ContextDefinition, ContextTypes, UpdateParameters} from "./types/context"
-import type {Transitions} from "./types/transitions"
-import type {Core, CoreDefinition, CoreObj} from "./types/core"
-import type {Reactions} from "./types/reaction"
-import type {ViewDefinition} from "./types/view"
-import type {CreateParams} from "./types/create"
-import type {MetaConstructor, Snapshot, OnUpdate, OnTransition} from "./types/meta"
+import type {ContextData, ContextDefinition, ContextTypes, UpdateParameters} from "./types/context.ts"
+import type {Transitions} from "./types/transitions.ts"
+import type {Core, CoreDefinition, CoreObj} from "./types/core.ts"
+import type {Reactions} from "./types/reaction.ts"
+import type {ViewDefinition} from "./types/view.ts"
+import type {CreateParams} from "./types/create.ts"
+import type {MetaConstructor, Snapshot, OnUpdate, OnTransition} from "./types/meta.ts"
 
-export {BroadcastMessage} from "./types/meta"
+export {BroadcastMessage} from "./types/meta.ts"
 
 /**
 
@@ -93,10 +93,10 @@ export declare function MetaFor(
  @property graph - Граф meta
  @property destroy - Уничтожение meta
  */
-export declare class Meta<S extends string, C extends Record<string, any>, I extends Record<string, any>> {
+export declare class Meta<S extends string, C extends ContextDefinition, I extends Record<string, any>> {
   id: string
-  title?: string
-  description?: string
+  title: string
+  description: string
   state: S
   context: ContextData<C>
   states: readonly (S | undefined)[]
@@ -106,15 +106,15 @@ export declare class Meta<S extends string, C extends Record<string, any>, I ext
   reactions: Reactions<C, I>
   channel: BroadcastChannel
   process: boolean
-  component: Element
+  component: HTMLElement | Element
 
   constructor(params: MetaConstructor<S, C, I>)
 
   update: (context: UpdateParameters<C>) => void
   _updateExternal: (params: { context: UpdateParameters<C>; srcName?: string; funcName?: string }) => void
   onUpdate: OnUpdate<C>
-  onTransition: OnTransition<S, C, I>
-  snapshot: () => Snapshot<C, S>
+  onTransition: OnTransition<S>
+  snapshot: () => Snapshot<S, C, I>
   graph: () => Promise<any>
   destroy: () => void
 }

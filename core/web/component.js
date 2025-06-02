@@ -12,10 +12,10 @@ const camelToKebab = (str) => {
 }
 
 /**
- * @template {import("../../types/core").CoreObj} I
- * @template {import("../../types/context").ContextDefinition} C
+ * @template {import("types/core.js").CoreObj} I
+ * @template {import("types/context.js").ContextDefinition} C
  * @template {string} S
- * @param {import("../../types/view").ComponentParams<I, C, S>} params
+ * @param {import("types/view.js").ComponentParams<I, C, S>} params
  */
 export default ({ view, particle }) => {
   const particleContextKeys = Object.keys(particle.context).map(camelToKebab)

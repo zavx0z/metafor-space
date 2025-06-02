@@ -1,4 +1,4 @@
-import type {ContextData, ContextDefinition, Update} from "./context.d.ts"
+import type {ContextData, ContextDefinition, Update} from "./context.ts"
 
 export type CoreObj = Record<string, any>
 

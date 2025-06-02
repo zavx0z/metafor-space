@@ -1,6 +1,6 @@
 import type {Meta} from "../metafor"
-import type {ContextData, ContextDefinition, Update} from "./context"
-import type {Core, CoreObj} from "./core"
+import type {ContextData, ContextDefinition, Update} from "./context.ts"
+import type {Core, CoreObj} from "./core.ts"
 import type {HtmlType, TemplateResult} from "../html/html"
 import {ref} from "../html/directives/ref"
 

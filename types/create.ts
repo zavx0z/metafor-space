@@ -1,8 +1,8 @@
-import type { ContextData, ContextDefinition, PartialContextData } from "./context"
-import type { CoreData, CoreDefinition } from "./core"
-import type { Transitions } from "./transitions"
-import type {  Reactions } from "./reaction"
-import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta"
+import type { ContextDefinition, PartialContextData } from "./context.ts"
+import type { CoreData, CoreDefinition } from "./core.ts"
+import type { Transitions } from "./transitions.ts"
+import type { Reactions } from "./reaction.ts"
+import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta.ts"
 /**
  Опции создания частицы в коллбеке create
 

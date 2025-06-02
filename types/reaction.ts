@@ -1,5 +1,5 @@
-import type { ContextData, ContextDefinition, Update } from "./context"
-import type { Core } from "./core"
+import type { ContextData, ContextDefinition, Update } from "./context.ts"
+import type { Core } from "./core.ts"
 
 /**
  @property user - Идентификатор пользователя.

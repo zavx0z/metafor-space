@@ -1,5 +1,5 @@
-import type { ContextData, ContextDefinition, Update } from "./context.d.ts"
-import type { Core } from "./core.d.ts"
+import type { ContextData, ContextDefinition, Update } from "./context.ts"
+import type { Core } from "./core.ts"
 
 /**
  Действие объявленное в transitions

@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * Создает и настраивает граф для частицы
- * @template {import("../../types/context.js").ContextDefinition} C - контекст частицы
+ * @template {import("types/context.ts").ContextDefinition} C - контекст частицы
  * @template {string} S - состояние частицы
  * @template {Record<string, any>} I - ядро частицы
  *
