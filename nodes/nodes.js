@@ -53,9 +53,6 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
           <h1>Nodes</h1>
           <button @click=${() => update({op: "add"})}>Add</button>
           <button @click=${() => update({op: "remove"})}>Remove</button>
-          ${context.nodes.map(/** @param {{id: string}} i */(i) => html`
-              <div>${i.id}</div>
-          `)}
           ${repeat(context.nodes, node => node.id, node => html`
               <div>${node.id}</div>
           `)}
@@ -63,12 +60,49 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
   `,
   style: ({css}) => css`
       :host {
-          color: white;
+          color: rgb(var(--surface-50));
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          position: relative;
       }
 
-      h1,
-      p {
-          color: red;
+
+      /* Стили для кнопки */
+
+      button {
+          /* Определяем переменные для цветов кнопки */
+          --button-border-color: rgb(var(--surface-400));
+          --background-color: rgb(var(--surface-500));
+          --button-hover-background: rgb(var(--surface-400));
+          --button-active-background: rgb(var(--surface-500));
+          --button-disabled-background: rgb(var(--surface-800));
+          /* height: 26px; */
+          border: 1px solid var(--button-border-color);
+          border-radius: 4px;
+          background-color: var(--background-color);
+          color: rgba(var(--surface-50));
+          cursor: pointer;
+          font-size: inherit;
+          transition: all 0.3s ease;
+
+
+          &:hover {
+              background-color: var(--button-hover-background);
+              border-color: var(--button-border-color);
+          }
+
+          &:active {
+              background-color: var(--button-active-background);
+              border-color: var(--button-border-color);
+          }
+
+          &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+              background-color: var(--button-disabled-background);
+              border-color: var(--button-border-color);
+          }
       }
   `,
 })

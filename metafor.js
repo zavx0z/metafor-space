@@ -225,8 +225,7 @@ export class Meta {
   }
 
   /** @type {import('./types/meta').OnTransition<S>}*/
-  onTransition = (cb) =>
-    this.$state.onChange((oldValue, newValue) => {
+  onTransition = (cb) => this.$state.onChange((oldValue, newValue) => {
       if (newValue !== undefined) cb(oldValue, newValue)
     })
 
