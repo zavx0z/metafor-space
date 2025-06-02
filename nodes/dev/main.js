@@ -5,7 +5,7 @@ Nodes.create({
   state: "ожидание патча",
 })
 
-MetaFor("node", {description: "Nodes", development: false}).states(
+MetaFor("test", {description: "Nodes", development: false}).states(
   "начало",
   "конец"
 ).context((t) => ({

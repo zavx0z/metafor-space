@@ -1,6 +1,7 @@
 import {MetaFor} from "../metafor.js"
 import ELK from "elkjs"
 import {repeat} from "../html/directives/repeat.js"
+import {node} from "./node.js"
 
 export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
 ).states(
@@ -44,17 +45,23 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
     op: "add",
     action: ({context, patch, update}) => {
       console.log(patch)
-      update({nodes: [...context.nodes, patch.value]})
+      if (patch.value.id !== "node") {
+        update({nodes: [...context.nodes, patch.value]})
+        node.create({
+          state: "видима",
+        })
+      }
     },
   },
 ]).view({
+  // isolated: false,
   render: ({html, update, context}) => html`
       <div>
           <h1>Nodes</h1>
           <button @click=${() => update({op: "add"})}>Add</button>
           <button @click=${() => update({op: "remove"})}>Remove</button>
           ${repeat(context.nodes, node => node.id, node => html`
-              <div>${node.id}</div>
+              <metafor-node id=${node.id}>${node.id}</metafor-node>
           `)}
       </div>
   `,
