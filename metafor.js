@@ -1,3 +1,7 @@
+/**
+ * @typedef {import("./types/context").ContextDefinition} ContextDefinition
+ * @typedef {import("./types/core").CoreObj} CoreObj
+ */
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
@@ -32,10 +36,16 @@ export const MetaFor = (tag, conf = {}) => {
             array: (params) => ({type: "array", ...params}),
             enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
           })
-          development &&
-          import("./core/validator/index.js").then((module) =>
+          development && import("./core/validator/index.js").then((module) =>
             module.validateContextDefinition({tag, context: contextDefinition})
           )
+
+          const contextData = Object.keys(contextDefinition).reduce((acc, key) => {
+            const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
+            if (typeof defaultValue !== "undefined") return {...acc, [key]: defaultValue}
+            else return {...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined}
+          }, {})
+
           return {
             core(core = () => Object.create({})) {
               const coreDefinition = core
@@ -56,6 +66,7 @@ export const MetaFor = (tag, conf = {}) => {
                         options,
                         states,
                         contextDefinition,
+                        contextData,
                         transitions,
                         coreDefinition,
                         reactions
@@ -70,6 +81,7 @@ export const MetaFor = (tag, conf = {}) => {
                               options,
                               states,
                               contextDefinition,
+                              contextData,
                               transitions,
                               coreDefinition,
                               reactions,
@@ -86,6 +98,7 @@ export const MetaFor = (tag, conf = {}) => {
                       options,
                       states,
                       contextDefinition,
+                      contextData,
                       transitions,
                       coreDefinition,
                       reactions: [],
@@ -100,6 +113,7 @@ export const MetaFor = (tag, conf = {}) => {
                             options,
                             states,
                             contextDefinition,
+                            contextData,
                             transitions,
                             coreDefinition,
                             reactions: [],
@@ -149,6 +163,7 @@ const createMeta = ({
                       options,
                       states,
                       contextDefinition,
+                      contextData,
                       transitions,
                       coreDefinition,
                       reactions = [],
@@ -159,17 +174,7 @@ const createMeta = ({
     options,
     states
   }))
-  const {meta, state, context = {}, debug, onTransition, core, onUpdate} = options
-
-  const contextData = /** @type {import('./types/context').ContextData<C>} */ (
-    Object.keys(contextDefinition).reduce((acc, key) => {
-      const createValue = context && context[key]
-      const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
-      if (typeof createValue !== "undefined") return {...acc, [key]: createValue}
-      else if (typeof defaultValue !== "undefined") return {...acc, [key]: defaultValue}
-      else return {...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined}
-    }, {})
-  )
+  const {state, onTransition, onUpdate} = options
   createWebComponent({
     view,
     description,
@@ -468,6 +473,7 @@ const createWebComponent = (
       }
 
       #updateListeners = new Set()
+
       /** @type {import('./types/meta').OnUpdate<C>}*/
       onUpdate(cb) {
         this.#updateListeners.add(cb)
@@ -523,6 +529,7 @@ const createWebComponent = (
     }
   )
 }
+
 /**
  @template {ContextDefinition} C
  @param {import('./types/transitions').When<C>} when
