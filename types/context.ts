@@ -107,9 +107,9 @@ export type PartialContextData<C extends ContextDefinition> = Partial<{
  Принимает частичный объект с новыми значениями контекста.
 
  @template C - Тип контекста
- @property context - Новые данные контекста
+ @property ctx - Новые данные контекста
  */
-export type Update<C extends ContextDefinition> = (context: UpdateParameters<C>) => void
+export type Update<C extends ContextDefinition> = (ctx: UpdateParameters<C>) => void
 
 
 /**
@@ -245,7 +245,7 @@ export type StringEnumDefinition<T extends readonly string[]> = EnumDefinition<T
  @property funcName - Имя функции вызвавшей изменение
  */
 export type UpdateContextParams<C extends Record<string, any>> = {
-    context: ContextData<C>
+    ctx: ContextData<C>
     srcName?: string
     funcName?: string
 }

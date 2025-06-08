@@ -1,284 +1,5 @@
-/**
- * @typedef {import("./types/context").ContextDefinition} ContextDefinition
- * @typedef {import("./types/core").CoreObj} CoreObj
- */
-/**
- @template {string} S - состояние
- @template {ContextDefinition} C - контекст
- @template {CoreObj} I - ядро
- */
-class Meta {
-  title = ""
-  description = ""
-  graph = /** @type {() => Promise<any>} */ () => Promise.resolve(/** @type {any} */ (undefined))
-  component = /**@type {HTMLElement | Element} */ (/** @type {unknown} */ (null))
-  #process = false
-  #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
-
-  get state() {
-    return this.$state?.value()
-  }
-
-  get process() {
-    return this.#process
-  }
-
-  set process(value) {
-    this.#process = value
-    if (!value) this.update(this.context)
-  }
-
-  /** @param {import('./types/meta').MetaConstructor<S, C, I>} params */ // prettier-ignore
-  constructor({ channel, id, states, contextDefinition, transitions, initialState, contextData, core, coreData, reactions, onTransition, onUpdate, destroy }) {
-    this.channel = channel
-    this.id = id
-    this.reactions = reactions
-    this.$state = this.#createSignal(initialState)
-    this.destroy = () => {
-      this.channel.postMessage({
-        meta: { particle: this.id, func: "destroy", target: "particle", timestamp: Date.now() },
-        patch: { path: "/", op: "remove" },
-      })
-      this.channel.close()
-      this.#updateListeners.clear()
-      this.$state.clear()
-      this.types = {}
-      this.context = {}
-      this.core = (/**@type {import("./types/core").Core<I>} */ ({}))
-      this.transitions.length = 0
-      this.reactions.length = 0
-      this.#parsedCore = {}
-      if (typeof destroy === "function") destroy(this)
-    }
-    this.states = states
-    /** @type {import('./types/context').ContextData<C>} */
-    this.context = /** @type {import('./types/context').ContextData<C>} */ (
-      Object.keys(contextDefinition).reduce((acc, key) => {
-        const createValue = contextData && contextData[key]
-        const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
-        if (typeof createValue !== "undefined") return { ...acc, [key]: createValue }
-        else if (typeof defaultValue !== "undefined") return { ...acc, [key]: defaultValue }
-        else return { ...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined }
-      }, {})
-    )
-    /** @type{ContextDefinition}*/
-    this.types = contextDefinition
-    this.transitions = transitions || []
-
-    this.core = /** @type {import("./types/core").Core<I>} */ ((() => {
-      let /** @type {string | null} */ currentCaller = null
-      const self = /** @type {import("./types/core").Core<I>} */ ({})
-      const coreObj = core({ update: (ctx) => this._updateExternal({ context: ctx, srcName: "core", funcName: currentCaller || "unknown" }), context: this.context, self })
-      // Прокси для self, для синхронизации значений
-      Object.entries(coreObj).forEach(([key, value]) => {
-        if (typeof value !== "function") {
-          Object.defineProperty(self, key, {
-            get: () => coreObj[key],
-            //@ts-ignore
-            set: (newValue) => (coreObj[key] = newValue),
-            enumerable: true,
-            configurable: true,
-          })//@ts-ignore
-        } else self[key] = value
-      })
-      const wrappedCore = Object.entries(coreObj).reduce((acc, [name, value]) => {
-        if (typeof value === "function") {
-          //@ts-ignore
-          acc[name] = (...args) => {
-            currentCaller = name
-            const result = value.apply(coreObj, args)
-            currentCaller = null
-            return result
-          }
-        } else Object.defineProperty(acc, name, {
-          get: () => coreObj[name],
-          //@ts-ignore
-          set: (newValue) => coreObj[name] = newValue,
-          enumerable: true,
-          configurable: true,
-        })
-        return acc
-      }, {})
-      Object.assign(self, wrappedCore)
-      return wrappedCore
-    })())
-    //@ts-ignore присваивание свойству ядра переданного объекта, массива или карты
-    Object.entries(coreData || {}).forEach( ([key, value]) =>
-        this.core[key] !== undefined && //@ts-ignore
-        (this.core[key] = Array.isArray(value)
-          ? value //@ts-ignore
-          : (this.core[key] = Object.isFrozen(value) ? value : Object.freeze(value)))
-    )
-    this.channel.onmessage = ({ data: { meta, patch } }) => {
-      this.reactions.forEach((reaction) => {
-        if (reactionFilter(reaction, patch)) {
-          reaction.action({
-            patch,
-            context: this.context,
-            meta,
-            update: (ctx) => this.#updateContext({ context: ctx, srcName: "reaction", funcName: meta.name }),
-            core: this.core,
-          })
-        }
-      })
-    }
-    // TODO: при восстановлении входить в состояние без вызова действия
-    this.channel.postMessage({
-      meta: { meta: this.id, func: "constructor", target: "meta", timestamp: Date.now() },
-      patch: { path: "/", op: "add", value: this.snapshot() },
-    })
-
-    if (onTransition) {
-      this.$state.onChange((oldValue, newValue) => {
-        if (newValue !== undefined) onTransition(oldValue, newValue, this)
-      })
-    }
-    if (onUpdate) this.onUpdate(onUpdate)
-
-    const transition = this.transitions.find((i) => i.from === initialState)
-    if (transition?.action) {
-      this.process = true
-      this.#runAction(transition.action)
-    } else this.#transition()
-  }
-
-  /**
-   * Проверка условий перехода и выполнение действия
-   */
-  #transition() {
-    const transitionFrom = this.transitions.find((t) => t.from === this.state)
-    if (transitionFrom) {
-      for (const transition of transitionFrom.to) {
-        if (Object.keys(transition.when).length === 0) break
-        if (conditions(transition.when, this.context, this.types)) {
-          const actionDefinition = this.transitions.find((i) => i.from === transition.state && i.action)
-          if (actionDefinition?.action) {
-            this.process = true
-            this.$state.setValue(transition.state)
-            this.#runAction(actionDefinition.action)
-          } else this.$state.setValue(transition.state)
-        }
-      }
-    }
-  }
-
-  /**
-   * Обновление контекста из внешнего источника (core, reaction)
-   * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
-   */
-  _updateExternal = ({ context, srcName = "core", funcName = "unknown" }) => {
-    const updCtx = this.#updateContext({ context, srcName, funcName })
-    if (updCtx && !this.process) this.#transition()
-  }
-
-  /**
-   * Выполнение действия с последующим отключением блокировки переходов
-   * @param {import('./types/actions').Action<C, I>} action
-   */
-  #runAction(action) {
-    const result = action({
-      context: this.context,
-      update: (ctx) => this.#updateContext({ context: ctx, srcName: "action" }),
-      core: this.core,
-    })
-    const finallyFn = () => (this.process = false)
-    if (result?.then) result.finally(finallyFn)
-    else finallyFn()
-  }
-
-  /** @param {import("./types/context").UpdateContextParams<C>} params */
-  #updateContext = ({ context, srcName = "unknown", funcName = "unknown" }) => {
-    const updCtx = Object.keys(context).reduce((acc, /** @type {keyof C} */ key) => {
-      if (this.context[key] !== context[key]) {
-        this.context[key] = context[key]
-        return { ...acc, [key]: context[key] }
-      }
-      return acc
-    }, {})
-    if (Object.keys(updCtx).length > 0) {
-      this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
-      this.channel.postMessage(
-        /** @type {import('./types/meta').BroadcastMessage} */ ({
-          meta: { meta: this.id, func: funcName, target: srcName, timestamp: Date.now() },
-          patch: { path: `/context`, op: "replace", value: updCtx },
-        })
-      )
-    }
-    return updCtx
-  }
-
-  /** @type {import('./types/context').Update<C>} */
-  update = (context) => {
-    this.#updateContext({ context })
-    if (this.process) return
-    this.#transition()
-  }
-
-  #updateListeners = new Set()
-
-  /** @type {import('./types/meta').OnUpdate<C>}*/
-  onUpdate(cb) {
-    this.#updateListeners.add(cb)
-    return () => {
-      this.#updateListeners.delete(cb)
-    }
-  }
-
-  /** @type {import('./types/meta').OnTransition<S>}*/
-  onTransition = (cb) => this.$state.onChange((oldValue, newValue) => {
-      if (newValue !== undefined) cb(oldValue, newValue)
-    })
-
-  /** @returns {import('./types/meta').Snapshot<S, C, I>} */
-  snapshot() {
-    return {
-      id: this.id,
-      title: this.title || "",
-      description: this.description || "",
-      state: this.state,
-      states: this.states,
-      core: this.#parsedCore,
-      context: this.context,
-      types: this.types,
-      transitions: this.transitions.map((t) => ({
-        from: t.from,
-        to: t.to.map((toState) => ({
-          state: toState.state,
-          when: toState.when,
-        })),
-      })),
-    }
-  }
-
-  /**
-   * @param {S} state
-   * @returns {import('./types/state').Signal<S>}
-   */
-  #createSignal(state) {
-    const listeners = new Set()
-    return {
-      setValue: (next) => {
-        if (state !== next) {
-          const oldValue = state
-          state = next
-          listeners.forEach((listener) => listener(oldValue, next))
-          this.channel.postMessage({
-            meta: { particle: this.id, timestamp: Date.now() },
-            patch: { path: "/state", op: "replace", value: next },
-          })
-        }
-      },
-      value: () => state,
-      onChange: (listener) => {
-        listeners.add(listener)
-        return () => {
-          listeners.delete(listener)
-        }
-      },
-      clear: () => listeners.clear(),
-    }
-  }
-}
+import {html, render} from "./html/html.js"
+import {ref} from "./html/directives/ref.js"
 
 let devChannel = null
 /**
@@ -287,13 +8,13 @@ let devChannel = null
  */
 const setDevChannel = (channel) => {
   devChannel = channel
-  devChannel.onmessage = ({ data }) => console.warn(`${data.id}: ${data.message}`)
+  devChannel.onmessage = ({data}) => console.warn(`${data.id}: ${data.message}`)
   console.debug("Режим разработки активирован")
 }
 
 /** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
-  const { development, description } = conf
+  const {development, description} = conf
   if (development) {
     import("./core/validator/index.js")
     setDevChannel(new BroadcastChannel("validator"))
@@ -301,59 +22,89 @@ export const MetaFor = (tag, conf = {}) => {
   }
   return {
     states(...states) {
-      development && import("./core/validator/index.js").then((module) => module.validateStates({ tag, states }))
+      development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
       return {
         context(context) {
           const contextDefinition = context({
-            string: (params) => ({ type: "string", ...params }),
-            number: (params) => ({ type: "number", ...params }),
-            boolean: (params) => ({ type: "boolean", ...params }),
-            array: (params) => ({ type: "array", ...params }),
-            enum: (...values) => (params = {}) => ({ type: "enum", values, ...params })
+            string: (params) => ({type: "string", ...params}),
+            number: (params) => ({type: "number", ...params}),
+            boolean: (params) => ({type: "boolean", ...params}),
+            array: (params) => ({type: "array", ...params}),
+            enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
           })
           development &&
-            import("./core/validator/index.js").then((module) =>
-              module.validateContextDefinition({ tag, context: contextDefinition })
-            )
+          import("./core/validator/index.js").then((module) =>
+            module.validateContextDefinition({tag, context: contextDefinition})
+          )
           return {
             core(core = () => Object.create({})) {
               const coreDefinition = core
               development &&
-                import("./core/validator/index.js").then((module) => module.validateCore({ tag, core: coreDefinition }))
+              import("./core/validator/index.js").then((module) => module.validateCore({tag, core: coreDefinition}))
               return {
                 transitions(transitions) {
                   if (development) {
-                    const data = { tag, transitions: [...transitions], contextDefinition }
+                    const data = {tag, transitions: [...transitions], contextDefinition}
                     import("./core/validator/index.js").then((module) => module.validateTransitions(data))
                   }
                   return {
                     reactions: (reactions = []) => ({
-                      create: (options) => createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions }),
+                      create: (options) => createMeta({
+                        development,
+                        description,
+                        tag,
+                        options,
+                        states,
+                        contextDefinition,
+                        transitions,
+                        coreDefinition,
+                        reactions
+                      }),
                       view: (view) => {
                         return {
                           create: (options) => {
-                            const meta = createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions })
-
-                            if (view.isolated === undefined) view.isolated = true
-                            if (options.view?.isolated === false) view.isolated = false
-                            import("./core/web/component.js").then((module) => module.default({ view, meta }))
-
-                            return meta
+                            return createMeta({
+                              development,
+                              description,
+                              tag,
+                              options,
+                              states,
+                              contextDefinition,
+                              transitions,
+                              coreDefinition,
+                              reactions,
+                              view
+                            })
                           },
                         }
                       },
                     }),
-                    create: (options) =>  createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions: [] }) ,
+                    create: (options) => createMeta({
+                      development,
+                      description,
+                      tag,
+                      options,
+                      states,
+                      contextDefinition,
+                      transitions,
+                      coreDefinition,
+                      reactions: [],
+                    }),
                     view: (view) => {
                       return {
                         create: (options) => {
-                          const meta = createMeta({ development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions: [] })
-
-                          if (view.isolated === undefined) view.isolated = true
-                          if (options.view?.isolated === false) view.isolated = false
-                          import("./core/web/component.js").then((module) => module.default({ view, meta }))
-
-                          return meta
+                          return createMeta({
+                            development,
+                            description,
+                            tag,
+                            options,
+                            states,
+                            contextDefinition,
+                            transitions,
+                            coreDefinition,
+                            reactions: [],
+                            view
+                          })
                         }
                       }
                     }
@@ -390,18 +141,388 @@ const reactionFilter = (reaction, patch) => {
  @template {CoreObj} I - ядро
 
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
- @return {import("./metafor").Meta<S, C, I>}
  */
-const createMeta = ({development, description, tag, options, states, contextDefinition, transitions, coreDefinition, reactions=[]}) => {
-  development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
-  const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
-  const channel = new BroadcastChannel("channel")
-  const instance = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
-  instance.description = description || options.description || ""
-  if (debug) import("./core/debug.js").then((module) => module.default(instance, debug))
-  return /**@type {import("./metafor").Meta<S, C, I>} */ instance
-}
+const createMeta = ({
+                      development,
+                      description,
+                      tag,
+                      options,
+                      states,
+                      contextDefinition,
+                      transitions,
+                      coreDefinition,
+                      reactions = [],
+                      view
+                    }) => {
+  development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({
+    tag,
+    options,
+    states
+  }))
+  const {meta, state, context = {}, debug, onTransition, core, onUpdate} = options
 
+  const contextData = /** @type {import('./types/context').ContextData<C>} */ (
+    Object.keys(contextDefinition).reduce((acc, key) => {
+      const createValue = context && context[key]
+      const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
+      if (typeof createValue !== "undefined") return {...acc, [key]: createValue}
+      else if (typeof defaultValue !== "undefined") return {...acc, [key]: defaultValue}
+      else return {...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined}
+    }, {})
+  )
+  createWebComponent({
+    view,
+    description,
+    tag,
+    context: contextData,
+    reactions,
+    transitions,
+    state,
+    core: coreDefinition,
+    onTransition,
+    onUpdate,
+    types: contextDefinition
+  })
+}
+/**
+ * Преобразует строку из camelCase в kebab-case
+ * @param {string} str - Строка в формате camelCase
+ * @return {string} Строка в формате kebab-case
+ */
+const camelToKebab = (str) => str.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
+
+/**
+ * @template {import("./types/core").CoreObj} I
+ * @template {import("./types/context").ContextDefinition} C
+ * @template {string} S
+ * @param {import("./types/view").ComponentParams<I, C, S>} params
+ */
+const createWebComponent = (
+  {
+    view,
+    description = "",
+    tag,
+    context,
+    reactions,
+    transitions,
+    onTransition,
+    onUpdate,
+    state,
+    states,
+    types,
+    core
+  }) => {
+  const ContextKeys = Object.keys(context).map(camelToKebab)
+
+  // Создаем карту соответствия между kebab-case и camelCase ключами
+  /** @type {Record<string, string>} */
+  const kebabToCamelMap = Object.keys(context).reduce((map, key) => {
+    map[camelToKebab(key)] = key
+    return map
+  }, /** @type {Record<string, string>} */ ({}))
+
+  customElements.define(
+    "metafor-" + tag,
+    class extends HTMLElement {
+      #process = false
+      #core = /** @type{import("./types/core").Core<I>} */ ({})
+      #channel = new BroadcastChannel('channel')
+
+      get state() {
+        return this.$state?.value()
+      }
+
+      get process() {
+        return this.#process
+      }
+
+      set process(value) {
+        this.#process = value
+        if (!value) this.update(context)
+      }
+
+      constructor() {
+        super()
+        this.shadow = this.attachShadow({mode: "open"})
+        this.$state = this.#createSignal(state)
+
+        view?.style?.({
+          css: (strings, ...values) => {
+            const sheet = new CSSStyleSheet()
+            const result = strings.reduce((acc, str, i) => acc + str + (values[i] || ""), "")
+            sheet.replaceSync(result)
+            this.shadow.adoptedStyleSheets.push(sheet)
+            return sheet
+          },
+        })
+        this.#core = /** @type {import("./types/core").Core<I>} */ ((() => {
+          let /** @type {string | null} */ currentCaller = null
+          const self = /** @type {import("./types/core").Core<I>} */ ({})
+          const coreObj = core({
+            update: (ctx) => this._updateExternal({
+              ctx,
+              srcName: "core",
+              funcName: currentCaller || "unknown"
+            }), context, self
+          })
+          // Прокси для self, для синхронизации значений
+          Object.entries(coreObj).forEach(([key, value]) => {
+            if (typeof value !== "function") {
+              Object.defineProperty(self, key, {
+                get: () => coreObj[key],
+                //@ts-ignore
+                set: (newValue) => (coreObj[key] = newValue),
+                enumerable: true,
+                configurable: true,
+              })//@ts-ignore
+            } else self[key] = value
+          })
+          const wrappedCore = Object.entries(coreObj).reduce((acc, [name, value]) => {
+            if (typeof value === "function") {
+              //@ts-ignore
+              acc[name] = (...args) => {
+                currentCaller = name
+                const result = value.apply(coreObj, args)
+                currentCaller = null
+                return result
+              }
+            } else Object.defineProperty(acc, name, {
+              get: () => coreObj[name],
+              //@ts-ignore
+              set: (newValue) => coreObj[name] = newValue,
+              enumerable: true,
+              configurable: true,
+            })
+            return acc
+          }, {})
+          Object.assign(self, wrappedCore)
+          return wrappedCore
+        })())
+        //@ts-ignore присваивание свойству ядра переданного объекта, массива или карты
+        Object.entries(core || {}).forEach(([key, value]) =>
+          this.#core[key] !== undefined && //@ts-ignore
+          (this.#core[key] = Array.isArray(value)
+            ? value //@ts-ignore
+            : (this.#core[key] = Object.isFrozen(value) ? value : Object.freeze(value)))
+        )
+      }
+
+      connectedCallback() {
+        this.#channel.onmessage = ({data: {meta, patch}}) => {
+          reactions.forEach((reaction) => {
+            if (reactionFilter(reaction, patch)) {
+              reaction.action({
+                patch,
+                context,
+                meta,
+                update: (ctx) => this.#updateContext({ctx, srcName: "reaction", funcName: meta.name}),
+                core: this.#core,
+              })
+            }
+          })
+        }
+        // TODO: при восстановлении входить в состояние без вызова действия
+        this.#channel.postMessage({
+          meta: {meta: tag, func: "constructor", target: "meta", timestamp: Date.now()},
+          patch: {path: "/", op: "add", value: this.snapshot()},
+        })
+
+        if (onTransition) {
+          this.$state.onChange((oldValue, newValue) => {
+            if (newValue !== undefined) onTransition(oldValue, newValue, this)
+          })
+        }
+        if (onUpdate) this.onUpdate(onUpdate)
+
+        const transition = transitions.find((i) => i.from === state)
+        if (transition?.action) {
+          this.process = true
+          this.#runAction(transition.action)
+        } else this.#transition()
+        // console.log("connectedCallback")
+        const updateView = () => {
+          const result = view?.render({
+            update: (ctx) =>
+              this._updateExternal({
+                ctx,
+                srcName: "component",
+                funcName: "handler",
+              }),
+            context,
+            state: this.state,
+            core,
+            html: html,
+            ref: ref,
+          })
+          // @ts-ignore
+          render(result, this.shadow ?? this)
+        }
+
+        this.onUpdate(updateView)
+        this.onTransition(updateView) // TODO: оптимизировать обновление
+        updateView()
+
+        view?.onMount?.({component: /** @type {HTMLElement} */ (this.shadow?.host ?? this), core: meta.core})
+      }
+
+      disconnectedCallback() {
+        view?.onDestroy?.({component: /** @type {HTMLElement} */ (this.shadow?.host ?? this), core: meta.core})
+        // meta.destroy()
+      }
+
+      static get observedAttributes() {
+        return ContextKeys
+      }
+
+      /** @param {string} name @param {string} oldValue @param {string} newValue */
+      attributeChangedCallback(name, oldValue, newValue) {
+        // Преобразуем kebab-case обратно в camelCase для обновления контекста
+        const camelCaseName = kebabToCamelMap[name]
+        if (camelCaseName) {
+          const propType = types[camelCaseName].type
+          if (propType === "boolean") {
+            // @ts-ignore - Принудительное приведение типа для boolean атрибута
+            this.update({[camelCaseName]: newValue !== null})
+          }
+        }
+      }
+
+      /** @type {import('./types/context').Update<C>} */
+      update = (ctx) => {
+        this.#updateContext({ctx})
+        if (this.process) return
+        this.#transition()
+      }
+
+      /**
+       * @param {S} state
+       * @returns {import('./types/state').Signal<S>}
+       */
+      #createSignal(state) {
+        const listeners = new Set()
+        return {
+          setValue: (next) => {
+            if (state !== next) {
+              const oldValue = state
+              state = next
+              listeners.forEach((listener) => listener(oldValue, next))
+              this.#channel.postMessage({
+                meta: {particle: this.id, timestamp: Date.now()},
+                patch: {path: "/state", op: "replace", value: next},
+              })
+            }
+          },
+          value: () => state,
+          onChange: (listener) => {
+            listeners.add(listener)
+            return () => {
+              listeners.delete(listener)
+            }
+          },
+          clear: () => listeners.clear(),
+        }
+      }
+
+      /**
+       * Проверка условий перехода и выполнение действия
+       */
+      #transition() {
+        const transitionFrom = transitions.find((t) => t.from === this.state)
+        if (transitionFrom) {
+          for (const transition of transitionFrom.to) {
+            if (Object.keys(transition.when).length === 0) break
+            if (conditions(transition.when, context, types)) {
+              const actionDefinition = transitions.find((i) => i.from === transition.state && i.action)
+              if (actionDefinition?.action) {
+                this.#process = true
+                this.$state.setValue(transition.state)
+                this.#runAction(actionDefinition.action)
+              } else this.$state.setValue(transition.state)
+            }
+          }
+        }
+      }
+
+      /**
+       * Обновление контекста из внешнего источника (core, reaction)
+       * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
+       */
+      _updateExternal = ({ctx, srcName = "core", funcName = "unknown"}) => {
+        const updCtx = this.#updateContext({ctx, srcName, funcName})
+        if (updCtx && !this.process) this.#transition()
+      }
+
+      /**
+       * Выполнение действия с последующим отключением блокировки переходов
+       * @param {import('./types/actions').Action<C, I>} action
+       */
+      #runAction(action) {
+        const result = action({
+          context,
+          update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
+          core: this.#core,
+        })
+        const finallyFn = () => (this.process = false)
+        if (result?.then) result.finally(finallyFn)
+        else finallyFn()
+      }
+
+      #updateListeners = new Set()
+      /** @type {import('./types/meta').OnUpdate<C>}*/
+      onUpdate(cb) {
+        this.#updateListeners.add(cb)
+        return () => {
+          this.#updateListeners.delete(cb)
+        }
+      }
+
+      /** @type {import('./types/meta').OnTransition<S>}*/
+      onTransition = (cb) => this.$state.onChange((oldValue, newValue) => {
+        if (newValue !== undefined) cb(oldValue, newValue)
+      })
+
+      /** @param {import("./types/context").UpdateContextParams<C>} params */
+      #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
+        const updCtx = Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
+          if (context[key] !== ctx[key]) {
+            context[key] = ctx[key]
+            return {...acc, [key]: ctx[key]}
+          }
+          return acc
+        }, {})
+        if (Object.keys(updCtx).length > 0) {
+          this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
+          this.#channel.postMessage(
+            /** @type {import('./types/meta').BroadcastMessage} */ ({
+              meta: {meta: this.id, func: funcName, target: srcName, timestamp: Date.now()},
+              patch: {path: `/context`, op: "replace", value: updCtx},
+            })
+          )
+        }
+        return updCtx
+      }
+
+      snapshot() {
+        return {
+          id: tag,
+          description,
+          state: this.state,
+          states,
+          // core: this.#parsedCore,
+          context,
+          types,
+          transitions: transitions.map((t) => ({
+            from: t.from,
+            to: t.to.map((toState) => ({
+              state: toState.state,
+              when: toState.when,
+            })),
+          })),
+        }
+      }
+    }
+  )
+}
 /**
  @template {ContextDefinition} C
  @param {import('./types/transitions').When<C>} when
@@ -575,7 +696,7 @@ export function parseFunction(func) {
       .filter((prop) => prop.length > 0)
     props.forEach((prop) => writeProperties.add(prop))
   }
-  return { read: Array.from(readProperties), write: Array.from(writeProperties) }
+  return {read: Array.from(readProperties), write: Array.from(writeProperties)}
 }
 
 /**

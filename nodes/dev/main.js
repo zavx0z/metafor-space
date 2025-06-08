@@ -28,7 +28,6 @@ MetaFor("test", {description: "Nodes", development: false}).states(
   },
 ]).view({
   render: ({html, context}) => html`
-      <h1>${context.status}</h1>
   `
 }).create({
   state: "начало",

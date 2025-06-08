@@ -3,6 +3,7 @@ import type { CoreData, CoreDefinition } from "./core.ts"
 import type { Transitions } from "./transitions.ts"
 import type { Reactions } from "./reaction.ts"
 import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta.ts"
+import type {ViewDefinition} from "./view.ts";
 /**
  Опции создания частицы в коллбеке create
 
@@ -100,5 +101,6 @@ export type FabricCallbackCreateFuncHelper<
   contextDefinition: ContextDefinition
   transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
-  reactions:  Reactions<C, I>
+  reactions: Reactions<C, I>
+  view?: ViewDefinition<I, C, S>
 }

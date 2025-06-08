@@ -1,8 +1,11 @@
 import type {Meta} from "../metafor"
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
-import type {Core, CoreObj} from "./core.ts"
+import type {Core, CoreData, CoreDefinition, CoreObj} from "./core.ts"
 import type {HtmlType, TemplateResult} from "../html/html"
 import {ref} from "../html/directives/ref"
+import type {Transitions} from "./transitions.ts";
+import type {Reactions} from "./reaction.ts";
+import type {CreateOnTransitionCallBack, OnUpdateCallBack} from "./meta.ts";
 
 /**
  Структура условного блока для компонента
@@ -45,8 +48,20 @@ export type ConditionsMap = Map<string | number, Condition>
  @property meta - Экземпляр meta
  */
 export type ComponentParams<I extends CoreObj, C extends ContextDefinition, S extends string> = {
-  view: ViewDefinition<I, C, S>
-  meta: Meta<S, C, I>
+  view?: ViewDefinition<I, C, S>
+  description?: string
+  tag: string
+  context: ContextData<C>
+  states: S[]
+  types: ContextDefinition
+  transitions: Transitions<S, C, I>
+  state: S
+  core: CoreDefinition<I, C>
+  // coreData: CoreData<I>
+  reactions: Reactions<C, I>
+  onTransition?: CreateOnTransitionCallBack<S, C, I>
+  onUpdate?: OnUpdateCallBack<C>
+  destroy?: (particle: Meta<S, C, I>) => void
 }
 
 /**
