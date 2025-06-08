@@ -14,12 +14,12 @@ describe("Инициализация c действием", async () => {
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
-  document.body.innerHTML = `<metafor-test-meta></metafor-test-meta>`
+  document.body.innerHTML = `<metafor-test></metafor-test>`
 
-  MetaFor("test-meta")
+  const meta = MetaFor("test")
     .states("INITIAL", "OTHER", "NEXT")
     .context((t) => ({
-      value: t.string({nullable: true, default: "initial"}),
+      value: t.string({nullable: true, default: initialContext.value}),
     }))
     .core()
     .transitions([
@@ -42,9 +42,8 @@ describe("Инициализация c действием", async () => {
     ])
     .create({
       state: initialState,
-      context: initialContext
     })
-  const meta = document.querySelector("metafor-test-meta") as unknown as Meta<any, any, any>
+  // const meta = document.querySelector("metafor-test") as unknown as Meta<any, any, any>
   test.todo("Условия meta заблокированы до окончания автопереходов")
   test.todo("Независимо от блокировки, сообщения с изменениями отправляются")
   const block = meta.process // Блокировку до окончания действия можно перехватить сразу после выполнения синхронного конструктора

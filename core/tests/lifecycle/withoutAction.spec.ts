@@ -7,8 +7,8 @@ describe("Инициализация без действия", async () => {
 
   const initialState = "INITIAL"
   const initialContext = {value: "initial"}
-
-  const meta = MetaFor("test-meta")
+  document.body.innerHTML = `<metafor-test></metafor-test>`
+  const meta = MetaFor("test")
     .states("INITIAL", "OTHER")
     .context((t)=>({
       value: t.string({nullable: true})

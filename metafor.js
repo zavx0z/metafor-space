@@ -47,8 +47,8 @@ export const MetaFor = (tag, conf = {}) => {
           }, {})
 
           return {
-            core(core = () => Object.create({})) {
-              const coreDefinition = core
+            core(core) {
+              const coreDefinition = core || (() => Object.create({}))
               development &&
               import("./core/validator/index.js").then((module) => module.validateCore({tag, core: coreDefinition}))
               return {
@@ -73,21 +73,19 @@ export const MetaFor = (tag, conf = {}) => {
                       }),
                       view: (view) => {
                         return {
-                          create: (options) => {
-                            return createMeta({
-                              development,
-                              description,
-                              tag,
-                              options,
-                              states,
-                              contextDefinition,
-                              contextData,
-                              transitions,
-                              coreDefinition,
-                              reactions,
-                              view
-                            })
-                          },
+                          create: (options) => createMeta({
+                            development,
+                            description,
+                            tag,
+                            options,
+                            states,
+                            contextDefinition,
+                            contextData,
+                            transitions,
+                            coreDefinition,
+                            reactions,
+                            view
+                          })
                         }
                       },
                     }),
@@ -105,21 +103,19 @@ export const MetaFor = (tag, conf = {}) => {
                     }),
                     view: (view) => {
                       return {
-                        create: (options) => {
-                          return createMeta({
-                            development,
-                            description,
-                            tag,
-                            options,
-                            states,
-                            contextDefinition,
-                            contextData,
-                            transitions,
-                            coreDefinition,
-                            reactions: [],
-                            view
-                          })
-                        }
+                        create: (options) => createMeta({
+                          development,
+                          description,
+                          tag,
+                          options,
+                          states,
+                          contextDefinition,
+                          contextData,
+                          transitions,
+                          coreDefinition,
+                          reactions: [],
+                          view
+                        })
                       }
                     }
                   }
@@ -155,6 +151,7 @@ const reactionFilter = (reaction, patch) => {
  @template {CoreObj} I - ядро
 
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
+ @return {import("./metafor").Meta<S, C, I>}
  */
 const createMeta = ({
                       development,
@@ -175,7 +172,7 @@ const createMeta = ({
     states
   }))
   const {state, onTransition, onUpdate} = options
-  createWebComponent({
+  return createWebComponent({
     view,
     description,
     tag,
@@ -533,6 +530,7 @@ const createWebComponent = (
       }
     }
   )
+  return /**@type{import("./metafor").Meta<S, C, I>}*/ (document.querySelector("metafor-" + tag))
 }
 
 /**

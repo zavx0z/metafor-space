@@ -51,14 +51,14 @@ export declare function MetaFor(
         transitions: (transitions: Transitions<S, C, I>) => {
           reactions: (reactions: Reactions<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
-              create: (data: CreateParams<C, S, I>) => void
+              create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
             }
-            create: (data: CreateParams<C, S, I>) => void
+            create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
           }
           view: (view: ViewDefinition<I, C, S>) => {
-            create: (data: CreateParams<C, S, I>) => void
+            create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
           }
-          create: (data: CreateParams<C, S, I>) => void
+          create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
         }
       }
     }

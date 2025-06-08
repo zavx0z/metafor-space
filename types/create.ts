@@ -34,8 +34,6 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
   description?: string
   /** Начальное состояние */
   state: S
-  /** Начальные данные контекста */
-  context?: PartialContextData<C>
   /** Опции отображения */
   view?: {
     /** Флаг изолированного отображения (по умолчанию Shadow DOM) */
