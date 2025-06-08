@@ -13,7 +13,7 @@ describe("Инициализация c действием", async () => {
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
-  const meta = MetaFor("test-particle")
+  const meta = MetaFor("test-meta")
     .states("INITIAL", "OTHER", "NEXT")
     .context((t) => ({
       value: t.string({ nullable: true }),

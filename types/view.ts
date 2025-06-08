@@ -42,11 +42,11 @@ export type ConditionsMap = Map<string | number, Condition>
  Параметры инициализации компонента
 
  @property view - Коллбек инициализации представления
- @property particle - Экземпляр частицы
+ @property meta - Экземпляр meta
  */
 export type ComponentParams<I extends CoreObj, C extends ContextDefinition, S extends string> = {
   view: ViewDefinition<I, C, S>
-  particle: Meta<S, C, I>
+  meta: Meta<S, C, I>
 }
 
 /**

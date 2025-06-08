@@ -7,7 +7,7 @@
  @template {ContextDefinition} C - контекст
  @template {CoreObj} I - ядро
  */
-export class Meta {
+class Meta {
   title = ""
   description = ""
   graph = /** @type {() => Promise<any>} */ () => Promise.resolve(/** @type {any} */ (undefined))
@@ -44,7 +44,7 @@ export class Meta {
       this.$state.clear()
       this.types = {}
       this.context = {}
-      this.core = {}
+      this.core = (/**@type {import("./types/core").Core<I>} */ ({}))
       this.transitions.length = 0
       this.reactions.length = 0
       this.#parsedCore = {}
@@ -336,7 +336,7 @@ export const MetaFor = (tag, conf = {}) => {
 
                             if (view.isolated === undefined) view.isolated = true
                             if (options.view?.isolated === false) view.isolated = false
-                            import("./core/web/component.js").then((module) => module.default({ view, particle: meta }))
+                            import("./core/web/component.js").then((module) => module.default({ view, meta }))
 
                             return meta
                           },
@@ -351,7 +351,7 @@ export const MetaFor = (tag, conf = {}) => {
 
                           if (view.isolated === undefined) view.isolated = true
                           if (options.view?.isolated === false) view.isolated = false
-                          import("./core/web/component.js").then((module) => module.default({ view, particle: meta }))
+                          import("./core/web/component.js").then((module) => module.default({ view, meta }))
 
                           return meta
                         }
@@ -396,11 +396,10 @@ const createMeta = ({development, description, tag, options, states, contextDefi
   development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({ tag, options, states }))
   const { meta, state, context = {}, debug, graph, onTransition, core, onUpdate } = options
   const channel = new BroadcastChannel("channel")
-  const particle = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
-  particle.description = description || options.description || ""
-  if (graph) particle.graph = () => import("./core/web/graph.js").then((module) => module.default(particle))
-  if (debug) import("./core/debug.js").then((module) => module.default(particle, debug))
-  return /**@type {import("./metafor").Meta<S, C, I>} */ particle
+  const instance = new Meta({ channel, id: meta?.name || tag, states, contextDefinition, transitions, initialState: state, contextData: context, core: coreDefinition, coreData: /** @type {Partial<any>} */ (core), reactions, onTransition, onUpdate })
+  instance.description = description || options.description || ""
+  if (debug) import("./core/debug.js").then((module) => module.default(instance, debug))
+  return /**@type {import("./metafor").Meta<S, C, I>} */ instance
 }
 
 /**

@@ -56,7 +56,7 @@ export type Reaction<C extends ContextDefinition, I extends Record<string, unkno
 - user
 - device
 - tab
-- particle
+- meta
 - index
 - timestamp
 

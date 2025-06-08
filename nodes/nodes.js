@@ -277,10 +277,6 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
           }
         }
 
-
-        /
-        /
-
         svg.connections {
           position: absolute;
           top: 0;
@@ -298,9 +294,6 @@ export const Nodes = MetaFor("nodes", {description: "Nodes", development: true}
             stroke-dashoffset: 0;
           }
         }
-
-        /
-        /
 
         graph-state {
           --background-color: rgba(var(--surface-600) / var(--background-alpha));

@@ -23,7 +23,7 @@ describe("null триггер", () => {
       .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { size: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
     meta.update({ size: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    // expect(meta.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
 
     meta = template
       .context((t) => ({ name: t.string({ nullable: false, default: "" }) }))
@@ -31,7 +31,7 @@ describe("null триггер", () => {
       .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { name: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
     meta.update({ name: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    // expect(meta.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
 
     meta = template
       .context((t) => ({ active: t.boolean({ nullable: false, default: false }) }))
@@ -39,7 +39,7 @@ describe("null триггер", () => {
       .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", when: { active: null } }] }])
       .create({ state: "ОЖИДАНИЕ" })
     meta.update({ active: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    // expect(meta.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
 
     meta = template
       .context((t) => ({ status: t.enum("active", "inactive")({ nullable: false, default: "active" }) }))

@@ -15,7 +15,7 @@
 //   })
 //
 //   it("При отсутствии триггеров в коллапсах, переход не будет выполнен", async () => {
-//     const particle = MetaFor("dev-test-empty-trigger", { development: true })
+//     const meta = MetaFor("dev-test-empty-trigger", { development: true })
 //       .states("ОЖИДАНИЕ", "РАБОТА")
 //       .context(({ number }) => ({
 //         parameter: number({ default: 0 }),
@@ -30,8 +30,8 @@
 //       .actions({})
 //       .create({ state: "ОЖИДАНИЕ" })
 //     Bun.sleepSync(200)
-//     const { state } = particle
-//     particle.destroy()
+//     const { state } = meta
+//     meta.destroy()
 //
 //     expect(state).toBe("ОЖИДАНИЕ")
 //     await Bun.sleep(400)
@@ -41,7 +41,7 @@
 //   })
 //
 //   it("При наличии пустого состояния выводится предупреждение", async () => {
-//     const particle = MetaFor("dev-test-empty-state", { development: true })
+//     const meta = MetaFor("dev-test-empty-state", { development: true })
 //       .states("", "ОТКРЫТ", "ЗАКРЫТ")
 //       .context(({ number }) => ({
 //         parameter: number({ default: 0 }),
@@ -51,7 +51,7 @@
 //       .actions({})
 //       .create({ state: "ОТКРЫТ" })
 //
-//     particle.destroy()
+//     meta.destroy()
 //     await Bun.sleep(100)
 //
 //     expect(messages.get("dev-test-empty-state")?.find((m) => m.src === "states")?.message).toEqual(

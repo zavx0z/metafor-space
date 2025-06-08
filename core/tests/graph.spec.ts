@@ -20,8 +20,8 @@
 // describe("Граф частицы", () => {
 //   test("Должен добавить WebComponent при включенной опции graph", async () => {
 //     const result = await fixture.page.evaluate(async () => {
-//       const particle = window
-//         .MetaFor("test-particle")
+//       const meta = window
+//         .MetaFor("test-meta")
 //         .states("IDLE", "ACTIVE")
 //         .context((t) => ({
 //           value: t.number({title: "Значение для тестирования переходов", nullable: false})
@@ -35,9 +35,9 @@
 //           state: "IDLE",
 //           graph: true
 //         })
-//       const component = await particle.graph()
+//       const component = await meta.graph()
 //       return component.id
 //     })
-//     expect(result).toEqual("/test-particle")
+//     expect(result).toEqual("/test-meta")
 //   })
 // })

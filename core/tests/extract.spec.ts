@@ -6,7 +6,7 @@
 //     beforeAll(() => (console.debug = () => undefined))
 //     afterAll(() => (console.debug = consoleLog))
 //
-//     const particle = MetaFor("action-extract")
+//     const meta = MetaFor("action-extract")
 //         .states("state-1", "state-2")
 //         .context((t) => ({
 //             a: t.number({title: "a", default: 1}),
@@ -85,7 +85,7 @@
 //                 b: "test",
 //             },
 //         })
-//     const snapshot = particle.snapshot()
+//     const snapshot = meta.snapshot()
 //
 //     describe("Извлечение используемого контекста в функции действия состояния", () => {
 //         const actions = snapshot.actions
@@ -140,8 +140,8 @@
 //     })
 //
 //     describe("Извлечение используемого контекста в функциях core", () => {
-//         const {core} = particle.snapshot()
-//         // consoleLog("@@@@@@@@@@@@@@@@@",particle.snapshot())
+//         const {core} = meta.snapshot()
+//         // consoleLog("@@@@@@@@@@@@@@@@@",meta.snapshot())
 //         describe("В теле функции чтения контекста через context.dot", () => {
 //             const bodyDot = core.bodyDot
 //             const {read, write} = bodyDot
