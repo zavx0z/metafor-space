@@ -15,14 +15,14 @@ MetaFor("test", {description: "Nodes", development: false}).states(
   {
     from: "начало",
     action: ({context}) => {
-      console.log(context)
+      // console.log(context)
     },
     to: [{state: "конец", when: {status: "start"}}],
   },
   {
     from: "конец",
     action: async () => {
-      console.log("конец")
+      // console.log("конец")
     },
     to: [{state: "начало", when: {status: "end"}}],
   },

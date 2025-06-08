@@ -51,7 +51,7 @@ export default ({ view, particle }) => {
       }
 
       connectedCallback() {
-        console.log("connectedCallback")
+        // console.log("connectedCallback")
         const updateView = () => {
           const result = view.render({
             update: (context) =>
