@@ -10,14 +10,13 @@ describe("Инициализация без действия", async () => {
   document.body.innerHTML = `<metafor-test></metafor-test>`
   const meta = MetaFor("test")
     .states("INITIAL", "OTHER")
-    .context((t)=>({
-      value: t.string({nullable: true})
+    .context((t) => ({
+      value: t.string({nullable: true, default: initialContext.value})
     }))
     .core()
     .transitions([])
     .create({
-      state: initialState,
-      context: initialContext
+      state: initialState
     })
 
   const messages = await waitForMessages(10)
