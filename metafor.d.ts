@@ -47,7 +47,7 @@ export declare function MetaFor(
 ): {
   states: <S extends string>(...states: S[]) => {
     context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
-      core: <I extends CoreObj>(core: CoreDefinition<I, C>) => {
+      core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
         transitions: (transitions: Transitions<S, C, I>) => {
           reactions: (reactions: Reactions<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
@@ -93,7 +93,7 @@ export declare function MetaFor(
  @property graph - Граф meta
  @property destroy - Уничтожение meta
  */
-export declare class Meta<S extends string, C extends ContextDefinition, I extends Record<string, any>> {
+export declare class Meta<S extends string, C extends ContextDefinition, I extends Record<string, any>> extends HTMLElement{
   id: string
   title: string
   description: string

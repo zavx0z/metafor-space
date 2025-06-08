@@ -87,7 +87,7 @@ export type ViewDefinition<I extends Record<string, any>, C extends ContextDefin
  @property core - Экземпляр частицы
  */
 type MountParams<I extends Record<string, any>> = ({component, core,}: {
-  component: HTMLElement
+  component: Element
   core: Core<I>
 }) => void
 

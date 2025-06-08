@@ -180,6 +180,7 @@ const createMeta = ({
     description,
     tag,
     context: contextData,
+    states,
     reactions,
     transitions,
     state,
@@ -226,15 +227,19 @@ const createWebComponent = (
     return map
   }, /** @type {Record<string, string>} */ ({}))
 
-  customElements.define(
-    "metafor-" + tag,
+  customElements.define("metafor-" + tag,
     class extends HTMLElement {
+      #shadow = this.attachShadow({mode: "open"})
       #process = false
       #core = /** @type{import("./types/core").Core<I>} */ ({})
       #channel = new BroadcastChannel('channel')
+      #state = this.#createSignal(state)
+      #states = states
+      #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
+      context = context
 
       get state() {
-        return this.$state?.value()
+        return this.#state?.value()
       }
 
       get process() {
@@ -243,20 +248,18 @@ const createWebComponent = (
 
       set process(value) {
         this.#process = value
-        if (!value) this.update(context)
+        if (!value) this.update(this.context)
       }
 
       constructor() {
         super()
-        this.shadow = this.attachShadow({mode: "open"})
-        this.$state = this.#createSignal(state)
 
         view?.style?.({
           css: (strings, ...values) => {
             const sheet = new CSSStyleSheet()
             const result = strings.reduce((acc, str, i) => acc + str + (values[i] || ""), "")
             sheet.replaceSync(result)
-            this.shadow.adoptedStyleSheets.push(sheet)
+            this.#shadow.adoptedStyleSheets.push(sheet)
             return sheet
           },
         })
@@ -268,7 +271,7 @@ const createWebComponent = (
               ctx,
               srcName: "core",
               funcName: currentCaller || "unknown"
-            }), context, self
+            }), context: this.context, self
           })
           // Прокси для self, для синхронизации значений
           Object.entries(coreObj).forEach(([key, value]) => {
@@ -318,7 +321,7 @@ const createWebComponent = (
             if (reactionFilter(reaction, patch)) {
               reaction.action({
                 patch,
-                context,
+                context: this.context,
                 meta,
                 update: (ctx) => this.#updateContext({ctx, srcName: "reaction", funcName: meta.name}),
                 core: this.#core,
@@ -333,8 +336,8 @@ const createWebComponent = (
         })
 
         if (onTransition) {
-          this.$state.onChange((oldValue, newValue) => {
-            if (newValue !== undefined) onTransition(oldValue, newValue, this)
+          this.#state.onChange((oldValue, newValue) => {
+            if (newValue !== undefined) onTransition(oldValue, newValue, this.snapshot())
           })
         }
         if (onUpdate) this.onUpdate(onUpdate)
@@ -353,25 +356,25 @@ const createWebComponent = (
                 srcName: "component",
                 funcName: "handler",
               }),
-            context,
+            context: this.context,
             state: this.state,
-            core,
+            core: this.#core,
             html: html,
             ref: ref,
           })
           // @ts-ignore
-          render(result, this.shadow ?? this)
+          render(result, this.#shadow ?? this)
         }
 
         this.onUpdate(updateView)
         this.onTransition(updateView) // TODO: оптимизировать обновление
         updateView()
 
-        view?.onMount?.({component: /** @type {HTMLElement} */ (this.shadow?.host ?? this), core: meta.core})
+        view?.onMount?.({component: this.#shadow.host, core: this.#core})
       }
 
       disconnectedCallback() {
-        view?.onDestroy?.({component: /** @type {HTMLElement} */ (this.shadow?.host ?? this), core: meta.core})
+        view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
       }
 
@@ -379,7 +382,9 @@ const createWebComponent = (
         return ContextKeys
       }
 
-      /** @param {string} name @param {string} oldValue @param {string} newValue */
+      /** @param {string} name
+       * @param {string} oldValue
+       * @param {string} newValue */
       attributeChangedCallback(name, oldValue, newValue) {
         // Преобразуем kebab-case обратно в camelCase для обновления контекста
         const camelCaseName = kebabToCamelMap[name]
@@ -436,13 +441,13 @@ const createWebComponent = (
         if (transitionFrom) {
           for (const transition of transitionFrom.to) {
             if (Object.keys(transition.when).length === 0) break
-            if (conditions(transition.when, context, types)) {
+            if (conditions(transition.when, this.context, types)) {
               const actionDefinition = transitions.find((i) => i.from === transition.state && i.action)
               if (actionDefinition?.action) {
                 this.#process = true
-                this.$state.setValue(transition.state)
+                this.#state.setValue(transition.state)
                 this.#runAction(actionDefinition.action)
-              } else this.$state.setValue(transition.state)
+              } else this.#state.setValue(transition.state)
             }
           }
         }
@@ -463,7 +468,7 @@ const createWebComponent = (
        */
       #runAction(action) {
         const result = action({
-          context,
+          context: this.context,
           update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
           core: this.#core,
         })
@@ -483,15 +488,15 @@ const createWebComponent = (
       }
 
       /** @type {import('./types/meta').OnTransition<S>}*/
-      onTransition = (cb) => this.$state.onChange((oldValue, newValue) => {
+      onTransition = (cb) => this.#state.onChange((oldValue, newValue) => {
         if (newValue !== undefined) cb(oldValue, newValue)
       })
 
       /** @param {import("./types/context").UpdateContextParams<C>} params */
       #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
         const updCtx = Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
-          if (context[key] !== ctx[key]) {
-            context[key] = ctx[key]
+          if (this.context[key] !== ctx[key]) {
+            this.context[key] = ctx[key]
             return {...acc, [key]: ctx[key]}
           }
           return acc
@@ -513,9 +518,9 @@ const createWebComponent = (
           id: tag,
           description,
           state: this.state,
-          states,
-          // core: this.#parsedCore,
-          context,
+          states: this.#states,
+          core: this.#parsedCore,
+          context: this.context,
           types,
           transitions: transitions.map((t) => ({
             from: t.from,

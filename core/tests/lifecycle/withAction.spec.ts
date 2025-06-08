@@ -1,6 +1,7 @@
-import { describe, expect, test } from "bun:test"
-import { MetaFor } from "@metafor/space"
-import { messagesFixture } from "../../../fixtures/broadcast"
+import {describe, expect, test} from "bun:test"
+import {MetaFor} from "@metafor/space"
+import {messagesFixture} from "../../../fixtures/broadcast"
+import type {Meta} from "../../../metafor";
 
 describe("Инициализация c действием", async () => {
   const {waitForMessages} = messagesFixture()
@@ -13,24 +14,26 @@ describe("Инициализация c действием", async () => {
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
-  const meta = MetaFor("test-meta")
+  document.body.innerHTML = `<metafor-test-meta></metafor-test-meta>`
+
+  MetaFor("test-meta")
     .states("INITIAL", "OTHER", "NEXT")
     .context((t) => ({
-      value: t.string({ nullable: true }),
+      value: t.string({nullable: true, default: "initial"}),
     }))
     .core()
     .transitions([
       {
         from: "INITIAL",
-        action:  async ({update}) => {
+        action: async ({update}) => {
           await Bun.sleep(1000)
           update(nextContext)
         }, // Асинхронное действие - так можно проверить блокировку,
-        to: [{ state: "NEXT", when: { value: nextContext.value } }],
+        to: [{state: "NEXT", when: {value: nextContext.value}}],
       },
       {
         from: "NEXT",
-        action:  async ({update}) => {
+        action: async ({update}) => {
           await Bun.sleep(1000)
           update(otherContext)
         }, // Асинхронное действие - так можно проверить блокировку,
@@ -41,7 +44,7 @@ describe("Инициализация c действием", async () => {
       state: initialState,
       context: initialContext
     })
-
+  const meta = document.querySelector("metafor-test-meta") as unknown as Meta<any, any, any>
   test.todo("Условия meta заблокированы до окончания автопереходов")
   test.todo("Независимо от блокировки, сообщения с изменениями отправляются")
   const block = meta.process // Блокировку до окончания действия можно перехватить сразу после выполнения синхронного конструктора
@@ -71,6 +74,6 @@ describe("Инициализация c действием", async () => {
   describe("meta инициализирован", async () => {
     test("Условия разблокированы", () => expect(meta.process, "Условия должны быть разблокированы после выполнения всех действий автоперехода").toBe(false))
     test("Состояние не равно параметру state в create", () => expect(meta.state, "Должно быть равно последнему состоянию в переходе (автопереход)").toBe(otherState))
-    test("Контекст не равен параметру context в create", () => expect(meta.context, "Должен быть равен контексту в последнем переходе").toEqual(otherContext))
+    test("Контекст не равен параметру по умолчанию", () => expect(meta.context, "Должен быть равен контексту в последнем переходе").toEqual(otherContext))
   })
 })

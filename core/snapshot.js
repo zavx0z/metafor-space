@@ -1,5 +1,3 @@
-import { Meta } from "../metafor.js"
-
 /**
  @param {Record<string, any>} snapshot
  @throws {Error}
@@ -13,29 +11,27 @@ export function validateSnapshot(snapshot) {
 }
 
 /**
- @template {import("types/context.ts").ContextDefinition} C
+ @template {import("../types/context.ts").ContextDefinition} C
  @template {string} S
  @template {Record<string, unknown>} I
 
  @param {Record<string, any>} snapshot
- @returns {import('../metafor.js').Meta<S, C, I>}
  */
 export function ParticleFromSnapshot(snapshot) {
   validateSnapshot(snapshot)
   const channel = new BroadcastChannel("channel")
-  return new Meta({
-    channel,
-    id: snapshot.id,
-    states: snapshot.states,
-    contextDefinition: snapshot.types,
-    transitions: snapshot.transitions,
-    initialState: snapshot.state,
-    contextData: snapshot.context,
-    actions: {},
-    core: () => /** @type {I} */ ({}),
-    coreData: {},
-    reactions: [],
-    onTransition: () => {},
-    destroy: () => {},
-  })
+  // return new Meta({
+  //   channel,
+  //   id: snapshot.id,
+  //   states: snapshot.states,
+  //   contextDefinition: snapshot.types,
+  //   transitions: snapshot.transitions,
+  //   initialState: snapshot.state,
+  //   contextData: snapshot.context,
+  //   core: () => /** @type {I} */ ({}),
+  //   coreData: {},
+  //   reactions: [],
+  //   onTransition: () => {},
+  //   destroy: () => {},
+  // })
 }

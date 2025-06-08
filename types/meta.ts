@@ -22,7 +22,7 @@ import type { Meta } from "../metafor"
  */
 export type Snapshot<S extends string, C extends ContextDefinition, I extends CoreObj> = {
   id: string
-  title: string
+  // title: string
   description: string
   state: S
   states: readonly S[]
@@ -161,10 +161,10 @@ export type OnTransitionCallBack<S extends string> = (
  *
  * @param preview - Предыдущее состояние
  * @param current - Текущее состояние
- * @param meta - Мета
+ * @param snapshot - Мета
  */
 export type CreateOnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
   preview: S | undefined,
   current: S | undefined,
-  meta: Meta<S, C, I>
+  snapshot: Snapshot<S, C, I>
 ) => void

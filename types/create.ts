@@ -1,4 +1,4 @@
-import type { ContextDefinition, PartialContextData } from "./context.ts"
+import type {ContextData, ContextDefinition, PartialContextData} from "./context.ts"
 import type { CoreData, CoreDefinition } from "./core.ts"
 import type { Transitions } from "./transitions.ts"
 import type { Reactions } from "./reaction.ts"
@@ -99,6 +99,7 @@ export type FabricCallbackCreateFuncHelper<
   options: CreateParams<C, S, I>
   states: S[]
   contextDefinition: ContextDefinition
+  contextData: ContextData<C>
   transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
   reactions: Reactions<C, I>
