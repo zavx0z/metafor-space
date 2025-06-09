@@ -102,7 +102,6 @@ export declare class Meta<S extends string, C extends ContextDefinition, I exten
   states: readonly (S | undefined)[]
   types: Record<string, any>
   transitions: Transitions<S, C, I>
-  core: Core<I>
   reactions: Reactions<C, I>
   channel: BroadcastChannel
   process: boolean

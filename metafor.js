@@ -303,13 +303,6 @@ const createWebComponent = (
           Object.assign(self, wrappedCore)
           return wrappedCore
         })())
-        //@ts-ignore присваивание свойству ядра переданного объекта, массива или карты
-        Object.entries(core || {}).forEach(([key, value]) =>
-          this.#core[key] !== undefined && //@ts-ignore
-          (this.#core[key] = Array.isArray(value)
-            ? value //@ts-ignore
-            : (this.#core[key] = Object.isFrozen(value) ? value : Object.freeze(value)))
-        )
       }
 
       connectedCallback() {
@@ -379,7 +372,8 @@ const createWebComponent = (
         return ContextKeys
       }
 
-      /** @param {string} name
+      /** 
+       * @param {string} name
        * @param {string} oldValue
        * @param {string} newValue */
       attributeChangedCallback(name, oldValue, newValue) {
@@ -530,7 +524,7 @@ const createWebComponent = (
       }
     }
   )
-  return /**@type{import("./metafor").Meta<S, C, I>}*/ (document.querySelector("metafor-" + tag))
+  return /** @type{import("./metafor").Meta<S, C, I>} */ (document.querySelector("metafor-" + tag))
 }
 
 /**
