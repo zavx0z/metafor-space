@@ -36,34 +36,6 @@ export type Condition = {
 }
 
 /**
- Интерфейс для хранения условий отображения компонентов
- */
-export type ConditionsMap = Map<string | number, Condition>
-
-/**
- Параметры инициализации компонента
-
- @property view - Коллбек инициализации представления
- @property meta - Экземпляр meta
- */
-export type ComponentParams<S extends string, C extends ContextDefinition, I extends CoreObj> = {
-  view?: ViewDefinition<I, C, S>
-  description?: string
-  tag: string
-  context: ContextData<C>
-  states: S[]
-  types: ContextDefinition
-  transitions: Transitions<S, C, I>
-  state: S
-  core: CoreDefinition<I, C>
-  // coreData: CoreData<I>
-  reactions: Reactions<C, I>
-  onTransition?: CreateOnTransitionCallBack<S, C, I>
-  onUpdate?: OnUpdateCallBack<C>
-  destroy?: (meta: Meta<S, C>) => void
-}
-
-/**
  Интерфейс для хранения представления компонента
 
  @property render - Коллбек для рендеринга компонента

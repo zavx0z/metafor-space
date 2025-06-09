@@ -58,7 +58,7 @@ export const MetaFor = (tag, conf = {}) => {
                     import("./core/validator/index.js").then((module) => module.validateTransitions(data))
                   }
                   return {
-                    reactions: (reactions = []) => ({
+                    reactions: (reactions) => ({
                       create: (options) => createMeta({
                         development,
                         description,
@@ -99,7 +99,6 @@ export const MetaFor = (tag, conf = {}) => {
                       contextData,
                       transitions,
                       coreDefinition,
-                      reactions: [],
                     }),
                     view: (view) => {
                       return {
@@ -113,7 +112,6 @@ export const MetaFor = (tag, conf = {}) => {
                           contextData,
                           transitions,
                           coreDefinition,
-                          reactions: [],
                           view
                         })
                       }
@@ -153,73 +151,28 @@ const reactionFilter = (reaction, patch) => {
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
  @return {Meta<S, C>}
  */
-const createMeta = ({
-                      development,
-                      description,
-                      tag,
-                      options,
-                      states,
-                      contextDefinition,
-                      contextData,
-                      transitions,
-                      coreDefinition,
-                      reactions = [],
-                      view
-                    }) => {
-  development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({
-    tag,
-    options,
-    states
-  }))
-  const {state, onTransition, onUpdate} = options
-  return createWebComponent({
-    view,
-    description,
-    tag,
-    context: contextData,
-    states,
-    reactions,
-    transitions,
-    state,
-    core: coreDefinition,
-    onTransition,
-    onUpdate,
-    types: contextDefinition
-  })
-}
-/**
- * Преобразует строку из camelCase в kebab-case
- * @param {string} str - Строка в формате camelCase
- * @return {string} Строка в формате kebab-case
- */
-const camelToKebab = (str) => str.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
-
-/**
- * @template {import("./types/core").CoreObj} I
- * @template {import("./types/context").ContextDefinition} C
- * @template {string} S
- * @param {import("./types/view").ComponentParams<S, C, I>} params
- */
-const createWebComponent = (
+const createMeta = (
   {
-    view,
+    development,
     description = "",
     tag,
-    context,
-    reactions,
-    transitions,
-    onTransition,
-    onUpdate,
-    state,
+    options,
     states,
-    types,
-    core
+    contextDefinition,
+    contextData,
+    transitions,
+    coreDefinition,
+    reactions = [],
+    view
   }) => {
-  const ContextKeys = Object.keys(context).map(camelToKebab)
+  development && import("./core/validator/index.js").then(
+    (module) => module.validateCreateOptions({tag, options, states}))
+  const {state, onTransition, onUpdate} = options
+  const ContextKeys = Object.keys(contextData).map(camelToKebab)
 
   // Создаем карту соответствия между kebab-case и camelCase ключами
   /** @type {Record<string, string>} */
-  const kebabToCamelMap = Object.keys(context).reduce((map, key) => {
+  const kebabToCamelMap = Object.keys(contextData).reduce((map, key) => {
     map[camelToKebab(key)] = key
     return map
   }, /** @type {Record<string, string>} */ ({}))
@@ -233,7 +186,7 @@ const createWebComponent = (
       #state = this.#createSignal(state)
       #states = states
       #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
-      context = context
+      context = contextData
 
       get state() {
         return this.#state?.value()
@@ -263,7 +216,7 @@ const createWebComponent = (
         this.#core = /** @type {import("./types/core").Core<I>} */ ((() => {
           let /** @type {string | null} */ currentCaller = null
           const self = /** @type {import("./types/core").Core<I>} */ ({})
-          const coreObj = core({
+          const coreObj = coreDefinition({
             update: (ctx) => this._updateExternal({
               ctx,
               srcName: "core",
@@ -372,7 +325,7 @@ const createWebComponent = (
         return ContextKeys
       }
 
-      /** 
+      /**
        * @param {string} name
        * @param {string} oldValue
        * @param {string} newValue */
@@ -380,7 +333,7 @@ const createWebComponent = (
         // Преобразуем kebab-case обратно в camelCase для обновления контекста
         const camelCaseName = kebabToCamelMap[name]
         if (camelCaseName) {
-          const propType = types[camelCaseName].type
+          const propType = contextDefinition[camelCaseName].type
           if (propType === "boolean") {
             // @ts-ignore - Принудительное приведение типа для boolean атрибута
             this.update({[camelCaseName]: newValue !== null})
@@ -420,7 +373,7 @@ const createWebComponent = (
               listeners.delete(listener)
             }
           },
-          clear: () => listeners.clear(),
+          clear: listeners.clear,
         }
       }
 
@@ -432,7 +385,7 @@ const createWebComponent = (
         if (transitionFrom) {
           for (const transition of transitionFrom.to) {
             if (Object.keys(transition.when).length === 0) break
-            if (conditions(transition.when, this.context, types)) {
+            if (conditions(transition.when, this.context, contextDefinition)) {
               const actionDefinition = transitions.find((i) => i.from === transition.state && i.action)
               if (actionDefinition?.action) {
                 this.#process = true
@@ -512,7 +465,7 @@ const createWebComponent = (
           states: this.#states,
           core: this.#parsedCore,
           context: this.context,
-          types,
+          types: contextDefinition,
           transitions: transitions.map((t) => ({
             from: t.from,
             to: t.to.map((toState) => ({
@@ -526,6 +479,12 @@ const createWebComponent = (
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
 }
+/**
+ * Преобразует строку из camelCase в kebab-case
+ * @param {string} str - Строка в формате camelCase
+ * @return {string} Строка в формате kebab-case
+ */
+const camelToKebab = (str) => str.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
 
 /**
  @template {ContextDefinition} C

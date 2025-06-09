@@ -1,5 +1,5 @@
 import type {ContextData, ContextDefinition, PartialContextData} from "./context.ts"
-import type { CoreData, CoreDefinition } from "./core.ts"
+import type {CoreData, CoreDefinition, CoreObj} from "./core.ts"
 import type { Transitions } from "./transitions.ts"
 import type { Reactions } from "./reaction.ts"
 import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta.ts"
@@ -82,14 +82,13 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
  @property states - состояния
  @property contextDefinition - определение контекста
  @property transitions - переходы
- @property actions - действия
  @property coreDefinition - определение ядра
- @property reactions - реакции
+ @property [reactions=[]] - реакции
  */
 export type FabricCallbackCreateFuncHelper<
   S extends string,
   C extends ContextDefinition,
-  I extends Record<string, any>
+  I extends CoreObj
 > = {
   development?: boolean
   description?: string
@@ -100,6 +99,6 @@ export type FabricCallbackCreateFuncHelper<
   contextData: ContextData<C>
   transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
-  reactions: Reactions<C, I>
+  reactions?: Reactions<C, I>
   view?: ViewDefinition<I, C, S>
 }
