@@ -1,39 +1,7 @@
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
-import type {Core, CoreDefinition, CoreObj} from "./core.ts"
+import type {Core} from "./core.ts"
 import type {HtmlType, TemplateResult} from "../html/html"
 import {ref} from "../html/directives/ref"
-import type {Transitions} from "./transitions.ts";
-import type {Reactions} from "./reaction.ts";
-import type {CreateOnTransitionCallBack, OnUpdateCallBack} from "./meta.ts";
-
-/**
- Структура условного блока для компонента
-
- @property raw - HTML-шаблон для истинного условия
- @property template - HTML-шаблон для ложного условия
- */
-export type Block = {
-  raw: string
-  template?: HTMLTemplateElement | Node
-  xpath?: string
-}
-
-/**
- Структура условного блока для компонента
-
- @property condition - Функция для проверки условия
- @property context - Массив ключей контекста, используемых в условии
- @property states - Массив состояний, используемых в условии
- @property true - HTML-шаблон для истинного условия
- @property false - HTML-шаблон для ложного условия
- */
-export type Condition = {
-  condition: Function
-  context: string[]
-  states: string[]
-  true?: Block
-  false?: Block
-}
 
 /**
  Интерфейс для хранения представления компонента
@@ -48,7 +16,6 @@ export type ViewDefinition<I extends Record<string, any>, C extends ContextDefin
   onMount?: MountParams<I>
   onDestroy?: MountParams<I>
   style?: ({css}: { css: (strings: TemplateStringsArray, ...values: any[]) => CSSStyleSheet }) => void
-  isolated?: boolean
 }
 
 /**
