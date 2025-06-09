@@ -105,7 +105,6 @@ export declare class Meta<S extends string, C extends ContextDefinition, I exten
   reactions: Reactions<C, I>
   channel: BroadcastChannel
   process: boolean
-  component: HTMLElement | Element
 
   constructor(params: MetaConstructor<S, C, I>)
 
@@ -114,6 +113,5 @@ export declare class Meta<S extends string, C extends ContextDefinition, I exten
   onUpdate: OnUpdate<C>
   onTransition: OnTransition<S>
   snapshot: () => Snapshot<S, C, I>
-  graph: () => Promise<any>
   destroy: () => void
 }

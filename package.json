@@ -64,6 +64,7 @@
     "test:core": "bun test tests/core.spec.ts",
     "test:core[debug]": "bun test tests/core.spec.ts --debug",
     "test:core[watch]": "bun test tests/core.spec.ts --watch",
+    "test:enum": "bun test tests/enum.spec.ts",
 
     "test:metafor": "bun test tests/metafor.spec.ts",
     "test:state": "bun test tests/state.spec.ts",
@@ -75,7 +76,6 @@
     "test:update": "bun test tests/update.spec.ts",
     "test:update[debug]": "bun test tests/update.spec.ts --debug",
     "test:update[watch]": "bun test tests/update.spec.ts --watch",
-    "test:enum": "bun test tests/enum.spec.ts",
     "test:dev": "bun test tests/dev.spec.ts",
     "test:sync": "bun test tests/sync.spec.ts",
     "test:extract": "bun test tests/extract.spec.ts",

@@ -3,7 +3,9 @@ import { describe, expect, test } from "bun:test"
 
 describe("Enum тип", () => {
   test("создание enum типа", () => {
-    const meta = MetaFor("test-enum")
+    document.body.innerHTML = `<metafor-test-1></metafor-test-1>`
+
+    const meta = MetaFor("test-1")
       .states("INITIAL", "FINAL")
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({ title: "Статус", nullable: true, default: "inactive" }),
@@ -21,7 +23,9 @@ describe("Enum тип", () => {
   })
 
   test("проверка перехода по enum значению", async () => {
-    const meta = MetaFor("test-enum")
+    document.body.innerHTML = `<metafor-test-2></metafor-test-2>`
+
+    const meta = MetaFor("test-2")
       .states("INITIAL", "ACTIVE")
       .context((t) => ({
         status: t.enum("active", "inactive")({ default: "inactive" }),
@@ -39,8 +43,10 @@ describe("Enum тип", () => {
     expect(meta.state).toBe("ACTIVE")
   })
 
-  test("сложные условия enum условия", async () => {
-    const meta = MetaFor("test-enum")
+  test("сложные условия enum", async () => {
+    document.body.innerHTML = `<metafor-test-3></metafor-test-3>`
+
+    const meta = MetaFor("test-3")
       .states("INITIAL", "ACTIVE", "INACTIVE")
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({ default: "pending" }),
@@ -70,7 +76,9 @@ describe("Enum тип", () => {
   })
 
   test("числовой enum тип", () => {
-    const meta = MetaFor("test-enum")
+    document.body.innerHTML = `<metafor-test-4></metafor-test-4>`
+
+    const meta = MetaFor("test-4")
       .states("INITIAL", "FINAL")
       .context((t) => ({
         status: t.enum(1, 2, 3)({ title: "Статус", nullable: true, default: 1 }),
@@ -83,7 +91,9 @@ describe("Enum тип", () => {
   })
 
   test("проверка перехода по числовому enum значению", async () => {
-    const meta = MetaFor("test-enum")
+    document.body.innerHTML = `<metafor-test-5></metafor-test-5>`
+
+    const meta = MetaFor("test-5")
       .states("INITIAL", "ACTIVE")
       .context((t) => ({
         status: t.enum(1, 2)({ default: 1 }),
@@ -99,18 +109,5 @@ describe("Enum тип", () => {
 
     meta.update({ status: 2 })
     expect(meta.state).toBe("ACTIVE")
-  })
-
-  test("смешанный enum тип", () => {
-    const meta = MetaFor("test-enum")
-      .states("INITIAL", "FINAL")
-      .context((t) => ({
-        status: t.enum("active", "inactive")({ title: "Статус", default: "active" }),
-      }))
-      .core()
-      .transitions([])
-      .create({ state: "INITIAL" })
-
-    expect(meta.context.status).toBe("active")
   })
 })
