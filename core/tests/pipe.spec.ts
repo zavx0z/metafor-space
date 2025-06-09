@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "@metafor/space"
+import { MetaFor, type Meta } from "@metafor/space"
 
 describe("Пайплайн", () => {
-  const meta = MetaFor("manager-progress")
+  document.body.innerHTML = `<metafor-test></metafor-test>`
+
+  const Meta = MetaFor("test")
     .states("IDLE", "ACTIVE", "COMPLETE")
     .context((t) => ({
       username: t.string({ title: "Имя пользователя", nullable: true, default: "" }),
@@ -28,6 +30,8 @@ describe("Пайплайн", () => {
         console.log(preview, current)
       },
     })
+  const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
+
   test("Обновление контекста и переход в COMPLETE", () => {
     expect(meta.context).toEqual({ username: "user123", progress: 101 })
     expect(meta.state).toBe("COMPLETE")

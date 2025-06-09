@@ -1,27 +1,28 @@
-import { describe, expect, test } from "bun:test"
-import { MetaFor } from "@metafor/space"
+import {describe, expect, test} from "bun:test"
+import {MetaFor, type Meta} from "@metafor/space"
 
 describe("Синхронизация core и context", async () => {
-  const meta = MetaFor("sync-test")
+  document.body.innerHTML = `<metafor-test></metafor-test>`
+
+  const Meta = MetaFor("test")
     .states("IDLE")
     .context((t) => ({
-      dataLength: t.number({ default: 0 }),
+      dataLength: t.number({default: 0}),
     }))
-    .core(({ update }) => ({
+    .core(({update}) => ({
       data: [],
       popData() {
-        update({ dataLength: 0 })
+        update({dataLength: 0})
         this.data.splice(0, this.data.length)
       },
       pushData(data: any) {
         this.data.push(data)
-        update({ dataLength: this.data.length })
+        update({dataLength: this.data.length})
       },
     }))
     .transitions([])
-    .create({
-      state: "IDLE",
-    })
+    .create({state: "IDLE"})
+  const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
 
   let count = 50
   const delay = 20

@@ -1,8 +1,9 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor} from "@metafor/space"
+import {MetaFor, type Meta} from "@metafor/space"
 
 describe("Корректные переходы состояний при загрузке данных", () => {
-  const template = MetaFor("Загрузчик данных")
+  document.body.innerHTML = `<metafor-test></metafor-test>`
+  const Meta = MetaFor("test")
     .states("IDLE", "LOADING", "SUCCESS", "ERROR")
     .context((t) => ({
       url: t.string({title: "URL", nullable: true, default: "https://api.example.com/data"}),
@@ -30,8 +31,9 @@ describe("Корректные переходы состояний при заг
         from: "SUCCESS",
         to: [{state: "IDLE", when: {url: {include: "complete"}}}],
       },
-    ])
-  const meta = template.create({state: "IDLE"})
+    ]).create({state: "IDLE"})
+  const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
+
   describe("Инициализация и начальные состояния", () => {
     test("Начальное состояние должно быть IDLE", () => {
       expect(meta.state).toBe("IDLE")
