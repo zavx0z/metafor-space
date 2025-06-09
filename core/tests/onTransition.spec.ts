@@ -1,7 +1,8 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor} from "@metafor/space"
+import {MetaFor, type Meta} from "@metafor/space"
 
-const meta = MetaFor("Обработчик событий")
+document.body.innerHTML = `<metafor-test></metafor-test>`
+const Meta = MetaFor("test")
   .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
   .context((t) => ({
     url: t.string({title: "URL", nullable: true}),
@@ -31,6 +32,7 @@ const meta = MetaFor("Обработчик событий")
     },
   ])
   .create({state: "IDLE"})
+const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
 
 describe("Подписка на изменения состояния (onTransition)", () => {
   describe("Базовая работа подписки", () => {
@@ -94,9 +96,9 @@ describe("Подписка на изменения состояния (onTransit
 
   describe("Последовательные изменения", () => {
     test("Корректное отслеживание цепочки изменений состояний", async () => {
-      const collapses: { from: string; to: string }[] = []
+      const transitions: { from: string; to: string }[] = []
 
-      meta.onTransition((prevState, nextState) => collapses.push({from: prevState as string, to: nextState as string}))
+      meta.onTransition((prevState, nextState) => transitions.push({from: prevState as string, to: nextState as string}))
 
       // Переход в RUNNING
       meta.update({url: "https://api.example.com", responseTime: 3000, errorCode: 0})
@@ -107,7 +109,7 @@ describe("Подписка на изменения состояния (onTransit
       // Переход обратно в IDLE
       meta.update({url: "https://api.example.com", responseTime: 1000, errorCode: 0})
 
-      expect(collapses).toEqual([
+      expect(transitions).toEqual([
         {from: "IDLE", to: "RUNNING"},
         {from: "RUNNING", to: "ERROR"},
         {from: "ERROR", to: "IDLE"},
