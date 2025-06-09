@@ -1,11 +1,12 @@
 import { describe, expect, test } from "bun:test"
-import { MetaFor } from "@metafor/space"
+import { MetaFor, type Meta } from "@metafor/space"
 import { messagesFixture } from "../../fixtures/broadcast"
 
 describe("update", async () => {
   const { waitForMessages } = messagesFixture()
+  document.body.innerHTML = `<metafor-test-1></metafor-test-1>`
 
-  const meta = MetaFor("test")
+  const Meta = MetaFor("test-1")
     .states("INITIAL", "NEXT", "FINAL")
     .context((t) => ({
       field1: t.string({ nullable: true }),
@@ -32,6 +33,7 @@ describe("update", async () => {
       },
     ])
     .create({ state: "INITIAL" })
+  const meta = document.querySelector('metafor-test-1') as Meta<typeof Meta.state, typeof Meta.context>
 
   const messages = await waitForMessages()
 
