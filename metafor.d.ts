@@ -1,10 +1,10 @@
 import type {ContextData, ContextDefinition, ContextTypes, UpdateParameters} from "./types/context.ts"
 import type {Transitions} from "./types/transitions.ts"
-import type {Core, CoreDefinition, CoreObj} from "./types/core.ts"
+import type {CoreDefinition, CoreObj} from "./types/core.ts"
 import type {Reactions} from "./types/reaction.ts"
 import type {ViewDefinition} from "./types/view.ts"
 import type {CreateParams} from "./types/create.ts"
-import type {MetaConstructor, Snapshot, OnUpdate, OnTransition} from "./types/meta.ts"
+import type {Snapshot, OnUpdate, OnTransition} from "./types/meta.ts"
 
 export {BroadcastMessage} from "./types/meta.ts"
 
@@ -91,7 +91,7 @@ export declare function MetaFor(
  @property graph - Граф meta
  @property destroy - Уничтожение meta
  */
-export declare class Meta<S extends string, C extends ContextDefinition> extends HTMLElement {
+export interface Meta<S extends string, C extends ContextDefinition> extends HTMLElement {
   id: string
   title: string
   description: string
