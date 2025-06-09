@@ -1,9 +1,7 @@
 import {MetaFor} from "../../metafor.js"
-import {Nodes} from "../nodes.js"
+import Nodes from "../nodes.js"
 
-Nodes.create({
-  state: "ожидание патча",
-})
+Nodes.create({state: "ожидание патча"})
 
 MetaFor("test", {description: "Nodes", development: false}).states(
   "начало",
