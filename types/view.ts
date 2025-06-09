@@ -1,6 +1,5 @@
-import type {Meta} from "../metafor"
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
-import type {Core, CoreData, CoreDefinition, CoreObj} from "./core.ts"
+import type {Core, CoreDefinition, CoreObj} from "./core.ts"
 import type {HtmlType, TemplateResult} from "../html/html"
 import {ref} from "../html/directives/ref"
 import type {Transitions} from "./transitions.ts";

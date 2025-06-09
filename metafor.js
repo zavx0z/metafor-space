@@ -151,7 +151,7 @@ const reactionFilter = (reaction, patch) => {
  @template {CoreObj} I - ядро
 
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
- @return {import("./metafor").Meta<S, C>}
+ @return {Meta<S, C>}
  */
 const createMeta = ({
                       development,
@@ -524,7 +524,7 @@ const createWebComponent = (
       }
     }
   )
-  return /** @type{import("./metafor").Meta<S, C>} */ (document.querySelector("metafor-" + tag))
+  return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
 }
 
 /**
