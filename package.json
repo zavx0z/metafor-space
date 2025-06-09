@@ -72,14 +72,13 @@
     "test:state": "bun test tests/state.spec.ts",
     "test:sync": "bun test tests/sync.spec.ts",
     "test:transitions:lock": "bun test tests/transitions.lock.spec.ts",
+    "test:update": "bun test tests/update.spec.ts",
+    "test:view": "bun test tests/view.spec.ts",
 
     "test:serialize": "bun test tests/serialize.spec.ts",
-    "test:update": "bun test tests/update.spec.ts",
-    "test:update[debug]": "bun test tests/update.spec.ts --debug",
-    "test:update[watch]": "bun test tests/update.spec.ts --watch",
     "test:dev": "bun test tests/dev.spec.ts",
     "test:extract": "bun test tests/extract.spec.ts",
-    "test:view": "bun test tests/view.spec.ts",
+
     "test:html": "bun test ./html",
     "test:html[watch]": "bun test tests/html --watch",
     "test:html:marker": "bun test tests/html/marker.spec.ts",

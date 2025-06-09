@@ -2,7 +2,7 @@ import { afterAll } from "bun:test"
 import { type BroadcastMessage } from "../metafor"
 
 export const messagesFixture = (options?: {
-  particle: string
+  meta: string
 }): {
   messages: BroadcastMessage[]
   onmessage: (cb: (message: BroadcastMessage) => void) => void
@@ -13,14 +13,14 @@ export const messagesFixture = (options?: {
   const messages: BroadcastMessage[] = []
 
   channel.addEventListener("message", ({ data }) => {
-    if (!options?.particle || data.meta?.particle === options.particle) {
+    if (!options?.meta || data.meta?.particle === options.meta) {
       messages.push(data)
     }
   })
 
   const onmessage = (cb: (message: BroadcastMessage) => void) => {
     channel.addEventListener("message", ({ data }) => {
-      if (!options?.particle || data.meta?.particle === options.particle) {
+      if (!options?.meta || data.meta?.particle === options.meta) {
         cb(data)
       }
     })
@@ -40,7 +40,7 @@ export const messagesFixture = (options?: {
       }
 
       channel.addEventListener("message", ({ data }: MessageEvent) => {
-        if (!options?.particle || data.meta?.particle === options.particle) lastMessageTime = Date.now()
+        if (!options?.meta || data.meta?.particle === options.meta) lastMessageTime = Date.now()
       })
       checkMessages()
     })
