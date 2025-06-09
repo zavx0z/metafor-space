@@ -147,6 +147,48 @@ declare global {
   }
 
   /**
+   * Глобальные координаты элемента
+   * @interface CanvasBB
+   * @property x - Позиция по X
+   * @property y - Позиция по Y
+   * @property width - Ширина
+   * @property height - Высота
+   * @property center - Центр
+   * @property center.x - Позиция по X
+   * @property center.y - Позиция по Y
+   */
+  interface CanvasBB {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+
+  /**
+   * Внутренние координаты элемента
+   * @interface ViewportBB
+   * @property x - Позиция по X
+   * @property y - Позиция по Y
+   * @property width - Ширина
+   * @property height - Высота
+   * @property center - Центр
+   * @property center.x - Позиция по X
+   * @property center.y - Позиция по Y
+   * @property scale - Масштаб
+   */
+  interface ViewportBB {
+    x: number
+    y: number
+    width: number
+    height: number
+    center: {
+      x: number
+      y: number
+    }
+    scale: number
+  }
+
+  /**
    * Quantum Viewport - компонент для создания бесконечной области просмотра
    * @interface QViewportElement
    * @property state - Текущее состояние viewport (масштаб и позиция)
@@ -213,11 +255,17 @@ declare global {
     gestureStartTranslateY: number
     gestureStartX: number
     gestureStartY: number
+
     init(): void
+
     destroy(): void
+
     handleGestureStart(e: GestureEvent): void
+
     handleGestureChange(e: GestureEvent): void
+
     handleGestureEnd(e: GestureEvent): void
+
     handleWheel(e: WheelEvent): void
   }
 
@@ -232,7 +280,9 @@ declare global {
   interface QViewportDragHandler {
     viewport: QViewport
     config: QViewportConfig
+
     init(): void
+
     destroy(): void
   }
 
@@ -248,8 +298,11 @@ declare global {
   interface QViewportTransformHandler {
     viewport: QViewport
     config: QViewportConfig
+
     init(): void
+
     destroy(): void
+
     updateTransform(): void
   }
 
@@ -304,6 +357,7 @@ declare global {
     color: string
     width: number
   }
+
   /**
    * Ребро
    * @interface InternalExternalEdge
@@ -340,6 +394,7 @@ declare global {
     color: string
     width: number
   }
+
   /**
    * Патч для обновления соединений
    * @interface PatchEdge

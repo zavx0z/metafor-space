@@ -5,8 +5,8 @@ describe("Пайплайн", () => {
   const meta = MetaFor("manager-progress")
     .states("IDLE", "ACTIVE", "COMPLETE")
     .context((t) => ({
-      username: t.string({ title: "Имя пользователя", nullable: true }),
-      progress: t.number({ title: "Прогресс", nullable: true }),
+      username: t.string({ title: "Имя пользователя", nullable: true, default: "" }),
+      progress: t.number({ title: "Прогресс", nullable: true, default: 0 }),
     }))
     .core()
     .transitions([
@@ -24,10 +24,6 @@ describe("Пайплайн", () => {
     .create({
       description: "Управление прогрессом пользователя",
       state: "IDLE",
-      context: {
-        username: "",
-        progress: 0,
-      },
       onTransition: (preview, current) => {
         console.log(preview, current)
       },

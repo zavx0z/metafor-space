@@ -47,7 +47,7 @@ export type ConditionsMap = Map<string | number, Condition>
  @property view - Коллбек инициализации представления
  @property meta - Экземпляр meta
  */
-export type ComponentParams<I extends CoreObj, C extends ContextDefinition, S extends string> = {
+export type ComponentParams<S extends string, C extends ContextDefinition, I extends CoreObj> = {
   view?: ViewDefinition<I, C, S>
   description?: string
   tag: string
@@ -61,7 +61,7 @@ export type ComponentParams<I extends CoreObj, C extends ContextDefinition, S ex
   reactions: Reactions<C, I>
   onTransition?: CreateOnTransitionCallBack<S, C, I>
   onUpdate?: OnUpdateCallBack<C>
-  destroy?: (particle: Meta<S, C, I>) => void
+  destroy?: (meta: Meta<S, C>) => void
 }
 
 /**

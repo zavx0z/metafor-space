@@ -87,7 +87,7 @@ export declare function setChildPartValue<T extends ChildPart>(
  */
 export declare function setCommittedValue(
   part: ChildPart | AttributePart | PropertyPart | BooleanAttributePart | ElementPart | EventPart,
-  value: unknown
+  value?: unknown
 ): unknown
 
 /**

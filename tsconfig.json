@@ -26,5 +26,5 @@
     "noPropertyAccessFromIndexSignature": false
   },
   "exclude": [
-    "node_modules", "**/snapshot/**/*", "fixtures/browser/index.html"]
+    "node_modules/happy-dom/**/*", "**/snapshot/**/*", "fixtures/browser/index.html"]
 }

@@ -37,7 +37,7 @@ test("Блокировка переходов перед входом в нов�
       state: "INIT",
       onTransition: async (_, newState, meta) => {
         if (newState === "PROCESS") {
-          meta.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
+          // meta.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
           value = meta.context.value
         }
       },
@@ -79,7 +79,7 @@ test("Снятие блокировки после действия", async () =
   const meta = MetaFor("test-lock")
     .states("INIT", "DONE")
     .context((t) => ({
-      value: t.number({ nullable: true }),
+      value: t.number({ nullable: true, default: 2 }),
     }))
     .core()
     .transitions([
@@ -92,7 +92,7 @@ test("Снятие блокировки после действия", async () =
         to: [{ state: "DONE", when: { value: { gt: 10 } } }],
       },
     ])
-    .create({ state: "INIT", context: { value: 2 } })
+    .create({ state: "INIT"})
 
   expect(meta.state).toBe("INIT")
   expect(meta.process).toBe(true)

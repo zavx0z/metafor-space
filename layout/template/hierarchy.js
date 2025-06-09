@@ -1,6 +1,17 @@
-import {contextId, contextPortId, edgeId, parseTriggerParameterId, parseTriggerPortId, stateId, triggerId, triggerParameterId, triggerPortId} from "../../graph/id.js"
+// @ts-nocheck
+import {
+  contextId,
+  contextPortId,
+  edgeId,
+  parseTriggerParameterId,
+  parseTriggerPortId,
+  stateId,
+  triggerId,
+  triggerParameterId,
+  triggerPortId
+} from "../../nodes/id.js"
 
-/** @type {import("../../graph/types/index.js").LayoutConfig} */
+// /** @type {import("../../graph/types/index.js").LayoutConfig} */
 const config = {
   base: {
     "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
@@ -38,8 +49,9 @@ const config = {
 /**
  * Формирует триггеры для состояния
  * @param {string} state - текущее состояние
- * @param {QMachineSnapshot} snapshot - снапшот с данными
- * @param {import("../../graph/types/index.ts").Metrics} metrics - метрики для расчета layout
+ * @param {import("../../types/meta").Snapshot<any, any, any>} snapshot - снапшот с данными
+ * @param {any} metrics - метрики для расчета layout
+ // * @param {import("../../graph/types/index.ts").Metrics} metrics - метрики для расчета layout
  * @returns {Array<import('elkjs').ElkNode>} массив триггеров
  */
 function createTriggers(state, snapshot, metrics) {

@@ -1,7 +1,7 @@
 import {afterAll, describe, expect, test} from "bun:test"
 import puppeteer from "puppeteer"
 import {join} from "node:path"
-import {getMimeType} from "../../server/static.js"
+import {getMimeType} from "../../fixtures/browser/static.js"
 
 const html = String.raw
 const rootDir = join(import.meta.dir, "../")

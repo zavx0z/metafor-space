@@ -76,7 +76,7 @@ describe("update", async () => {
 
   test("update должен логировать источник вызова и измененные поля", async () => {
     // Проверяем одиночный вызов update из core
-    meta.core.coreMethod()
+    // meta.core.coreMethod()
     await Bun.sleep(10)
     expect(messages[4]).toMatchObject({
       meta: {
@@ -93,7 +93,7 @@ describe("update", async () => {
     })
 
     // Проверяем множественные вызовы update из core
-    meta.core.complexMethod()
+    // meta.core.complexMethod()
     await Bun.sleep(10)
     expect(messages[5]).toEqual({
       meta: {

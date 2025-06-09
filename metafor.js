@@ -198,7 +198,7 @@ const camelToKebab = (str) => str.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLower
  * @template {import("./types/core").CoreObj} I
  * @template {import("./types/context").ContextDefinition} C
  * @template {string} S
- * @param {import("./types/view").ComponentParams<I, C, S>} params
+ * @param {import("./types/view").ComponentParams<S, C, I>} params
  */
 const createWebComponent = (
   {

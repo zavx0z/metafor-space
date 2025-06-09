@@ -3,7 +3,7 @@ import {MetaFor} from "../../metafor.js";
 MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
-    redy: t.boolean({title: "Готов к отображению"})
+    redy: t.boolean({title: "Готов к отображению", default: true})
   }))
   .core(() => ({}))
   .transitions([
@@ -21,9 +21,4 @@ MetaFor("node", {development: true, description: "Node"})
       return html``
     }
   })
-  .create({
-    state: "visible",
-    context: {
-      redy: true
-    }
-  })
+  .create({state: "visible"})

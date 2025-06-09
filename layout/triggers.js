@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {parseTriggerPortId, triggerId, triggerPortId} from "../graph/id.js"
 import {operatorSymbols} from "../graph/operators.js"
 

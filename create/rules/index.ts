@@ -269,7 +269,7 @@ MetaFor("rules", {
     onTransition: async (prev, next, meta) => {
       console.log(`Transition: ${prev} -> ${next}`)
       if (next === "отмена пользователем") {
-        meta?.destroy()
+        // meta?.destroy()
       }
     },
   })

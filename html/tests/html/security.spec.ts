@@ -1,15 +1,18 @@
 import {afterEach, beforeEach, describe, expect, test} from "bun:test"
 import {html, render} from "../../html"
+import type {SanitizerFactory} from "../../html.t.ts";
 
 describe("enhanced security hooks", () => {
   let container: HTMLDivElement
   beforeEach(() => {
     container = document.createElement("div")
     container.id = "container"
+    // @ts-ignore
     render.setSanitizer(testSanitizerFactory)
   })
 
   afterEach(() => {
+    // @ts-ignore
     render._testOnlyClearSanitizerFactoryDoNotCallOrElse()
     sanitizerCalls.length = 0
   })

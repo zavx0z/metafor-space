@@ -1,4 +1,4 @@
-import {MetaFor} from "../../metafor.js"
+import {MetaFor} from "../metafor.js"
 
 const meta = MetaFor("directive", {})
   .states("В работе", "На паузе", "Рефакторинг", "На тестировании", "Код-ревью")

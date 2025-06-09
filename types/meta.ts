@@ -1,15 +1,13 @@
-import type { ContextData, ContextDefinition } from "./context.ts"
-import type { Transitions } from "./transitions.ts"
-import type {CoreData, CoreDefinition, CoreObj} from "./core.ts"
-import type {  Reactions } from "./reaction.ts"
-import type { Meta } from "../metafor"
+import type {ContextData, ContextDefinition} from "./context.ts"
+import type {Transitions} from "./transitions.ts"
+import type {CoreObj} from "./core.ts"
 
 /**
  Снимок состояния частицы
 
  @template C - Тип контекста
  @template S - Тип состояния
- 
+
  @property id - Идентификатор снимка
  @property title - Заголовок снимка
  @property description - Описание снимка
@@ -66,43 +64,6 @@ export type Patch = {
   path: string
   op: "add" | "remove" | "replace" | "move" | "copy" | "test"
   value: any
-}
-
-/**
- Параметры конструктора Meta
-
- @template S - Тип состояний
- @template C - Тип контекста
- @template I - Тип действий
-
- @property channel - Канал для коммуникации
- @property id - Идентификатор meta
- @property states - Список возможных состояний
- @property contextDefinition - Определение контекста
- @property transitions - Правила переходов
- @property initialState - Начальное состояние
- @property contextData - Начальные данные контекста
- @property core - Определение ядра
- @property coreData - Данные ядра
- @property reactions - Реакции на изменения
- @property onTransition - Callback при изменении состояния
- @property onUpdate - Callback при изменении контекста
- @property destroy - Callback при уничтожении meta
- */
-export type MetaConstructor<S extends string, C extends ContextDefinition, I extends Record<string, any>> = {
-  channel: BroadcastChannel
-  id: string
-  states: S[]
-  contextDefinition: ContextDefinition
-  transitions: Transitions<S, C, I>
-  initialState: S
-  contextData: ContextData<C>
-  core: CoreDefinition<I, C>
-  coreData: CoreData<I>
-  reactions: Reactions<C, I>
-  onTransition?: CreateOnTransitionCallBack<S, C, I>
-  onUpdate?: OnUpdateCallBack<C>
-  destroy?: (particle: Meta<S, C, I>) => void
 }
 
 /**
