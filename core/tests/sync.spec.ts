@@ -1,10 +1,11 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor, type Meta} from "@metafor/space"
+import {MetaFor} from "@metafor/space"
+
 // FIXME:
 describe("Синхронизация core и context", async () => {
-  document.body.innerHTML = `<metafor-test></metafor-test>`
-
-  const Meta = MetaFor("test")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("IDLE", "push", "pop")
     .context((t) => ({
       process: t.enum("pop", "push")({nullable: true}),
@@ -45,7 +46,7 @@ describe("Синхронизация core и context", async () => {
       }
     ])
     .create({state: "IDLE"})
-  const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   let count = 50
   const delay = 20

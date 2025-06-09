@@ -65,45 +65,48 @@ export declare function MetaFor(
   }
 }
 
-/**
- Meta - класс частицы
+declare global {
+  /**
+   Meta - класс частицы
 
- @template S - Состояния
- @template C - Контекст
- @template I - Ядро
+   @template S - Состояния
+   @template C - Контекст
+   @template I - Ядро
 
- @property id - Идентификатор meta
- @property title - Заголовок meta
- @property description - Описание meta
- @property state - Состояние meta
- @property context - Контекст meta
- @property states - Состояния meta
- @property types - Типы meta
- @property core - Ядро meta
- @property reactions - Реакции meta
- @property channel - Канал meta
- @property process - Флаг процесса meta
- @property component - Компонент meta
- @property update - Обновление meta
- @property onUpdate - Обработчик обновления meta
- @property onTransition - Обработчик перехода meta
- @property snapshot - Снимок meta
- @property graph - Граф meta
- @property destroy - Уничтожение meta
- */
-export interface Meta<S extends string, C extends ContextDefinition> extends HTMLElement {
-  id: string
-  title: string
-  description: string
-  state: S
-  context: ContextData<C>
-  states: readonly S[]
-  types: Record<string, any>
-  process: boolean
+   @property id - Идентификатор meta
+   @property title - Заголовок meta
+   @property description - Описание meta
+   @property state - Состояние meta
+   @property context - Контекст meta
+   @property states - Состояния meta
+   @property types - Типы meta
+   @property core - Ядро meta
+   @property reactions - Реакции meta
+   @property channel - Канал meta
+   @property process - Флаг процесса meta
+   @property component - Компонент meta
+   @property update - Обновление meta
+   @property onUpdate - Обработчик обновления meta
+   @property onTransition - Обработчик перехода meta
+   @property snapshot - Снимок meta
+   @property graph - Граф meta
+   @property destroy - Уничтожение meta
+   */
+  export interface Meta<S extends string, C extends ContextDefinition> extends HTMLElement {
+    id: string
+    title: string
+    description: string
+    state: S
+    context: ContextData<C>
+    states: readonly S[]
+    types: Record<string, any>
+    process: boolean
 
-  update: (context: UpdateParameters<C>) => void
-  onUpdate: OnUpdate<C>
-  onTransition: OnTransition<S>
-  snapshot: () => Snapshot<S, C, any>
-  destroy: () => void
+    update: (context: UpdateParameters<C>) => void
+    onUpdate: OnUpdate<C>
+    onTransition: OnTransition<S>
+    snapshot: () => Snapshot<S, C, any>
+    destroy: () => void
+  }
 }
+

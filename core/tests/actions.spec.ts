@@ -2,15 +2,13 @@ import {describe, expect, test, beforeEach} from "bun:test"
 import {MetaFor} from "@metafor/space"
 
 
+
 describe("Actions", () => {
-  let count = 0
-  beforeEach(() => {
-    document.body.innerHTML = `<metafor-user-${count}></metafor-user-${count}>`
-    count +=1
-  })
 
   test("При входе в состояние выполняется действие", async () => {
-    const user = MetaFor("user-0")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
@@ -45,14 +43,17 @@ describe("Actions", () => {
       .create({
         state: "АНОНИМНЫЙ",
       })
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     await Bun.sleep(200)
-    expect(user.state).toBe("АВТОРИЗОВАН")
-    expect(user.context.nickname).toBe("zavx0z")
+    expect(meta.state).toBe("АВТОРИЗОВАН")
+    expect(meta.context.nickname).toBe("zavx0z")
   })
 
   test("Асинхронное действие", async () => {
-    const user = MetaFor("user-1")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
@@ -87,14 +88,18 @@ describe("Actions", () => {
       .create({
         state: "АНОНИМНЫЙ",
       })
-    user.update({email: "test@test.com", password: "password"})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
+    meta.update({email: "test@test.com", password: "password"})
     await new Promise((resolve) => setTimeout(resolve, 150))
-    expect(user.state).toBe("АВТОРИЗОВАН")
-    expect(user.context.nickname).toBe("async_user")
+    expect(meta.state).toBe("АВТОРИЗОВАН")
+    expect(meta.context.nickname).toBe("async_user")
   })
 
   test("Действие может обновлять несколько полей контекста", () => {
-    const user = MetaFor("user-2")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
@@ -131,14 +136,18 @@ describe("Actions", () => {
       .create({
         state: "АНОНИМНЫЙ"
       })
-    user.update({email: "initial@email.com", password: "password"})
-    expect(user.context.nickname).toBe("multi_update")
-    expect(user.context.email).toBe("updated@email.com")
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
+    meta.update({email: "initial@email.com", password: "password"})
+    expect(meta.context.nickname).toBe("multi_update")
+    expect(meta.context.email).toBe("updated@email.com")
   })
 
   test("Действие не выполняется если триггеры не сработали", () => {
     let actionCalled = false
-    const user = MetaFor("user-3")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
@@ -171,9 +180,11 @@ describe("Actions", () => {
         },
       ])
       .create({state: "АНОНИМНЫЙ"})
-    user.update({email: "test@test.com"})
-    expect(user.state).toBe("АНОНИМНЫЙ")
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
+    meta.update({email: "test@test.com"})
+    expect(meta.state).toBe("АНОНИМНЫЙ")
     expect(actionCalled).toBe(false)
-    expect(user.context.nickname).toBeNull()
+    expect(meta.context.nickname).toBeNull()
   })
 })

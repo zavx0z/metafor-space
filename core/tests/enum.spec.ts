@@ -1,11 +1,12 @@
 import { MetaFor } from "@metafor/space"
 import { describe, expect, test } from "bun:test"
 
+
 describe("Enum тип", () => {
   test("создание enum типа", () => {
-    document.body.innerHTML = `<metafor-test-1></metafor-test-1>`
-
-    const meta = MetaFor("test-1")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("INITIAL", "FINAL")
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({ title: "Статус", nullable: true, default: "inactive" }),
@@ -18,14 +19,15 @@ describe("Enum тип", () => {
         },
       ])
       .create({ state: "INITIAL" })
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context.status).toBe("inactive")
   })
 
   test("проверка перехода по enum значению", async () => {
-    document.body.innerHTML = `<metafor-test-2></metafor-test-2>`
-
-    const meta = MetaFor("test-2")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("INITIAL", "ACTIVE")
       .context((t) => ({
         status: t.enum("active", "inactive")({ default: "inactive" }),
@@ -38,15 +40,16 @@ describe("Enum тип", () => {
         },
       ])
       .create({ state: "INITIAL" })
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({ status: "active" })
     expect(meta.state).toBe("ACTIVE")
   })
 
   test("сложные условия enum", async () => {
-    document.body.innerHTML = `<metafor-test-3></metafor-test-3>`
-
-    const meta = MetaFor("test-3")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("INITIAL", "ACTIVE", "INACTIVE")
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({ default: "pending" }),
@@ -67,6 +70,7 @@ describe("Enum тип", () => {
         },
       ])
       .create({ state: "INITIAL" })
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({ status: "active" })
     expect(meta.state).toBe("ACTIVE")
@@ -76,9 +80,9 @@ describe("Enum тип", () => {
   })
 
   test("числовой enum тип", () => {
-    document.body.innerHTML = `<metafor-test-4></metafor-test-4>`
-
-    const meta = MetaFor("test-4")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("INITIAL", "FINAL")
       .context((t) => ({
         status: t.enum(1, 2, 3)({ title: "Статус", nullable: true, default: 1 }),
@@ -86,14 +90,15 @@ describe("Enum тип", () => {
       .core()
       .transitions([])
       .create({ state: "INITIAL" })
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context.status).toBe(1)
   })
 
   test("проверка перехода по числовому enum значению", async () => {
-    document.body.innerHTML = `<metafor-test-5></metafor-test-5>`
-
-    const meta = MetaFor("test-5")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("INITIAL", "ACTIVE")
       .context((t) => ({
         status: t.enum(1, 2)({ default: 1 }),
@@ -106,6 +111,7 @@ describe("Enum тип", () => {
         },
       ])
       .create({ state: "INITIAL" })
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({ status: 2 })
     expect(meta.state).toBe("ACTIVE")

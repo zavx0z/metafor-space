@@ -1,13 +1,14 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor, type Meta} from "@metafor/space"
+import {MetaFor} from "@metafor/space"
+
 
 describe("Конструктор MetaFor", () => {
   const nickname = "zavx0z"
   const email = "zavx0z@ya.ru"
   const password = "123456"
-  document.body.innerHTML = `<metafor-test></metafor-test>`
-
-  const Fabric = MetaFor("test")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Fabric = MetaFor(tag)
     .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
     .context((t) => ({
       nickname: t.string({title: "Имя", nullable: true}),
@@ -40,7 +41,7 @@ describe("Конструктор MetaFor", () => {
 
   test("Инициализация состояния без действия с контекстом который соответствует условию перехода", () => {
     const Meta = Fabric.create({state: "АНОНИМНЫЙ"})
-    const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context, "Контекст должен быть обновлен").toEqual({email, nickname, password})
     expect(meta.state, "Триггеры должны быть обработаны и состояние должно измениться").toBe("АВТОРИЗОВАН")

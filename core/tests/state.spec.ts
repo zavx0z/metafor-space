@@ -1,9 +1,11 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor, type Meta} from "@metafor/space"
+import {MetaFor} from "@metafor/space"
+
 
 describe("Корректные переходы состояний при загрузке данных", () => {
-  document.body.innerHTML = `<metafor-test></metafor-test>`
-  const Meta = MetaFor("test")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("IDLE", "LOADING", "SUCCESS", "ERROR")
     .context((t) => ({
       url: t.string({title: "URL", nullable: true, default: "https://api.example.com/data"}),
@@ -32,7 +34,7 @@ describe("Корректные переходы состояний при заг
         to: [{state: "IDLE", when: {url: {include: "complete"}}}],
       },
     ]).create({state: "IDLE"})
-  const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   describe("Инициализация и начальные состояния", () => {
     test("Начальное состояние должно быть IDLE", () => {

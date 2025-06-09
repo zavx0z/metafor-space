@@ -2,13 +2,15 @@ import {describe, expect, test} from "bun:test"
 import {MetaFor} from "@metafor/space"
 import {messagesFixture} from "../../../fixtures/broadcast"
 
+
 describe("Инициализация без действия", async () => {
   const {waitForMessages} = messagesFixture()
 
   const initialState = "INITIAL"
   const initialContext = {value: "initial"}
-  document.body.innerHTML = `<metafor-test></metafor-test>`
-  const meta = MetaFor("test")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("INITIAL", "OTHER")
     .context((t) => ({
       value: t.string({nullable: true, default: initialContext.value})
@@ -18,6 +20,7 @@ describe("Инициализация без действия", async () => {
     .create({
       state: initialState
     })
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   const messages = await waitForMessages(10)
 

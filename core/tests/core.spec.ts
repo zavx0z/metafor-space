@@ -1,10 +1,12 @@
 import {describe, expect, test} from "bun:test"
 import {MetaFor} from "@metafor/space"
 
+
 describe("core", () => {
   describe("обработка нажатия и отпускания пробела", () => {
-    document.body.innerHTML = `<metafor-test-1></metafor-test-1>`
-    const meta = MetaFor("test-1")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", "отпуск элемента")
       .context(({boolean}) => ({
         actionUpdate: boolean({title: "Обновление контекста из action", nullable: true, default: false}),
@@ -47,7 +49,8 @@ describe("core", () => {
       .create({
         state: "ОЖИДАНИЕ",
       })
-    console.log(meta.context, meta.state)
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
     test("Проверяем начальное состояние", () => {
       expect(meta.context.isSpacePressed).toBe(false)
       expect(meta.state).toBe("ОЖИДАНИЕ")
@@ -66,9 +69,9 @@ describe("core", () => {
 
   test.todo("Кто вызывает обновление контекста, какие параметры контекста обновляет и с какими значениями")
   test("Волатильность параметров", () => {
-    document.body.innerHTML = `<metafor-test-2></metafor-test-2>`
-
-    const meta = MetaFor("test-2")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({boolean}) => ({
         isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
@@ -99,13 +102,15 @@ describe("core", () => {
         }
       ])
       .create({state: "ОЖИДАНИЕ"})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
     meta.update({isSpacePressed: true})
     expect(meta.context.isSpacePressed).toBe(true)
   })
   test("Доступ внутри ядра ко всем входящим в состав meta функциям и объектам", () => {
-    document.body.innerHTML = `<metafor-test-3></metafor-test-3>`
-
-    const meta = MetaFor("test-3")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({boolean}) => ({
         isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
@@ -133,14 +138,16 @@ describe("core", () => {
         }
       ])
       .create({state: "ОЖИДАНИЕ"})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
     meta.update({isSpacePressed: true})
     expect(meta.context.isSpacePressed).toBe(true)
   })
 
   test("Доступ внутри ядра к контексту meta", () => {
-    document.body.innerHTML = `<metafor-test-4></metafor-test-4>`
-
-    const meta = MetaFor("test-4")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .states("ОЖИДАНИЕ", "ПАРАМЕТР ОБНОВЛЕН")
       .context(({number}) => ({
         parameter: number({default: 0}),
@@ -162,6 +169,8 @@ describe("core", () => {
         }
       ])
       .create({state: "ОЖИДАНИЕ"})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
     expect(meta.context.other).toBe(0)
   })
 })
@@ -169,10 +178,11 @@ describe("core", () => {
 describe("core", () => {
   describe("Взаимодействие с общими данными через core", () => {
     test("Данные в core доступны для модификации без замены", () => {
-      document.body.innerHTML = `<metafor-test-5></metafor-test-5>`
 
       const sharedArray: object[] = []
-      const meta = MetaFor("test-5")
+      const tag = Bun.randomUUIDv7()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const Meta = MetaFor(tag)
         .states("INITIAL", "MODIFIED")
         .context(({boolean}) => ({
           isUpdated: boolean({title: "Обновлено ли", default: false}),
@@ -194,6 +204,7 @@ describe("core", () => {
           },
         ])
         .create({state: "INITIAL"})
+      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
       expect(meta.context.isUpdated).toBe(true)
       expect(meta.state).toBe("MODIFIED")
@@ -203,9 +214,9 @@ describe("core", () => {
 
   describe("обновление ядра внутри через self ", () => {
     test("обновление ядра внутри через self", () => {
-      document.body.innerHTML = `<metafor-test-7></metafor-test-7>`
-
-      const meta = MetaFor("test-7")
+      const tag = Bun.randomUUIDv7()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const Meta = MetaFor(tag)
         .states("INITIAL", "UPDATED")
         .context((t) => ({
           coreParameter: t.number({nullable: true})
@@ -225,6 +236,8 @@ describe("core", () => {
           }
         ])
         .create({state: "INITIAL"})
+      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
       expect(meta.context.coreParameter).toEqual(1)
     })
   })

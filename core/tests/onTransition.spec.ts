@@ -1,8 +1,10 @@
 import {describe, expect, test} from "bun:test"
-import {MetaFor, type Meta} from "@metafor/space"
+import {MetaFor} from "@metafor/space"
 
-document.body.innerHTML = `<metafor-test></metafor-test>`
-const Meta = MetaFor("test")
+
+const tag = Bun.randomUUIDv7()
+document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+const Meta = MetaFor(tag)
   .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
   .context((t) => ({
     url: t.string({title: "URL", nullable: true}),
@@ -32,7 +34,7 @@ const Meta = MetaFor("test")
     },
   ])
   .create({state: "IDLE"})
-const meta = document.querySelector('metafor-test') as Meta<typeof Meta.state, typeof Meta.context>
+const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
 describe("Подписка на изменения состояния (onTransition)", () => {
   describe("Базовая работа подписки", () => {

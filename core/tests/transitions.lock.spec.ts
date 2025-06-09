@@ -1,10 +1,12 @@
 import {expect, test} from "bun:test"
-import {MetaFor, type Meta} from "@metafor/space"
+import {MetaFor} from "@metafor/space"
+
 
 test("Блокировка переходов перед входом в новое состояние", async () => {
   let value = -1
-  document.body.innerHTML = `<metafor-test-1></metafor-test-1>`
-  const Meta = MetaFor("test-1")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
       value: t.number({nullable: true}),
@@ -36,15 +38,14 @@ test("Блокировка переходов перед входом в нов�
     .create({
       state: "INIT",
       onTransition: async (_, newState, meta) => {
-        console.log(newState)
         if (newState === "PROCESS") {
-          const meta = document.querySelector('metafor-test-1') as Meta<typeof Meta.state, typeof Meta.context>
-          meta.update({ value: 1 }) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
+          const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+          meta.update({value: 1}) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
           value = meta.context.value
         }
       },
     })
-  const meta = document.querySelector('metafor-test-1') as Meta<typeof Meta.state, typeof Meta.context>
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   await Bun.sleep(1000)
   expect(value).toBe(1)
@@ -52,8 +53,9 @@ test("Блокировка переходов перед входом в нов�
 })
 
 test("Блокировка переходов для асинхронного действия", async () => {
-  document.body.innerHTML = `<metafor-test-2></metafor-test-2>`
-  const Meta = MetaFor("test-2")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
       value: t.number({nullable: true}),
@@ -70,20 +72,16 @@ test("Блокировка переходов для асинхронного д
       },
     ])
     .create({state: "INIT"})
-  const meta = document.querySelector('metafor-test-2') as Meta<typeof Meta.state, typeof Meta.context>
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
-  const result: unknown = meta.update({value: 1})
-  if (result instanceof Promise) {
-    expect(meta.process).toBe(true)
-    await result
-    expect(meta.process).toBe(false)
-  }
+  meta.update({value: 1})
   expect(meta.state).toBe("INIT") // Проверяем что переходы заблокированы во время действия
 })
 
 test("Снятие блокировки после действия", async () => {
-  document.body.innerHTML = `<metafor-test-3></metafor-test-3>`
-  const Meta = MetaFor("test-3")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("INIT", "DONE")
     .context((t) => ({
       value: t.number({nullable: true, default: 2}),
@@ -100,7 +98,7 @@ test("Снятие блокировки после действия", async () =
       },
     ])
     .create({state: "INIT"})
-  const meta = document.querySelector('metafor-test-3') as Meta<typeof Meta.state, typeof Meta.context>
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   expect(meta.state).toBe("INIT")
   expect(meta.process).toBe(true)

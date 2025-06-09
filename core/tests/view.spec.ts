@@ -1,35 +1,34 @@
-import { describe, it, expect, beforeAll } from "bun:test"
-import { MetaFor } from "@metafor/space"
+import {describe, it, expect} from "bun:test"
+import {MetaFor} from "@metafor/space"
 
 describe("View", () => {
-  beforeAll(() => {
-    document.body.innerHTML = "<metafor-view></metafor-view>"
-  })
-
-  const metaView = MetaFor("view")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("init")
     .context((t) => ({
-      param: t.boolean({ default: false }),
+      param: t.boolean({default: false}),
     }))
     .core()
     .transitions([])
     .view({
-      render: ({ html, update, context }) =>
-        html`<button @click=${() => update({ param: !context.param })}>${context.param ? "true" : "false"}</button>`,
+      render: ({html, update, context}) =>
+        html`
+          <button @click=${() => update({param: !context.param})}>${context.param ? "true" : "false"}</button>`,
     })
     .create({
       state: "init",
     })
-  it("При обновлении контекста, не должен вызываться connectedCallback", async () => { // FIXME: сделать проверку на перерендер
-    await Bun.sleep(1000)
-    const element: HTMLElement = document.querySelector("metafor-view")!
-    const button: HTMLButtonElement = element.shadowRoot?.querySelector("button")!
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
-    expect(element).toBeDefined()
+
+  it("При обновлении контекста, не должен вызываться connectedCallback", async () => { // FIXME: сделать проверку на перерендер
+    const button: HTMLButtonElement = meta.shadowRoot?.querySelector("button")!
+
     expect(button).toBeDefined()
     button.click()
 
-    expect(metaView.context.param).toBe(true)
+    expect(meta.context.param).toBe(true)
 
     expect(button?.textContent).toBe("true")
   })

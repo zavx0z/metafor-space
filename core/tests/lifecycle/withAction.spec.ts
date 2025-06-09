@@ -1,7 +1,7 @@
 import {describe, expect, test} from "bun:test"
 import {MetaFor} from "@metafor/space"
 import {messagesFixture} from "../../../fixtures/broadcast"
-import type {Meta} from "../../../metafor";
+
 
 describe("Инициализация c действием", async () => {
   const {waitForMessages} = messagesFixture()
@@ -14,9 +14,9 @@ describe("Инициализация c действием", async () => {
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
-  document.body.innerHTML = `<metafor-test></metafor-test>`
-
-  const meta = MetaFor("test")
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .states("INITIAL", "OTHER", "NEXT")
     .context((t) => ({
       value: t.string({nullable: true, default: initialContext.value}),
@@ -43,7 +43,8 @@ describe("Инициализация c действием", async () => {
     .create({
       state: initialState,
     })
-  // const meta = document.querySelector("metafor-test") as unknown as Meta<any, any, any>
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+
   test.todo("Условия meta заблокированы до окончания автопереходов")
   test.todo("Независимо от блокировки, сообщения с изменениями отправляются")
   const block = meta.process // Блокировку до окончания действия можно перехватить сразу после выполнения синхронного конструктора
