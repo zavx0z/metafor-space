@@ -51,14 +51,14 @@ export declare function MetaFor(
         transitions: (transitions: Transitions<S, C, I>) => {
           reactions: (reactions: Reactions<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
-              create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
+              create: (data: CreateParams<C, S, I>) => Meta<S, C>
             }
-            create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
+            create: (data: CreateParams<C, S, I>) => Meta<S, C>
           }
           view: (view: ViewDefinition<I, C, S>) => {
-            create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
+            create: (data: CreateParams<C, S, I>) => Meta<S, C>
           }
-          create: (data: CreateParams<C, S, I>) => Meta<S, C, I>
+          create: (data: CreateParams<C, S, I>) => Meta<S, C>
         }
       }
     }
@@ -79,39 +79,31 @@ export declare function MetaFor(
  @property context - Контекст meta
  @property states - Состояния meta
  @property types - Типы meta
- @property transitions - Переходы meta
  @property core - Ядро meta
  @property reactions - Реакции meta
  @property channel - Канал meta
  @property process - Флаг процесса meta
  @property component - Компонент meta
  @property update - Обновление meta
- @property _updateExternal - Обновление meta из вне
  @property onUpdate - Обработчик обновления meta
  @property onTransition - Обработчик перехода meta
  @property snapshot - Снимок meta
  @property graph - Граф meta
  @property destroy - Уничтожение meta
  */
-export declare class Meta<S extends string, C extends ContextDefinition, I extends Record<string, any>> extends HTMLElement{
+export declare class Meta<S extends string, C extends ContextDefinition> extends HTMLElement {
   id: string
   title: string
   description: string
   state: S
   context: ContextData<C>
-  states: readonly (S | undefined)[]
+  states: readonly S[]
   types: Record<string, any>
-  transitions: Transitions<S, C, I>
-  reactions: Reactions<C, I>
-  channel: BroadcastChannel
   process: boolean
 
-  constructor(params: MetaConstructor<S, C, I>)
-
   update: (context: UpdateParameters<C>) => void
-  _updateExternal: (params: { context: UpdateParameters<C>; srcName?: string; funcName?: string }) => void
   onUpdate: OnUpdate<C>
   onTransition: OnTransition<S>
-  snapshot: () => Snapshot<S, C, I>
+  snapshot: () => Snapshot<S, C, any>
   destroy: () => void
 }
