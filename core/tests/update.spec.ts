@@ -48,6 +48,7 @@ describe("update", async () => {
         // console.log(prev, current)
       }
     })
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   const messages = await waitForMessages()
 
@@ -124,5 +125,16 @@ describe("update", async () => {
     expect(messages[8].patch.path, "После обновления контекста получаем сообщение об изменении состояния").toBe(
       "/state"
     )
+  })
+  test("Несуществующие ключи не устанавливаются в контекст", () => {
+    //@ts-ignore
+    meta.update({field1: "exist", field2: "exist", field3: "not exist"})
+    //@ts-ignore
+    expect(meta.context.field3).toBeUndefined()
+    expect(meta.context).toBeObject({
+      field1: "exist",
+      field2: "exist",
+      state: "core"
+    })
   })
 })
