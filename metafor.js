@@ -52,7 +52,7 @@ export const MetaFor = (tag, conf = {}) => {
               development &&
               import("./core/validator/index.js").then((module) => module.validateCore({tag, core: coreDefinition}))
               return {
-                transitions(transitions) {
+                transitions(initialState, transitions) {
                   if (development) {
                     const data = {tag, transitions: [...transitions], contextDefinition}
                     import("./core/validator/index.js").then((module) => module.validateTransitions(data))
@@ -60,28 +60,30 @@ export const MetaFor = (tag, conf = {}) => {
                   return {
                     reactions: (reactions) => ({
                       create: (options) => createMeta({
+                        states,
+                        initialState,
+                        contextDefinition,
+                        contextData,
+                        transitions,
                         development,
                         description,
                         tag,
                         options,
-                        states,
-                        contextDefinition,
-                        contextData,
-                        transitions,
                         coreDefinition,
                         reactions
                       }),
                       view: (view) => {
                         return {
                           create: (options) => createMeta({
+                            states,
+                            initialState,
+                            contextDefinition,
+                            contextData,
+                            transitions,
                             development,
                             description,
                             tag,
                             options,
-                            states,
-                            contextDefinition,
-                            contextData,
-                            transitions,
                             coreDefinition,
                             reactions,
                             view
@@ -90,27 +92,29 @@ export const MetaFor = (tag, conf = {}) => {
                       },
                     }),
                     create: (options) => createMeta({
+                      states,
+                      initialState,
+                      contextDefinition,
+                      contextData,
+                      transitions,
                       development,
                       description,
                       tag,
                       options,
-                      states,
-                      contextDefinition,
-                      contextData,
-                      transitions,
                       coreDefinition,
                     }),
                     view: (view) => {
                       return {
                         create: (options) => createMeta({
+                          states,
+                          initialState,
+                          contextDefinition,
+                          contextData,
+                          transitions,
                           development,
                           description,
                           tag,
                           options,
-                          states,
-                          contextDefinition,
-                          contextData,
-                          transitions,
                           coreDefinition,
                           view
                         })
@@ -158,6 +162,7 @@ const createMeta = (
     tag,
     options,
     states,
+    initialState,
     contextDefinition,
     contextData,
     transitions,
@@ -167,7 +172,7 @@ const createMeta = (
   }) => {
   development && import("./core/validator/index.js").then(
     (module) => module.validateCreateOptions({tag, options, states}))
-  const {state, onTransition, onUpdate} = options
+  const {onTransition, onUpdate} = options
   const ContextKeys = Object.keys(contextData).map(camelToKebab)
 
   // Создаем карту соответствия между kebab-case и camelCase ключами
@@ -183,7 +188,7 @@ const createMeta = (
       #process = false
       #core = /** @type{import("./types/core").Core<I>} */ ({})
       #channel = new BroadcastChannel('channel')
-      #state = this.#createSignal(state)
+      #state = this.#createSignal(initialState)
       #states = states
       #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
       context = contextData
@@ -203,6 +208,7 @@ const createMeta = (
 
       constructor() {
         super()
+        this.dataset.state = initialState
 
         view?.style?.({
           css: (strings, ...values) => {
@@ -285,13 +291,14 @@ const createMeta = (
         }
         if (onUpdate) this.onUpdate(onUpdate)
 
-        const transition = transitions.find((i) => i.from === state)
+        const transition = transitions.find((i) => i.from === initialState)
         if (transition?.action) {
           this.process = true
           this.#runAction(transition.action)
         } else this.#transition()
         // console.log("connectedCallback")
         const updateView = () => {
+          this.dataset.state = String(this.state)
           const result = view?.render({
             update: (ctx) =>
               this._updateExternal({

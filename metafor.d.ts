@@ -48,7 +48,7 @@ export declare function MetaFor(
   states: <S extends string>(...states: S[]) => {
     context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
       core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
-        transitions: (transitions: Transitions<S, C, I>) => {
+        transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
           reactions: (reactions: Reactions<C, I>) => {
             view: (view: ViewDefinition<I, C, S>) => {
               create: (data: CreateParams<C, S, I>) => Meta<S, C>

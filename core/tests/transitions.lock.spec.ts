@@ -12,7 +12,7 @@ test("Блокировка переходов перед входом в нов�
       value: t.number({nullable: true}),
     }))
     .core()
-    .transitions([
+    .transitions("INIT", [
       {
         from: "INIT",
         action: ({update}) => {
@@ -36,7 +36,6 @@ test("Блокировка переходов перед входом в нов�
       },
     ])
     .create({
-      state: "INIT",
       onTransition: async (_, newState, meta) => {
         if (newState === "PROCESS") {
           const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
@@ -61,7 +60,7 @@ test("Блокировка переходов для асинхронного д
       value: t.number({nullable: true}),
     }))
     .core()
-    .transitions([
+    .transitions("INIT", [
       {
         from: "INIT",
         action: async ({update}) => {
@@ -70,8 +69,7 @@ test("Блокировка переходов для асинхронного д
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
-    ])
-    .create({state: "INIT"})
+    ]).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   meta.update({value: 1})
@@ -87,7 +85,7 @@ test("Снятие блокировки после действия", async () =
       value: t.number({nullable: true, default: 2}),
     }))
     .core()
-    .transitions([
+    .transitions("INIT", [
       {
         from: "INIT",
         action: async ({update}) => {
@@ -96,8 +94,7 @@ test("Снятие блокировки после действия", async () =
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
-    ])
-    .create({state: "INIT"})
+    ]).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   expect(meta.state).toBe("INIT")

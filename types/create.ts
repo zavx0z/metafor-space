@@ -32,13 +32,6 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
   title?: string
   /** Описание частицы */
   description?: string
-  /** Начальное состояние */
-  state: S
-  /** Опции отображения */
-  view?: {
-    /** Флаг изолированного отображения (по умолчанию Shadow DOM) */
-    isolated?: boolean
-  }
   /** Начальные данные ядра */
   core?: CoreData<I> | Record<string, any>
   /**
@@ -95,6 +88,7 @@ export type FabricCallbackCreateFuncHelper<
   tag: string
   options: CreateParams<C, S, I>
   states: S[]
+  initialState: S
   contextDefinition: ContextDefinition
   contextData: ContextData<C>
   transitions: Transitions<S, C, I>

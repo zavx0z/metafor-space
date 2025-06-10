@@ -16,10 +16,8 @@ describe("Инициализация без действия", async () => {
       value: t.string({nullable: true, default: initialContext.value})
     }))
     .core()
-    .transitions([])
-    .create({
-      state: initialState
-    })
+    .transitions(initialState, [])
+    .create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   const messages = await waitForMessages(10)

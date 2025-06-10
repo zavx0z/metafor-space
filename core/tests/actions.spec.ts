@@ -2,7 +2,6 @@ import {describe, expect, test, beforeEach} from "bun:test"
 import {MetaFor} from "@metafor/space"
 
 
-
 describe("Actions", () => {
 
   test("При входе в состояние выполняется действие", async () => {
@@ -16,7 +15,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true, default: "123456"}),
       }))
       .core()
-      .transitions([
+      .transitions("АНОНИМНЫЙ", [
         {
           from: "АНОНИМНЫЙ",
           to: [
@@ -39,10 +38,7 @@ describe("Actions", () => {
             },
           ],
         },
-      ])
-      .create({
-        state: "АНОНИМНЫЙ",
-      })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     await Bun.sleep(200)
@@ -61,7 +57,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .transitions([
+      .transitions("АНОНИМНЫЙ", [
         {
           from: "АНОНИМНЫЙ",
           to: [
@@ -84,10 +80,7 @@ describe("Actions", () => {
             },
           ],
         },
-      ])
-      .create({
-        state: "АНОНИМНЫЙ",
-      })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({email: "test@test.com", password: "password"})
@@ -107,7 +100,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .transitions([
+      .transitions("АНОНИМНЫЙ", [
         {
           from: "АНОНИМНЫЙ",
           to: [
@@ -132,10 +125,7 @@ describe("Actions", () => {
             },
           ],
         },
-      ])
-      .create({
-        state: "АНОНИМНЫЙ"
-      })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({email: "initial@email.com", password: "password"})
@@ -155,7 +145,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .transitions([
+      .transitions("АНОНИМНЫЙ",[
         {
           from: "АНОНИМНЫЙ",
           to: [
@@ -178,8 +168,7 @@ describe("Actions", () => {
             },
           ],
         },
-      ])
-      .create({state: "АНОНИМНЫЙ"})
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({email: "test@test.com"})

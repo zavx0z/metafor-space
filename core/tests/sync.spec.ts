@@ -23,7 +23,7 @@ describe("Синхронизация core и context", async () => {
         update({dataLength: this.data.length, process: null})
       },
     }))
-    .transitions([
+    .transitions("IDLE", [
       {
         from: "IDLE",
         to: [
@@ -44,8 +44,7 @@ describe("Синхронизация core и context", async () => {
         action: ({core}) => core.popData(),
         to: [{state: "IDLE", when: {process: null}}]
       }
-    ])
-    .create({state: "IDLE"})
+    ]).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   let count = 50

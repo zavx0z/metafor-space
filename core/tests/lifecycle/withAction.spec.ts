@@ -22,7 +22,7 @@ describe("Инициализация c действием", async () => {
       value: t.string({nullable: true, default: initialContext.value}),
     }))
     .core()
-    .transitions([
+    .transitions(initialState, [
       {
         from: "INITIAL",
         action: async ({update}) => {
@@ -39,10 +39,7 @@ describe("Инициализация c действием", async () => {
         }, // Асинхронное действие - так можно проверить блокировку,
         to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
-    ])
-    .create({
-      state: initialState,
-    })
+    ]).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   test.todo("Условия meta заблокированы до окончания автопереходов")

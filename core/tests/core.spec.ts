@@ -24,7 +24,7 @@ describe("core", () => {
           }
         },
       }))
-      .transitions([
+      .transitions("ОЖИДАНИЕ", [
         {
           from: "ОЖИДАНИЕ",
           to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}],
@@ -45,10 +45,7 @@ describe("core", () => {
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false, actionUpdate: false}}],
         }
-      ])
-      .create({
-        state: "ОЖИДАНИЕ",
-      })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     test("Проверяем начальное состояние", () => {
@@ -88,7 +85,7 @@ describe("core", () => {
           parameter: coreState.parameter,
         }
       })
-      .transitions([
+      .transitions("ОЖИДАНИЕ", [
         {
           from: "ОЖИДАНИЕ",
           to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
@@ -100,8 +97,7 @@ describe("core", () => {
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
         }
-      ])
-      .create({state: "ОЖИДАНИЕ"})
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({isSpacePressed: true})
@@ -124,7 +120,7 @@ describe("core", () => {
         },
         parameter: true,
       }))
-      .transitions([
+      .transitions("ОЖИДАНИЕ", [
         {
           from: "ОЖИДАНИЕ",
           to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
@@ -136,8 +132,7 @@ describe("core", () => {
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
         }
-      ])
-      .create({state: "ОЖИДАНИЕ"})
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     meta.update({isSpacePressed: true})
@@ -157,7 +152,7 @@ describe("core", () => {
         parameter: context.parameter,
         updateOther: () => update({other: self.parameter})
       }))
-      .transitions([
+      .transitions("ОЖИДАНИЕ", [
         {
           from: "ОЖИДАНИЕ",
           to: [{state: "ПАРАМЕТР ОБНОВЛЕН", when: {other: 1}}]
@@ -167,8 +162,7 @@ describe("core", () => {
           action: ({core}) => core.updateOther(),
           to: [{state: "ОЖИДАНИЕ", when: {other: 0}}]
         }
-      ])
-      .create({state: "ОЖИДАНИЕ"})
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context.other).toBe(0)
@@ -194,7 +188,7 @@ describe("core", () => {
           },
           getData: () => sharedArray,
         }))
-        .transitions([
+        .transitions("INITIAL", [
           {
             from: "INITIAL",
             action: ({core}) => {
@@ -202,8 +196,7 @@ describe("core", () => {
             },
             to: [{state: "MODIFIED", when: {isUpdated: true}}],
           },
-        ])
-        .create({state: "INITIAL"})
+        ]).create({})
       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
       expect(meta.context.isUpdated).toBe(true)
@@ -228,14 +221,13 @@ describe("core", () => {
             update({coreParameter: self.coreParameter})
           },
         }))
-        .transitions([
+        .transitions("INITIAL", [
           {
             from: "INITIAL",
             action: ({core}) => core.update(),
             to: [{state: "UPDATED", when: {coreParameter: null}}]
           }
-        ])
-        .create({state: "INITIAL"})
+        ]).create({})
       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
       expect(meta.context.coreParameter).toEqual(1)

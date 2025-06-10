@@ -18,7 +18,7 @@ describe("Конструктор MetaFor", () => {
     .core(() => ({
       password: "123456",
     }))
-    .transitions([
+    .transitions("АНОНИМНЫЙ", [
       {
         from: "АНОНИМНЫЙ",
         to: [{state: "АВТОРИЗАЦИЯ", when: {email: {isNull: false}, password: {isNull: false}}}],
@@ -40,7 +40,7 @@ describe("Конструктор MetaFor", () => {
     expect(Object.hasOwn(Fabric, "create"), "Функция-конструктор создания должна быть присутствовать").toBe(true))
 
   test("Инициализация состояния без действия с контекстом который соответствует условию перехода", () => {
-    const Meta = Fabric.create({state: "АНОНИМНЫЙ"})
+    const Meta = Fabric.create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context, "Контекст должен быть обновлен").toEqual({email, nickname, password})

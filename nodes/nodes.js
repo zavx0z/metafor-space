@@ -15,7 +15,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
 })).core(() => ({
   elk: new ELK(),
   // snapshots: /** @type {Map<string, import("../types/meta.js").Snapshot>} */ new Map()
-})).transitions([
+})).transitions("ожидание патча", [
   {
     from: "ожидание патча",
     action: ({context}) => {
@@ -173,4 +173,4 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
       </style>
     `
   },
-})
+}).create({})

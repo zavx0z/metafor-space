@@ -22,7 +22,7 @@ describe("update", async () => {
         update({field1: "test1", field2: 1})
       },
     }))
-    .transitions([
+    .transitions("INITIAL", [
       {
         from: "INITIAL",
         action: ({update}) => update({state: "action"}),
@@ -43,9 +43,7 @@ describe("update", async () => {
         action: ({core}) => core.complexMethod(),
         to: [{state: "final", when: {field1: "test1", field2: 1}}]
       }
-    ])
-    .create({
-      state: "INITIAL",
+    ]).create({
       onTransition: (prev, current) => {
         // console.log(prev, current)
       }
@@ -110,7 +108,7 @@ describe("update", async () => {
     expect(messages[6].patch.path, "После обновления контекста получаем сообщение об изменении состояния").toBe(
       "/state"
     )
-    expect(messages[7],"Проверяем множественные вызовы update из core").toEqual({
+    expect(messages[7], "Проверяем множественные вызовы update из core").toEqual({
       meta: {
         meta: "",
         func: "complexMethod",

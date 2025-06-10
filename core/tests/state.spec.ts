@@ -13,7 +13,7 @@ describe("Корректные переходы состояний при заг
       code: t.number({title: "Код ошибки", nullable: true, default: 0}),
     }))
     .core()
-    .transitions([
+    .transitions("IDLE", [
       {
         from: "IDLE",
         to: [{state: "LOADING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
@@ -33,7 +33,7 @@ describe("Корректные переходы состояний при заг
         from: "SUCCESS",
         to: [{state: "IDLE", when: {url: {include: "complete"}}}],
       },
-    ]).create({state: "IDLE"})
+    ]).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   describe("Инициализация и начальные состояния", () => {

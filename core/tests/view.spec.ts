@@ -10,15 +10,12 @@ describe("View", () => {
       param: t.boolean({default: false}),
     }))
     .core()
-    .transitions([])
+    .transitions("init", [])
     .view({
       render: ({html, update, context}) =>
         html`
           <button @click=${() => update({param: !context.param})}>${context.param ? "true" : "false"}</button>`,
-    })
-    .create({
-      state: "init",
-    })
+    }).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
 

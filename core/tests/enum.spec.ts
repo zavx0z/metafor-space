@@ -1,5 +1,5 @@
-import { MetaFor } from "@metafor/space"
-import { describe, expect, test } from "bun:test"
+import {MetaFor} from "@metafor/space"
+import {describe, expect, test} from "bun:test"
 
 
 describe("Enum тип", () => {
@@ -9,16 +9,15 @@ describe("Enum тип", () => {
     const Meta = MetaFor(tag)
       .states("INITIAL", "FINAL")
       .context((t) => ({
-        status: t.enum("active", "inactive", "pending")({ title: "Статус", nullable: true, default: "inactive" }),
+        status: t.enum("active", "inactive", "pending")({title: "Статус", nullable: true, default: "inactive"}),
       }))
       .core()
-      .transitions([
+      .transitions("INITIAL", [
         {
           from: "INITIAL",
-          to: [{ state: "FINAL", when: { status: "active" } }],
+          to: [{state: "FINAL", when: {status: "active"}}],
         },
-      ])
-      .create({ state: "INITIAL" })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context.status).toBe("inactive")
@@ -30,19 +29,18 @@ describe("Enum тип", () => {
     const Meta = MetaFor(tag)
       .states("INITIAL", "ACTIVE")
       .context((t) => ({
-        status: t.enum("active", "inactive")({ default: "inactive" }),
+        status: t.enum("active", "inactive")({default: "inactive"}),
       }))
       .core()
-      .transitions([
+      .transitions("INITIAL", [
         {
           from: "INITIAL",
-          to: [{ state: "ACTIVE", when: { status: "active" } }],
+          to: [{state: "ACTIVE", when: {status: "active"}}],
         },
-      ])
-      .create({ state: "INITIAL" })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
-    meta.update({ status: "active" })
+    meta.update({status: "active"})
     expect(meta.state).toBe("ACTIVE")
   })
 
@@ -52,30 +50,29 @@ describe("Enum тип", () => {
     const Meta = MetaFor(tag)
       .states("INITIAL", "ACTIVE", "INACTIVE")
       .context((t) => ({
-        status: t.enum("active", "inactive", "pending")({ default: "pending" }),
+        status: t.enum("active", "inactive", "pending")({default: "pending"}),
       }))
-      .core(({ update }) => ({
+      .core(({update}) => ({
         example: async () => {
-          update({ status: "inactive" })
+          update({status: "inactive"})
         },
       }))
-      .transitions([
+      .transitions("INITIAL", [
         {
           from: "INITIAL",
-          to: [{ state: "ACTIVE", when: { status: { oneOf: ["active", "pending"] } } }],
+          to: [{state: "ACTIVE", when: {status: {oneOf: ["active", "pending"]}}}],
         },
         {
           from: "ACTIVE",
-          to: [{ state: "INACTIVE", when: { status: "inactive" } }],
+          to: [{state: "INACTIVE", when: {status: "inactive"}}],
         },
-      ])
-      .create({ state: "INITIAL" })
+      ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
-    meta.update({ status: "active" })
+    meta.update({status: "active"})
     expect(meta.state).toBe("ACTIVE")
 
-    meta.update({ status: "inactive" })
+    meta.update({status: "inactive"})
     expect(meta.state).toBe("INACTIVE")
   })
 
@@ -85,11 +82,11 @@ describe("Enum тип", () => {
     const Meta = MetaFor(tag)
       .states("INITIAL", "FINAL")
       .context((t) => ({
-        status: t.enum(1, 2, 3)({ title: "Статус", nullable: true, default: 1 }),
+        status: t.enum(1, 2, 3)({title: "Статус", nullable: true, default: 1}),
       }))
       .core()
-      .transitions([])
-      .create({ state: "INITIAL" })
+      .transitions("INITIAL", [])
+      .create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
     expect(meta.context.status).toBe(1)
@@ -101,19 +98,19 @@ describe("Enum тип", () => {
     const Meta = MetaFor(tag)
       .states("INITIAL", "ACTIVE")
       .context((t) => ({
-        status: t.enum(1, 2)({ default: 1 }),
+        status: t.enum(1, 2)({default: 1}),
       }))
       .core()
-      .transitions([
+      .transitions("INITIAL", [
         {
           from: "INITIAL",
-          to: [{ state: "ACTIVE", when: { status: 2 } }],
+          to: [{state: "ACTIVE", when: {status: 2}}],
         },
       ])
-      .create({ state: "INITIAL" })
+      .create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
-    meta.update({ status: 2 })
+    meta.update({status: 2})
     expect(meta.state).toBe("ACTIVE")
   })
 })

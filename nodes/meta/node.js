@@ -3,25 +3,29 @@ import {MetaFor} from "../../metafor.js"
 export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
-    redy: t.boolean({title: "Готов к отображению", default: true})
+    redy: t.boolean({title: "Готов к отображению", default: true}),
+    title: t.string({title: "Заголовок", nullable: true})
   }))
   .core()
-  .transitions([
+  .transitions("hide", [
     {
       from: "hide",
       to: [{state: "visible", when: {redy: true}}]
     },
     {
       from: "visible",
-      to: [{state: "hide", when: {redy: false}}]
+      to: [{state: "hide", when: {title: {isNull: false}}}]
     }
   ])
   .view({
-    render: ({html}) => {
+    onMount: ({component}) => {
+      // console.log(component)
+    },
+    render: ({html, context, state}) => {
       return html`
         <header data-drag-selector="graph-atom">
           <div><!--кнопки слева--></div>
-          <h2 class="noselect">${"node.id"}</h2>
+          <h2 class="noselect">${context.title}</h2>
           <div>
             <!--кнопки справа-->
             <button aria-label="Редактировать">
@@ -43,6 +47,10 @@ export default MetaFor("node", {development: true, description: "Node"})
       const nodeHeaderHeight = "36px"
       const borderRadius = "7px"
       return css`
+          :host([data-state="visible"]) {
+              opacity: 1;
+          }
+
           :host {
               --font-color: rgb(var(--surface-50));
 
@@ -60,9 +68,9 @@ export default MetaFor("node", {development: true, description: "Node"})
               box-sizing: border-box;
               border-radius: ${borderRadius};
 
-              /*opacity: 0;*/
-              transition: opacity 0.2s ease-in-out;
-
+              opacity: 0;
+              transition: opacity 1s ease-in-out;
+              
               & > section {
                   display: flex;
                   position: relative;
@@ -194,4 +202,4 @@ export default MetaFor("node", {development: true, description: "Node"})
           }
       `
     }
-  }).create({state: "visible"})
+  }).create({})

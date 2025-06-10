@@ -1,7 +1,5 @@
 import {MetaFor} from "../../metafor.js"
-import Nodes from "../nodes.js"
-
-Nodes.create({state: "ожидание патча"})
+import "../nodes.js"
 
 MetaFor("test", {description: "Nodes", development: false}).states(
   "начало",
@@ -9,7 +7,7 @@ MetaFor("test", {description: "Nodes", development: false}).states(
 ).context((t) => ({
   status: t.enum("start", "end")({title: "Status", default: "start"}),
 })).core(() => ({})
-).transitions([
+).transitions("начало", [
   {
     from: "начало",
     action: ({context}) => {
@@ -28,7 +26,6 @@ MetaFor("test", {description: "Nodes", development: false}).states(
   render: ({html, context}) => html`
   `
 }).create({
-  state: "начало",
   onTransition: (preview, current, meta) => {
     console.log(preview, current, meta)
   },

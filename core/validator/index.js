@@ -2,7 +2,7 @@ import { validateContextDefinition as validateContextDefinitionNotWrapped } from
 import { validateCore as validateCoreNotWrapped } from "./core.js"
 import { validateCycles } from "./transitions.js"
 import { validateTriggers } from "./trigger.js"
-import { validateParticleOptions as validateParticleOptionsNotWrapped } from "./create.js"
+// import { validateParticleOptions as validateParticleOptionsNotWrapped } from "./create.js"
 import { validateStates as validateStatesNotWrapped } from "./state.js"
 
 const channel = new BroadcastChannel("validator")
@@ -148,7 +148,7 @@ export function validateCore({ tag, core }) {
  */
 export function validateCreateOptions({ tag, options, states }) {
   try {
-    validateParticleOptionsNotWrapped({ options, states })
+    // validateParticleOptionsNotWrapped({ options, states })
   } catch (error) {
     const { message } = /**@type {Error}*/ (error)
     sendError({ id: tag, message, src: "create" })

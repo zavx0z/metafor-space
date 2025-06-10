@@ -12,7 +12,7 @@ const Meta = MetaFor(tag)
     errorCode: t.number({title: "Код ошибки", nullable: true, default: 0}),
   }))
   .core()
-  .transitions([
+  .transitions("IDLE", [
     {
       from: "IDLE",
       to: [{state: "RUNNING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
@@ -32,8 +32,7 @@ const Meta = MetaFor(tag)
       from: "SUCCESS",
       to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
     },
-  ])
-  .create({state: "IDLE"})
+  ]).create({})
 const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
 describe("Подписка на изменения состояния (onTransition)", () => {
@@ -100,7 +99,10 @@ describe("Подписка на изменения состояния (onTransit
     test("Корректное отслеживание цепочки изменений состояний", async () => {
       const transitions: { from: string; to: string }[] = []
 
-      meta.onTransition((prevState, nextState) => transitions.push({from: prevState as string, to: nextState as string}))
+      meta.onTransition((prevState, nextState) => transitions.push({
+        from: prevState as string,
+        to: nextState as string
+      }))
 
       // Переход в RUNNING
       meta.update({url: "https://api.example.com", responseTime: 3000, errorCode: 0})
