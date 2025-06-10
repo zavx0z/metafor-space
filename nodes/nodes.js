@@ -68,7 +68,6 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
               states: core.snapshot?.states
             }}
         >
-          <div>slot test</div>
         </metafor-node>
       `
     })} `,

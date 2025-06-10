@@ -1,9 +1,9 @@
 import {MetaFor} from "../../metafor.js"
 import "../nodes.js"
 
-setTimeout(() => {
-  document.body.insertAdjacentHTML('beforeend', '<metafor-test></metafor-test>');
-}, 1000)
+// setTimeout(() => {
+//   document.body.insertAdjacentHTML('beforeend', '<metafor-test></metafor-test>');
+// }, 1000)
 
 MetaFor("test", {description: "Nodes", development: false}).states(
   "начало",

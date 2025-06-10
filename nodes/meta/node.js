@@ -1,5 +1,6 @@
 import {MetaFor} from "../../metafor.js"
-import {repeat} from "../../html/directives/repeat.js";
+import {repeat} from "../../html/directives/repeat.js"
+import "./state.js"
 
 export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
@@ -36,7 +37,16 @@ export default MetaFor("node", {development: true, description: "Node"})
         </header>
         <section class="content" data-drag-selector="graph-atom">
           <atom-svg></atom-svg>
-          ${repeat(context.states, i => i, i => html`<p>${i}</p>`)}
+          ${repeat(context.states, i => i, i => {
+            return html`
+              <metafor-state
+                  id=${i}
+                  .context=${{
+                    title: i
+                  }}>
+              </metafor-state>
+            `
+          })}
         </section>
       `
     },
@@ -46,159 +56,120 @@ export default MetaFor("node", {development: true, description: "Node"})
       const nodeHeaderHeight = "36px"
       const borderRadius = "7px"
       return css`
-          :host([data-state="visible"]) {
-              opacity: 1;
+        :host([data-state="visible"]) {
+          opacity: 1;
+        }
+
+        :host {
+          --font-color: rgb(var(--surface-50));
+
+          --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
+
+          .theme-dark & {
+            --background-color: rgba(var(--surface-900) / var(--background-alpha));
           }
 
-          :host {
-              --font-color: rgb(var(--surface-50));
+          position: absolute;
+          user-select: none;
+          will-change: transform;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+          border-radius: ${borderRadius};
 
-              --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
+          opacity: 0;
+          transition: opacity 1s ease-in-out;
 
-              .theme-dark & {
-                  --background-color: rgba(var(--surface-900) / var(--background-alpha));
-              }
+          & > section {
+            display: flex;
+            position: relative;
+            background-color: var(--background-color);
+            width: ${width};
+            height: ${height};
+            border-bottom-right-radius: inherit;
+            border-bottom-left-radius: inherit;
+          }
 
-              position: absolute;
-              user-select: none;
-              will-change: transform;
+          header {
+            --background-color: rgba(var(--surface-500) / var(--background-alpha));
+
+            height: ${nodeHeaderHeight};
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--background-color);
+            box-sizing: border-box;
+            user-select: none;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+
+            & > div:first-child {
+              flex: 1;
               display: flex;
-              flex-direction: column;
-              box-sizing: border-box;
-              border-radius: ${borderRadius};
+              gap: 4px;
+              padding-left: 4px;
+            }
 
-              opacity: 0;
-              transition: opacity 1s ease-in-out;
+            & > h2 {
+              flex: 1;
+              text-align: center;
+              margin: 0;
+              padding: 0;
+            }
 
-              & > section {
-                  display: flex;
-                  position: relative;
-                  background-color: var(--background-color);
-                  width: ${width};
-                  height: ${height};
-                  border-bottom-right-radius: inherit;
-                  border-bottom-left-radius: inherit;
+            & > div:last-child {
+              flex: 1;
+              display: flex;
+              justify-content: flex-end;
+              padding-right: 4px;
+              gap: 4px;
+            }
+
+            button {
+              background: none;
+              border: none;
+              padding: 4px;
+              cursor: pointer;
+              border-radius: 4px;
+              color: var(--font-color);
+
+              &:hover {
+                background-color: rgba(0, 0, 0, 0.05);
               }
 
-              header {
-                  --background-color: rgba(var(--surface-500) / var(--background-alpha));
-
-                  height: ${nodeHeaderHeight};
-                  position: relative;
-                  z-index: 2;
-                  width: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  background-color: var(--background-color);
-                  box-sizing: border-box;
-                  user-select: none;
-                  border-top-left-radius: inherit;
-                  border-top-right-radius: inherit;
-
-                  & > div:first-child {
-                      flex: 1;
-                      display: flex;
-                      gap: 4px;
-                      padding-left: 4px;
-                  }
-
-                  & > h2 {
-                      flex: 1;
-                      text-align: center;
-                      margin: 0;
-                      padding: 0;
-                  }
-
-                  & > div:last-child {
-                      flex: 1;
-                      display: flex;
-                      justify-content: flex-end;
-                      padding-right: 4px;
-                      gap: 4px;
-                  }
-
-                  button {
-                      background: none;
-                      border: none;
-                      padding: 4px;
-                      cursor: pointer;
-                      border-radius: 4px;
-                      color: var(--font-color);
-
-                      &:hover {
-                          background-color: rgba(0, 0, 0, 0.05);
-                      }
-
-                      & svg {
-                          display: block;
-                      }
-                  }
+              & svg {
+                display: block;
               }
-
-              svg.connections path {
-                  &.next {
-                      stroke: rgb(var(--secondary-500));
-                  }
-
-                  &.active {
-                      stroke: rgb(var(--secondary-500));
-                  }
-
-                  &.preview {
-                      stroke: rgb(var(--primary-500));
-                  }
-              }
-
-              trigger-parameter {
-                  &.next:before {
-                      background-color: rgb(var(--secondary-700) / var(--background-alpha)) !important;
-                  }
-
-                  &.preview:before {
-                      background-color: rgb(var(--primary-700)) !important;
-                  }
-              }
-
-              graph-state {
-                  &.active {
-                      &:before {
-                          --border-color: rgba(var(--secondary-50)) !important;
-                          box-shadow: 0 0 4px 2px rgba(var(--secondary-500));
-                      }
-
-                      & > state-header {
-                          background: rgb(var(--secondary-500) / var(--background-alpha));
-                      }
-                  }
-
-                  &.next {
-                      /* box-shadow: 0 0 var(--node-shadow-size) rgba(var(--tertiary-900)); */
-
-                      & > state-header {
-                          background-color: rgba(var(--secondary-500) / var(--background-alpha));
-                      }
-                  }
-
-                  &.preview {
-                      &:before {
-                          box-shadow: 0 0 var(--node-shadow-size) rgba(var(--primary-500));
-                      }
-
-                      &:hover {
-                          & > state-header {
-                              background-color: rgba(var(--primary-500) / var(--background-alpha));
-                          }
-                      }
-
-                      &:not(:hover) {
-                          & > state-header {
-                              background-color: rgba(var(--primary-700) / var(--background-alpha));
-                          }
-                      }
-                  }
-              }
+            }
           }
+
+          svg.connections path {
+            &.next {
+              stroke: rgb(var(--secondary-500));
+            }
+
+            &.active {
+              stroke: rgb(var(--secondary-500));
+            }
+
+            &.preview {
+              stroke: rgb(var(--primary-500));
+            }
+          }
+
+          trigger-parameter {
+            &.next:before {
+              background-color: rgb(var(--secondary-700) / var(--background-alpha)) !important;
+            }
+
+            &.preview:before {
+              background-color: rgb(var(--primary-700)) !important;
+            }
+          }
+        }
       `
     }
   }).create({})

@@ -39,13 +39,6 @@ export const MetaFor = (tag, conf = {}) => {
           development && import("./core/validator/index.js").then((module) =>
             module.validateContextDefinition({tag, context: contextDefinition})
           )
-
-          const contextData = Object.keys(contextDefinition).reduce((acc, key) => {
-            const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
-            if (typeof defaultValue !== "undefined") return {...acc, [key]: defaultValue}
-            else return {...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined}
-          }, {})
-
           return {
             core(core) {
               const coreDefinition = core || (() => Object.create({}))
@@ -63,7 +56,6 @@ export const MetaFor = (tag, conf = {}) => {
                         states,
                         initialState,
                         contextDefinition,
-                        contextData,
                         transitions,
                         development,
                         description,
@@ -78,7 +70,6 @@ export const MetaFor = (tag, conf = {}) => {
                             states,
                             initialState,
                             contextDefinition,
-                            contextData,
                             transitions,
                             development,
                             description,
@@ -95,7 +86,6 @@ export const MetaFor = (tag, conf = {}) => {
                       states,
                       initialState,
                       contextDefinition,
-                      contextData,
                       transitions,
                       development,
                       description,
@@ -109,7 +99,6 @@ export const MetaFor = (tag, conf = {}) => {
                           states,
                           initialState,
                           contextDefinition,
-                          contextData,
                           transitions,
                           development,
                           description,
@@ -155,7 +144,7 @@ const reactionFilter = (reaction, patch) => {
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
  @return {Meta<S, C>}
  */
-const createMeta = (
+function createMeta(
   {
     development,
     description = "",
@@ -164,23 +153,14 @@ const createMeta = (
     states,
     initialState,
     contextDefinition,
-    contextData,
     transitions,
     coreDefinition,
     reactions = [],
     view
-  }) => {
+  }) {
   development && import("./core/validator/index.js").then(
     (module) => module.validateCreateOptions({tag, options, states}))
   const {onTransition, onUpdate} = options
-  const ContextKeys = Object.keys(contextData).map(camelToKebab)
-
-  // Создаем карту соответствия между kebab-case и camelCase ключами
-  /** @type {Record<string, string>} */
-  const kebabToCamelMap = Object.keys(contextData).reduce((map, key) => {
-    map[camelToKebab(key)] = key
-    return map
-  }, /** @type {Record<string, string>} */ ({}))
 
   customElements.define("metafor-" + tag,
     class extends HTMLElement {
@@ -191,7 +171,11 @@ const createMeta = (
       #state = this.#createSignal(initialState)
       #states = states
       #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
-      context = contextData
+      context = /** @type {import("./types/context").ContextData<C>} */(Object.keys(contextDefinition).reduce((acc, key) => {
+        const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
+        if (typeof defaultValue !== "undefined") return {...acc, [key]: defaultValue}
+        else return {...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined}
+      }, {}))
 
       get state() {
         return this.#state?.value()
@@ -208,6 +192,7 @@ const createMeta = (
 
       constructor() {
         super()
+        // Создаем новый объект контекста для каждого инстанса
         // console.log("connected ", this.tagName.toLowerCase(), this.context)
         this.dataset.state = initialState
         view?.style?.({
@@ -371,28 +356,6 @@ const createMeta = (
         // meta.destroy()
       }
 
-      static get observedAttributes() {
-        return ContextKeys
-      }
-
-      /**
-       * @param {string} name
-       * @param {string} oldValue
-       * @param {string} newValue */
-      attributeChangedCallback(name, oldValue, newValue) {
-        // Преобразуем kebab-case обратно в camelCase для обновления контекста
-        const camelCaseName = kebabToCamelMap[name]
-        if (camelCaseName) {
-          const propType = contextDefinition[camelCaseName].type
-          if (propType === "boolean") {
-            // @ts-ignore - Принудительное приведение типа для boolean атрибута
-            this.update({[camelCaseName]: newValue !== null})
-          } else if (propType === "string") {
-            console.log(name, oldValue, newValue)
-          }
-        }
-      }
-
       /**
        * Проверка условий перехода и выполнение действия
        */
@@ -501,6 +464,7 @@ const createMeta = (
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
 }
+
 /**
  * Преобразует строку из camelCase в kebab-case
  * @param {string} str - Строка в формате camelCase

@@ -90,7 +90,6 @@ export type FabricCallbackCreateFuncHelper<
   states: S[]
   initialState: S
   contextDefinition: ContextDefinition
-  contextData: ContextData<C>
   transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
   reactions?: Reactions<C, I>

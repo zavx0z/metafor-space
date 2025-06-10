@@ -901,7 +901,7 @@ export class PropertyPart extends AttributePart {
     value = this._sanitizer(value)
     // @ts-ignore
     // this.element[this.name] = value === nothing ? undefined : value
-    // console.log(value)
+    // console.log(this.element, this.name, value)
     this.element.update(value)
   }
 }
