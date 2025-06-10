@@ -28,7 +28,7 @@ import { html, render } from "@metafor/html"
 Для клиентского кода (без сборки)
 
 ```javascript
-import { html, render } from "quantum/html/html.js"
+import { html, render } from "metafor/html/html.js"
 ```
 
 Пакет также включает дополнительные модули:

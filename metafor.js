@@ -208,8 +208,8 @@ const createMeta = (
 
       constructor() {
         super()
+        // console.log("connected ", this.tagName.toLowerCase(), this.context)
         this.dataset.state = initialState
-
         view?.style?.({
           css: (strings, ...values) => {
             const sheet = new CSSStyleSheet()
@@ -312,14 +312,15 @@ const createMeta = (
             html: html,
             ref: ref,
           })
-          // @ts-ignore
-          render(result, this.#shadow ?? this)
+          console.log(result, this.tagName)
+          const rendered = render(result, this.#shadow)
+          // console.log(rendered, this.tagName)
         }
-
-        this.onUpdate(updateView)
-        this.onTransition(updateView) // TODO: оптимизировать обновление
-        updateView()
-
+        if (view) {
+          this.onUpdate(updateView)
+          this.onTransition(updateView) // TODO: оптимизировать обновление
+          updateView()
+        }
         view?.onMount?.({
           component: this.#shadow.host, core: this.#core, update: (ctx) =>
             this._updateExternal({
@@ -351,6 +352,8 @@ const createMeta = (
           if (propType === "boolean") {
             // @ts-ignore - Принудительное приведение типа для boolean атрибута
             this.update({[camelCaseName]: newValue !== null})
+          } else if (propType === "string") {
+            console.log(name, oldValue, newValue)
           }
         }
       }

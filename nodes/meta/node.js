@@ -3,7 +3,9 @@ import {MetaFor} from "../../metafor.js"
 export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
-    title: t.string({title: "Заголовок", nullable: true})
+    title: t.string({title: "Заголовок", nullable: true}),
+    titleAttr: t.string({title: "Заголовок", nullable: true}),
+    states: t.array({title: "Состояния"}),
   }))
   .core()
   .transitions("hide", [
@@ -19,7 +21,7 @@ export default MetaFor("node", {development: true, description: "Node"})
   .view({
     onMount: ({component, update}) => {
       // console.log(component)
-      update({title: component.id})
+      // update({title: component.id})
     },
     render: ({html, context, state}) => {
       return html`
@@ -38,6 +40,7 @@ export default MetaFor("node", {development: true, description: "Node"})
         </header>
         <section class="content" data-drag-selector="graph-atom">
           <atom-svg></atom-svg>
+          <slot/>
         </section>
       `
     },
