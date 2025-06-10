@@ -892,6 +892,7 @@ export class PropertyPart extends AttributePart {
   type = PROPERTY_PART
 
   /**
+   * Установка значений (контекста)
    @internal
    @param {unknown} value - Значение
    */
@@ -899,7 +900,8 @@ export class PropertyPart extends AttributePart {
     if (this._sanitizer === undefined) this._sanitizer = sanitizerFactoryInternal(this.element, this.name, "property")
     value = this._sanitizer(value)
     // @ts-ignore
-    this.element[this.name] = value === nothing ? undefined : value
+    // this.element[this.name] = value === nothing ? undefined : value
+    this.element.update(value)
   }
 }
 

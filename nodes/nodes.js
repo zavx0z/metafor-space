@@ -60,7 +60,9 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
         <metafor-node
             class="backdrop"
             id=${node.id}
-            .title=${node.id}
+            .context=${{
+              title: node.id
+            }}
         ></metafor-node>
       `)}
     `
