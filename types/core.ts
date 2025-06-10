@@ -1,6 +1,6 @@
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
 
-export type CoreObj = Record<string, any>
+export type CoreObj = Record<string, unknown>
 
 export type CoreData<I extends CoreObj> = Partial<I>
 

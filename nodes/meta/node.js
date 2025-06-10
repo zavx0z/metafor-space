@@ -1,4 +1,5 @@
 import {MetaFor} from "../../metafor.js"
+import {repeat} from "../../html/directives/repeat.js";
 
 export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
@@ -35,7 +36,7 @@ export default MetaFor("node", {development: true, description: "Node"})
         </header>
         <section class="content" data-drag-selector="graph-atom">
           <atom-svg></atom-svg>
-
+          ${repeat(context.states, i => i, i => html`<p>${i}</p>`)}
         </section>
       `
     },

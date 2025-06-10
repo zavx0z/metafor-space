@@ -17,11 +17,11 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
 })).core(() => ({
   elk: new ELK(),
   snapshot: /** @type {Snapshot | undefined} */ undefined,
-  snapshots: /** @type {Map<string, Snapshot>} */ new Map()
 })).transitions("ожидание патча", [
   {
     from: "ожидание патча",
-    action: ({context}) => {
+    action: ({context, core}) => {
+      core.snapshot = undefined
       console.log(context)
     },
     to: [
@@ -31,9 +31,8 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   },
   {
     from: "добавление ноды",
-    action: ({context, update}) => {
-      console.log(context)
-      // update({op: null})
+    action: ({update, core}) => {
+      update({op: null})
     },
     to: [{state: "ожидание патча", when: {op: null}}],
   },
@@ -52,16 +51,13 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
       if (patch.value.id !== "nodes" && patch.value.id !== "node") {
         console.log(patch)
         core.snapshot = patch.value
-        core.snapshots.set(patch.value.id, patch.value)
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
-        // core.snapshots.set(patch.value.id, patch)
       }
     },
   },
 ]).view({
   render: ({html, core, context}) => html`
     ${repeat(context.nodes, id => id, id => {
-      const meta = core.snapshots.get(id)
       return html`
         <metafor-node
             class="backdrop"
