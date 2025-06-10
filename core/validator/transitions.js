@@ -46,7 +46,7 @@ function canCreateCycle({ fromState, toState, forwardConditions, backwardConditi
         const hasGap = forwardRange.max < backwardRange.min || backwardRange.max < forwardRange.min
         if (!hasGap) {
           throw new Error(
-            `Обнаружена потенциальная циклическая зависимость в частице между состояниями ` +
+            `Обнаружена потенциальная циклическая зависимость в meta между состояниями ` +
             `${fromState} и ${toState}.\nУсловия переходов для поля "${field}":\n` +
             `${fromState} -> ${toState}: ${JSON.stringify(forward)}\n` +
             `${toState} -> ${fromState}: ${JSON.stringify(backward)}\n` +
@@ -66,7 +66,7 @@ function canCreateCycle({ fromState, toState, forwardConditions, backwardConditi
       }
       else {
         throw new Error(
-          `Обнаружена потенциальная циклическая зависимость в частице между состояниями ` +
+          `Обнаружена потенциальная циклическая зависимость в meta между состояниями ` +
           `${fromState} и ${toState}.\nУсловия переходов для поля "${field}":\n` +
           `${fromState} -> ${toState}: ${JSON.stringify(forward)}\n` +
           `${toState} -> ${fromState}: ${JSON.stringify(backward)}\n` +
