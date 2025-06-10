@@ -15,24 +15,38 @@ function canCreateCycle({ fromState, toState, forwardConditions, backwardConditi
     const forward = forwardConditions[field]
     const backward = backwardConditions[field]
 
-    // Проверяем только если оба условия числовые с диапазонами
-    if (typeof forward === "object" && typeof backward === "object") {
-      const forwardRange = {
-        min: forward.gt ?? forward.gte ?? -Infinity,
-        max: forward.lt ?? forward.lte ?? Infinity,
-      }
-      const backwardRange = {
-        min: backward.gt ?? backward.gte ?? -Infinity,
-        max: backward.lt ?? backward.lte ?? Infinity,
-      }
+    // Если одно из условий null, а другое - конкретное значение
+    if (
+      (forward === null && backward !== null) ||
+      (backward === null && forward !== null)
+    ) {
+      // Это валидный случай - нет цикла
+      continue
+    }
 
-      // Проверяем, что диапазоны не пересекаются и образуют разрыв
-      const hasGap = forwardRange.max < backwardRange.min || backwardRange.max < forwardRange.min
+    // Если оба условия null
+    if (forward === null && backward === null) {
+      // Это валидный случай - нет цикла
+      continue
+    }
 
-      // Если нет разрыва между диапазонами, значит возможен цикл
-      if (!hasGap) {
-        throw new Error(
-          `Обнаружена потенциальная циклическая зависимость в частице между состояниями ` +
+    // Если оба условия являются объектами
+    if (forward && backward && typeof forward === "object" && typeof backward === "object") {
+      // Если используются числовые диапазоны
+      if ('gt' in forward || 'gte' in forward || 'lt' in forward || 'lte' in forward) {
+        const forwardRange = {
+          min: forward.gt ?? forward.gte ?? -Infinity,
+          max: forward.lt ?? forward.lte ?? Infinity,
+        }
+        const backwardRange = {
+          min: backward.gt ?? backward.gte ?? -Infinity,
+          max: backward.lt ?? backward.lte ?? Infinity,
+        }
+
+        const hasGap = forwardRange.max < backwardRange.min || backwardRange.max < forwardRange.min
+        if (!hasGap) {
+          throw new Error(
+            `Обнаружена потенциальная циклическая зависимость в частице между состояниями ` +
             `${fromState} и ${toState}.\nУсловия переходов для поля "${field}":\n` +
             `${fromState} -> ${toState}: ${JSON.stringify(forward)}\n` +
             `${toState} -> ${fromState}: ${JSON.stringify(backward)}\n` +
@@ -40,8 +54,30 @@ function canCreateCycle({ fromState, toState, forwardConditions, backwardConditi
             `${fromState} -> ${toState}: (${forwardRange.min}, ${forwardRange.max})\n` +
             `${toState} -> ${fromState}: (${backwardRange.min}, ${backwardRange.max})\n` +
             `Условия должны иметь непересекающиеся диапазоны значений`
+          )
+        }
+      }
+      // Для других типов условий (например, isNull)
+      else if (forward.isNull === false && backward === null) {
+        // Это валидный случай - нет цикла
+      }
+      else if (forward === null && backward.isNull === false) {
+        // Это валидный случай - нет цикла
+      }
+      else {
+        throw new Error(
+          `Обнаружена потенциальная циклическая зависимость в частице между состояниями ` +
+          `${fromState} и ${toState}.\nУсловия переходов для поля "${field}":\n` +
+          `${fromState} -> ${toState}: ${JSON.stringify(forward)}\n` +
+          `${toState} -> ${fromState}: ${JSON.stringify(backward)}\n` +
+          `Условия противоречат друг другу`
         )
       }
+    }
+    // Если условия имеют разные типы, но не null
+    else if (forward !== backward) {
+      // Это валидный случай - нет цикла
+      continue
     }
   }
 }

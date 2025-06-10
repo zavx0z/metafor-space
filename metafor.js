@@ -320,7 +320,14 @@ const createMeta = (
         this.onTransition(updateView) // TODO: оптимизировать обновление
         updateView()
 
-        view?.onMount?.({component: this.#shadow.host, core: this.#core})
+        view?.onMount?.({
+          component: this.#shadow.host, core: this.#core, update: (ctx) =>
+            this._updateExternal({
+              ctx,
+              srcName: "component",
+              funcName: "handler",
+            }),
+        })
       }
 
       disconnectedCallback() {

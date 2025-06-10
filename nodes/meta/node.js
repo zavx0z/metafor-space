@@ -3,23 +3,23 @@ import {MetaFor} from "../../metafor.js"
 export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
-    redy: t.boolean({title: "Готов к отображению", default: true}),
     title: t.string({title: "Заголовок", nullable: true})
   }))
   .core()
   .transitions("hide", [
     {
       from: "hide",
-      to: [{state: "visible", when: {redy: true}}]
+      to: [{state: "visible", when: {title: {isNull: false}}}]
     },
     {
       from: "visible",
-      to: [{state: "hide", when: {title: {isNull: false}}}]
+      to: [{state: "hide", when: {title: null}}]
     }
   ])
   .view({
-    onMount: ({component}) => {
+    onMount: ({component, update}) => {
       // console.log(component)
+      update({title: component.id})
     },
     render: ({html, context, state}) => {
       return html`

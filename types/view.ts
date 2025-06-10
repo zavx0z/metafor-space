@@ -9,12 +9,11 @@ import {ref} from "../html/directives/ref"
  @property render - Коллбек для рендеринга компонента
  @property onMount - Коллбек для монтирования компонента
  @property onDestroy - Коллбек для размонтирования компонента
- @property [isolated=true] - Флаг изолированного рендеринга
  */
 export type ViewDefinition<I extends Record<string, any>, C extends ContextDefinition, S extends string> = {
   render: (params: ViewDefinitionParams<I, C, S>) => TemplateResult<1>
-  onMount?: MountParams<I>
-  onDestroy?: MountParams<I>
+  onMount?: MountParams<C, I>
+  onDestroy?: DestroyParams<I>
   style?: ({css}: { css: (strings: TemplateStringsArray, ...values: any[]) => CSSStyleSheet }) => void
 }
 
@@ -24,11 +23,21 @@ export type ViewDefinition<I extends Record<string, any>, C extends ContextDefin
  @property component - HTML-элемент компонента
  @property core - Экземпляр частицы
  */
-type MountParams<I extends Record<string, any>> = ({component, core,}: {
+type MountParams<C extends ContextDefinition, I extends Record<string, any>> = ({component, core,}: {
+  component: Element
+  core: Core<I>
+  update: Update<C>
+}) => void
+/**
+ Параметры монтирования компонента
+
+ @property component - HTML-элемент компонента
+ @property core - Экземпляр частицы
+ */
+type DestroyParams<I extends Record<string, any>> = ({component, core,}: {
   component: Element
   core: Core<I>
 }) => void
-
 /**
  Параметры представления компонента
 
