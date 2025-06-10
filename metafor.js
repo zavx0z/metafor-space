@@ -312,7 +312,7 @@ const createMeta = (
             html: html,
             ref: ref,
           })
-          console.log(result, this.tagName)
+          // console.log(result, this.tagName)
           const rendered = render(result, this.#shadow)
           // console.log(rendered, this.tagName)
         }
@@ -456,7 +456,7 @@ const createMeta = (
       /** @param {import("./types/context").UpdateContextParams<C>} params */
       #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
         const updCtx = Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
-          if (this.context[key] !== ctx[key]) {
+          if (this.context[key] !== ctx[key] && this.context[key] !== undefined) {
             this.context[key] = ctx[key]
             return {...acc, [key]: ctx[key]}
           }

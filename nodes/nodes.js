@@ -1,7 +1,6 @@
 import {MetaFor} from "../metafor.js"
 import ELK from "elkjs"
 import {repeat} from "../html/directives/repeat.js"
-import ID, {atomId, parseStateId, stateId} from "./id.js"
 import "./meta/node.js"
 
 export default MetaFor("nodes", {description: "Nodes", development: true}
@@ -61,7 +60,8 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
             class="backdrop"
             id=${node.id}
             .context=${{
-              title: node.id
+              title: node.id,
+              states: node.states
             }}
         ></metafor-node>
       `)}

@@ -4,8 +4,7 @@ export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
-    titleAttr: t.string({title: "Заголовок", nullable: true}),
-    states: t.array({title: "Состояния"}),
+    // states: t.array({title: "Состояния"}),
   }))
   .core()
   .transitions("hide", [
