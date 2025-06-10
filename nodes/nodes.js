@@ -1,3 +1,6 @@
+/**
+ * @typedef {import("../types/meta.js").Snapshot<any, any, any>} Snapshot
+ */
 import {MetaFor} from "../metafor.js"
 import ELK from "elkjs"
 import {repeat} from "../html/directives/repeat.js"
@@ -13,7 +16,8 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   nodes: t.array({title: "Коллекция meta", default: []}),
 })).core(() => ({
   elk: new ELK(),
-  // snapshots: /** @type {Map<string, import("../types/meta.js").Snapshot>} */ new Map()
+  snapshot: /** @type {Snapshot | undefined} */ undefined,
+  snapshots: /** @type {Map<string, Snapshot>} */ new Map()
 })).transitions("ожидание патча", [
   {
     from: "ожидание патча",
@@ -29,7 +33,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
     from: "добавление ноды",
     action: ({context, update}) => {
       console.log(context)
-      update({op: null})
+      // update({op: null})
     },
     to: [{state: "ожидание патча", when: {op: null}}],
   },
@@ -45,28 +49,32 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   {
     op: "add",
     action: ({context, patch, update, core}) => {
-      console.log(patch)
       if (patch.value.id !== "nodes" && patch.value.id !== "node") {
-        update({nodes: [...context.nodes, patch.value]})
+        console.log(patch)
+        core.snapshot = patch.value
+        core.snapshots.set(patch.value.id, patch.value)
+        update({op: "add", nodes: [...context.nodes, patch.value.id]})
         // core.snapshots.set(patch.value.id, patch)
       }
     },
   },
 ]).view({
-  render: ({html, update, context}) => {
-    return html`
-      ${repeat(context.nodes, node => node.id, node => html`
+  render: ({html, core, context}) => html`
+    ${repeat(context.nodes, id => id, id => {
+      const meta = core.snapshots.get(id)
+      return html`
         <metafor-node
             class="backdrop"
-            id=${node.id}
+            id=${id}
             .context=${{
-              title: node.id,
-              states: node.states
+              title: id,
+              states: core.snapshot?.states
             }}
-        ></metafor-node>
-      `)}
-    `
-  },
+        >
+          <div>slot test</div>
+        </metafor-node>
+      `
+    })} `,
   style: ({css}) => {
     const borderRadius = "7px"
     return css`
@@ -178,4 +186,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
         }
     `
   }
-}).create({})
+}).create({
+  onTransition: (preview, current) => console.log(`${preview} => ${current}`),
+  onUpdate: (value) => console.log(value)
+})

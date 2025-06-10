@@ -8,11 +8,11 @@ describe("update", async () => {
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INITIAL", "action", "core", "core complex", "final")
+    .states("INITIAL", "action", "core", "core complex", "final", "reaction")
     .context((t) => ({
       field1: t.string({nullable: true}),
       field2: t.number({default: 0}),
-      state: t.enum("initial", "action", "core")({default: "initial"})
+      state: t.enum("initial", "action", "core", "reaction")({default: "initial"})
     }))
     .core(({update}) => ({
       coreMethod: () => {
@@ -42,6 +42,18 @@ describe("update", async () => {
         from: "core complex",
         action: ({core}) => core.complexMethod(),
         to: [{state: "final", when: {field1: "test1", field2: 1}}]
+      },
+      {
+        from: "final",
+        to:[{state: "reaction", when: {state: "reaction"}}]
+      }
+    ]).reactions([
+      {
+        op: "add",
+        action: ({update, context}) => {
+          update({state: "reaction"})
+          console.log(context)
+        }
       }
     ]).create({
       onTransition: (prev, current) => {
@@ -126,7 +138,7 @@ describe("update", async () => {
       "/state"
     )
   })
-  test("Несуществующие ключи не устанавливаются в контекст", () => {
+  test("Несуществующие ключи не устанавливаются в контекст (из view может быть потому что не подсвечивает IDE)", () => {
     //@ts-ignore
     meta.update({field1: "exist", field2: "exist", field3: "not exist"})
     //@ts-ignore
@@ -136,5 +148,21 @@ describe("update", async () => {
       field2: "exist",
       state: "core"
     })
+  })
+  test("Обновление из реакции", async () => {
+    const channel = new BroadcastChannel('channel')
+    expect(meta.state).toBe("final")
+    channel.postMessage({
+      patch: {
+        "path": "/",
+        "op": "add",
+        "value": {
+          "id": "test"
+        }
+      }
+    })
+    await Bun.sleep(20)
+    expect(meta.context.state).toBe("reaction")
+    expect(meta.state).toBe("reaction")
   })
 })

@@ -4,7 +4,7 @@ export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
-    // states: t.array({title: "Состояния"}),
+    states: t.array({title: "Состояния", default: []}),
   }))
   .core()
   .transitions("hide", [
@@ -18,11 +18,7 @@ export default MetaFor("node", {development: true, description: "Node"})
     }
   ])
   .view({
-    onMount: ({component, update}) => {
-      // console.log(component)
-      // update({title: component.id})
-    },
-    render: ({html, context, state}) => {
+    render: ({html, context}) => {
       return html`
         <header data-drag-selector="graph-atom">
           <div><!--кнопки слева--></div>
@@ -39,7 +35,7 @@ export default MetaFor("node", {development: true, description: "Node"})
         </header>
         <section class="content" data-drag-selector="graph-atom">
           <atom-svg></atom-svg>
-          <slot/>
+
         </section>
       `
     },
@@ -72,7 +68,7 @@ export default MetaFor("node", {development: true, description: "Node"})
 
               opacity: 0;
               transition: opacity 1s ease-in-out;
-              
+
               & > section {
                   display: flex;
                   position: relative;

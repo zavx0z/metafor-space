@@ -219,6 +219,25 @@ const createMeta = (
             return sheet
           },
         })
+
+        this.#channel.onmessage = ({data: {meta, patch}}) => {
+          reactions.forEach((reaction) => {
+            if (reactionFilter(reaction, patch)) {
+              reaction.action({
+                patch,
+                context: this.context,
+                meta,
+                update: (ctx) => this._updateExternal({
+                  ctx,
+                  srcName: "reaction",
+                  funcName: "unknown"
+                }),
+                core: this.#core,
+              })
+            }
+          })
+        }
+
         this.#core = /** @type {import("./types/core").Core<I>} */ ((() => {
           let /** @type {string | null} */ currentCaller = null
           const self = /** @type {import("./types/core").Core<I>} */ ({})
@@ -264,20 +283,36 @@ const createMeta = (
         })())
       }
 
-      connectedCallback() {
-        this.#channel.onmessage = ({data: {meta, patch}}) => {
-          reactions.forEach((reaction) => {
-            if (reactionFilter(reaction, patch)) {
-              reaction.action({
-                patch,
-                context: this.context,
-                meta,
-                update: (ctx) => this.#updateContext({ctx, srcName: "reaction", funcName: meta.name}),
-                core: this.#core,
+      /**
+       * @param {S} state
+       * @returns {import('./types/state').Signal<S>}
+       */
+      #createSignal(state) {
+        const listeners = new Set()
+        return {
+          setValue: (next) => {
+            if (state !== next) {
+              const oldValue = state
+              state = next
+              listeners.forEach((listener) => listener(oldValue, next))
+              this.#channel.postMessage({
+                meta: {particle: this.id, timestamp: Date.now()},
+                patch: {path: "/state", op: "replace", value: next},
               })
             }
-          })
+          },
+          value: () => state,
+          onChange: (listener) => {
+            listeners.add(listener)
+            return () => {
+              listeners.delete(listener)
+            }
+          },
+          clear: listeners.clear,
         }
+      }
+
+      connectedCallback() {
         // TODO: при восстановлении входить в состояние без вызова действия
         this.#channel.postMessage({
           meta: {meta: tag, func: "constructor", target: "meta", timestamp: Date.now()},
@@ -358,42 +393,6 @@ const createMeta = (
         }
       }
 
-      /** @type {import('./types/context').Update<C>} */
-      update = (ctx) => {
-        this.#updateContext({ctx})
-        if (this.process) return
-        this.#transition()
-      }
-
-      /**
-       * @param {S} state
-       * @returns {import('./types/state').Signal<S>}
-       */
-      #createSignal(state) {
-        const listeners = new Set()
-        return {
-          setValue: (next) => {
-            if (state !== next) {
-              const oldValue = state
-              state = next
-              listeners.forEach((listener) => listener(oldValue, next))
-              this.#channel.postMessage({
-                meta: {particle: this.id, timestamp: Date.now()},
-                patch: {path: "/state", op: "replace", value: next},
-              })
-            }
-          },
-          value: () => state,
-          onChange: (listener) => {
-            listeners.add(listener)
-            return () => {
-              listeners.delete(listener)
-            }
-          },
-          clear: listeners.clear,
-        }
-      }
-
       /**
        * Проверка условий перехода и выполнение действия
        */
@@ -414,6 +413,12 @@ const createMeta = (
         }
       }
 
+      /** @type {import('./types/context').Update<C>} */
+      update = (ctx) => {
+        this.#updateContext({ctx})
+        if (this.process) return
+        this.#transition()
+      }
       /**
        * Обновление контекста из внешнего источника (core, reaction)
        * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
