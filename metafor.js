@@ -352,6 +352,7 @@ function createMeta(
       }
 
       disconnectedCallback() {
+        this.#shadow.adoptedStyleSheets = []
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
       }

@@ -74,112 +74,112 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   style: ({css}) => {
     const borderRadius = "7px"
     return css`
-        :host {
-            color: rgb(var(--surface-50));
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
+      :host {         
+        color: rgb(var(--surface-50));
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
 
+      }
+
+      /* Стили для кнопки */
+
+      button {
+        /* Определяем переменные для цветов кнопки */
+        --button-border-color: rgb(var(--surface-400));
+        --background-color: rgb(var(--surface-500));
+        --button-hover-background: rgb(var(--surface-400));
+        --button-active-background: rgb(var(--surface-500));
+        --button-disabled-background: rgb(var(--surface-800));
+        /* height: 26px; */
+        border: 1px solid var(--button-border-color);
+        border-radius: 4px;
+        background-color: var(--background-color);
+        color: rgba(var(--surface-50));
+        cursor: pointer;
+        font-size: inherit;
+        transition: all 0.3s ease;
+
+
+        &:hover {
+          background-color: var(--button-hover-background);
+          border-color: var(--button-border-color);
         }
 
-        /* Стили для кнопки */
-
-        button {
-            /* Определяем переменные для цветов кнопки */
-            --button-border-color: rgb(var(--surface-400));
-            --background-color: rgb(var(--surface-500));
-            --button-hover-background: rgb(var(--surface-400));
-            --button-active-background: rgb(var(--surface-500));
-            --button-disabled-background: rgb(var(--surface-800));
-            /* height: 26px; */
-            border: 1px solid var(--button-border-color);
-            border-radius: 4px;
-            background-color: var(--background-color);
-            color: rgba(var(--surface-50));
-            cursor: pointer;
-            font-size: inherit;
-            transition: all 0.3s ease;
-
-
-            &:hover {
-                background-color: var(--button-hover-background);
-                border-color: var(--button-border-color);
-            }
-
-            &:active {
-                background-color: var(--button-active-background);
-                border-color: var(--button-border-color);
-            }
-
-            &:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                background-color: var(--button-disabled-background);
-                border-color: var(--button-border-color);
-            }
+        &:active {
+          background-color: var(--button-active-background);
+          border-color: var(--button-border-color);
         }
 
-        svg.connections {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background-color: var(--button-disabled-background);
+          border-color: var(--button-border-color);
+        }
+      }
 
-            & path {
-                stroke: rgb(var(--surface-300));
-                stroke-width: 4px;
-                fill: none;
-                transition: stroke 0.3s ease;
-                stroke-dasharray: var(--dash-length) var(--gap-length);
-                stroke-dashoffset: 0;
-            }
+      svg.connections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+
+        & path {
+          stroke: rgb(var(--surface-300));
+          stroke-width: 4px;
+          fill: none;
+          transition: stroke 0.3s ease;
+          stroke-dasharray: var(--dash-length) var(--gap-length);
+          stroke-dashoffset: 0;
+        }
+      }
+
+      graph-state {
+        --background-color: rgba(var(--surface-600) / var(--background-alpha));
+
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        border-radius: ${borderRadius};
+        transition: box-shadow 0.3s ease-in-out;
+        box-sizing: border-box;
+
+        & > section {
+          background: var(--background-color);
         }
 
-        graph-state {
-            --background-color: rgba(var(--surface-600) / var(--background-alpha));
+        &:has(> :nth-child(2)) {
+          & > state-header {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
 
-            position: absolute;
+            &::before {
+              border-bottom-left-radius: 0 !important;
+              border-bottom-right-radius: 0 !important;
+            }
+          }
+        }
+
+        &:has(> :nth-child(2)) {
+          section {
+            padding: 8px 8px 0 8px;
             display: flex;
             flex-direction: column;
-            border-radius: ${borderRadius};
-            transition: box-shadow 0.3s ease-in-out;
-            box-sizing: border-box;
+            position: relative;
+            background-color: var(--background-color);
 
-            & > section {
-                background: var(--background-color);
+            &:last-child {
+              padding-bottom: 8px;
+              border-bottom-left-radius: ${borderRadius};
+              border-bottom-right-radius: ${borderRadius};
             }
-
-            &:has(> :nth-child(2)) {
-                & > state-header {
-                    border-bottom-left-radius: 0 !important;
-                    border-bottom-right-radius: 0 !important;
-
-                    &::before {
-                        border-bottom-left-radius: 0 !important;
-                        border-bottom-right-radius: 0 !important;
-                    }
-                }
-            }
-
-            &:has(> :nth-child(2)) {
-                section {
-                    padding: 8px 8px 0 8px;
-                    display: flex;
-                    flex-direction: column;
-                    position: relative;
-                    background-color: var(--background-color);
-
-                    &:last-child {
-                        padding-bottom: 8px;
-                        border-bottom-left-radius: ${borderRadius};
-                        border-bottom-right-radius: ${borderRadius};
-                    }
-                }
-            }
+          }
         }
+      }
     `
   }
 }).create({

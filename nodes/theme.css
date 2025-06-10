@@ -5,11 +5,13 @@
 .theme-xr {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 *,
 *::before,
 *::after {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
+
 .theme-desktop {
   --font-color: rgb(var(--surface-50));
   --background-color: rgb(var(--surface-900));
@@ -21,11 +23,13 @@
   --highlight-background-color: rgb(var(--surface-600));
   --highlight-color: rgb(var(--primary-400));
   --highlight-color-editor: rgb(var(--primary-500) / 0.2);
+
   html,
   body {
     background-color: transparent;
   }
 }
+
 .theme-dark,
 .theme-xr {
   --font-color: rgb(var(--surface-50));
@@ -38,17 +42,20 @@
   --highlight-background-color: rgb(var(--surface-600));
   --highlight-color: rgb(var(--primary-400));
   --highlight-color-editor: rgb(var(--primary-500) / 0.2);
+
   html,
   body {
     background-color: rgb(var(--surface-900));
   }
 }
+
 .theme-xr {
   html,
   body {
     background-color: rgb(var(--surface-900));
   }
 }
+
 .theme-light {
   color-scheme: light;
 
@@ -67,6 +74,7 @@
     background-color: rgb(var(--surface-50));
   }
 }
+
 html,
 body {
   margin: 0;
@@ -112,6 +120,7 @@ body {
   .theme-dark &:before {
     --shadow-color: rgba(var(--surface-800) / 0.8);
   }
+
   &:before {
     content: "";
     top: 0;
@@ -125,7 +134,7 @@ body {
     z-index: -2;
     transition: box-shadow 0.3s ease-in-out;
     box-shadow: 0 0 calc(var(--shadow-size) * 44px) calc(var(--shadow-size) * 4px) var(--shadow-color),
-      0 0 calc(var(--shadow-size) * 7px) calc(var(--shadow-size) * 4px) var(--shadow-color);
+    0 0 calc(var(--shadow-size) * 7px) calc(var(--shadow-size) * 4px) var(--shadow-color);
   }
 
   &:after {
@@ -148,6 +157,7 @@ body {
 .text {
   text-shadow: 2px 2px 4px rgb(var(--surface-900));
 }
+
 h1,
 h2,
 h3,
@@ -166,12 +176,6 @@ button {
 
 /* Стили для кнопки */
 button {
-  /* Определяем переменные для цветов кнопки */
-  --button-border-color: rgb(var(--surface-400));
-  --background-color: rgb(var(--surface-500));
-  --button-hover-background: rgb(var(--surface-400));
-  --button-active-background: rgb(var(--surface-500));
-  --button-disabled-background: rgb(var(--surface-800));
   /* height: 26px; */
   border: 1px solid var(--button-border-color);
   border-radius: 4px;
