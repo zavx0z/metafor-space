@@ -16,7 +16,8 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   nodes: t.array({title: "Коллекция meta", default: []}),
 })).core(() => ({
   elk: new ELK(),
-  snapshot: /** @type {Snapshot | undefined} */ undefined,
+  /** @type {Snapshot | undefined} */
+  snapshot: undefined,
 })).transitions("ожидание патча", [
   {
     from: "ожидание патча",
@@ -31,7 +32,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   },
   {
     from: "добавление ноды",
-    action: ({update, core}) => {
+    action: ({update}) => {
       update({op: null})
     },
     to: [{state: "ожидание патча", when: {op: null}}],
@@ -48,7 +49,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   {
     op: "add",
     action: ({context, patch, update, core}) => {
-      if (patch.value.id !== "nodes" && patch.value.id !== "node") {
+      if (patch.value.id !== "nodes" && patch.value.id !== "node" && patch.value.id !== "state") {
         console.log(patch)
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})

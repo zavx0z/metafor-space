@@ -6,7 +6,7 @@ const meta = MetaFor("directive", {})
     types: t.boolean({title: "Файл типов"}),
   }))
   .core(() => ({}))
-  .transitions([
+  .transitions("В работе", [
     {
       from: "В работе",
       action: () => console.log("В работе"),
@@ -15,18 +15,17 @@ const meta = MetaFor("directive", {})
   ])
   .view({
     render: ({html}) => html`
-        <h1>Директивы</h1>
-        <ul>
-            ${["one", "two"].map(i => html`
-                <li>
-                    ${i}
-                </li>
-            `)}
-        </ul>
+      <h1>Директивы</h1>
+      <ul>
+        ${["one", "two"].map(i => html`
+          <li>
+            ${i}
+          </li>
+        `)}
+      </ul>
     `
   })
   .create({
-    state: "В работе",
     onUpdate: (value) => {
       console.log(value)
     },

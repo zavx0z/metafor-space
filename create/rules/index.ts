@@ -2,12 +2,12 @@
 
 import prompts from "prompts"
 import chalk from "chalk"
-import { fileURLToPath } from "node:url"
-import { dirname, join } from "node:path"
-import { currentVersion } from "./src/version"
-import { readPackageJson } from "./src/project"
-import { MetaFor } from "../.."
-import { existsSync, mkdirSync, rmSync } from "node:fs"
+import {fileURLToPath} from "node:url"
+import {dirname, join} from "node:path"
+import {currentVersion} from "./src/version"
+import {readPackageJson} from "./src/project"
+import {MetaFor} from "../.."
+import {existsSync, mkdirSync, rmSync} from "node:fs"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -47,56 +47,56 @@ MetaFor("rules", {
     "завершение работы"
   )
   .context((t) => ({
-    version: t.string({ title: "версия create-rules", nullable: true }),
-    description: t.string({ title: "описание create-rules", default: "Create cursor rules" }),
+    version: t.string({title: "версия create-rules", nullable: true}),
+    description: t.string({title: "описание create-rules", default: "Create cursor rules"}),
 
-    projectName: t.string({ title: "имя проекта", nullable: true }),
-    packageJsonPath: t.string({ title: "путь к package.json", default: "./package.json" }),
-    rulesPath: t.string({ title: "путь к правилам", default: "./.cursor/rules" }),
-    rulePath: t.string({ title: "путь к правилу", nullable: true }),
-    cancel: t.boolean({ title: "отмена", nullable: true }),
-    error: t.string({ title: "ошибка", nullable: true }),
+    projectName: t.string({title: "имя проекта", nullable: true}),
+    packageJsonPath: t.string({title: "путь к package.json", default: "./package.json"}),
+    rulesPath: t.string({title: "путь к правилам", default: "./.cursor/rules"}),
+    rulePath: t.string({title: "путь к правилу", nullable: true}),
+    cancel: t.boolean({title: "отмена", nullable: true}),
+    error: t.string({title: "ошибка", nullable: true}),
   }))
-    .core(() => ({
-      packageJson: /** @type {Object} */ undefined,
-    }))
-  .transitions([
+  .core(() => ({
+    packageJson: /** @type {Object} */ undefined,
+  }))
+  .transitions("подписка на отмену", [
     {
       from: "подписка на отмену",
-      action: ({ update }) => {
+      action: ({update}) => {
         process.on("SIGINT", () => {
-          update({ cancel: true })
+          update({cancel: true})
           process.exit(0)
         })
         process.on("SIGTERM", () => {
-          update({ cancel: true })
+          update({cancel: true})
           process.exit(0)
         })
-        update({ cancel: false })
+        update({cancel: false})
       },
       to: [
-        { state: "получение версии create-rules", when: { cancel: false } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "получение версии create-rules", when: {cancel: false}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "получение версии create-rules",
-      action: async ({ update }) => {
+      action: async ({update}) => {
         try {
           const version = await currentVersion(__dirname)
-          update({ version })
+          update({version})
         } catch (error) {
-          update({ error: (error as Error).message })
+          update({error: (error as Error).message})
         }
       },
       to: [
-        { state: "вывод приветственного сообщения", when: { version: { isNull: false } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "вывод приветственного сообщения", when: {version: {isNull: false}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "вывод приветственного сообщения",
-      action: async ({ context, update }) => {
+      action: async ({context, update}) => {
         console.log(
           chalk.blue(`
           Create cursor rules v${context.version}
@@ -104,95 +104,95 @@ MetaFor("rules", {
         `)
         )
       },
-      to: [{ state: "поиск package.json", when: { error: null } }],
+      to: [{state: "поиск package.json", when: {error: null}}],
     },
     {
       from: "поиск package.json",
-      action: async ({ context, update, core }) => {
-          try {
-              const packageJson = await readPackageJson(join(__dirname, context.packageJsonPath))
-              update({ projectName: packageJson.name })
-              core.packageJson = packageJson
-          } catch (error) {
-              update({ error: (error as Error).message })
-          }
+      action: async ({context, update, core}) => {
+        try {
+          const packageJson = await readPackageJson(join(__dirname, context.packageJsonPath))
+          update({projectName: packageJson.name})
+          core.packageJson = packageJson
+        } catch (error) {
+          update({error: (error as Error).message})
+        }
       },
       to: [
-        { state: "вывод данных о проекте", when: { error: null } },
-        { state: "ошибка чтения package.json", when: { error: { isNull: false } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "вывод данных о проекте", when: {error: null}},
+        {state: "ошибка чтения package.json", when: {error: {isNull: false}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "вывод данных о проекте",
-      action: ({ context }) => console.log(chalk.green(`Project name: ${context.projectName}`)),
+      action: ({context}) => console.log(chalk.green(`Project name: ${context.projectName}`)),
       to: [
-        { state: "поиск сгенерированных правил", when: { error: null } },
-        { state: "ошибка чтения package.json", when: { error: { isNull: false } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "поиск сгенерированных правил", when: {error: null}},
+        {state: "ошибка чтения package.json", when: {error: {isNull: false}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "поиск директории с правилами",
-      action: ({ context, update }) => {
+      action: ({context, update}) => {
         const rulesPath = join(__dirname, context.rulesPath)
         if (existsSync(rulesPath)) {
           console.log(chalk.green("Директория с правилами найдена"))
-          update({ rulesPath })
+          update({rulesPath})
         } else {
-          update({ error: "Директория с правилами не найдена" })
+          update({error: "Директория с правилами не найдена"})
         }
       },
       to: [
-        { state: "создание директории правил", when: { rulesPath: { isNull: true } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "создание директории правил", when: {rulesPath: {isNull: true}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "создание директории правил",
-      action: ({ context, update }) => {
-        mkdirSync(context.rulesPath, { recursive: true })
+      action: ({context, update}) => {
+        mkdirSync(context.rulesPath, {recursive: true})
         console.log(chalk.green("Директория с правилами создана"))
-        update({ rulesPath: context.rulesPath })
+        update({rulesPath: context.rulesPath})
       },
       to: [
-        { state: "поиск сгенерированных правил", when: { rulesPath: { isNull: false } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "поиск сгенерированных правил", when: {rulesPath: {isNull: false}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "поиск сгенерированных правил",
-      action: ({ context, update }) => {
+      action: ({context, update}) => {
         console.log(chalk.green("Поиск сгенерированных правил"))
         const rulePath = join(context.rulesPath, `${context.projectName}.mc`)
         if (existsSync(rulePath)) {
-          update({ rulePath })
+          update({rulePath})
         } else {
-          update({ error: `Правила не найдены: ${rulePath}` })
+          update({error: `Правила не найдены: ${rulePath}`})
         }
       },
       to: [
-        { state: "правила найдены и удалены", when: { rulePath: { isNull: false } } },
-        { state: "ошибка удаления правил", when: { error: { isNull: false } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "правила найдены и удалены", when: {rulePath: {isNull: false}}},
+        {state: "ошибка удаления правил", when: {error: {isNull: false}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "правила найдены и удалены",
-      action: ({ context }) => {
-        rmSync(context.rulePath, { force: true })
+      action: ({context}) => {
+        rmSync(context.rulePath, {force: true})
         console.log(chalk.green("Обновление правил..."))
       },
       to: [
-        { state: "генерация правил", when: { error: null } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "генерация правил", when: {error: null}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "ошибка удаления правил",
-      action: ({ context, update }) => {
+      action: ({context, update}) => {
         console.log(chalk.red(`Ошибка удаления правил: ${context.error}`))
-        update({ error: null })
+        update({error: null})
       },
       to: [],
     },
@@ -202,9 +202,9 @@ MetaFor("rules", {
         console.log(chalk.green("Генерация правил..."))
       },
       to: [
-        { state: "правила сгенерированы", when: { error: null } },
-        { state: "ошибка генерации правил", when: { error: { isNull: false } } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "правила сгенерированы", when: {error: null}},
+        {state: "ошибка генерации правил", when: {error: {isNull: false}}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
@@ -213,25 +213,25 @@ MetaFor("rules", {
         console.log(chalk.green("Правила сгенерированы"))
       },
       to: [
-        { state: "завершение работы", when: { error: null } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "завершение работы", when: {error: null}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "ошибка генерации правил",
-      action: ({ context }) => {
+      action: ({context}) => {
         console.log(chalk.red(`Ошибка генерации правил: ${context.error}`))
       },
       to: [
-        { state: "завершение работы", when: { error: null } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "завершение работы", when: {error: null}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
       from: "данные от пользователя",
       to: [
-        { state: "генерация правил", when: { error: null } },
-        { state: "отмена пользователем", when: { cancel: true } },
+        {state: "генерация правил", when: {error: null}},
+        {state: "отмена пользователем", when: {cancel: true}},
       ],
     },
     {
@@ -239,14 +239,14 @@ MetaFor("rules", {
       action: () => {
         console.log(chalk.red("Отмена выполнения create-rules пользователем."))
       },
-      to: [{ state: "завершение работы", when: { cancel: true } }],
+      to: [{state: "завершение работы", when: {cancel: true}}],
     },
     {
       from: "завершение работы",
-      action: ({ core }) => {
-          core.packageJson = undefined
-          // core.destroy()
-          process.exit(0)
+      action: ({core}) => {
+        core.packageJson = undefined
+        // core.destroy()
+        process.exit(0)
       },
       to: [],
     },
@@ -261,7 +261,6 @@ MetaFor("rules", {
   //   `
   // })
   .create({
-    state: "подписка на отмену",
     onUpdate: (value) => {
       // console.log(`Update: ${{ ...value }}`)
       console.table(value)
@@ -287,8 +286,8 @@ async function init() {
       name: "template",
       message: "Choose a template",
       choices: [
-        { title: "Basic", value: "basic" },
-        { title: "TypeScript", value: "typescript" },
+        {title: "Basic", value: "basic"},
+        {title: "TypeScript", value: "typescript"},
       ],
     },
   ])
