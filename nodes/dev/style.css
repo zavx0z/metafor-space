@@ -2,4 +2,5 @@
     --node-shadow-size: 10px;
     --dash-length: 10px; /* Длина штриха грани */
     --gap-length: 0px; /* Длина пробела между штрихами */
+    --node-border-radius: 7px;
 }
