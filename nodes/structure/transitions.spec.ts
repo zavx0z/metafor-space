@@ -1,6 +1,6 @@
 import {describe, test, expect} from "bun:test"
 import {MetaFor} from "../../metafor"
-import {extractBaseConditions} from "../layout/transitions"
+import {extractBaseConditions, extractTransitions} from "./transitions"
 
 describe("Параметры условий переходов", () => {
   const tag = "01975c8r"
@@ -53,9 +53,14 @@ describe("Параметры условий переходов", () => {
   const meta = document.querySelector(`metafor-${tag}`) as MetaAny
 
   const snapshot = meta.snapshot()
-  const ports = extractBaseConditions(snapshot)
 
   test("Извлечение всех условий и формирование входных портов", () => {
-    expect(ports).toMatchSnapshot()
+    const result = extractBaseConditions(snapshot)
+    expect(result).toMatchSnapshot()
+  })
+
+  test("Данные по всем портам всех условий переходов meta", () => {
+    const result = extractTransitions(snapshot)
+    expect(result).toMatchSnapshot()
   })
 })

@@ -1,49 +1,17 @@
-import {parseTriggerPortId, conditionId, conditionPortId} from "../id.js"
+import {parseConditionPortId, conditionId, conditionPortId} from "../id.js"
 import {operatorSymbols} from "../operators.js"
 
-/** @type{import("./transitions").extractBaseConditions} */
-export const extractBaseConditions = snapshot => {
-
-  /** @type{Map<string, import("./transitions").TransitionConditionsPorts>} */
-  let triggers = new Map()
-
-  snapshot.states.map(state => {
-    for (const transition of snapshot.transitions) {
-      if (transition.from !== state) {
-        for (const target of transition.to) {
-          if (target.state === state) {
-            for (const condition of Object.keys(target.when)) {
-              const id = conditionId({meta: snapshot.id, state, condition})
-              let trigger = triggers.get(id)
-              if (!trigger) {
-                triggers.set(id, {id, ports: []})
-                trigger = triggers.get(id)
-              }
-
-              trigger?.ports.push({
-                id: conditionPortId({
-                  meta: snapshot.id,
-                  from: transition.from,
-                  to: target.state,
-                  condition: condition,
-                  direction: "west"
-                })
-              })
-            }
-          }
-        }
-      }
-    }
-  })
-  return Array.from(triggers.values())
+/** @type{import("./transitions.js").extractTransitions} */
+export const extractTransitions = snapshot => {
+  return assignContent(extractBaseConditions(snapshot), snapshot)
 }
 
-/** @type{import("./transitions").assignContent} */
-const assignContent = (triggers, snapshot) => {
-  return triggers.map(trigger => ({
-    ...trigger,
-    ports: trigger.ports.map(port => {
-      const {from, to, condition} = parseTriggerPortId(port.id)
+/** @type{import("./transitions.js").assignContent} */
+const assignContent = (transitionsConditionsPorts, snapshot) => {
+  return transitionsConditionsPorts.map(condition => ({
+    id: condition.id,
+    ports: condition.ports.map(port => {
+      const {from, to, condition} = parseConditionPortId(port.id)
       const transition = snapshot.transitions.find(c => c.from === from)
       const target = transition?.to.find(t => t.state === to)
       if (!target) throw new Error(`Не удалось найти целевой переход для ${port.id}`)
@@ -75,24 +43,42 @@ const assignContent = (triggers, snapshot) => {
     })
   }))
 }
-/**
- * @param {SnapshotMetaForAny} snapshot
- * @returns {Array<{
- *   id: string,
- *   ports: Array<{
- *     id: string,
- *     operators: {
- *       [key: string]: {
- *         symbol: string,
- *         title: string,
- *         value: any
- *       }
- *     }
- *   }>
- * }>}
- */
-export const extractTriggers = snapshot => {
-  return assignContent(extractBaseConditions(snapshot), snapshot)
+
+/** @type{import("./transitions.js").extractBaseConditions} */
+export const extractBaseConditions = snapshot => {
+
+  /** @type{Map<string, import("./transitions.js").TransitionConditionsPorts>} */
+  let conditions = new Map()
+
+  snapshot.states.map(state => {
+    for (const transition of snapshot.transitions) {
+      if (transition.from !== state) {
+        for (const target of transition.to) {
+          if (target.state === state) {
+            for (const condition of Object.keys(target.when)) {
+              const id = conditionId({meta: snapshot.id, state, condition})
+              let cond = conditions.get(id)
+              if (!cond) {
+                conditions.set(id, {id, ports: []})
+                cond = conditions.get(id)
+              }
+
+              cond?.ports.push({
+                id: conditionPortId({
+                  meta: snapshot.id,
+                  from: transition.from,
+                  to: target.state,
+                  condition,
+                  direction: "west"
+                })
+              })
+            }
+          }
+        }
+      }
+    }
+  })
+  return Array.from(conditions.values())
 }
 
 /**

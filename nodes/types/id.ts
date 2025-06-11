@@ -34,7 +34,7 @@ export type TriggerPortDirection = 'east' | 'west';
 
 /**
  * Параметры порта триггера
- * @interface TriggerPortParams
+ * @interface ConditionPortParams
  * @property meta - Имя атома (например, "file")
  * @property from - Состояние-источник триггера
  * @property to - Целевое состояние триггера
@@ -43,7 +43,7 @@ export type TriggerPortDirection = 'east' | 'west';
  *   - east: выходной порт (справа)
  *   - west: входной порт (слева)
  */
-export interface TriggerPortParams {
+export interface ConditionPortParams {
   meta: string;
   from: string;
   to: string;

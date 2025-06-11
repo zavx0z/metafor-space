@@ -23,17 +23,17 @@ export const parseContextPortId = id => {
   return {atom, state, param, direction}
 }
 
-/** @param {import('./types/id').TriggerPortParams} params */
+/** @param {import('./types/id').ConditionPortParams} params */
 export const conditionPortId = ({meta, from, to, condition, direction}) => `/${meta.replace("/", "")}/${from}/${to}/${condition}/${direction}`
 
 /**
  * @param {string} id
- * @returns {import('./types/id').TriggerPortParams}
+ * @returns {import('./types/id').ConditionPortParams}
  */
-export const parseTriggerPortId = id => {
-  const [, atom, from, to, param, dir] = id.split("/")
+export const parseConditionPortId = id => {
+  const [, meta, from, to, condition, dir] = id.split("/")
   const direction = dir === "east" || dir === "west" ? dir : "west"
-  return {meta: atom, from, to, condition: param, direction}
+  return {meta, from, to, condition, direction}
 }
 
 /** @param {import('./types/id').EdgeParams} params */
@@ -110,7 +110,7 @@ export default {
   contextPortId,
   parseContextPortId,
   triggerPortId: conditionPortId,
-  parseTriggerPortId,
+  parseTriggerPortId: parseConditionPortId,
   edgeId,
   parseEdgeId,
   stateId,

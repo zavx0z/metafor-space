@@ -4,7 +4,7 @@ import {
   contextPortId,
   edgeId,
   parseTriggerParameterId,
-  parseTriggerPortId,
+  parseConditionPortId,
   stateId,
   conditionId,
   triggerParameterId,
@@ -162,7 +162,7 @@ export function generate(snapshot, metrics) {
     edges: allTriggers
       .map(trigger => (trigger?.children || [])
         .map(parameter => {
-          const {from, to, condition} = parseTriggerPortId(parameter.id)
+          const {from, to, condition} = parseConditionPortId(parameter.id)
           return {
             id: edgeId({
               sourceId: contextPortId({atom: snapshot.id, state: from, param: condition, direction: 'output'}),

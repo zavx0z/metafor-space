@@ -1,22 +1,38 @@
 /**
+ * Извлекает все условия в переходах из снимка meta.
+ * Формирует входные порты для каждого условия.
+ * Генерирует идентификаторы.
+ * Добавляет информацию операторов условий переходов.
  *
- * @param ports - Входные порты условий всех переходов состояний meta.
  * @param snapshot - Снимок meta.
  * @returns {ConditionsTransitionsPortsData} - Данные условий всех переходов для входных портов.
+ *
+ * @includeExample ./transitions.spec.ts
  */
-export declare function assignContent(ports: ConditionsTransitionsPorts, snapshot: SnapshotMetaForAny): ConditionsTransitionsPortsData
+export declare function extractTransitions(snapshot: SnapshotMetaForAny): ConditionsTransitionsPortsData
 
 /**
- * Данные условий всех переходов для входных портов.
+ * Добавляет информацию операторов условий переходов.
+ *
+ * @param transitionsConditionsPorts - Входные порты условий всех переходов состояний meta.
+ * @param snapshot - Снимок meta.
+ * @returns {ConditionsTransitionsPortsData} - Данные условий всех переходов для входных портов.
+ *
+ * @includeExample ./transitions.spec.ts
  */
+export declare function assignContent(transitionsConditionsPorts: ConditionsTransitionsPorts, snapshot: SnapshotMetaForAny): ConditionsTransitionsPortsData
+
+/** Данные условий всех переходов для входных портов. */
 export type ConditionsTransitionsPortsData = {
   id: string,
   ports: Array<{
     id: string,
-    content: {
-      symbol: string,
-      title: string,
-      value: any
+    operators: {
+      [key: string]: {
+        symbol: string,
+        title: string,
+        value: any
+      }
     }
   }>
 }[]
@@ -27,7 +43,9 @@ export type ConditionsTransitionsPortsData = {
  * Генерирует идентификаторы.
  *
  * @param snapshot - Снимок meta.
- * @includeExample ../tests/conditions.input.ports.spec.ts
+ * @return {ConditionsTransitionsPorts}
+ *
+ * @includeExample ./transitions.spec.ts
  */
 export declare function extractBaseConditions(snapshot: SnapshotMetaForAny): ConditionsTransitionsPorts
 
