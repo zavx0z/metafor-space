@@ -48,7 +48,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
     {
       op: "add",
       action: ({context, patch, update, core}) => {
-        if (patch.value.id !== "nodes" && patch.value.id !== "node" && patch.value.id !== "state") {
+        if (patch.value.id !== "node" && patch.value.id !== "state") {
           core.snapshot = patch.value
           update({op: "add", nodes: [...context.nodes, patch.value.id]})
         }

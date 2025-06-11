@@ -221,18 +221,18 @@ function createMeta(
       })())
       #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
       #states = states
-      #state = /** @type {import('./types/state').Signal<S>} */ ((() => {
+      #state = /** @type {import('./types/state').Signal<S>} */ (((state) => {
         const listeners = new Set()
         return {
           setValue: (next) => {
-            if (initialState !== next) {
-              const oldValue = initialState
-              initialState = next
+            if (state !== next) {
+              const oldValue = state
+              state = next
               listeners.forEach((listener) => listener(oldValue, next))
               this.#sendPatches({path: "/state", op: "replace", value: next})
             }
           },
-          value: () => initialState,
+          value: () => state,
           onChange: (listener) => {
             listeners.add(listener)
             return () => {
@@ -241,7 +241,7 @@ function createMeta(
           },
           clear: listeners.clear,
         }
-      })())
+      })(initialState))
 
       get state() {
         return this.#state?.value()
@@ -258,7 +258,6 @@ function createMeta(
 
       constructor() {
         super()
-        this.dataset.state = initialState
         view?.style?.({
           css: (strings, ...values) => {
             const sheet = new CSSStyleSheet()
@@ -271,6 +270,7 @@ function createMeta(
 
         if (!reactions.length) return
         this.#channel.onmessage = ({data: {meta, patch}}) => {
+          if (meta.tag === tag) return // TODO: должна быть более полная адресация
           reactions.forEach((reaction) => {
             if (reactionFilter(reaction, patch)) {
               reaction.action({
@@ -283,8 +283,7 @@ function createMeta(
       }
 
       connectedCallback() {
-        // TODO: при восстановлении входить в состояние без вызова действия
-        this.#sendPatches({path: "/", op: "add", value: this.snapshot()})
+        this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
         if (onTransition) {
           this.#state.onChange((oldValue, newValue) => {
             if (newValue !== undefined) onTransition(oldValue, newValue, this.snapshot())
@@ -301,31 +300,22 @@ function createMeta(
         if (view) {
           const updateView = () => {
             this.dataset.state = String(this.state)
-            const result = view?.render({
-              update: (ctx) =>
-                this._updateExternal({
-                  ctx,
-                  srcName: "component",
-                  funcName: "handler",
-                }),
+            render(view.render({
+              update: (ctx) => this._updateExternal({ctx, srcName: "component", funcName: "handler"}),
               context: this.context,
               state: this.state,
               core: this.#core,
               html: html,
               ref: ref,
-            })
-            render(result, this.#shadow)
+            }), this.#shadow)
           }
           this.onUpdate(updateView)
           this.onTransition(updateView) // TODO: оптимизировать обновление
           updateView()
           view.onMount?.({
-            component: this.#shadow.host, core: this.#core, update: (ctx) =>
-              this._updateExternal({
-                ctx,
-                srcName: "component",
-                funcName: "handler",
-              }),
+            update: (ctx) => this._updateExternal({ctx, srcName: "component", funcName: "handler"}),
+            component: this.#shadow.host,
+            core: this.#core
           })
         }
       }
