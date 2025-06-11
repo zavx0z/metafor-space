@@ -6,17 +6,19 @@ export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
-    states: t.array({title: "Состояния", nullable: true}),
+    states: t.array({title: "Состояния", default: []}),
   }))
   .core(() => ({
     /** @type {import("../../types/transitions").Transitions<any, any, any>} */
-    transitions: []
+    transitions: [],
+    /** @type {import("../../types/context").ContextData<any> | undefined} */
+    types: undefined,
   }))
   .transitions("hide", [
     {
       from: "hide",
-      action: ({context}) => console.log(context),
-      to: [{state: "visible", when: {title: {isNull: false}}}]
+      // action: ({context}) => console.log(context),
+      to: [{state: "visible", when: {title: {isNull: false}, states: {isEmpty: false}}}]
     },
     {
       from: "visible",

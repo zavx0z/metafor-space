@@ -15,7 +15,16 @@ const CONDITIONS = {
   number: new Set(["isNull", "eq", "gt", "gte", "lt", "lte", "notEq", "notGt", "notGte", "notLt", "notLte", "between"]),
   boolean: new Set(["eq", "notEq", "isNull", "logicalEq", "notNull"]),
   enum: new Set(["isNull", "eq", "notEq", "oneOf", "notOneOf"]),
-  array: new Set(["isNull", "length", "includes"])
+  array: new Set([
+    "isNull",
+    "length",
+    "includes",
+    "notIncludes",
+    "every",
+    "some",
+    "isEmpty",
+    "isNotEmpty"
+  ])
 }
 
 /**
@@ -211,13 +220,34 @@ function validateBooleanTrigger(field, value, definition) {
  @throws {Error} Если триггер некорректен
  */
 function validateArrayTrigger(field, value) {
+  if (value === null) return
   if (Array.isArray(value)) return
   if (isType(value, "object")) {
     const allowedKeys = CONDITIONS.array
     const keys = Object.keys(value)
     const hasValidKey = keys.some((key) => allowedKeys.has(key))
 
-    if (hasValidKey) return
+    if (hasValidKey) {
+      // Дополнительная валидация для length
+      if (value.length) {
+        if (typeof value.length === 'object' && value.length !== null) {
+          const lengthKeys = Object.keys(value.length)
+          const validLengthKeys = ['eq', 'gt', 'lt']
+          const hasValidLengthKey = lengthKeys.some(key => validLengthKeys.includes(key))
+          
+          if (!hasValidLengthKey) {
+            throw new Error(
+              `Некорректный формат length для поля массива "${field}". Ожидается объект с ключами ${validLengthKeys.join(", ")}. Получено: ${JSON.stringify(value.length)}`
+            )
+          }
+        } else if (typeof value.length !== 'number') {
+          throw new Error(
+            `Некорректный формат length для поля массива "${field}". Ожидается число или объект с ключами eq, gt, lt. Получено: ${JSON.stringify(value.length)}`
+          )
+        }
+      }
+      return
+    }
   }
   throw new Error(
     `Некорректный триггер для поля массива "${field}". Ожидается массив или объект с ключами ${Array.from(

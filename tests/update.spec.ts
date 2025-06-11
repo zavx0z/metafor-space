@@ -122,7 +122,7 @@ describe("update", async () => {
     )
     expect(messages[7], "Проверяем множественные вызовы update из core").toEqual({
       meta: {
-        meta: "",
+        tag: "",
         func: "complexMethod",
         target: "core",
         timestamp: expect.any(Number),

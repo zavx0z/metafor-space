@@ -261,7 +261,6 @@ type CondNumber =
  | every       | (item: any) => boolean | Все элементы удовлетворяют условию  |
  | some        | (item: any) => boolean | Хотя бы один элемент удовлетворяет условию |
  | isEmpty     | boolean          | Является ли массив пустым             |
- | isNotEmpty  | boolean          | Не является ли массив пустым          |
  */
 type CondArray<T = any> =
   | T[]
@@ -274,5 +273,4 @@ type CondArray<T = any> =
   every?: (item: T) => boolean
   some?: (item: T) => boolean
   isEmpty?: boolean
-  isNotEmpty?: boolean
 }

@@ -1,14 +1,25 @@
 import {MetaFor} from "../../metafor.js"
+import {repeat} from "../../html/directives/repeat.js"
 
 export default MetaFor('state')
   .states("hide", "visible")
   .context(t => ({
-    title: t.string({title: "Название состояния", nullable: true})
+    title: t.string({title: "Название состояния", nullable: true}),
+    types: t.array({title: "Параметры контекста", default: []})
   }))
   .core(() => ({
     transitions: []
   }))
-  .transitions("visible", [])
+  .transitions("hide", [
+    {
+      from: "hide",
+      to: [{state: "visible", when: {title: {isNull: false}, types: {isEmpty: false}}}]
+    },
+    {
+      from: "visible",
+      to: [{state: "hide", when: {title: null}}]
+    }
+  ])
   .reactions([])
   .view({
     render: ({context, html}) => html`
@@ -16,7 +27,9 @@ export default MetaFor('state')
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
-
+        ${repeat(context.types, i => i, key => html`
+          ${key}
+        `)}
       </section>
       <section>
         <button>

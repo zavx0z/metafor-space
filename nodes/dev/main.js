@@ -31,9 +31,9 @@ MetaFor("test", {description: "Nodes", development: false}).states(
   `
 }).create({
   onTransition: (preview, current, meta) => {
-    console.log(preview, current, meta)
+    // console.log(preview, current, meta)
   },
   onUpdate: (value) => {
-    console.log(value)
+    // console.log(value)
   },
 })

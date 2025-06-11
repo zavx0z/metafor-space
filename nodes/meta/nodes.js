@@ -1,6 +1,3 @@
-/**
- * @typedef {import("../../types/meta.ts").Snapshot<any, any, any>} Snapshot
- */
 import {MetaFor} from "../../metafor.js"
 import ELK from "elkjs"
 import {repeat} from "../../html/directives/repeat.js"
@@ -16,14 +13,14 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   nodes: t.array({title: "Коллекция meta", default: []}),
 })).core(() => ({
   elk: new ELK(),
-  /** @type {Snapshot | undefined} */
+  /** @type {SnapshotMetaForAny | undefined} */
   snapshot: undefined,
 })).transitions("ожидание патча", [
   {
     from: "ожидание патча",
     action: ({context, core}) => {
       core.snapshot = undefined
-      console.log(context)
+      // console.log(context)
     },
     to: [
       {state: "добавление ноды", when: {op: "add"}},
@@ -50,7 +47,6 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
     op: "add",
     action: ({context, patch, update, core}) => {
       if (patch.value.id !== "nodes" && patch.value.id !== "node" && patch.value.id !== "state") {
-        console.log(patch)
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
       }
@@ -65,7 +61,8 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
             id=${id}
             .context=${{
               title: id,
-              states: core.snapshot?.states
+              states: core.snapshot?.states,
+              types: core.snapshot?.types
             }}
             .core=${{
               transitions: core.snapshot?.transitions
@@ -186,6 +183,6 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
     `
   }
 }).create({
-  onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
-  onUpdate: (value) => console.log(value)
+  // onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
+  // onUpdate: (value) => console.log(value)
 })
