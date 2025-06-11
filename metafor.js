@@ -5,7 +5,7 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-const debug = true
+const debug = false
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -169,17 +169,79 @@ function createMeta(
   customElements.define("metafor-" + tag,
     class extends HTMLElement {
       #shadow = this.attachShadow({mode: "open"})
-      #process = false
-      #core = /** @type{import("./types/core").Core<I>} */ ({})
       #channel = new BroadcastChannel('channel')
-      #state = this.#createSignal(initialState)
-      #states = states
-      #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
+      #process = false
       context = /** @type {import("./types/context").ContextData<C>} */(Object.keys(contextDefinition).reduce((acc, key) => {
         const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
         if (typeof defaultValue !== "undefined") return {...acc, [key]: defaultValue}
         else return {...acc, [key]: "nullable" in contextDefinition[key] ? null : undefined}
       }, {}))
+      #core = /** @type {import("./types/core").Core<I>} */ ((() => {
+        let /** @type {string | null} */ currentCaller = null
+        const self = /** @type {import("./types/core").Core<I>} */ ({})
+        const coreObj = coreDefinition({
+          update: (ctx) => this._updateExternal({
+            ctx,
+            srcName: "core",
+            funcName: currentCaller || "unknown"
+          }), context: this.context, self
+        })
+        // Прокси для self, для синхронизации значений
+        Object.entries(coreObj).forEach(([key, value]) => {
+          if (typeof value !== "function") {
+            Object.defineProperty(self, key, {
+              get: () => coreObj[key],
+              //@ts-ignore
+              set: (newValue) => (coreObj[key] = newValue),
+              enumerable: true,
+              configurable: true,
+            })//@ts-ignore
+          } else self[key] = value
+        })
+        const wrappedCore = Object.entries(coreObj).reduce((acc, [name, value]) => {
+          if (typeof value === "function") {
+            //@ts-ignore
+            acc[name] = (...args) => {
+              currentCaller = name
+              const result = value.apply(coreObj, args)
+              currentCaller = null
+              return result
+            }
+          } else Object.defineProperty(acc, name, {
+            get: () => coreObj[name],
+            //@ts-ignore
+            set: (newValue) => coreObj[name] = newValue,
+            enumerable: true,
+            configurable: true,
+          })
+          return acc
+        }, {})
+        Object.assign(self, wrappedCore)
+        return wrappedCore
+      })())
+      #parsedCore = /** @type {Record<string, ParsedResult>} */ ({})
+      #states = states
+      #state = /** @type {import('./types/state').Signal<S>} */ ((() => {
+        const listeners = new Set()
+        return {
+          setValue: (next) => {
+            if (initialState !== next) {
+              const oldValue = initialState
+              initialState = next
+              listeners.forEach((listener) => listener(oldValue, next))
+              this.#sendPatches({path: "/state", op: "replace", value: next})
+            }
+          },
+          value: () => initialState,
+          onChange: (listener) => {
+            listeners.add(listener)
+            return () => {
+              listeners.delete(listener)
+            }
+          },
+          clear: listeners.clear,
+        }
+      })())
 
       get state() {
         return this.#state?.value()
@@ -196,8 +258,6 @@ function createMeta(
 
       constructor() {
         super()
-        // Создаем новый объект контекста для каждого инстанса
-        // console.log("connected ", this.tagName.toLowerCase(), this.context)
         this.dataset.state = initialState
         view?.style?.({
           css: (strings, ...values) => {
@@ -209,110 +269,16 @@ function createMeta(
           },
         })
 
+        if (!reactions.length) return
         this.#channel.onmessage = ({data: {meta, patch}}) => {
           reactions.forEach((reaction) => {
             if (reactionFilter(reaction, patch)) {
               reaction.action({
-                patch,
-                context: this.context,
-                meta,
-                update: (ctx) => this._updateExternal({
-                  ctx,
-                  srcName: "reaction",
-                  funcName: "unknown"
-                }),
-                core: this.#core,
+                patch, context: this.context, meta, core: this.#core,
+                update: (ctx) => this._updateExternal({ctx, srcName: "reaction", funcName: "unknown"}),
               })
             }
           })
-        }
-
-        this.#core = /** @type {import("./types/core").Core<I>} */ ((() => {
-          let /** @type {string | null} */ currentCaller = null
-          const self = /** @type {import("./types/core").Core<I>} */ ({})
-          const coreObj = coreDefinition({
-            update: (ctx) => this._updateExternal({
-              ctx,
-              srcName: "core",
-              funcName: currentCaller || "unknown"
-            }), context: this.context, self
-          })
-          // Прокси для self, для синхронизации значений
-          Object.entries(coreObj).forEach(([key, value]) => {
-            if (typeof value !== "function") {
-              Object.defineProperty(self, key, {
-                get: () => coreObj[key],
-                //@ts-ignore
-                set: (newValue) => (coreObj[key] = newValue),
-                enumerable: true,
-                configurable: true,
-              })//@ts-ignore
-            } else self[key] = value
-          })
-          const wrappedCore = Object.entries(coreObj).reduce((acc, [name, value]) => {
-            if (typeof value === "function") {
-              //@ts-ignore
-              acc[name] = (...args) => {
-                currentCaller = name
-                const result = value.apply(coreObj, args)
-                currentCaller = null
-                return result
-              }
-            } else Object.defineProperty(acc, name, {
-              get: () => coreObj[name],
-              //@ts-ignore
-              set: (newValue) => coreObj[name] = newValue,
-              enumerable: true,
-              configurable: true,
-            })
-            return acc
-          }, {})
-          Object.assign(self, wrappedCore)
-          return wrappedCore
-        })())
-      }
-
-      /**@param {PatchMetaFor} patches*/
-      #sendPatches(patches) {
-        /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
-        this.#channel.postMessage(message)
-        if (debug) log(message, {...this.#core})
-      }
-
-      /** @param {import("./types/core").CoreData<I>} value*/
-      _updateCore(value) {
-        Object.keys(value).forEach(key => {
-          if (key in this.#core) {
-            // @ts-ignore
-            this.#core[key] = value[key]
-          }
-        })
-      }
-
-      /**
-       * @param {S} state
-       * @returns {import('./types/state').Signal<S>}
-       */
-      #createSignal(state) {
-        const listeners = new Set()
-        return {
-          setValue: (next) => {
-            if (state !== next) {
-              const oldValue = state
-              state = next
-              listeners.forEach((listener) => listener(oldValue, next))
-              this.#sendPatches({path: "/state", op: "replace", value: next})
-            }
-          },
-          value: () => state,
-          onChange: (listener) => {
-            listeners.add(listener)
-            return () => {
-              listeners.delete(listener)
-            }
-          },
-          clear: listeners.clear,
         }
       }
 
@@ -331,45 +297,62 @@ function createMeta(
           this.process = true
           this.#runAction(transition.action)
         } else this.#transition()
-        // console.log("connectedCallback")
-        const updateView = () => {
-          this.dataset.state = String(this.state)
-          const result = view?.render({
-            update: (ctx) =>
+
+        if (view) {
+          const updateView = () => {
+            this.dataset.state = String(this.state)
+            const result = view?.render({
+              update: (ctx) =>
+                this._updateExternal({
+                  ctx,
+                  srcName: "component",
+                  funcName: "handler",
+                }),
+              context: this.context,
+              state: this.state,
+              core: this.#core,
+              html: html,
+              ref: ref,
+            })
+            render(result, this.#shadow)
+          }
+          this.onUpdate(updateView)
+          this.onTransition(updateView) // TODO: оптимизировать обновление
+          updateView()
+          view.onMount?.({
+            component: this.#shadow.host, core: this.#core, update: (ctx) =>
               this._updateExternal({
                 ctx,
                 srcName: "component",
                 funcName: "handler",
               }),
-            context: this.context,
-            state: this.state,
-            core: this.#core,
-            html: html,
-            ref: ref,
           })
-          // console.log(result, this.tagName)
-          const rendered = render(result, this.#shadow)
-          // console.log(rendered, this.tagName)
         }
-        if (view) {
-          this.onUpdate(updateView)
-          this.onTransition(updateView) // TODO: оптимизировать обновление
-          updateView()
-        }
-        view?.onMount?.({
-          component: this.#shadow.host, core: this.#core, update: (ctx) =>
-            this._updateExternal({
-              ctx,
-              srcName: "component",
-              funcName: "handler",
-            }),
-        })
       }
 
       disconnectedCallback() {
+        console.log("disconnectedCallback")
         this.#shadow.adoptedStyleSheets = []
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
+      }
+
+      /**@param {PatchMetaFor} patches*/
+      #sendPatches(patches) {
+        /**@type {import("./metafor").BroadcastMessage}*/
+        const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
+        this.#channel.postMessage(message)
+        if (debug) log(message, {...this.#core})
+      }
+
+      /** @param {import("./types/core").CoreData<I>} value*/
+      _updateCore(value) {
+        Object.keys(value).forEach(key => {
+          if (key in this.#core) {
+            // @ts-ignore
+            this.#core[key] = value[key]
+          }
+        })
       }
 
       /**

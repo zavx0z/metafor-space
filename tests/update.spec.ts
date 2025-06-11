@@ -68,9 +68,7 @@ describe("update", async () => {
   test("actionInit в INITIAL", () => {
     expect(messages[1]).toMatchObject({
       meta: {
-        meta: "",
-        func: "unknown",
-        target: "action",
+        tag,
         timestamp: expect.any(Number),
       },
       patch: {
@@ -87,9 +85,7 @@ describe("update", async () => {
   test("actionDouble в action", () => {
     expect(messages[3]).toMatchObject({
       meta: {
-        meta: "",
-        func: "unknown",
-        target: "action",
+        tag,
         timestamp: expect.any(Number),
       },
       patch: {
@@ -106,9 +102,7 @@ describe("update", async () => {
   test("update должен логировать источник вызова и измененные поля", async () => {
     expect(messages[5], "Проверяем одиночный вызов update из core").toMatchObject({
       meta: {
-        meta: "",
-        func: "coreMethod",
-        target: "core",
+        tag,
         timestamp: expect.any(Number),
       },
       patch: {
@@ -122,9 +116,7 @@ describe("update", async () => {
     )
     expect(messages[7], "Проверяем множественные вызовы update из core").toEqual({
       meta: {
-        tag: "",
-        func: "complexMethod",
-        target: "core",
+        tag,
         timestamp: expect.any(Number),
       },
       patch: {
