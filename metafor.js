@@ -5,7 +5,9 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-import './core/console.js'
+const debug = true
+let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
+if (debug) log = (await import('./core/console.js')).log
 
 let devChannel = null
 /**
@@ -275,6 +277,7 @@ function createMeta(
         /**@type {import("./metafor").BroadcastMessage}*/
         const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
         this.#channel.postMessage(message)
+        if (debug) log(message, {...this.#core})
       }
 
       /** @param {import("./types/core").CoreData<I>} value*/

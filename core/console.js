@@ -12,6 +12,7 @@ const centerText = (text, width) => {
     .padEnd(width, ' ');
 };
 
+/** @param {Object} obj*/
 const formatAndLogObject = (obj) => {
   const jsonString = JSON.stringify(obj, null, 2);
   const lines = jsonString.split('\n');
@@ -39,9 +40,29 @@ const formatAndLogObject = (obj) => {
   });
 };
 
-const ch = new BroadcastChannel("channel")
-/** @param {{data: import("../metafor").BroadcastMessage}} message */
-ch.onmessage = ({data: {meta, patch}}) => {
+/**
+ * Используем JSON.stringify для красивого вывода объекта
+ *
+ * @param {*} value
+ * @return {string}
+ */
+const formattedObj = (value) => JSON.stringify(value, null, 2)
+  .split('\n')
+  .map((line, i, lines) => {
+    // Не добавляем отступ для первой и последней строки
+    if (i === 0 || i === lines.length - 1) {
+      return line;
+    }
+    return `${line}`; // Добавляем отступ для вложенных строк
+  })
+  .join('\n');
+
+/**
+ * @param {import("../metafor").BroadcastMessage} message
+ * @param {import("../types/core").CoreObj} core
+ */
+export function log(message, core) {
+  const {meta, patch} = message
   // Ширины колонок
   const TAG_WIDTH = 10;
   const OP_WIDTH = 8;
@@ -69,6 +90,7 @@ ch.onmessage = ({data: {meta, patch}}) => {
       "",
       "color: lightskyblue; font-weight: bold"
     );
+    console.log(formattedObj(core))
     console.groupEnd();
     return;
   } else if (patch.path === "/") {
@@ -92,21 +114,16 @@ ch.onmessage = ({data: {meta, patch}}) => {
     );
 
   if (typeof patch.value === 'object' && patch.value !== null) {
-    // Используем JSON.stringify для красивого вывода объекта
-    const formattedObj = JSON.stringify(patch.value, null, 2)
-      .split('\n')
-      .map((line, i, lines) => {
-        // Не добавляем отступ для первой и последней строки
-        if (i === 0 || i === lines.length - 1) {
-          return line;
-        }
-        return `${line}`; // Добавляем отступ для вложенных строк
-      })
-      .join('\n');
-
-    console.log(formattedObj)
+    console.log(formattedObj(patch.value))
+    console.log(core)
   } else {
     console.log(patch.value);
   }
   console.groupEnd();
 }
+
+// const ch = new BroadcastChannel("channel")
+// /** @param {{data: import("../metafor").BroadcastMessage}} message */
+// ch.onmessage = ({data: {meta, patch}}) => {
+//   log({meta, patch})
+// }
