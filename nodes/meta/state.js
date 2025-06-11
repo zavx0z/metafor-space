@@ -5,7 +5,9 @@ export default MetaFor('state')
   .context(t => ({
     title: t.string({title: "Название состояния", nullable: true})
   }))
-  .core()
+  .core(() => ({
+    transitions: []
+  }))
   .transitions("visible", [])
   .reactions([])
   .view({
@@ -51,7 +53,7 @@ export default MetaFor('state')
         }
 
         &:has(> :nth-child(2)) {
-          & > state-header {
+          & > header {
             border-bottom-left-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
 

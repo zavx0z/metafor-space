@@ -67,6 +67,9 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
               title: id,
               states: core.snapshot?.states
             }}
+            .core=${{
+              transitions: core.snapshot?.transitions
+            }}
         >
         </metafor-node>
       `
@@ -74,7 +77,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
   style: ({css}) => {
     const borderRadius = "7px"
     return css`
-      :host {         
+      :host {
         color: rgb(var(--surface-50));
         width: 100vw;
         height: 100vh;
@@ -183,6 +186,6 @@ export default MetaFor("nodes", {description: "Nodes", development: true}
     `
   }
 }).create({
-  onTransition: (preview, current) => console.log(`${preview} => ${current}`),
+  onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
   onUpdate: (value) => console.log(value)
 })

@@ -899,10 +899,14 @@ export class PropertyPart extends AttributePart {
   _commitValue(value) {
     if (this._sanitizer === undefined) this._sanitizer = sanitizerFactoryInternal(this.element, this.name, "property")
     value = this._sanitizer(value)
-    // @ts-ignore
-    // this.element[this.name] = value === nothing ? undefined : value
     // console.log(this.element, this.name, value)
-    this.element.update(value)
+    // @ts-ignore
+    if (this.name === "context") this.element.update(value)
+    // @ts-ignore
+    else if (this.name === "core") this.element._updateCore(value)
+    else
+      // @ts-ignore
+      this.element[this.name] = value === nothing ? undefined : value
   }
 }
 

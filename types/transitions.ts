@@ -116,7 +116,7 @@ export type When<C extends ContextDefinition> = Partial<{
           : C[K] extends BooleanDefinition
             ? CondBoolean
             : C[K] extends ArrayDefinition
-              ? any[] | { length: CondNumber }
+              ? CondArray
               : never
 }>
 
@@ -245,4 +245,34 @@ type CondNumber =
   notLt?: number
   notLte?: number
   between?: [number, number]
+}
+
+/** # Условия для массивов
+
+ Позволяет определять условия для массивов в контексте.
+ Поддерживает как прямое значение, так и набор правил сравнения.
+
+ | Параметр    | Тип              | Описание                              |
+ | ----------- | ---------------- | ------------------------------------- |
+ | isNull      | boolean          | Является ли значение null             |
+ | length      | number \| { min?: number; max?: number } | Длина массива                    |
+ | includes    | any              | Содержит ли массив указанный элемент  |
+ | notIncludes | any              | Не содержит ли массив указанный элемент|
+ | every       | (item: any) => boolean | Все элементы удовлетворяют условию  |
+ | some        | (item: any) => boolean | Хотя бы один элемент удовлетворяет условию |
+ | isEmpty     | boolean          | Является ли массив пустым             |
+ | isNotEmpty  | boolean          | Не является ли массив пустым          |
+ */
+type CondArray<T = any> =
+  | T[]
+  | null
+  | {
+  isNull?: boolean
+  length?: number | { min?: number; max?: number }
+  includes?: T
+  notIncludes?: T
+  every?: (item: T) => boolean
+  some?: (item: T) => boolean
+  isEmpty?: boolean
+  isNotEmpty?: boolean
 }

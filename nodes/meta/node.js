@@ -6,12 +6,16 @@ export default MetaFor("node", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
-    states: t.array({title: "Состояния", default: []}),
+    states: t.array({title: "Состояния", nullable: true}),
   }))
-  .core()
+  .core(() => ({
+    /** @type {import("../../types/transitions").Transitions<any, any, any>} */
+    transitions: []
+  }))
   .transitions("hide", [
     {
       from: "hide",
+      action: ({context}) => console.log(context),
       to: [{state: "visible", when: {title: {isNull: false}}}]
     },
     {
@@ -43,7 +47,9 @@ export default MetaFor("node", {development: true, description: "Node"})
                   id=${i}
                   .context=${{
                     title: i
-                  }}>
+                  }}
+
+              >
               </metafor-state>
             `
           })}
@@ -172,4 +178,7 @@ export default MetaFor("node", {development: true, description: "Node"})
         }
       `
     }
-  }).create({})
+  }).create({
+    onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
+    onUpdate: (value) => console.log(value)
+  })

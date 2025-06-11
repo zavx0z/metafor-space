@@ -268,6 +268,16 @@ function createMeta(
         })())
       }
 
+      /** @param {import("./types/core").CoreData<I>} value*/
+      _updateCore(value) {
+        Object.keys(value).forEach(key => {
+          if (key in this.#core) {
+            // @ts-ignore
+            this.#core[key] = value[key]
+          }
+        })
+      }
+
       /**
        * @param {S} state
        * @returns {import('./types/state').Signal<S>}
@@ -465,13 +475,6 @@ function createMeta(
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
 }
-
-/**
- * Преобразует строку из camelCase в kebab-case
- * @param {string} str - Строка в формате camelCase
- * @return {string} Строка в формате kebab-case
- */
-const camelToKebab = (str) => str.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
 
 /**
  @template {ContextDefinition} C
