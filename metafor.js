@@ -270,7 +270,6 @@ function createMeta(
 
         if (!reactions.length) return
         this.#channel.onmessage = ({data: {meta, patch}}) => {
-          if (meta.tag === tag) return // TODO: должна быть более полная адресация
           reactions.forEach((reaction) => {
             if (reactionFilter(reaction, patch)) {
               reaction.action({
@@ -322,6 +321,7 @@ function createMeta(
 
       disconnectedCallback() {
         console.log("disconnectedCallback")
+        this.#channel.close()
         this.#shadow.adoptedStyleSheets = []
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
