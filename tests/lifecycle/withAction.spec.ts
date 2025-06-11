@@ -1,6 +1,6 @@
 import {describe, expect, test} from "bun:test"
 import {MetaFor} from "@metafor/space"
-import {messagesFixture} from "../../../fixtures/broadcast"
+import {messagesFixture} from "../../fixtures/broadcast.ts"
 
 
 describe("Инициализация c действием", async () => {

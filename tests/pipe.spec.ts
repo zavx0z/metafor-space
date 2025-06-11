@@ -25,9 +25,9 @@ describe("Пайплайн", () => {
       },
     ]).create({
       description: "Управление прогрессом пользователя",
-      onTransition: (preview, current) => {
-        console.log(preview, current)
-      },
+      // onTransition: (preview, current) => {
+      //   console.log(preview, current)
+      // },
     })
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 

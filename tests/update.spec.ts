@@ -1,6 +1,6 @@
 import {describe, expect, test} from "bun:test"
 import {MetaFor} from "@metafor/space"
-import {messagesFixture} from "../../fixtures/broadcast"
+import {messagesFixture} from "../fixtures/broadcast.ts"
 
 
 describe("update", async () => {
@@ -50,9 +50,8 @@ describe("update", async () => {
     ]).reactions([
       {
         op: "add",
-        action: ({update, context}) => {
+        action: ({update}) => {
           update({state: "reaction"})
-          console.log(context)
         }
       }
     ]).create({

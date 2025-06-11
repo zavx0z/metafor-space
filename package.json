@@ -150,6 +150,8 @@
     "test:directives:async-replace[watch]": "bun test tests/directives/async-replace.spec.ts --watch",
     "test:directives:async-append": "bun test tests/directives/async-append.spec.ts",
     "test:directives:async-append[debug]": "bun test tests/directives/async-append.spec.ts --inspect-brk",
-    "test:directives:async-append[watch]": "bun test tests/directives/async-append.spec.ts --watch"
+    "test:directives:async-append[watch]": "bun test tests/directives/async-append.spec.ts --watch",
+
+    "test:node:layout:transitions": "bun test nodes/tests/conditions.input.ports.spec.ts"
   }
 }
