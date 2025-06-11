@@ -1,45 +1,31 @@
-//@ts-nocheck
-import {parseTriggerPortId, triggerId, triggerPortId} from "../graph/id.js"
-import {operatorSymbols} from "../graph/operators.js"
+import {parseTriggerPortId, conditionId, conditionPortId} from "../id.js"
+import {operatorSymbols} from "../operators.js"
 
-/**
- * Извлекает информацию о триггерах из снимка состояния атома.
- *
- * @param {QMachineSnapshot} snapshot
- *
- * @returns {Array<{
- *   id: string,
- *   ports: Array<{
- *     id: string,
- *     content: {
- *       symbol: string,
- *       title: string,
- *       value: any
- *     }
- *   }>
- * }>} Массив объектов триггеров
- */
-const extractBaseTriggers = snapshot => {
+/** @type{import("./transitions").extractBaseConditions} */
+export const extractBaseConditions = snapshot => {
+
+  /** @type{Map<string, import("./transitions").TransitionConditionsPorts>} */
   let triggers = new Map()
+
   snapshot.states.map(state => {
-    for (const collapse of snapshot.collapses) {
-      if (collapse.from !== state) {
-        for (const target of collapse.to) {
+    for (const transition of snapshot.transitions) {
+      if (transition.from !== state) {
+        for (const target of transition.to) {
           if (target.state === state) {
-            for (const param of Object.keys(target.trigger)) {
-              const id = triggerId({atom: snapshot.id, state: state, param})
+            for (const condition of Object.keys(target.when)) {
+              const id = conditionId({meta: snapshot.id, state, condition})
               let trigger = triggers.get(id)
               if (!trigger) {
-                triggers.set(id, {id: id, ports: []})
+                triggers.set(id, {id, ports: []})
                 trigger = triggers.get(id)
               }
 
-              trigger.ports.push({
-                id: triggerPortId({
-                  atom: snapshot.id,
-                  from: collapse.from,
+              trigger?.ports.push({
+                id: conditionPortId({
+                  meta: snapshot.id,
+                  from: transition.from,
                   to: target.state,
-                  param,
+                  condition: condition,
                   direction: "west"
                 })
               })
@@ -51,32 +37,18 @@ const extractBaseTriggers = snapshot => {
   })
   return Array.from(triggers.values())
 }
-/**
- *
- * @param {Array<{
- *   id: string,
- *   ports: Array<{
- *     id: string,
- *     content: {
- *       symbol: string,
- *       title: string,
- *       value: any
- *     }
- *   }>
- * }>} triggers
- * @param {QMachineSnapshot} snapshot
- * @returns {*}
- */
+
+/** @type{import("./transitions").assignContent} */
 const assignContent = (triggers, snapshot) => {
   return triggers.map(trigger => ({
     ...trigger,
     ports: trigger.ports.map(port => {
-      const {from, to, param} = parseTriggerPortId(port.id)
-      const collapse = snapshot.collapses.find(c => c.from === from)
-      const target = collapse?.to.find(t => t.state === to)
+      const {from, to, condition} = parseTriggerPortId(port.id)
+      const transition = snapshot.transitions.find(c => c.from === from)
+      const target = transition?.to.find(t => t.state === to)
       if (!target) throw new Error(`Не удалось найти целевой переход для ${port.id}`)
 
-      const content = target.trigger[param]
+      const content = target.when[condition]
       /** @type {Record<string, { symbol: string; title: string; value: any }>} */
       const operators = {}
       if (typeof content === "object" && content !== null) {
@@ -86,6 +58,7 @@ const assignContent = (triggers, snapshot) => {
           operators[operatorKey] = {
             symbol: operator.symbol,
             title: operator.title,
+            // @ts-ignore
             value: content[operatorKey]
           }
         }
@@ -103,7 +76,7 @@ const assignContent = (triggers, snapshot) => {
   }))
 }
 /**
- * @param {QMachineSnapshot} snapshot
+ * @param {SnapshotMetaForAny} snapshot
  * @returns {Array<{
  *   id: string,
  *   ports: Array<{
@@ -119,7 +92,7 @@ const assignContent = (triggers, snapshot) => {
  * }>}
  */
 export const extractTriggers = snapshot => {
-  return assignContent(extractBaseTriggers(snapshot), snapshot)
+  return assignContent(extractBaseConditions(snapshot), snapshot)
 }
 
 /**

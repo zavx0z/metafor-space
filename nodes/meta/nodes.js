@@ -1,10 +1,10 @@
 /**
- * @typedef {import("../types/meta.js").Snapshot<any, any, any>} Snapshot
+ * @typedef {import("../../types/meta.ts").Snapshot<any, any, any>} Snapshot
  */
-import {MetaFor} from "../metafor.js"
+import {MetaFor} from "../../metafor.js"
 import ELK from "elkjs"
-import {repeat} from "../html/directives/repeat.js"
-import "./meta/node.js"
+import {repeat} from "../../html/directives/repeat.js"
+import "./node.js"
 
 export default MetaFor("nodes", {description: "Nodes", development: true}
 ).states(

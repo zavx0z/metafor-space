@@ -35,19 +35,19 @@ export type TriggerPortDirection = 'east' | 'west';
 /**
  * Параметры порта триггера
  * @interface TriggerPortParams
- * @property atom - Имя атома (например, "file")
+ * @property meta - Имя атома (например, "file")
  * @property from - Состояние-источник триггера
  * @property to - Целевое состояние триггера
- * @property param - Имя параметра контекста (например, "path", "content")
+ * @property condition - Имя параметра контекста (например, "path", "content")
  * @property direction - Направление порта триггера:
  *   - east: выходной порт (справа)
  *   - west: входной порт (слева)
  */
 export interface TriggerPortParams {
-  atom: string;
+  meta: string;
   from: string;
   to: string;
-  param: string;
+  condition: string;
   direction: TriggerPortDirection;
 }
 
@@ -76,14 +76,14 @@ export interface StateParams {
 /**
  * Параметры триггера
  * @interface TriggerParams
- * @property atom - Имя атома (например, "file")
+ * @property meta - Имя атома (например, "file")
  * @property state - Имя состояния атома
- * @property param - Имя параметра контекста (например, "path")
+ * @property condition - Имя параметра контекста (например, "path")
  */
 export interface TriggerParams {
-  atom: string;
+  meta: string;
   state: string;
-  param: string;
+  condition: string;
 }
 
 /**

@@ -24,7 +24,7 @@ export const parseContextPortId = id => {
 }
 
 /** @param {import('./types/id').TriggerPortParams} params */
-export const triggerPortId = ({atom, from, to, param, direction}) => `/${atom.replace("/", "")}/${from}/${to}/${param}/${direction}`
+export const conditionPortId = ({meta, from, to, condition, direction}) => `/${meta.replace("/", "")}/${from}/${to}/${condition}/${direction}`
 
 /**
  * @param {string} id
@@ -33,7 +33,7 @@ export const triggerPortId = ({atom, from, to, param, direction}) => `/${atom.re
 export const parseTriggerPortId = id => {
   const [, atom, from, to, param, dir] = id.split("/")
   const direction = dir === "east" || dir === "west" ? dir : "west"
-  return {atom, from, to, param, direction}
+  return {meta: atom, from, to, condition: param, direction}
 }
 
 /** @param {import('./types/id').EdgeParams} params */
@@ -73,7 +73,7 @@ export const parseContextId = id => {
 }
 
 /** @param {import('./types/id').TriggerParams} params */
-export const triggerId = ({atom, state, param}) => `/${atom.replace("/", "")}/${state}/${param}/trigger`
+export const conditionId = ({meta, state, condition}) => `/${meta.replace("/", "")}/${state}/${condition}/condition`
 
 /**
  * @param {string} id
@@ -81,7 +81,7 @@ export const triggerId = ({atom, state, param}) => `/${atom.replace("/", "")}/${
  */
 export const parseTriggerId = id => {
   const [, atom, state, param] = id.split("/")
-  return {atom, state, param}
+  return {meta: atom, state, condition: param}
 }
 
 /** @param {import('./types/id').TriggerParameterParams} params */
@@ -109,7 +109,7 @@ export default {
   parseContextParameterId,
   contextPortId,
   parseContextPortId,
-  triggerPortId,
+  triggerPortId: conditionPortId,
   parseTriggerPortId,
   edgeId,
   parseEdgeId,
@@ -117,7 +117,7 @@ export default {
   parseStateId,
   contextId,
   parseContextId,
-  triggerId,
+  triggerId: conditionId,
   parseTriggerId,
   triggerParameterId,
   parseTriggerParameterId,

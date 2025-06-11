@@ -67,7 +67,7 @@ export declare function MetaFor(
 
 declare global {
   /**
-   Meta - класс частицы
+   Meta
 
    @template S - Состояния
    @template C - Контекст
@@ -108,5 +108,37 @@ declare global {
     snapshot: () => Snapshot<S, C, any>
     destroy: () => void
   }
+
+  export type MetaAny = Meta<any, any>
+
+
+  /**
+   Снимок meta
+
+   @template C - Тип контекста
+   @template S - Тип состояния
+
+   @property id - Идентификатор снимка
+   @property title - Заголовок снимка
+   @property description - Описание снимка
+   @property state - Текущее состояние
+   @property states - Доступные состояния
+   @property context - Данные контекста
+   @property types - Определение типов контекста
+   @property transitions - Переходы
+   @property core - Ядро
+   */
+  export type SnapshotMetaFor<S extends string, C extends ContextDefinition, I extends CoreObj> = {
+    id: string
+    // title: string
+    description: string
+    state: S
+    states: readonly S[]
+    context: ContextData<C>
+    types: ContextDefinition
+    transitions: Transitions<S, C, I>
+    core: Record<string, { read: string[]; write: string[] }>
+  }
+  export type SnapshotMetaForAny = SnapshotMetaFor<any, any, any>
 }
 

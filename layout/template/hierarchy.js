@@ -6,9 +6,9 @@ import {
   parseTriggerParameterId,
   parseTriggerPortId,
   stateId,
-  triggerId,
+  conditionId,
   triggerParameterId,
-  triggerPortId
+  conditionPortId
 } from "../../nodes/id.js"
 
 // /** @type {import("../../graph/types/index.js").LayoutConfig} */
@@ -64,7 +64,7 @@ function createTriggers(state, snapshot, metrics) {
       if (target.state !== state) continue
 
       for (const param of Object.keys(target.trigger)) {
-        const id = triggerId({atom: snapshot.id, state: state, param})
+        const id = conditionId({meta: snapshot.id, state: state, condition: param})
 
         const [width, height] = metrics.triggers.sizes[id]
 
@@ -79,7 +79,7 @@ function createTriggers(state, snapshot, metrics) {
           height: metrics.triggers.portSpacing,
           ports: [{
             layoutOptions: config.port.west,
-            id: triggerPortId({atom: snapshot.id, from: collapse.from, to: target.state, param, direction: 'west'})
+            id: conditionPortId({meta: snapshot.id, from: collapse.from, to: target.state, condition: param, direction: 'west'})
           }]
         })
       }
@@ -143,14 +143,14 @@ export function generate(snapshot, metrics) {
             const {from, to, param, atom} = parseTriggerParameterId(parameter.id)
             return {
               id: edgeId({
-                sourceId: triggerPortId({atom, from, to, param, direction: 'east'}),
+                sourceId: conditionPortId({meta: atom, from, to, condition: param, direction: 'east'}),
                 targetId: contextPortId({atom, state: to, param, direction: 'input'})
               }),
-              sources: [triggerPortId({
-                atom: snapshot.id,
+              sources: [conditionPortId({
+                meta: snapshot.id,
                 from,
                 to,
-                param,
+                condition: param,
                 direction: 'east'
               }).replace("/east", "")],
               targets: [contextPortId({atom: snapshot.id, state: to, param, direction: 'input'})]
@@ -162,14 +162,14 @@ export function generate(snapshot, metrics) {
     edges: allTriggers
       .map(trigger => (trigger?.children || [])
         .map(parameter => {
-          const {from, to, param} = parseTriggerPortId(parameter.id)
+          const {from, to, condition} = parseTriggerPortId(parameter.id)
           return {
             id: edgeId({
-              sourceId: contextPortId({atom: snapshot.id, state: from, param, direction: 'output'}),
-              targetId: triggerPortId({atom: snapshot.id, from, to, param, direction: 'west'})
+              sourceId: contextPortId({atom: snapshot.id, state: from, param: condition, direction: 'output'}),
+              targetId: conditionPortId({meta: snapshot.id, from, to, param: condition, direction: 'west'})
             }),
-            sources: [contextPortId({atom: snapshot.id, state: from, param, direction: 'output'})],
-            targets: [triggerPortId({atom: snapshot.id, from, to, param, direction: 'west'})]
+            sources: [contextPortId({atom: snapshot.id, state: from, param: condition, direction: 'output'})],
+            targets: [conditionPortId({meta: snapshot.id, from, to, param: condition, direction: 'west'})]
           }
         })).flat()
   }

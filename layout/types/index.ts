@@ -17,7 +17,7 @@ type Operator = {
  * @property id - Уникальный идентификатор порта
  * @property operators - Словарь операторов сравнения
  */
-export type TriggerPort = {    
+export type TriggerPort = {
   id: string,
   operators: {
     [key: string]: Operator
