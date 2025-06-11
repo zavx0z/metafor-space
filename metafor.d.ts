@@ -140,5 +140,18 @@ declare global {
     core: Record<string, { read: string[]; write: string[] }>
   }
   export type SnapshotMetaForAny = SnapshotMetaFor<any, any, any>
+
+  /**
+   Патч для применения к частице
+
+   @property path - Путь к частице
+   @property op - Операция
+   @property value - Значение
+   */
+  export type PatchMetaFor = {
+    path: string
+    op: "add" | "remove" | "replace" | "move" | "copy" | "test"
+    value: any
+  }
 }
 

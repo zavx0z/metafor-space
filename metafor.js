@@ -5,6 +5,8 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
+import './core/console.js'
+
 let devChannel = null
 /**
  * Установка канала для разработки
@@ -268,6 +270,13 @@ function createMeta(
         })())
       }
 
+      /**@param {PatchMetaFor} patches*/
+      #sendPatches(patches) {
+        /**@type {import("./metafor").BroadcastMessage}*/
+        const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
+        this.#channel.postMessage(message)
+      }
+
       /** @param {import("./types/core").CoreData<I>} value*/
       _updateCore(value) {
         Object.keys(value).forEach(key => {
@@ -290,10 +299,7 @@ function createMeta(
               const oldValue = state
               state = next
               listeners.forEach((listener) => listener(oldValue, next))
-              this.#channel.postMessage({
-                meta: {particle: this.id, timestamp: Date.now()},
-                patch: {path: "/state", op: "replace", value: next},
-              })
+              this.#sendPatches({path: "/state", op: "replace", value: next})
             }
           },
           value: () => state,
@@ -309,11 +315,7 @@ function createMeta(
 
       connectedCallback() {
         // TODO: при восстановлении входить в состояние без вызова действия
-        this.#channel.postMessage({
-          meta: {meta: tag, func: "constructor", target: "meta", timestamp: Date.now()},
-          patch: {path: "/", op: "add", value: this.snapshot()},
-        })
-
+        this.#sendPatches({path: "/", op: "add", value: this.snapshot()})
         if (onTransition) {
           this.#state.onChange((oldValue, newValue) => {
             if (newValue !== undefined) onTransition(oldValue, newValue, this.snapshot())
@@ -443,12 +445,7 @@ function createMeta(
         }, {})
         if (Object.keys(updCtx).length > 0) {
           this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
-          this.#channel.postMessage(
-            /** @type {import('./types/meta').BroadcastMessage} */ ({
-              meta: {meta: this.id, func: funcName, target: srcName, timestamp: Date.now()},
-              patch: {path: `/context`, op: "replace", value: updCtx},
-            })
-          )
+          this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
         }
         return updCtx
       }

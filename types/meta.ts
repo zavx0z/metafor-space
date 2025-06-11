@@ -45,9 +45,9 @@ export type Snapshot<S extends string, C extends ContextDefinition, I extends Co
  */
 export type BroadcastMessage = {
   meta: {
-    meta: string
-    func: string
-    target: string
+    tag: string
+    func?: string
+    target?: string
     timestamp: number
   }
   patch: Patch
