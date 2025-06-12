@@ -30,8 +30,8 @@ describe("Конструктор MetaFor", () => {
       },
     ])
 
-  test("view", () =>
-    expect(Object.hasOwn(Fabric, "view"), "Функция-конструктор представления должна быть присутствовать").toBe(true))
+  // test("view", () =>
+  //   expect(Object.hasOwn(Fabric, "view"), "Функция-конструктор представления должна быть присутствовать").toBe(true))
 
   test("reactions", () =>
     expect(Object.hasOwn(Fabric, "reactions"), "Функция-конструктор реакций должна быть присутствовать").toBe(true))

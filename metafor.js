@@ -68,23 +68,6 @@ export const MetaFor = (tag, conf = {}) => {
                         coreDefinition,
                         reactions
                       }),
-                      view: (view) => {
-                        return {
-                          create: (options) => createMeta({
-                            states,
-                            initialState,
-                            contextDefinition,
-                            transitions,
-                            development,
-                            description,
-                            tag,
-                            options,
-                            coreDefinition,
-                            reactions,
-                            view
-                          })
-                        }
-                      },
                     }),
                     create: (options) => createMeta({
                       states,
@@ -97,20 +80,43 @@ export const MetaFor = (tag, conf = {}) => {
                       options,
                       coreDefinition,
                     }),
-                    view: (view) => {
+                  }
+                },
+                view(view){
+                  return{
+                    transitions(initialState, transitions) {
+                      if (development) {
+                        const data = {tag, transitions: [...transitions], contextDefinition}
+                        import("./core/validator/index.js").then((module) => module.validateTransitions(data))
+                      }
                       return {
+                        reactions: (reactions) => ({
+                          create: (options) => createMeta({
+                            states,
+                            initialState,
+                            contextDefinition,
+                            view,
+                            transitions,
+                            development,
+                            description,
+                            tag,
+                            options,
+                            coreDefinition,
+                            reactions
+                          }),
+                        }),
                         create: (options) => createMeta({
                           states,
                           initialState,
                           contextDefinition,
+                          view,
                           transitions,
                           development,
                           description,
                           tag,
                           options,
                           coreDefinition,
-                          view
-                        })
+                        }),
                       }
                     }
                   }

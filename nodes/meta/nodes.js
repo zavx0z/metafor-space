@@ -4,11 +4,7 @@ import {repeat} from "../../html/directives/repeat.js"
 import "./node.js"
 
 export default MetaFor("nodes", {description: "Nodes", development: true})
-  .states(
-    "ожидание патча",
-    "добавление ноды",
-    "удаление ноды",
-  )
+  .states("ожидание патча", "добавление ноды", "удаление ноды")
   .context((t) => ({
     op: t.enum("add", "remove")({title: "Тип патча", nullable: true}),
     nodes: t.array({title: "Коллекция meta", default: []}),
@@ -18,62 +14,25 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
     /** @type {SnapshotMetaForAny | undefined} */
     snapshot: undefined,
   }))
-  .transitions("ожидание патча", [
-    {
-      in: "ожидание патча",
-      action: ({core}) => {
-        core.snapshot = undefined
-      },
-      to: [
-        {state: "добавление ноды", when: {op: "add"}},
-        {state: "удаление ноды", when: {op: "remove"}},
-      ],
-    },
-    {
-      in: "добавление ноды",
-      action: ({update}) => {
-        update({op: null})
-      },
-      to: [{state: "ожидание патча", when: {op: null}}],
-    },
-    {
-      in: "удаление ноды",
-      action: ({update}) => {
-        update({op: null, nodes: []})
-      },
-      to: [{state: "ожидание патча", when: {op: null}}],
-    }
-  ])
-  .reactions([
-    {
-      op: "add",
-      action: ({context, patch, update, core}) => {
-        if (patch.value.id !== "node" && patch.value.id !== "state") {
-          core.snapshot = patch.value
-          update({op: "add", nodes: [...context.nodes, patch.value.id]})
-        }
-      },
-    },
-  ])
   .view({
     render: ({html, core, context}) => html`
       ${repeat(context.nodes, id => id, id => {
-        return html`
+      return html`
           <metafor-node
               class="backdrop"
               id=${id}
               .context=${{
-                title: id,
-                states: core.snapshot?.states,
-                // types: core.snapshot?.types
-              }}
+        title: id,
+        states: core.snapshot?.states,
+        // types: core.snapshot?.types
+      }}
               .core=${{
-                snapshot: core.snapshot
-              }}
+        snapshot: core.snapshot
+      }}
           >
           </metafor-node>
         `
-      })} `,
+    })} `,
     style: ({css}) => {
       const borderRadius = "7px"
       return css`
@@ -186,5 +145,41 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
       `
     }
   })
-  .create({
-  })
+  .transitions("ожидание патча", [
+    {
+      in: "ожидание патча",
+      action: ({core}) => {
+        core.snapshot = undefined
+      },
+      to: [
+        {state: "добавление ноды", when: {op: "add"}},
+        {state: "удаление ноды", when: {op: "remove"}},
+      ],
+    },
+    {
+      in: "добавление ноды",
+      action: ({update}) => {
+        update({op: null})
+      },
+      to: [{state: "ожидание патча", when: {op: null}}],
+    },
+    {
+      in: "удаление ноды",
+      action: ({update}) => {
+        update({op: null, nodes: []})
+      },
+      to: [{state: "ожидание патча", when: {op: null}}],
+    }
+  ])
+  .reactions([
+    {
+      op: "add",
+      action: ({context, patch, update, core}) => {
+        if (patch.value.id !== "node" && patch.value.id !== "state") {
+          core.snapshot = patch.value
+          update({op: "add", nodes: [...context.nodes, patch.value.id]})
+        }
+      },
+    },
+  ])
+  .create({})

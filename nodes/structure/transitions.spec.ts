@@ -12,6 +12,9 @@ describe("Параметры условий переходов", () => {
       count: t.number({title: "Числовое значение", default: 0})
     }))
     .core()
+    .view({
+      render: ({html}) => html``
+    })
     .transitions("start", [
       {
         in: "idle",
@@ -47,9 +50,7 @@ describe("Параметры условий переходов", () => {
         ],
       },
     ])
-    .view({
-      render: ({html}) => html``
-    }).create({})
+    .create({})
   const meta = document.querySelector(`metafor-${tag}`) as MetaAny
 
   const snapshot = meta.snapshot()

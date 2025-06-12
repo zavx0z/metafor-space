@@ -39,7 +39,8 @@ describe("Инициализация c действием", async () => {
         }, // Асинхронное действие - так можно проверить блокировку,
         to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
-    ]).create({})
+    ])
+    .create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   test.todo("Условия meta заблокированы до окончания автопереходов")

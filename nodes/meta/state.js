@@ -10,17 +10,6 @@ export default MetaFor('state')
   .core(() => ({
     transitions: []
   }))
-  .transitions("hide", [
-    {
-      in: "hide",
-      to: [{state: "visible", when: {title: {isNull: false}, types: {isEmpty: false}}}]
-    },
-    {
-      in: "visible",
-      to: [{state: "hide", when: {title: null}}]
-    }
-  ])
-  .reactions([])
   .view({
     render: ({context, html}) => html`
       <header>
@@ -123,4 +112,16 @@ export default MetaFor('state')
         }
       }
     `
-  }).create({})
+  })
+  .transitions("hide", [
+    {
+      in: "hide",
+      to: [{state: "visible", when: {title: {isNull: false}, types: {isEmpty: false}}}]
+    },
+    {
+      in: "visible",
+      to: [{state: "hide", when: {title: null}}]
+    }
+  ])
+  .reactions([])
+  .create({})
