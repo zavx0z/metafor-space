@@ -17,22 +17,22 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
   .view({
     render: ({html, core, context}) => html`
       ${repeat(context.nodes, id => id, id => {
-      return html`
+        return html`
           <metafor-node
               class="backdrop"
               id=${id}
               .context=${{
-        title: id,
-        states: core.snapshot?.states,
-        // types: core.snapshot?.types
-      }}
+                title: id,
+                states: core.snapshot?.states,
+                // types: core.snapshot?.types
+              }}
               .core=${{
-        snapshot: core.snapshot
-      }}
+                snapshot: core.snapshot
+              }}
           >
           </metafor-node>
         `
-    })} `,
+      })} `,
     style: ({css}) => {
       const borderRadius = "7px"
       return css`
@@ -173,12 +173,14 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
   ])
   .reactions([
     {
-      op: "add",
+      filter: ({patch}) =>
+        patch.op === "add" &&
+        patch.value.id !== "node" &&
+        patch.value.id !== "state",
       action: ({context, patch, update, core}) => {
-        if (patch.value.id !== "node" && patch.value.id !== "state") {
-          core.snapshot = patch.value
-          update({op: "add", nodes: [...context.nodes, patch.value.id]})
-        }
+        console.log(patch)
+        core.snapshot = patch.value
+        update({op: "add", nodes: [...context.nodes, patch.value.id]})
       },
     },
   ])

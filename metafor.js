@@ -5,7 +5,7 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-const debug = false
+const debug = true
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -82,8 +82,8 @@ export const MetaFor = (tag, conf = {}) => {
                     }),
                   }
                 },
-                view(view){
-                  return{
+                view(view) {
+                  return {
                     transitions(initialState, transitions) {
                       if (development) {
                         const data = {tag, transitions: [...transitions], contextDefinition}
@@ -130,21 +130,21 @@ export const MetaFor = (tag, conf = {}) => {
   }
 }
 
-/**
- * Фильтр реакций
- *
- * @template {ContextDefinition} C
- * @template {CoreObj} I
- *
- * @param {import("./types/reaction").Reaction<C, I>} reaction
- * @param {import("./types/meta").Patch} patch
- * @returns {boolean}
- */
-const reactionFilter = (reaction, patch) => {
-  if (reaction.path === patch.path && reaction.op === patch.op) return true
-  if (reaction.op === patch.op) return true
-  return Object.keys(reaction).length === 1 && "action" in reaction;
-}
+// /**
+//  * Фильтр реакций
+//  *
+//  * @template {ContextDefinition} C
+//  * @template {CoreObj} I
+//  *
+//  * @param {import("./types/reaction").Reaction<C, I>} reaction
+//  * @param {import("./types/meta").Patch} patch
+//  * @returns {boolean}
+//  */
+// const reactionFilter = (reaction, patch) => {
+//   if (reaction.path === patch.path && reaction.op === patch.op) return true
+//   if (reaction.op === patch.op) return true
+//   return Object.keys(reaction).length === 1 && "action" in reaction;
+// }
 
 /**
  @template {string} S - состояние
@@ -280,7 +280,7 @@ function createMeta(
         this.#channel = new BroadcastChannel('channel')
         if (reactions.length) this.#channel.onmessage = ({data: {meta, patch}}) => {
           reactions.forEach((reaction) => {
-            if (reactionFilter(reaction, patch)) {
+            if (reaction.filter({meta, patch, context: this.context})) {
               reaction.action({
                 patch, context: this.context, meta, core: this.#core,
                 update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),

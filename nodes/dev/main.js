@@ -8,7 +8,7 @@ import "../meta/nodes.js"
 MetaFor("test", {description: "Nodes", development: false})
   .states("начало", "конец")
   .context((t) => ({
-    status: t.enum("start", "end")({title: "Status", default: "start"}),
+    status: t.enum("start", "end")({title: "Status", default: "end"}),
   }))
   .core(() => ({})
   )
@@ -19,17 +19,27 @@ MetaFor("test", {description: "Nodes", development: false})
   .transitions("начало", [
     {
       in: "начало",
-      action: ({context}) => {
-        // console.log(context)
+      action: async ({update}) => {
+        // await new Promise((resolve) => {
+        //   setTimeout(() => {
+        //     update({status: "end"})
+        //     return resolve('')
+        //   }, 1000)
+        // })
       },
-      to: [{state: "конец", when: {status: "start"}}],
+      to: [{state: "конец", when: {status: "end"}}],
     },
     {
       in: "конец",
-      action: async () => {
-        // console.log("конец")
+      action: async ({update}) => {
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            update({status: "start"})
+            return resolve('')
+          }, 1000)
+        })
       },
-      to: [{state: "начало", when: {status: "end"}}],
+      to: [{state: "начало", when: {status: "start"}}],
     },
   ])
   .create({

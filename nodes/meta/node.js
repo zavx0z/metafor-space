@@ -35,16 +35,16 @@ export default MetaFor("node", {development: true, description: "Node"})
         <section class="content" data-drag-selector="graph-atom">
           <atom-svg></atom-svg>
           ${repeat(context.states, i => i, i => {
-        return html`
+            return html`
               <metafor-state
                   id=${i}
                   .context=${{
-          title: i
-        }}
+                    title: i
+                  }}
               >
               </metafor-state>
             `
-      })}
+          })}
         </section>
       `
     },
@@ -174,12 +174,19 @@ export default MetaFor("node", {development: true, description: "Node"})
   .transitions("hide", [
     {
       in: "hide",
-      // action: ({context}) => console.log(context),
       to: [{state: "visible", when: {title: {isNull: false}, states: {isEmpty: false}}}]
     },
     {
       in: "visible",
       to: [{state: "hide", when: {title: null}}]
+    }
+  ])
+  .reactions([
+    {
+      filter: ({meta, context}) => meta.tag === context.title,
+      action: ({meta, patch}) => {
+        console.log("Node reaction", meta, patch)
+      }
     }
   ])
   .create({
