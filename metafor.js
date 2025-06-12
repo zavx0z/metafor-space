@@ -298,29 +298,32 @@ function createMeta(
         } else this.#transition()
 
         if (view) {
-          const updateView = () => {
-            this.dataset.state = String(this.state)
-            render(view.render({
-              update: (ctx) => this._update({ctx, srcName: "component", funcName: "handler"}),
-              context: this.context,
-              state: this.state,
-              core: this.#core,
-              html: html,
-              ref: ref,
-            }), this.#shadow)
-          }
-          this.onUpdate(updateView)
-          this.onTransition(updateView) // TODO: оптимизировать обновление
-          updateView()
+
+          this.onUpdate(this.#updateView)
+          this.onTransition(this.#updateView) // TODO: оптимизировать обновление
+          this.#updateView()
           view.onMount?.({
-            update: (ctx) => this._update({ctx, srcName: "component", funcName: "handler"}),
+            update: (ctx) => this._update({ctx, srcName: "view", funcName: "onMount"}),
             component: this.#shadow.host,
             core: this.#core
           })
         }
       }
 
+      #updateView = () => {
+        if (!view) return
+        render(view.render({
+          update: (ctx) => this._update({ctx, srcName: "component", funcName: "handler"}),
+          context: this.context,
+          state: this.state,
+          core: this.#core,
+          html: html,
+          ref: ref,
+        }), this.#shadow)
+      }
+
       disconnectedCallback() {
+        this.#sendPatches({op: "remove", path: "/", value: null})
         if (this.#channel) {
           this.#channel.onmessage = null
           this.#channel.close()
@@ -334,12 +337,12 @@ function createMeta(
 
       /**@param {PatchMetaFor} patches*/
       #sendPatches = (patches) => {
-        if (!this.#channel) {
-          console.warn("Нет канала")
-          return
-        }
         /**@type {import("./metafor").BroadcastMessage}*/
         const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
+        if (!this.#channel) {
+          console.warn("Нет канала!", message)
+          return
+        }
         this.#channel.postMessage(message)
         if (debug) log(message, {...this.#core})
       }
@@ -354,24 +357,31 @@ function createMeta(
         })
       }
 
+      /** @type {import('./types/context').Update<C>} */
+      update = (ctx) => {
+        this.#updateContext({ctx})
+        if (this.process) return
+        this.#transition()
+      }
+
       /**
-       * Проверка условий перехода и выполнение действия
+       * Обновление контекста из внешнего источника (core, reaction)
+       * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
        */
-      #transition = () => {
-        const transitionFrom = transitions.find((t) => t.from === this.state)
-        if (transitionFrom) {
-          for (const transition of transitionFrom.to) {
-            if (Object.keys(transition.when).length === 0) break
-            if (conditions(transition.when, this.context, contextDefinition)) {
-              const actionDefinition = transitions.find((i) => i.from === transition.state && i.action)
-              if (actionDefinition?.action) {
-                this.#process = true
-                this.#state.setValue(transition.state)
-                this.#runAction(actionDefinition.action)
-              } else this.#state.setValue(transition.state)
-            }
-          }
+      _update = ({ctx, srcName = "core", funcName = "unknown"}) => {
+        this.#updateContext({ctx, srcName, funcName})
+        if (this.process) return
+        this.#transition()
+      }
+
+      /** @param {import("./types/context").UpdateContextParams<C>} params */
+      #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
+        const updCtx = this._updateContext(ctx)
+        if (Object.keys(updCtx).length > 0) {
+          this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
+          this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
         }
+        return updCtx
       }
 
       /** @type {import('./types/context')._Update<C>} */
@@ -389,20 +399,14 @@ function createMeta(
         }, {})
       }
 
-      /** @type {import('./types/context').Update<C>} */
-      update = (ctx) => {
-        this.#updateContext({ctx})
-        if (this.process) return
-        this.#transition()
-      }
-      /**
-       * Обновление контекста из внешнего источника (core, reaction)
-       * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
-       */
-      _update = ({ctx, srcName = "core", funcName = "unknown"}) => {
-        this.#updateContext({ctx, srcName, funcName})
-        if (this.process) return
-        this.#transition()
+      #updateListeners = new Set()
+
+      /** @type {import('./types/meta').OnUpdate<C>}*/
+      onUpdate = (cb) => {
+        this.#updateListeners.add(cb)
+        return () => {
+          this.#updateListeners.delete(cb)
+        }
       }
 
       /**
@@ -420,23 +424,24 @@ function createMeta(
         else finallyFn()
       }
 
-      /** @param {import("./types/context").UpdateContextParams<C>} params */
-      #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
-        const updCtx = this._updateContext(ctx)
-        if (Object.keys(updCtx).length > 0) {
-          this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
-          this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
-        }
-        return updCtx
-      }
-
-      #updateListeners = new Set()
-
-      /** @type {import('./types/meta').OnUpdate<C>}*/
-      onUpdate = (cb) => {
-        this.#updateListeners.add(cb)
-        return () => {
-          this.#updateListeners.delete(cb)
+      /**
+       * Проверка условий перехода и выполнение действия
+       */
+      #transition = () => {
+        const transitionFrom = transitions.find((t) => t.from === this.state)
+        if (transitionFrom) {
+          for (const transition of transitionFrom.to) {
+            if (Object.keys(transition.when).length === 0) break
+            if (conditions(transition.when, this.context, contextDefinition)) {
+              const actionDefinition = transitions.find((i) => i.from === transition.state && i.action)
+              if (actionDefinition?.action) {
+                this.#process = true
+                this.#state.setValue(transition.state)
+                this.#runAction(actionDefinition.action)
+              } else this.#state.setValue(transition.state)
+              if (view) this.dataset.state = String(this.state)
+            }
+          }
         }
       }
 

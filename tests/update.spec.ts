@@ -4,8 +4,9 @@ import {messagesFixture} from "../fixtures/broadcast.ts"
 
 
 describe("update", async () => {
-  const {waitForMessages} = messagesFixture()
   const tag = Bun.randomUUIDv7()
+  const {waitForMessages} = messagesFixture({meta: tag})
+
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
     .states("INITIAL", "action", "core", "core complex", "final", "reaction")

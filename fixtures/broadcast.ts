@@ -13,7 +13,7 @@ export const messagesFixture = (options?: {
   const messages: BroadcastMessage[] = []
 
   channel.addEventListener("message", ({ data }) => {
-    if (!options?.meta || data.meta?.particle === options.meta) {
+    if (!options?.meta || data.meta?.tag === options.meta) {
       messages.push(data)
     }
   })

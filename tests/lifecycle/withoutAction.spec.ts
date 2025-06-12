@@ -4,11 +4,11 @@ import {messagesFixture} from "../../fixtures/broadcast.ts"
 
 
 describe("Инициализация без действия", async () => {
-  const {waitForMessages} = messagesFixture()
+  const tag = Bun.randomUUIDv7()
+  const {waitForMessages} = messagesFixture({meta: tag})
 
   const initialState = "INITIAL"
   const initialContext = {value: "initial"}
-  const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
     .states("INITIAL", "OTHER")
@@ -21,7 +21,6 @@ describe("Инициализация без действия", async () => {
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
 
   const messages = await waitForMessages(10)
-
   describe("Присваивание контекста/состояния и отправка snapshot meta", async () => {
     const message = messages[0]
 
@@ -51,4 +50,5 @@ describe("Инициализация без действия", async () => {
       expect(meta.context).toEqual(initialContext)
     })
   })
+  await Bun.sleep(2000)
 })

@@ -4,7 +4,8 @@ import {messagesFixture} from "../../fixtures/broadcast.ts"
 
 
 describe("Инициализация c действием", async () => {
-  const {waitForMessages} = messagesFixture()
+  const tag = Bun.randomUUIDv7()
+  const {waitForMessages} = messagesFixture({meta: tag})
 
   const initialState = "INITIAL"
   const initialContext = {value: "initial"}
@@ -14,7 +15,6 @@ describe("Инициализация c действием", async () => {
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
-  const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
     .states("INITIAL", "OTHER", "NEXT")
@@ -69,6 +69,7 @@ describe("Инициализация c действием", async () => {
     })
   })
   describe("meta инициализирован", async () => {
+    await Bun.sleep(1100)
     test("Условия разблокированы", () => expect(meta.process, "Условия должны быть разблокированы после выполнения всех действий автоперехода").toBe(false))
     test("Состояние не равно параметру state в create", () => expect(meta.state, "Должно быть равно последнему состоянию в переходе (автопереход)").toBe(otherState))
     test("Контекст не равен параметру по умолчанию", () => expect(meta.context, "Должен быть равен контексту в последнем переходе").toEqual(otherContext))
