@@ -181,6 +181,6 @@ export default MetaFor("node", {development: true, description: "Node"})
       `
     }
   }).create({
-    onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
-    onUpdate: (value) => console.log(value)
+    // onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
+    // onUpdate: (value) => console.log(value)
   })

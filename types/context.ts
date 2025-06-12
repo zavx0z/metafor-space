@@ -102,6 +102,7 @@ export type PartialContextData<C extends ContextDefinition> = Partial<{
 
 /**
  Функция обновления контекста
+ @external
 
  Используется в действиях и методах ядра для обновления данных контекста.
  Принимает частичный объект с новыми значениями контекста.
@@ -111,6 +112,17 @@ export type PartialContextData<C extends ContextDefinition> = Partial<{
  */
 export type Update<C extends ContextDefinition> = (ctx: UpdateParameters<C>) => void
 
+/**
+ Функция обновления контекста
+ @internal
+
+ Используется в действиях и методах ядра для обновления данных контекста.
+ Принимает частичный объект с новыми значениями контекста.
+
+ @template C - Тип контекста
+ @property ctx - Новые данные контекста
+ */
+export type _Update<C extends ContextDefinition> = (ctx: UpdateParameters<C>) => PartialContextData<C>
 
 /**
  Утилиты для создания типов контекста
@@ -238,6 +250,7 @@ export type StringEnumDefinition<T extends readonly string[]> = EnumDefinition<T
 
 /**
  Параметры обновления контекста
+ @internal
 
  @template C - Тип контекста
  @property context - Данные контекста для обновления

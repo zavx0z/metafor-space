@@ -65,7 +65,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
               .context=${{
                 title: id,
                 states: core.snapshot?.states,
-                types: core.snapshot?.types
+                // types: core.snapshot?.types
               }}
               .core=${{
                 transitions: core.snapshot?.transitions

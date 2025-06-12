@@ -169,7 +169,8 @@ function createMeta(
   customElements.define("metafor-" + tag,
     class extends HTMLElement {
       #shadow = this.attachShadow({mode: "open"})
-      #channel = new BroadcastChannel('channel')
+      /**@type{BroadcastChannel|undefined}*/
+      #channel = undefined
       #process = false
       context = /** @type {import("./types/context").ContextData<C>} */(Object.keys(contextDefinition).reduce((acc, key) => {
         const defaultValue = "default" in contextDefinition[key] ? contextDefinition[key].default : undefined
@@ -267,9 +268,11 @@ function createMeta(
             return sheet
           },
         })
+      }
 
-        if (!reactions.length) return
-        this.#channel.onmessage = ({data: {meta, patch}}) => {
+      connectedCallback() {
+        this.#channel = new BroadcastChannel('channel')
+        if (reactions.length) this.#channel.onmessage = ({data: {meta, patch}}) => {
           reactions.forEach((reaction) => {
             if (reactionFilter(reaction, patch)) {
               reaction.action({
@@ -279,9 +282,7 @@ function createMeta(
             }
           })
         }
-      }
 
-      connectedCallback() {
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
         if (onTransition) {
           this.#state.onChange((oldValue, newValue) => {
@@ -320,15 +321,22 @@ function createMeta(
       }
 
       disconnectedCallback() {
-        console.log("disconnectedCallback")
-        this.#channel.close()
+        if (this.#channel) {
+          this.#channel.onmessage = null
+          this.#channel?.close()
+          this.#channel = undefined
+        }
         this.#shadow.adoptedStyleSheets = []
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
       }
 
       /**@param {PatchMetaFor} patches*/
-      #sendPatches(patches) {
+      #sendPatches = (patches) => {
+        if (!this.#channel) {
+          console.warn("Нет канала")
+          return
+        }
         /**@type {import("./metafor").BroadcastMessage}*/
         const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
         this.#channel.postMessage(message)
@@ -348,7 +356,7 @@ function createMeta(
       /**
        * Проверка условий перехода и выполнение действия
        */
-      #transition() {
+      #transition = () => {
         const transitionFrom = transitions.find((t) => t.from === this.state)
         if (transitionFrom) {
           for (const transition of transitionFrom.to) {
@@ -365,6 +373,21 @@ function createMeta(
         }
       }
 
+      /** @type {import('./types/context')._Update<C>} */
+      _updateContext(ctx) {
+        return Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
+          if (!(key in this.context)) {
+            console.warn(`${String(key)} отсутствует в контексте!`, this.context)
+            return acc
+          }
+          if (this.context[key] !== ctx[key]) {
+            this.context[key] = ctx[key]
+            return {...acc, [key]: ctx[key]}
+          }
+          return acc
+        }, {})
+      }
+
       /** @type {import('./types/context').Update<C>} */
       update = (ctx) => {
         this.#updateContext({ctx})
@@ -376,15 +399,16 @@ function createMeta(
        * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
        */
       _updateExternal = ({ctx, srcName = "core", funcName = "unknown"}) => {
-        const updCtx = this.#updateContext({ctx, srcName, funcName})
-        if (updCtx && !this.process) this.#transition()
+        this.#updateContext({ctx, srcName, funcName})
+        if (this.process) return
+        this.#transition()
       }
 
       /**
        * Выполнение действия с последующим отключением блокировки переходов
        * @param {import('./types/actions').Action<C, I>} action
        */
-      #runAction(action) {
+      #runAction = (action) => {
         const result = action({
           context: this.context,
           update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
@@ -395,10 +419,20 @@ function createMeta(
         else finallyFn()
       }
 
+      /** @param {import("./types/context").UpdateContextParams<C>} params */
+      #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
+        const updCtx = this._updateContext(ctx)
+        if (Object.keys(updCtx).length > 0) {
+          this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
+          this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
+        }
+        return updCtx
+      }
+
       #updateListeners = new Set()
 
       /** @type {import('./types/meta').OnUpdate<C>}*/
-      onUpdate(cb) {
+      onUpdate = (cb) => {
         this.#updateListeners.add(cb)
         return () => {
           this.#updateListeners.delete(cb)
@@ -410,23 +444,7 @@ function createMeta(
         if (newValue !== undefined) cb(oldValue, newValue)
       })
 
-      /** @param {import("./types/context").UpdateContextParams<C>} params */
-      #updateContext = ({ctx, srcName = "unknown", funcName = "unknown"}) => {
-        const updCtx = Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
-          if (this.context[key] !== ctx[key] && this.context[key] !== undefined) {
-            this.context[key] = ctx[key]
-            return {...acc, [key]: ctx[key]}
-          }
-          return acc
-        }, {})
-        if (Object.keys(updCtx).length > 0) {
-          this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
-          this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
-        }
-        return updCtx
-      }
-
-      snapshot() {
+      snapshot = () => {
         return {
           id: tag,
           description,

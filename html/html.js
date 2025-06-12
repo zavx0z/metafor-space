@@ -901,7 +901,7 @@ export class PropertyPart extends AttributePart {
     value = this._sanitizer(value)
     // console.log(this.element, this.name, value)
     // @ts-ignore
-    if (this.name === "context") this.element.update(value)
+    if (this.name === "context" && value) this.element._updateContext(value)
     // @ts-ignore
     else if (this.name === "core") this.element._updateCore(value)
     else
