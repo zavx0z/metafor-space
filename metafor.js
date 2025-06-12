@@ -181,7 +181,7 @@ function createMeta(
         let /** @type {string | null} */ currentCaller = null
         const self = /** @type {import("./types/core").Core<I>} */ ({})
         const coreObj = coreDefinition({
-          update: (ctx) => this._updateExternal({
+          update: (ctx) => this._update({
             ctx,
             srcName: "core",
             funcName: currentCaller || "unknown"
@@ -277,7 +277,7 @@ function createMeta(
             if (reactionFilter(reaction, patch)) {
               reaction.action({
                 patch, context: this.context, meta, core: this.#core,
-                update: (ctx) => this._updateExternal({ctx, srcName: "reaction", funcName: "unknown"}),
+                update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
               })
             }
           })
@@ -301,7 +301,7 @@ function createMeta(
           const updateView = () => {
             this.dataset.state = String(this.state)
             render(view.render({
-              update: (ctx) => this._updateExternal({ctx, srcName: "component", funcName: "handler"}),
+              update: (ctx) => this._update({ctx, srcName: "component", funcName: "handler"}),
               context: this.context,
               state: this.state,
               core: this.#core,
@@ -313,7 +313,7 @@ function createMeta(
           this.onTransition(updateView) // TODO: оптимизировать обновление
           updateView()
           view.onMount?.({
-            update: (ctx) => this._updateExternal({ctx, srcName: "component", funcName: "handler"}),
+            update: (ctx) => this._update({ctx, srcName: "component", funcName: "handler"}),
             component: this.#shadow.host,
             core: this.#core
           })
@@ -323,10 +323,11 @@ function createMeta(
       disconnectedCallback() {
         if (this.#channel) {
           this.#channel.onmessage = null
-          this.#channel?.close()
+          this.#channel.close()
           this.#channel = undefined
         }
         this.#shadow.adoptedStyleSheets = []
+        this.#core =/**@type{import("./types/core").Core<I>}*/(/**@type{unknown}*/(undefined))
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
       }
@@ -398,7 +399,7 @@ function createMeta(
        * Обновление контекста из внешнего источника (core, reaction)
        * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
        */
-      _updateExternal = ({ctx, srcName = "core", funcName = "unknown"}) => {
+      _update = ({ctx, srcName = "core", funcName = "unknown"}) => {
         this.#updateContext({ctx, srcName, funcName})
         if (this.process) return
         this.#transition()

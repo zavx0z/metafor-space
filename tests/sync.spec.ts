@@ -33,7 +33,8 @@ describe("Синхронизация core и context", async () => {
       },
       {
         from: "push",
-        action: ({core}) => core.pushData(),
+        action: ({core}) =>
+          core.pushData(),
         to: [
           {state: "IDLE", when: {process: null}},
           {state: "pop", when: {process: "pop"}}
@@ -46,7 +47,6 @@ describe("Синхронизация core и context", async () => {
       }
     ]).create({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
-
   let count = 50
   const delay = 20
   const interval = setInterval(() => {
@@ -71,5 +71,5 @@ describe("Синхронизация core и context", async () => {
       })
     }
   })
-  await Bun.sleep(delay * count)
+  await Bun.sleep(1500)
 })
