@@ -5,7 +5,7 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-const debug = false
+const debug = true
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -298,10 +298,10 @@ function createMeta(
         } else this.#transition()
 
         if (view) {
-
-          this.onUpdate(this.#updateView)
-          this.onTransition(this.#updateView) // TODO: оптимизировать обновление
-          this.#updateView()
+          // Обновляем представление только если нет переходов или они не сработали
+          if (!transition?.action) {
+            this.#updateView()
+          }
           view.onMount?.({
             update: (ctx) => this._update({ctx, srcName: "view", funcName: "onMount"}),
             component: this.#shadow.host,
@@ -310,6 +310,7 @@ function createMeta(
         }
       }
 
+      /**@type{import("./types/view").UpdateView} */
       #updateView = () => {
         if (!view) return
         render(view.render({
@@ -344,7 +345,7 @@ function createMeta(
           return
         }
         this.#channel.postMessage(message)
-        if (debug) log(message, {...this.#core})
+        if (debug) log(message, this.#core)
       }
 
       /** @param {import("./types/core").CoreData<I>} value*/
@@ -359,19 +360,29 @@ function createMeta(
 
       /** @type {import('./types/context').Update<C>} */
       update = (ctx) => {
-        this.#updateContext({ctx})
-        if (this.process) return
+        const upd = this.#updateContext({ctx})
+        if (this.process) {
+          if (view && Object.keys(upd).length) this.#updateView()
+          return
+        }
+        const state = this.state
         this.#transition()
+        if (view && Object.keys(upd).length && state === this.state) this.#updateView()
       }
 
       /**
-       * Обновление контекста из внешнего источника (core, reaction)
+       * Обновление контекста из core, reaction
        * @param {import("./types/context").UpdateContextParams<C>} params - параметры обновления контекста
        */
       _update = ({ctx, srcName = "core", funcName = "unknown"}) => {
-        this.#updateContext({ctx, srcName, funcName})
-        if (this.process) return
+        const upd = this.#updateContext({ctx, srcName, funcName})
+        if (this.process) {
+          if (view && Object.keys(upd).length) this.#updateView()
+          return
+        }
+        const state = this.state
         this.#transition()
+        if (view && Object.keys(upd).length && state === this.state) this.#updateView()
       }
 
       /** @param {import("./types/context").UpdateContextParams<C>} params */
@@ -437,8 +448,12 @@ function createMeta(
               if (actionDefinition?.action) {
                 this.#process = true
                 this.#state.setValue(transition.state)
+                if (view) this.#updateView()
                 this.#runAction(actionDefinition.action)
-              } else this.#state.setValue(transition.state)
+              } else {
+                this.#state.setValue(transition.state)
+                if (view) this.#updateView()
+              }
               if (view) this.dataset.state = String(this.state)
             }
           }

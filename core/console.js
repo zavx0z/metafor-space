@@ -90,8 +90,9 @@ export function log(message, core) {
       "",
       "color: lightskyblue; font-weight: bold"
     );
-    console.log(formattedObj(core))
-    console.groupEnd();
+    console.log("core snap: ", {...core})
+    console.log("core live: ", core)
+    console.groupEnd()
     return;
   } else if (patch.path === "/") {
     console.groupCollapsed(
@@ -115,7 +116,8 @@ export function log(message, core) {
 
   if (typeof patch.value === 'object' && patch.value !== null) {
     console.log(formattedObj(patch.value))
-    console.log(core)
+    console.log("core snap: ", {...core})
+    console.log("core live: ", core)
   } else {
     console.log(patch.value);
   }
