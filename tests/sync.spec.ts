@@ -25,14 +25,14 @@ describe("Синхронизация core и context", async () => {
     }))
     .transitions("IDLE", [
       {
-        from: "IDLE",
+        in: "IDLE",
         to: [
           {state: "push", when: {process: "push"}},
           {state: "pop", when: {process: "pop"}}
         ]
       },
       {
-        from: "push",
+        in: "push",
         action: ({core}) =>
           core.pushData(),
         to: [
@@ -41,7 +41,7 @@ describe("Синхронизация core и context", async () => {
         ]
       },
       {
-        from: "pop",
+        in: "pop",
         action: ({core}) => core.popData(),
         to: [{state: "IDLE", when: {process: null}}]
       }

@@ -20,11 +20,11 @@ describe("Конструктор MetaFor", () => {
     }))
     .transitions("АНОНИМНЫЙ", [
       {
-        from: "АНОНИМНЫЙ",
+        in: "АНОНИМНЫЙ",
         to: [{state: "АВТОРИЗАЦИЯ", when: {email: {isNull: false}, password: {isNull: false}}}],
       },
       {
-        from: "АВТОРИЗАЦИЯ",
+        in: "АВТОРИЗАЦИЯ",
         action: ({update}) => update({nickname}),
         to: [{state: "АВТОРИЗОВАН", when: {nickname: {isNull: false}}}],
       },

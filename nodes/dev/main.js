@@ -13,14 +13,14 @@ MetaFor("test", {description: "Nodes", development: false}).states(
 })).core(() => ({})
 ).transitions("начало", [
   {
-    from: "начало",
+    in: "начало",
     action: ({context}) => {
       // console.log(context)
     },
     to: [{state: "конец", when: {status: "start"}}],
   },
   {
-    from: "конец",
+    in: "конец",
     action: async () => {
       // console.log("конец")
     },

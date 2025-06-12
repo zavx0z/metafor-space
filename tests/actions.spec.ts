@@ -17,7 +17,7 @@ describe("Actions", () => {
       .core()
       .transitions("АНОНИМНЫЙ", [
         {
-          from: "АНОНИМНЫЙ",
+          in: "АНОНИМНЫЙ",
           to: [
             {
               state: "АВТОРИЗАЦИЯ",
@@ -26,7 +26,7 @@ describe("Actions", () => {
           ],
         },
         {
-          from: "АВТОРИЗАЦИЯ",
+          in: "АВТОРИЗАЦИЯ",
           action: ({update}) => {
             const nickname = "zavx0z"
             update({nickname})
@@ -59,7 +59,7 @@ describe("Actions", () => {
       .core()
       .transitions("АНОНИМНЫЙ", [
         {
-          from: "АНОНИМНЫЙ",
+          in: "АНОНИМНЫЙ",
           to: [
             {
               state: "АВТОРИЗАЦИЯ",
@@ -68,7 +68,7 @@ describe("Actions", () => {
           ],
         },
         {
-          from: "АВТОРИЗАЦИЯ",
+          in: "АВТОРИЗАЦИЯ",
           action: async ({update}) => {
             await new Promise((resolve) => setTimeout(resolve, 100))
             update({nickname: "async_user"})
@@ -102,7 +102,7 @@ describe("Actions", () => {
       .core()
       .transitions("АНОНИМНЫЙ", [
         {
-          from: "АНОНИМНЫЙ",
+          in: "АНОНИМНЫЙ",
           to: [
             {
               state: "АВТОРИЗАЦИЯ",
@@ -111,7 +111,7 @@ describe("Actions", () => {
           ],
         },
         {
-          from: "АВТОРИЗАЦИЯ",
+          in: "АВТОРИЗАЦИЯ",
           action: ({update}) => {
             update({
               nickname: "multi_update",
@@ -147,7 +147,7 @@ describe("Actions", () => {
       .core()
       .transitions("АНОНИМНЫЙ",[
         {
-          from: "АНОНИМНЫЙ",
+          in: "АНОНИМНЫЙ",
           to: [
             {
               state: "АВТОРИЗАЦИЯ",
@@ -156,7 +156,7 @@ describe("Actions", () => {
           ],
         },
         {
-          from: "АВТОРИЗАЦИЯ",
+          in: "АВТОРИЗАЦИЯ",
           action: ({update}) => {
             actionCalled = true
             update({nickname: "should_not_update"})

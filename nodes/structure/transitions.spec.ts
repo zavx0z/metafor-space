@@ -14,7 +14,7 @@ describe("Параметры условий переходов", () => {
     .core()
     .transitions("start", [
       {
-        from: "idle",
+        in: "idle",
         to: [{
           state: "start",
           when: {
@@ -24,14 +24,14 @@ describe("Параметры условий переходов", () => {
         }]
       },
       {
-        from: "start",
+        in: "start",
         to: [{
           state: "finish",
           when: {process: "end"}
         }],
       },
       {
-        from: "finish",
+        in: "finish",
         to: [
           {
             state: "start",

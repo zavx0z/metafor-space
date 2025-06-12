@@ -18,12 +18,12 @@ export default MetaFor("node", {development: true, description: "Node"})
   }))
   .transitions("hide", [
     {
-      from: "hide",
+      in: "hide",
       // action: ({context}) => console.log(context),
       to: [{state: "visible", when: {title: {isNull: false}, states: {isEmpty: false}}}]
     },
     {
-      from: "visible",
+      in: "visible",
       to: [{state: "hide", when: {title: null}}]
     }
   ])

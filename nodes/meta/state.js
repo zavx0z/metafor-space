@@ -12,11 +12,11 @@ export default MetaFor('state')
   }))
   .transitions("hide", [
     {
-      from: "hide",
+      in: "hide",
       to: [{state: "visible", when: {title: {isNull: false}, types: {isEmpty: false}}}]
     },
     {
-      from: "visible",
+      in: "visible",
       to: [{state: "hide", when: {title: null}}]
     }
   ])

@@ -5,7 +5,7 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-const debug = true
+const debug = false
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -291,7 +291,7 @@ function createMeta(
         }
         if (onUpdate) this.onUpdate(onUpdate)
 
-        const transition = transitions.find((i) => i.from === initialState)
+        const transition = transitions.find((i) => i.in === initialState)
         if (transition?.action) {
           this.process = true
           this.#runAction(transition.action)
@@ -439,12 +439,12 @@ function createMeta(
        * Проверка условий перехода и выполнение действия
        */
       #transition = () => {
-        const transitionFrom = transitions.find((t) => t.from === this.state)
+        const transitionFrom = transitions.find((t) => t.in === this.state)
         if (transitionFrom) {
           for (const transition of transitionFrom.to) {
             if (Object.keys(transition.when).length === 0) break
             if (conditions(transition.when, this.context, contextDefinition)) {
-              const actionDefinition = transitions.find((i) => i.from === transition.state && i.action)
+              const actionDefinition = transitions.find((i) => i.in === transition.state && i.action)
               if (actionDefinition?.action) {
                 this.#process = true
                 this.#state.setValue(transition.state)
@@ -475,7 +475,7 @@ function createMeta(
           context: this.context,
           types: contextDefinition,
           transitions: transitions.map((t) => ({
-            from: t.from,
+            in: t.in,
             to: t.to.map((toState) => ({
               state: toState.state,
               when: toState.when,

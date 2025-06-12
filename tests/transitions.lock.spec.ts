@@ -14,14 +14,14 @@ test("Блокировка переходов перед входом в нов�
     .core()
     .transitions("INIT", [
       {
-        from: "INIT",
+        in: "INIT",
         action: ({update}) => {
           update({value: 11})
         },
         to: [{state: "PROCESS", when: {value: {gt: 10}}}],
       },
       {
-        from: "PROCESS",
+        in: "PROCESS",
         action: ({update}) => {
           update({value: 15})
           const end = Date.now() + 500
@@ -62,7 +62,7 @@ test("Блокировка переходов для асинхронного д
     .core()
     .transitions("INIT", [
       {
-        from: "INIT",
+        in: "INIT",
         action: async ({update}) => {
           await new Promise((resolve) => setTimeout(resolve, 10))
           update({value: 15}) // Это не должно вызвать переход
@@ -87,7 +87,7 @@ test("Снятие блокировки после действия", async () =
     .core()
     .transitions("INIT", [
       {
-        from: "INIT",
+        in: "INIT",
         action: async ({update}) => {
           await new Promise((resolve) => setTimeout(resolve, 50))
           update({value: 15})

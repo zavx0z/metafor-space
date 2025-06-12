@@ -20,7 +20,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
   }))
   .transitions("ожидание патча", [
     {
-      from: "ожидание патча",
+      in: "ожидание патча",
       action: ({core}) => {
         core.snapshot = undefined
       },
@@ -30,14 +30,14 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
       ],
     },
     {
-      from: "добавление ноды",
+      in: "добавление ноды",
       action: ({update}) => {
         update({op: null})
       },
       to: [{state: "ожидание патча", when: {op: null}}],
     },
     {
-      from: "удаление ноды",
+      in: "удаление ноды",
       action: ({update}) => {
         update({op: null, nodes: []})
       },

@@ -14,22 +14,22 @@ const Meta = MetaFor(tag)
   .core()
   .transitions("IDLE", [
     {
-      from: "IDLE",
+      in: "IDLE",
       to: [{state: "RUNNING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
     },
     {
-      from: "RUNNING",
+      in: "RUNNING",
       to: [
         {state: "SUCCESS", when: {responseTime: {gt: 0, lt: 5000}, errorCode: 200}},
         {state: "ERROR", when: {errorCode: {gt: 400, lt: 599}}},
       ],
     },
     {
-      from: "ERROR",
+      in: "ERROR",
       to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
     },
     {
-      from: "SUCCESS",
+      in: "SUCCESS",
       to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
     },
   ]).create({})
@@ -97,10 +97,10 @@ describe("Подписка на изменения состояния (onTransit
 
   describe("Последовательные изменения", () => {
     test("Корректное отслеживание цепочки изменений состояний", async () => {
-      const transitions: { from: string; to: string }[] = []
+      const transitions: { in: string; to: string }[] = []
 
       meta.onTransition((prevState, nextState) => transitions.push({
-        from: prevState as string,
+        in: prevState as string,
         to: nextState as string
       }))
 
@@ -114,9 +114,9 @@ describe("Подписка на изменения состояния (onTransit
       meta.update({url: "https://api.example.com", responseTime: 1000, errorCode: 0})
 
       expect(transitions).toEqual([
-        {from: "IDLE", to: "RUNNING"},
-        {from: "RUNNING", to: "ERROR"},
-        {from: "ERROR", to: "IDLE"},
+        {in: "IDLE", to: "RUNNING"},
+        {in: "RUNNING", to: "ERROR"},
+        {in: "ERROR", to: "IDLE"},
       ])
     })
   })

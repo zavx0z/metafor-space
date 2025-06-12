@@ -15,22 +15,22 @@ describe("Корректные переходы состояний при заг
     .core()
     .transitions("IDLE", [
       {
-        from: "IDLE",
+        in: "IDLE",
         to: [{state: "LOADING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
       },
       {
-        from: "LOADING",
+        in: "LOADING",
         to: [
           {state: "SUCCESS", when: {responseTime: {gt: 0, lt: 5000}, code: 200}},
           {state: "ERROR", when: {code: {gt: 400, lt: 599}}},
         ],
       },
       {
-        from: "ERROR",
+        in: "ERROR",
         to: [{state: "LOADING", when: {responseTime: {gt: 0, lt: 5000}, code: {gt: 400, lt: 599}}}],
       },
       {
-        from: "SUCCESS",
+        in: "SUCCESS",
         to: [{state: "IDLE", when: {url: {include: "complete"}}}],
       },
     ]).create({})

@@ -25,27 +25,27 @@ describe("update", async () => {
     }))
     .transitions("INITIAL", [
       {
-        from: "INITIAL",
+        in: "INITIAL",
         action: ({update}) => update({state: "action"}),
         to: [{state: "action", when: {state: "action"}}],
       },
       {
-        from: "action",
+        in: "action",
         action: ({update}) => update({state: "core", field1: "action complex"}),
         to: [{state: "core", when: {state: "core"}}],
       },
       {
-        from: "core",
+        in: "core",
         action: ({core}) => core.coreMethod(),
         to: [{state: "core complex", when: {field1: "test"}}]
       },
       {
-        from: "core complex",
+        in: "core complex",
         action: ({core}) => core.complexMethod(),
         to: [{state: "final", when: {field1: "test1", field2: 1}}]
       },
       {
-        from: "final",
+        in: "final",
         to:[{state: "reaction", when: {state: "reaction"}}]
       }
     ]).reactions([

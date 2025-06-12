@@ -14,7 +14,7 @@ describe("null условие перехода", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: null}}]
         }
       ]).create({})
@@ -37,7 +37,7 @@ describe("null условие перехода", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [
             {state: "число", when: {size: null}},
             {state: "строка", when: {name: null}},
@@ -70,7 +70,7 @@ describe("null условие перехода", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ", to: [{state: "ДОБАВИТЬ", when: {name: null}}]
+          in: "ОЖИДАНИЕ", to: [{state: "ДОБАВИТЬ", when: {name: null}}]
         }
       ]).create({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
@@ -88,7 +88,7 @@ describe("null условие перехода", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {active: null}}]
         }
       ]).create({})
@@ -108,7 +108,7 @@ describe("null условие перехода", () => {
       })).core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {status: null}}]
         }
       ]).create({})
@@ -131,7 +131,7 @@ describe("isNull триггер", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 4}}}],
         },
       ]).create({})
@@ -150,7 +150,7 @@ describe("isNull триггер", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 4}}}],
         },
       ]).create({})
@@ -168,7 +168,7 @@ describe("isNull триггер", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
         }
       ]).create({})
@@ -189,7 +189,7 @@ describe("isNull триггер", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}],
         },
       ]).create({})
@@ -207,7 +207,7 @@ describe("isNull триггер", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5, lt: 15}}}],
         },
       ]).create({})
@@ -227,7 +227,7 @@ describe("isNull триггер", () => {
       .transitions("ОЖИДАНИЕ", [
         /* FIXME: валидатор не должен пропускать такой триггер */
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{
             state: "ДОБАВИТЬ",
             when: {size: {isNull: false, gt: 5, lt: 15}}
@@ -250,7 +250,7 @@ describe("isNull триггер", () => {
       .core()
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
         }
       ]).create({})

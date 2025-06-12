@@ -26,11 +26,11 @@ describe("core", () => {
       }))
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}],
         },
         {
-          from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
           action: ({core, update}) => {
             core.handleKeyDown("Space")
             update({actionUpdate: true})
@@ -38,7 +38,7 @@ describe("core", () => {
           to: [{state: "отпуск элемента", when: {isSpacePressed: false, actionUpdate: false}}]
         },
         {
-          from: "отпуск элемента",
+          in: "отпуск элемента",
           action: ({core, update}) => {
             core.handleKeyUp("Space")
             update({actionUpdate: true})
@@ -87,11 +87,11 @@ describe("core", () => {
       })
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
         },
         {
-          from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
           action: ({core}) => {
             core.handleKeyDown("Space")
           },
@@ -122,11 +122,11 @@ describe("core", () => {
       }))
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
         },
         {
-          from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
           action: ({core}) => {
             core.handleKeyDown("Space")
           },
@@ -154,11 +154,11 @@ describe("core", () => {
       }))
       .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
+          in: "ОЖИДАНИЕ",
           to: [{state: "ПАРАМЕТР ОБНОВЛЕН", when: {other: 1}}]
         },
         {
-          from: "ПАРАМЕТР ОБНОВЛЕН",
+          in: "ПАРАМЕТР ОБНОВЛЕН",
           action: ({core}) => core.updateOther(),
           to: [{state: "ОЖИДАНИЕ", when: {other: 0}}]
         }
@@ -190,7 +190,7 @@ describe("core", () => {
         }))
         .transitions("INITIAL", [
           {
-            from: "INITIAL",
+            in: "INITIAL",
             action: ({core}) => {
               core.addData(42)
             },
@@ -223,7 +223,7 @@ describe("core", () => {
         }))
         .transitions("INITIAL", [
           {
-            from: "INITIAL",
+            in: "INITIAL",
             action: ({core}) => core.update(),
             to: [{state: "UPDATED", when: {coreParameter: null}}]
           }

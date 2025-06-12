@@ -12,7 +12,7 @@ const assignContent = (transitionsConditionsPorts, snapshot) => {
     id: condition.id,
     ports: condition.ports.map(port => {
       const {from, to, condition} = parseConditionPortId(port.id)
-      const transition = snapshot.transitions.find(c => c.from === from)
+      const transition = snapshot.transitions.find(c => c.in === from)
       const target = transition?.to.find(t => t.state === to)
       if (!target) throw new Error(`Не удалось найти целевой переход для ${port.id}`)
 
@@ -52,7 +52,7 @@ export const extractBaseConditions = snapshot => {
 
   snapshot.states.map(state => {
     for (const transition of snapshot.transitions) {
-      if (transition.from !== state) {
+      if (transition.in !== state) {
         for (const target of transition.to) {
           if (target.state === state) {
             for (const condition of Object.keys(target.when)) {
@@ -66,7 +66,7 @@ export const extractBaseConditions = snapshot => {
               cond?.ports.push({
                 id: conditionPortId({
                   meta: snapshot.id,
-                  from: transition.from,
+                  from: transition.in,
                   to: target.state,
                   condition,
                   direction: "west"

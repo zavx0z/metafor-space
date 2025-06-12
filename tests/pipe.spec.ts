@@ -14,12 +14,12 @@ describe("Пайплайн", () => {
     .core()
     .transitions("IDLE", [
       {
-        from: "IDLE",
+        in: "IDLE",
         action: ({update}) => update({username: "user123", progress: 20}),
         to: [{state: "ACTIVE", when: {username: {include: "user"}, progress: {gt: 0, lt: 50}}}],
       },
       {
-        from: "ACTIVE",
+        in: "ACTIVE",
         action: ({update}) => update({progress: 101}),
         to: [{state: "COMPLETE", when: {progress: {gt: 100}}}],
       },

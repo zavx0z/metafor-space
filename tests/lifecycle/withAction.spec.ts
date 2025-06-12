@@ -24,7 +24,7 @@ describe("Инициализация c действием", async () => {
     .core()
     .transitions(initialState, [
       {
-        from: "INITIAL",
+        in: "INITIAL",
         action: async ({update}) => {
           await Bun.sleep(1000)
           update(nextContext)
@@ -32,7 +32,7 @@ describe("Инициализация c действием", async () => {
         to: [{state: "NEXT", when: {value: nextContext.value}}],
       },
       {
-        from: "NEXT",
+        in: "NEXT",
         action: async ({update}) => {
           await Bun.sleep(1000)
           update(otherContext)

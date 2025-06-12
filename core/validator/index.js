@@ -76,10 +76,10 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
 
   // Проверка наличия обязательных полей
   transitions.forEach((transition, index) => {
-    if (!transition.from) {
+    if (!transition.in) {
       sendError({
         id: tag,
-        message: `Отсутствует обязательное поле 'from' в transitions[${index}]`,
+        message: `Отсутствует обязательное поле 'in' в transitions[${index}]`,
         src: "transitions",
       })
     }
