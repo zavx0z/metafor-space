@@ -68,7 +68,7 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
                 // types: core.snapshot?.types
               }}
               .core=${{
-                transitions: core.snapshot?.transitions
+                snapshot: core.snapshot
               }}
           >
           </metafor-node>

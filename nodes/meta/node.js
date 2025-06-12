@@ -9,10 +9,12 @@ export default MetaFor("node", {development: true, description: "Node"})
     states: t.array({title: "Состояния", default: []}),
   }))
   .core(() => ({
-    /** @type {import("../../types/transitions").Transitions<any, any, any>} */
-    transitions: [],
-    /** @type {import("../../types/context").ContextData<any> | undefined} */
-    types: undefined,
+    // /** @type {import("../../types/transitions").Transitions<any, any, any>} */
+    // transitions: [],
+    // /** @type {import("../../types/context").ContextData<any> | null} */
+    // types: null,
+    /** @type {SnapshotMetaForAny|null}*/
+    snapshot: null
   }))
   .transitions("hide", [
     {
@@ -50,7 +52,6 @@ export default MetaFor("node", {development: true, description: "Node"})
                   .context=${{
                     title: i
                   }}
-
               >
               </metafor-state>
             `
