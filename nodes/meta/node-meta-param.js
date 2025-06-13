@@ -1,7 +1,8 @@
 import {MetaFor} from "../../metafor.js"
+import './node-meta-socket.js'
 
 export default MetaFor("node-meta-param")
-  .states("init", "redy")
+  .states("init", "ready")
   .context(t => ({
     title: t.string({title: "Название параметра", nullable: true}),
     name: t.string({title: "Ключ параметра", nullable: true}),
@@ -13,7 +14,11 @@ export default MetaFor("node-meta-param")
       <metafor-node-meta-socket data-direction="input" data-active="false"></metafor-node-meta-socket>
       <span class="noselect">${context.title}</span>
       <input name=${context.name} value=${context.value}/>
-      <metafor-node-meta-socket data-direction="output" data-active="false"/></metafor-node-meta-socket>
+      <metafor-node-meta-socket
+          class="connected"
+          data-direction="output"
+          data-active="false"
+      /></metafor-node-meta-socket>
     `,
     style: ({css}) => css`
       :host {
@@ -21,6 +26,7 @@ export default MetaFor("node-meta-param")
 
         background-color: var(--background-color);
         margin: 2px 0;
+        padding: 0 2px;
 
         display: flex;
         align-items: center;
@@ -79,14 +85,14 @@ export default MetaFor("node-meta-param")
         console.log("param", core)
       },
       to: [{
-        state: "redy", when: {
+        state: "ready", when: {
           title: {isNull: false},
           name: {isNull: false}
         }
       }]
     },
     {
-      in: "redy",
+      in: "ready",
       to: [{
         state: "init", when: {
           title: null,

@@ -11,7 +11,7 @@ import {ref} from "../html/directives/ref"
  @property onDestroy - Коллбек для размонтирования компонента
  */
 export type ViewDefinition<I extends Record<string, any>, C extends ContextDefinition, S extends string> = {
-  render: (params: ViewDefinitionParams<I, C, S>) => TemplateResult<1>
+  render?: (params: ViewDefinitionParams<I, C, S>) => TemplateResult<1>
   onMount?: MountParams<C, I>
   onDestroy?: DestroyParams<I>
   style?: ({css}: { css: (strings: TemplateStringsArray, ...values: any[]) => CSSStyleSheet }) => void

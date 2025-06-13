@@ -50,7 +50,7 @@ describe("update", async () => {
       }
     ]).reactions([
       {
-        op: "add",
+        filter: ({patch}) => patch.op === "add",
         action: ({update}) => {
           update({state: "reaction"})
         }

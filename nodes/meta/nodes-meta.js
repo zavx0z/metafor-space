@@ -127,6 +127,7 @@ export default MetaFor("nodes-meta", {description: "Nodes", development: true})
         patch.op === "add" &&
         patch.value.id !== "node-meta" &&
         patch.value.id !== "node-meta-state" &&
+        patch.value.id !== "node-meta-socket" &&
         patch.value.id !== "node-meta-param",
       action: ({context, patch, update, core}) => {
         core.snapshot = patch.value

@@ -5,7 +5,7 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-const debug = true
+const debug = false
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -129,22 +129,6 @@ export const MetaFor = (tag, conf = {}) => {
     }
   }
 }
-
-// /**
-//  * Фильтр реакций
-//  *
-//  * @template {ContextDefinition} C
-//  * @template {CoreObj} I
-//  *
-//  * @param {import("./types/reaction").Reaction<C, I>} reaction
-//  * @param {import("./types/meta").Patch} patch
-//  * @returns {boolean}
-//  */
-// const reactionFilter = (reaction, patch) => {
-//   if (reaction.path === patch.path && reaction.op === patch.op) return true
-//   if (reaction.op === patch.op) return true
-//   return Object.keys(reaction).length === 1 && "action" in reaction;
-// }
 
 /**
  @template {string} S - состояние
@@ -319,7 +303,7 @@ function createMeta(
 
       /**@type{import("./types/view").UpdateView} */
       #updateView = () => {
-        if (!view) return
+        if (!view?.render) return
         render(view.render({
           update: (ctx) => this._update({ctx, srcName: "component", funcName: "handler"}),
           context: this.context,
@@ -368,13 +352,7 @@ function createMeta(
       /** @type {import('./types/context').Update<C>} */
       update = (ctx) => {
         const upd = this.#updateContext({ctx})
-        if (this.process) {
-          if (view && Object.keys(upd).length) this.#updateView()
-          return
-        }
-        const state = this.state
-        this.#transition()
-        if (view && Object.keys(upd).length && state === this.state) this.#updateView()
+        this.#update(upd)
       }
 
       /**
@@ -383,13 +361,7 @@ function createMeta(
        */
       _update = ({ctx, srcName = "core", funcName = "unknown"}) => {
         const upd = this.#updateContext({ctx, srcName, funcName})
-        if (this.process) {
-          if (view && Object.keys(upd).length) this.#updateView()
-          return
-        }
-        const state = this.state
-        this.#transition()
-        if (view && Object.keys(upd).length && state === this.state) this.#updateView()
+        this.#update(upd)
       }
 
       /** @param {import("./types/context").UpdateContextParams<C>} params */
@@ -400,6 +372,17 @@ function createMeta(
           this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
         }
         return updCtx
+      }
+
+      /** @param {import("./types/context").PartialContextData<C>} upd */
+      #update = (upd) => {
+        if (this.process) {
+          if (view?.render && Object.keys(upd).length) this.#updateView()
+          return
+        }
+        const state = this.state
+        this.#transition()
+        if (view?.render && Object.keys(upd).length && state === this.state) this.#updateView()
       }
 
       /** @type {import('./types/context')._Update<C>} */
