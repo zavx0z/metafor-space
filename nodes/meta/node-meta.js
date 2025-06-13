@@ -30,7 +30,16 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
         ${repeat(context.states, i => i, i => html`
-          <metafor-node-meta-state id=${i} .context=${{title: i}} .core=${{data: {types: core.data?.types}}}/>
+          <metafor-node-meta-state
+              id=${i}
+              .context=${{title: i}}
+              .core=${{
+                data: {
+                  types: core.data?.types,
+                  context: core.data?.context,
+                }
+              }}
+          />
         `)}
       </section>
     `,

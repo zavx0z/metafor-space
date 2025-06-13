@@ -7,9 +7,7 @@ export default MetaFor("node-meta-param")
     name: t.string({title: "Ключ параметра", nullable: true}),
     value: t.string({title: "Значение параметра", nullable: true}),
   }))
-  .core(()=>({
-    data: null
-  }))
+  .core()
   .view({
     render: ({context, html}) => html`
       <node-meta-socket data-direction="input" data-active="false"></node-meta-socket>

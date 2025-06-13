@@ -4,7 +4,8 @@ import "./node-meta-param.js"
 
 /**
  * @typedef {Object} Data
- * @prop {import("../../types/context").TypeDefinition} types
+ * @prop {import("../../types/context").ContextDefinition} types
+ * @prop {import("../../types/context").ContextData<any>} context
  */
 
 export default MetaFor('node-meta-state')
@@ -23,9 +24,17 @@ export default MetaFor('node-meta-state')
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
-        ${repeat(context.params, i => i, key => html`
-          <metafor-node-meta-param id=${key} .core=${{data: "data"}}></metafor-node-meta-param>
-        `)}
+        ${repeat(context.params, key => key,/**@param{string}key*/ key => {
+          return html`
+            <metafor-node-meta-param
+                id=${key}
+                .context=${{
+                  name: key,
+                  title: core.data?.types[key].title,
+                  value: core.data?.context[key],
+                }}
+            /> `
+        })}
       </section>
       <section>
         <button>
@@ -137,7 +146,8 @@ export default MetaFor('node-meta-state')
     {
       in: "visible",
       action: ({core}) => {
-        core.data = null
+        requestAnimationFrame(() => core.data = null)
+        // core.data = null
       },
       to: [{state: "hide", when: {title: null}}]
     }
