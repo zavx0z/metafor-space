@@ -51,7 +51,7 @@ export declare function MetaFor(
         view: (view: ViewDefinition<I, C, S>) => {
           transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
             reactions: (reactions: Reactions<C, I>) => {
-              create: (options: CreateParams<C, S, I>) => Meta<S, C>
+              create: (options?: CreateParams<C, S, I>) => Meta<S, C>
             }
             create: (options: CreateParams<C, S, I>) => Meta<S, C>
           }

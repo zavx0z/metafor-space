@@ -11,7 +11,10 @@ export default MetaFor("node-meta-param")
   .core()
   .view({
     render: ({context, html}) => html`
-      <metafor-node-meta-socket data-direction="input" data-active="false"></metafor-node-meta-socket>
+      <metafor-node-meta-socket
+          data-direction="input"
+          data-active="false"
+      ></metafor-node-meta-socket>
       <span class="noselect">${context.title}</span>
       <input name=${context.name} value=${context.value}/>
       <metafor-node-meta-socket
@@ -82,7 +85,7 @@ export default MetaFor("node-meta-param")
     {
       in: "init",
       action: ({core}) => {
-        console.log("param", core)
+        // console.log("param", core)
       },
       to: [{
         state: "ready", when: {

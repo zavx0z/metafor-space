@@ -53,24 +53,11 @@ export default MetaFor('node-meta-state')
         transition: box-shadow 0.3s ease-in-out;
         box-sizing: border-box;
 
-        & header {
-          padding: 8px 24px;
-          background-color: rgba(var(--surface-400) / var(--background-alpha));
-          border-radius: var(--node-border-radius);
-          position: relative;
-          font-weight: 800;
-          letter-spacing: 0.02em;
-
-          & h2 {
-            margin: 0;
-          }
-        }
-
         & > section {
           background: var(--background-color);
         }
       }
-      
+
       :host:has(> :nth-child(2)) > header {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
@@ -93,6 +80,19 @@ export default MetaFor('node-meta-state')
         padding-bottom: 8px;
         border-bottom-left-radius: var(--node-border-radius);
         border-bottom-right-radius: var(--node-border-radius);
+      }
+
+      header {
+        padding: 8px 24px;
+        background-color: rgba(var(--surface-400) / var(--background-alpha));
+        border-radius: var(--node-border-radius);
+        position: relative;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+
+        & h2 {
+          margin: 0;
+        }
       }
 
       button {
@@ -129,7 +129,7 @@ export default MetaFor('node-meta-state')
     {
       in: "hide",
       action: ({core, context, update}) => {
-        console.log("state: ", context.title, core.data?.types)
+        // console.log("state: ", context.title, core.data?.types)
         if (core.data) update({params: Object.keys(core.data.types)})
       },
       to: [{

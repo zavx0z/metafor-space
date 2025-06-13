@@ -5,7 +5,7 @@
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 
-const debug = false
+const debug = true
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -91,7 +91,7 @@ export const MetaFor = (tag, conf = {}) => {
                       }
                       return {
                         reactions: (reactions) => ({
-                          create: (options) => createMeta({
+                          create: (options={}) => createMeta({
                             states,
                             initialState,
                             contextDefinition,
@@ -593,7 +593,7 @@ export function conditions(when, context, types) {
         // @ts-ignore
         if ("notIncludes" in condition && value.includes(condition.notIncludes)) return false
         // @ts-ignore
-        if ("empty" in condition && condition.empty !== (value.length === 0)) return false
+        if ("isEmpty" in condition && condition.isEmpty !== (value.length === 0)) return false
         continue
       default:
         return false
