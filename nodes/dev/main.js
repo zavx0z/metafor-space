@@ -1,5 +1,5 @@
 import {MetaFor} from "../../metafor.js"
-import "../meta/nodes.js"
+import "../meta/nodes-meta.js"
 
 // setTimeout(() => {
 //   document.body.insertAdjacentHTML('beforeend', '<metafor-test></metafor-test>');

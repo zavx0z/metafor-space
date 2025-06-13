@@ -1,23 +1,28 @@
 import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
+import "./node-meta-param.js"
 
-export default MetaFor('state')
+export default MetaFor('node-meta-state')
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Название состояния", nullable: true}),
-    types: t.array({title: "Параметры контекста", default: []})
+    params: t.array({title: "Параметры контекста", default: []})
   }))
   .core(() => ({
-    transitions: []
+    /** @type{SnapshotMetaForAny | null} */
+    data: null
   }))
   .view({
-    render: ({context, html}) => html`
+    render: ({context, html, core}) => html`
       <header>
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
-        ${repeat(context.types, i => i, key => html`
-          ${key}
+        ${repeat(context.params, i => i, key => html`
+          <node-meta-param
+              id=${key}
+              .core=${{data: core.data}}
+          ></node-meta-param>
         `)}
       </section>
       <section>
@@ -116,10 +121,21 @@ export default MetaFor('state')
   .transitions("hide", [
     {
       in: "hide",
-      to: [{state: "visible", when: {title: {isNull: false}, types: {isEmpty: false}}}]
+      action: ({core, context}) => {
+        console.log("state: ", context.title, core.data)
+      },
+      to: [{
+        state: "visible", when: {
+          title: {isNull: false},
+          params: {isEmpty: false}
+        }
+      }]
     },
     {
       in: "visible",
+      action: ({core}) => {
+        core.data = null
+      },
       to: [{state: "hide", when: {title: null}}]
     }
   ])

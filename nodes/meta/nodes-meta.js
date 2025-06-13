@@ -1,9 +1,9 @@
 import {MetaFor} from "../../metafor.js"
 import ELK from "elkjs"
 import {repeat} from "../../html/directives/repeat.js"
-import "./node.js"
+import "./node-meta.js"
 
-export default MetaFor("nodes", {description: "Nodes", development: true})
+export default MetaFor("nodes-meta", {description: "Nodes", development: true})
   .states("ожидание патча", "добавление ноды", "удаление ноды")
   .context((t) => ({
     op: t.enum("add", "remove")({title: "Тип патча", nullable: true}),
@@ -18,19 +18,17 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
     render: ({html, core, context}) => html`
       ${repeat(context.nodes, id => id, id => {
         return html`
-          <metafor-node
-              class="backdrop"
+          <metafor-node-meta
               id=${id}
+              class="backdrop"
               .context=${{
                 title: id,
                 states: core.snapshot?.states,
-                // types: core.snapshot?.types
               }}
               .core=${{
-                snapshot: core.snapshot
+                data: core.snapshot
               }}
-          >
-          </metafor-node>
+          ></metafor-node-meta>
         `
       })} `,
     style: ({css}) => {
@@ -175,10 +173,9 @@ export default MetaFor("nodes", {description: "Nodes", development: true})
     {
       filter: ({patch}) =>
         patch.op === "add" &&
-        patch.value.id !== "node" &&
-        patch.value.id !== "state",
+        patch.value.id !== "node-meta" &&
+        patch.value.id !== "node-meta-state",
       action: ({context, patch, update, core}) => {
-        console.log(patch)
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
       },

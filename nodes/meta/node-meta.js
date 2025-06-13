@@ -1,23 +1,19 @@
 import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
-import "./state.js"
+import "./node-meta-state.js"
 
-export default MetaFor("node", {development: true, description: "Node"})
+export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
     states: t.array({title: "Состояния", default: []}),
   }))
   .core(() => ({
-    // /** @type {import("../../types/transitions").Transitions<any, any, any>} */
-    // transitions: [],
-    // /** @type {import("../../types/context").ContextData<any> | null} */
-    // types: null,
-    /** @type {SnapshotMetaForAny|null}*/
-    snapshot: null
+    /** @type { SnapshotMetaForAny | null } */
+    data: null
   }))
   .view({
-    render: ({html, context}) => {
+    render: ({html, context, core}) => {
       return html`
         <header data-drag-selector="graph-atom">
           <div><!--кнопки слева--></div>
@@ -34,17 +30,17 @@ export default MetaFor("node", {development: true, description: "Node"})
         </header>
         <section class="content" data-drag-selector="graph-atom">
           <atom-svg></atom-svg>
-          ${repeat(context.states, i => i, i => {
-            return html`
-              <metafor-state
-                  id=${i}
-                  .context=${{
-                    title: i
-                  }}
-              >
-              </metafor-state>
-            `
-          })}
+          ${repeat(context.states, i => i, i => html`
+                <metafor-node-meta-state
+                    id=${i}
+                    .context=${{
+                      title: i
+                    }}
+                    .core=${{data: core.data}}
+                >
+                </metafor-node-meta-state>
+              `
+          )}
         </section>
       `
     },
@@ -174,6 +170,9 @@ export default MetaFor("node", {development: true, description: "Node"})
   .transitions("hide", [
     {
       in: "hide",
+      action: ({update, core}) => {
+
+      },
       to: [{state: "visible", when: {title: {isNull: false}, states: {isEmpty: false}}}]
     },
     {
