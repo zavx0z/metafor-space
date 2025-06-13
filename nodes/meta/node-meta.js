@@ -13,37 +13,27 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     data: null
   }))
   .view({
-    render: ({html, context, core}) => {
-      return html`
-        <header data-drag-selector="graph-atom">
-          <div><!--кнопки слева--></div>
-          <h2 class="noselect">${context.title}</h2>
-          <div>
-            <!--кнопки справа-->
-            <button aria-label="Редактировать">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor">
-                <path
-                    d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/>
-              </svg>
-            </button>
-          </div>
-        </header>
-        <section class="content" data-drag-selector="graph-atom">
-          <atom-svg></atom-svg>
-          ${repeat(context.states, i => i, i => html`
-                <metafor-node-meta-state
-                    id=${i}
-                    .context=${{
-                      title: i
-                    }}
-                    .core=${{data: core.data}}
-                >
-                </metafor-node-meta-state>
-              `
-          )}
-        </section>
-      `
-    },
+    render: ({html, context, core}) => html`
+      <header data-drag-selector="graph-atom">
+        <div><!--кнопки слева--></div>
+        <h2 class="noselect">${context.title}</h2>
+        <div>
+          <!--кнопки справа-->
+          <button aria-label="Редактировать">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor">
+              <path
+                  d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+      <section class="content" data-drag-selector="graph-atom">
+        <atom-svg></atom-svg>
+        ${repeat(context.states, i => i, i => html`
+          <metafor-node-meta-state id=${i} .context=${{title: i}} .core=${{data: {types: core.data?.types}}}/>
+        `)}
+      </section>
+    `,
     style: ({css}) => {
       const width = "1000px"
       const height = "4444px"
@@ -171,7 +161,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     {
       in: "hide",
       action: ({update, core}) => {
-
+        console.log(core.data)
       },
       to: [{state: "visible", when: {title: {isNull: false}, states: {isEmpty: false}}}]
     },
@@ -188,7 +178,4 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       }
     }
   ])
-  .create({
-    // onTransition: (preview, current, snapshot) => console.log(`${snapshot.id}: ${preview} => ${current}`),
-    // onUpdate: (value) => console.log(value)
-  })
+  .create({})

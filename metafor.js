@@ -265,6 +265,7 @@ function createMeta(
 
       constructor() {
         super()
+        this.dataset.state = initialState
         view?.style?.({
           css: (strings, ...values) => {
             const sheet = new CSSStyleSheet()
@@ -300,14 +301,14 @@ function createMeta(
         const transition = transitions.find((i) => i.in === initialState)
         if (transition?.action) {
           this.process = true
-          this.#runAction(transition.action)
+          this.#runAction(transition.action) // FIXME: если в действии нет вызова update, то #updateView не происходит
         } else this.#transition()
-
         if (view) {
           // Обновляем представление только если нет переходов или они не сработали
-          if (!transition?.action) {
-            this.#updateView()
-          }
+          // if (!transition?.action) {
+          //   this.#updateView()
+          // }
+          this.#updateView() //FIXME: временное решение
           view.onMount?.({
             update: (ctx) => this._update({ctx, srcName: "view", funcName: "onMount"}),
             component: this.#shadow.host,

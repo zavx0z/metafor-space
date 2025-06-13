@@ -21,14 +21,9 @@ export default MetaFor("nodes-meta", {description: "Nodes", development: true})
           <metafor-node-meta
               id=${id}
               class="backdrop"
-              .context=${{
-                title: id,
-                states: core.snapshot?.states,
-              }}
-              .core=${{
-                data: core.snapshot
-              }}
-          ></metafor-node-meta>
+              .context=${{title: id, states: core.snapshot?.states}}
+              .core=${{data: core.snapshot}}
+          />
         `
       })} `,
     style: ({css}) => {
@@ -174,7 +169,8 @@ export default MetaFor("nodes-meta", {description: "Nodes", development: true})
       filter: ({patch}) =>
         patch.op === "add" &&
         patch.value.id !== "node-meta" &&
-        patch.value.id !== "node-meta-state",
+        patch.value.id !== "node-meta-state" &&
+        patch.value.id !== "node-meta-param",
       action: ({context, patch, update, core}) => {
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})

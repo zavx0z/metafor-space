@@ -2,6 +2,11 @@ import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
 import "./node-meta-param.js"
 
+/**
+ * @typedef {Object} Data
+ * @prop {import("../../types/context").TypeDefinition} types
+ */
+
 export default MetaFor('node-meta-state')
   .states("hide", "visible")
   .context(t => ({
@@ -9,7 +14,7 @@ export default MetaFor('node-meta-state')
     params: t.array({title: "Параметры контекста", default: []})
   }))
   .core(() => ({
-    /** @type{SnapshotMetaForAny | null} */
+    /** @type{Data | null} */
     data: null
   }))
   .view({
@@ -19,10 +24,7 @@ export default MetaFor('node-meta-state')
       </header>
       <section>
         ${repeat(context.params, i => i, key => html`
-          <node-meta-param
-              id=${key}
-              .core=${{data: core.data}}
-          ></node-meta-param>
+          <metafor-node-meta-param id=${key} .core=${{data: "data"}}></metafor-node-meta-param>
         `)}
       </section>
       <section>
@@ -121,8 +123,9 @@ export default MetaFor('node-meta-state')
   .transitions("hide", [
     {
       in: "hide",
-      action: ({core, context}) => {
-        console.log("state: ", context.title, core.data)
+      action: ({core, context, update}) => {
+        console.log("state: ", context.title, core.data?.types)
+        if (core.data) update({params: Object.keys(core.data.types)})
       },
       to: [{
         state: "visible", when: {

@@ -7,13 +7,15 @@ export default MetaFor("node-meta-param")
     name: t.string({title: "Ключ параметра", nullable: true}),
     value: t.string({title: "Значение параметра", nullable: true}),
   }))
-  .core()
+  .core(()=>({
+    data: null
+  }))
   .view({
     render: ({context, html}) => html`
-      <node-meta-socket data-active="false"></node-meta-socket>
+      <node-meta-socket data-direction="input" data-active="false"></node-meta-socket>
       <span class="parameter-name noselect">${context.title}</span>
       <input name="${context.name}" class="parameter-value" value=${context.value}/>
-      <node-meta-socket data-active="false"></node-meta-socket>
+      <node-meta-socket data-active="false" data-direction="output"></node-meta-socket>
     `,
     style: ({css}) => css`
       :host {
