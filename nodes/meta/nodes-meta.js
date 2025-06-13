@@ -92,49 +92,6 @@ export default MetaFor("nodes-meta", {description: "Nodes", development: true})
             stroke-dashoffset: 0;
           }
         }
-
-        graph-state {
-          --background-color: rgba(var(--surface-600) / var(--background-alpha));
-
-          position: absolute;
-          display: flex;
-          flex-direction: column;
-          border-radius: ${borderRadius};
-          transition: box-shadow 0.3s ease-in-out;
-          box-sizing: border-box;
-
-          & > section {
-            background: var(--background-color);
-          }
-
-          &:has(> :nth-child(2)) {
-            & > state-header {
-              border-bottom-left-radius: 0 !important;
-              border-bottom-right-radius: 0 !important;
-
-              &::before {
-                border-bottom-left-radius: 0 !important;
-                border-bottom-right-radius: 0 !important;
-              }
-            }
-          }
-
-          &:has(> :nth-child(2)) {
-            section {
-              padding: 8px 8px 0 8px;
-              display: flex;
-              flex-direction: column;
-              position: relative;
-              background-color: var(--background-color);
-
-              &:last-child {
-                padding-bottom: 8px;
-                border-bottom-left-radius: ${borderRadius};
-                border-bottom-right-radius: ${borderRadius};
-              }
-            }
-          }
-        }
       `
     }
   })

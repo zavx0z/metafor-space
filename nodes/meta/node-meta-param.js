@@ -10,21 +10,20 @@ export default MetaFor("node-meta-param")
   .core()
   .view({
     render: ({context, html}) => html`
-      <node-meta-socket data-direction="input" data-active="false"></node-meta-socket>
-      <span class="parameter-name noselect">${context.title}</span>
-      <input name="${context.name}" class="parameter-value" value=${context.value}/>
-      <node-meta-socket data-active="false" data-direction="output"></node-meta-socket>
+      <metafor-node-meta-socket data-direction="input" data-active="false"></metafor-node-meta-socket>
+      <span class="noselect">${context.title}</span>
+      <input name=${context.name} value=${context.value}/>
+      <metafor-node-meta-socket data-direction="output" data-active="false"/></metafor-node-meta-socket>
     `,
     style: ({css}) => css`
       :host {
-        --background-color: rgba(var(--surface-300));
+        --background-color: rgba(var(--surface-900));
 
+        background-color: var(--background-color);
         margin: 2px 0;
 
-        &:focus-within {
-          border-color: rgba(var(--primary-500));
-          box-shadow: 0 0 2px 1px rgba(var(--primary-500));
-        }
+        display: flex;
+        align-items: center;
 
         &:active {
           border-color: rgba(var(--primary-500));
@@ -42,22 +41,34 @@ export default MetaFor("node-meta-param")
             /* border-color: rgba(var(--secondary-500)); */
           }
         }
+      }
 
-        & input {
-          -webkit-appearance: none;
-          appearance: none;
-          background-color: inherit;
-          margin: 0;
-          width: 100%;
-          height: 100%;
-          text-align: right;
-          border: none;
-          border-radius: 3px;
-          color: var(--font-color);
-          font-size: 13px;
-          box-sizing: border-box;
-          outline: none;
-        }
+      :host:focus-within {
+        border-color: rgba(var(--primary-500));
+        box-shadow: 0 0 2px 1px rgba(var(--primary-500));
+      }
+
+      span {
+        color: var(--font-color);
+        font-size: 13px;
+        white-space: nowrap;
+        user-select: none;
+      }
+
+      input {
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: inherit;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        text-align: right;
+        border: none;
+        border-radius: 13px;
+        color: var(--font-color);
+        font-size: 13px;
+        box-sizing: border-box;
+        outline: none;
       }
     `
   })

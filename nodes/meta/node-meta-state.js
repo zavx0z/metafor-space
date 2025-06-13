@@ -69,34 +69,30 @@ export default MetaFor('node-meta-state')
         & > section {
           background: var(--background-color);
         }
+      }
+      
+      :host:has(> :nth-child(2)) > header {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
 
-        &:has(> :nth-child(2)) {
-          & > header {
-            border-bottom-left-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
+      :host:has(> :nth-child(2)) > header::before {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
 
-            &::before {
-              border-bottom-left-radius: 0 !important;
-              border-bottom-right-radius: 0 !important;
-            }
-          }
-        }
+      :host:has(> :nth-child(2)) > section {
+        padding: 8px 8px 0 8px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background-color: var(--background-color);
+      }
 
-        &:has(> :nth-child(2)) {
-          section {
-            padding: 8px 8px 0 8px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            background-color: var(--background-color);
-
-            &:last-child {
-              padding-bottom: 8px;
-              border-bottom-left-radius: var(--node-border-radius);
-              border-bottom-right-radius: var(--node-border-radius);
-            }
-          }
-        }
+      :host:has(> :nth-child(2)) > section:last-child {
+        padding-bottom: 8px;
+        border-bottom-left-radius: var(--node-border-radius);
+        border-bottom-right-radius: var(--node-border-radius);
       }
 
       button {
