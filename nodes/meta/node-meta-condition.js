@@ -8,13 +8,11 @@ export default MetaFor("node-meta-condition")
     port: t.string({title: "ID порта"}),
     operators: t.array({default: []})
   }))
-  .core(() => ({
-    /** @type{import("../structure/transitions").ConditionsTransitionPortsData | null} */
+  .core(() => /**@type{import("./node-meta-condition.t").Core}*/ ({
     data: null
   }))
   .view({
     render: ({html, context}) => html`
-      <span id=${context.id} data-port=${context.port}></span>
       <metafor-node-meta-socket data-active=${false}></metafor-node-meta-socket>
       ${repeat(context.operators, i => i, i => html`
         <span class="noselect">
@@ -24,19 +22,7 @@ export default MetaFor("node-meta-condition")
       `)}
     `,
     style: ({css}) => css`
-      :host {
-        --shadow-size: 0.5 !important;
-        --background-color: rgba(var(--surface-400)) !important;
-        position: absolute;
-        display: flex;
-        border-radius: 4px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 2px;
-        width: auto;
-      }
-
-      span:first-child:before {
+      :host(:before) {
         --background-color: rgba(var(--surface-400));
       }
     `

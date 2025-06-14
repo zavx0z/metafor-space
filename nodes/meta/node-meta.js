@@ -2,7 +2,7 @@ import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
 import {extractTransitions} from "../structure/transitions.js"
 import "./node-meta-state.js"
-import "./node-meta-condition.js"
+import "./node-meta-conditions.js"
 
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
@@ -35,12 +35,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
         ${repeat(context.conditions, i => i, i => html`
-          <metafor-node-meta-condition
-              id=${i}
-              .core=${{
-                data: core.conditions.find(t => t.id === i)
-              }}
-          ></metafor-node-meta-condition>
+          <metafor-node-meta-conditions id=${i} .core=${{data: core.conditions.find(t => t.id === i)}}/>
         `)}
         ${repeat(context.states, i => i, i => html`
           <metafor-node-meta-state

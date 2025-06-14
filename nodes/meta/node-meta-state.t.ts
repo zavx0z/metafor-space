@@ -1,5 +1,5 @@
 import meta from "./node-meta-state.js"
-import type {Context, Types} from "../dev/meta.t.ts"
+import type {ContextDefinition, ContextData} from "../../types/context.ts"
 
 const snapshot = meta.snapshot()
 
@@ -11,7 +11,7 @@ declare global {
 
 export interface Core {
   data: null | {
-    types: Types
-    context: Context
+    types: ContextDefinition
+    context: ContextData<any>
   }
 }
