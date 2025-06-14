@@ -2,20 +2,13 @@ import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
 import "./node-meta-param.js"
 
-/**
- * @typedef {Object} Data
- * @prop {import("../../types/context").ContextDefinition} types
- * @prop {import("../../types/context").ContextData<any>} context
- */
-
 export default MetaFor('node-meta-state')
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Название состояния", nullable: true}),
     params: t.array({title: "Параметры контекста", default: []})
   }))
-  .core(() => ({
-    /** @type{Data | null} */
+  .core(() => /** @type import("./node-meta-state.t").Core */ ({
     data: null
   }))
   .view({
@@ -24,7 +17,7 @@ export default MetaFor('node-meta-state')
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
-        ${repeat(context.params, key => key,/**@param{string}key*/ key => {
+        ${repeat(context.params, key => key, key => {
           return html`
             <metafor-node-meta-param
                 id=${key}

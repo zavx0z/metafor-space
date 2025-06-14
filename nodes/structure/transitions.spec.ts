@@ -1,6 +1,6 @@
 import {describe, test, expect} from "bun:test"
 import {MetaFor} from "../../metafor"
-import {extractBaseConditions, extractTransitions} from "./transitions"
+import {type ConditionsTransitionsPortsData, extractBaseConditions, extractTransitions} from "./transitions"
 
 describe("Параметры условий переходов", () => {
   const tag = "01975c8r"
@@ -30,7 +30,9 @@ describe("Параметры условий переходов", () => {
         in: "start",
         to: [{
           state: "finish",
-          when: {process: "end"}
+          when: {
+            process: "end"
+          }
         }],
       },
       {
@@ -45,7 +47,9 @@ describe("Параметры условий переходов", () => {
           },
           {
             state: "idle",
-            when: {process: "wait"}
+            when: {
+              process: "wait"
+            }
           }
         ],
       },
@@ -61,7 +65,7 @@ describe("Параметры условий переходов", () => {
   })
 
   test("Данные по всем портам всех условий переходов meta", () => {
-    const result = extractTransitions(snapshot)
+    const result: ConditionsTransitionsPortsData = extractTransitions(snapshot)
     expect(result).toMatchSnapshot()
   })
 })

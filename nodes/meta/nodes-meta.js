@@ -9,10 +9,9 @@ export default MetaFor("nodes-meta", {description: "Nodes", development: true})
     op: t.enum("add", "remove")({title: "Тип патча", nullable: true}),
     nodes: t.array({title: "Коллекция meta", default: []}),
   }))
-  .core(() => ({
+  .core(() => /** @type{import("./nodes-meta.t").Core} */ ({
     elk: new ELK(),
-    /** @type {SnapshotMetaForAny | undefined} */
-    snapshot: undefined,
+    snapshot: null,
   }))
   .view({
     render: ({html, core, context}) => html`
@@ -99,7 +98,7 @@ export default MetaFor("nodes-meta", {description: "Nodes", development: true})
     {
       in: "ожидание патча",
       action: ({core}) => {
-        core.snapshot = undefined
+        core.snapshot = null
       },
       to: [
         {state: "добавление ноды", when: {op: "add"}},

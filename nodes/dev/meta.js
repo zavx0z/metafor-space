@@ -1,11 +1,6 @@
 import {MetaFor} from "../../metafor.js"
-import "../meta/nodes-meta.js"
 
-// setTimeout(() => {
-//   document.body.insertAdjacentHTML('beforeend', '<metafor-test></metafor-test>');
-// }, 1000)
-
-MetaFor("test", {description: "Nodes", development: false})
+export default MetaFor("test", {description: "Nodes", development: false})
   .states("начало", "конец")
   .context((t) => ({
     status: t.enum("start", "end")({title: "Status", default: "end"}),

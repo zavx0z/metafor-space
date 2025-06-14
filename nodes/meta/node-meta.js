@@ -1,6 +1,8 @@
 import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
+import {extractTransitions} from "../structure/transitions.js"
 import "./node-meta-state.js"
+import "./node-meta-condition.js"
 
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
@@ -10,8 +12,10 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     conditions: t.array({title: "Условия переходов", default: []})
   }))
   .core(() => ({
-    /** @type { SnapshotMetaForAny | null } */
-    data: null
+    /** @type{SnapshotMetaForAny | null} */
+    data: null,
+    /** @type{import("../structure/transitions").ConditionsTransitionsPortsData} */
+    conditions: []
   }))
   .view({
     render: ({html, context, core}) => html`
@@ -33,6 +37,9 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
         ${repeat(context.conditions, i => i, i => html`
           <metafor-node-meta-condition
               id=${i}
+              .core=${{
+                data: core.conditions.find(t => t.id === i)
+              }}
           ></metafor-node-meta-condition>
         `)}
         ${repeat(context.states, i => i, i => html`
@@ -52,14 +59,11 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     style: ({css}) => {
       const width = "444px"
       const height = "444px"
-      const nodeHeaderHeight = "36px"
       const borderRadius = "7px"
       return css`
         :host {
           --font-color: rgb(var(--surface-50));
-
           --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
-
 
           position: absolute;
           display: flex;
@@ -168,10 +172,14 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     {
       in: "init",
       action: ({update, core}) => {
-        update({
-          conditions: Object.keys(core.data?.types ?? {}),
-          states: [...core.data?.states || []]
-        })
+        if (core.data) {
+          const conditions = extractTransitions(core.data)
+          core.conditions = conditions
+          update({
+            conditions: conditions.map(i => i.id),
+            states: [...core.data?.states]
+          })
+        }
       },
       to: [{
         state: "ready", when: {
@@ -184,7 +192,10 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     {
       in: "ready",
       action: ({core}) => {
-        requestAnimationFrame(() => core.data = null)
+        requestAnimationFrame(() => {
+          core.data = null
+          core.conditions = []
+        })
       },
       to: [{state: "init", when: {title: null}}]
     }
@@ -193,7 +204,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     {
       filter: ({meta, context}) => meta.tag === context.title,
       action: ({meta, patch}) => {
-        console.log("Node reaction", meta, patch)
+        // console.log("Node reaction", meta, patch)
       }
     }
   ])

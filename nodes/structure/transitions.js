@@ -1,12 +1,12 @@
 import {parseConditionPortId, conditionId, conditionPortId} from "../id.js"
 import {operatorSymbols} from "../operators.js"
 
-/** @type{import("./transitions.js").extractTransitions} */
+/** @type{import("./transitions").extractTransitions} */
 export const extractTransitions = snapshot => {
   return assignContent(extractBaseConditions(snapshot), snapshot)
 }
 
-/** @type{import("./transitions.js").assignContent} */
+/** @type{import("./transitions").assignContent} */
 const assignContent = (transitionsConditionsPorts, snapshot) => {
   return transitionsConditionsPorts.map(condition => ({
     id: condition.id,
@@ -44,10 +44,10 @@ const assignContent = (transitionsConditionsPorts, snapshot) => {
   }))
 }
 
-/** @type{import("./transitions.js").extractBaseConditions} */
+/** @type{import("./transitions").extractBaseConditions} */
 export const extractBaseConditions = snapshot => {
 
-  /** @type{Map<string, import("./transitions.js").TransitionConditionsPorts>} */
+  /** @type{Map<string, import("./transitions").TransitionConditionsPorts>} */
   let conditions = new Map()
 
   snapshot.states.map(state => {

@@ -23,7 +23,10 @@ export declare function extractTransitions(snapshot: SnapshotMetaForAny): Condit
 export declare function assignContent(transitionsConditionsPorts: ConditionsTransitionsPorts, snapshot: SnapshotMetaForAny): ConditionsTransitionsPortsData
 
 /** Данные условий всех переходов для входных портов. */
-export type ConditionsTransitionsPortsData = {
+export type ConditionsTransitionsPortsData = ConditionsTransitionPortsData[]
+
+/** Данные условий перехода для входных портов. */
+export type ConditionsTransitionPortsData = {
   id: string,
   ports: Array<{
     id: string,
@@ -35,7 +38,7 @@ export type ConditionsTransitionsPortsData = {
       }
     }
   }>
-}[]
+}
 
 /**
  * Извлекает все условия в переходах из снимка meta.
@@ -50,7 +53,7 @@ export type ConditionsTransitionsPortsData = {
 export declare function extractBaseConditions(snapshot: SnapshotMetaForAny): ConditionsTransitionsPorts
 
 /** Входные порты условий всех переходов состояний meta */
-type ConditionsTransitionsPorts = TransitionConditionsPorts[]
+export type ConditionsTransitionsPorts = TransitionConditionsPorts[]
 
 /**
  * Входные порты для условия перехода в состояние из других состояний.
