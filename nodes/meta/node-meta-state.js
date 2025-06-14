@@ -1,5 +1,4 @@
 import {MetaFor} from "../../metafor.js"
-import {repeat} from "../../html/directives/repeat.js"
 import "./node-meta-param.js"
 
 export default MetaFor('node-meta-state', {
@@ -15,7 +14,7 @@ export default MetaFor('node-meta-state', {
     data: null
   }))
   .view({
-    render: ({context, html, core}) => html`
+    render: ({context, html, core, repeat}) => html`
       <header>
         <h2 class="noselect">${context.title}</h2>
       </header>

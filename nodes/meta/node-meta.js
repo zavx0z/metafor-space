@@ -1,5 +1,4 @@
 import {MetaFor} from "../../metafor.js"
-import {repeat} from "../../html/directives/repeat.js"
 import {extractTransitions} from "../structure/transitions.js"
 import "./node-meta-state.js"
 import "./node-meta-transition.js"
@@ -16,7 +15,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     transitions: []
   }))
   .view({
-    render: ({html, context, core}) => html`
+    render: ({html, context, core, repeat}) => html`
       <header data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.title}</h2>

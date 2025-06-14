@@ -4,8 +4,9 @@
  */
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
+import {repeat} from "./html/directives/repeat.js"
 
-const debug = true
+const debug = false
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -91,7 +92,7 @@ export const MetaFor = (tag, conf = {}) => {
                       }
                       return {
                         reactions: (reactions) => ({
-                          create: (options={}) => createMeta({
+                          create: (options = {}) => createMeta({
                             states,
                             initialState,
                             contextDefinition,
@@ -309,8 +310,7 @@ function createMeta(
           context: this.context,
           state: this.state,
           core: this.#core,
-          html: html,
-          ref: ref,
+          html, ref, repeat
         }), this.#shadow)
       }
 

@@ -1,6 +1,5 @@
 import {MetaFor} from "../../metafor.js"
 import "./node-meta-condition.js"
-import {repeat} from "../../html/directives/repeat.js"
 
 export default MetaFor("node-meta-transition")
   .states('init', 'ready')
@@ -11,7 +10,7 @@ export default MetaFor("node-meta-transition")
     conditions: null
   }))
   .view({
-    render: ({html, context}) => repeat(context.conditions, c => html`
+    render: ({html, context, repeat}) => repeat(context.conditions, c => html`
       <metafor-meta-condition id=${c}/>
     `),
     style: ({css}) => css`

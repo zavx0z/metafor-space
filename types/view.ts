@@ -2,6 +2,7 @@ import type {ContextData, ContextDefinition, Update} from "./context.ts"
 import type {Core} from "./core.ts"
 import type {HtmlType, TemplateResult} from "../html/html"
 import {ref} from "../html/directives/ref"
+import type {repeat} from "../html/directives/repeat"
 
 /**
  Интерфейс для хранения представления компонента
@@ -60,6 +61,7 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
   core: Core<I>
   html: HtmlType
   ref: typeof ref
+  repeat: typeof repeat
 }
 
 /**
@@ -166,4 +168,4 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  * @see {@link html} - HTML-шаблонизатор
  * @see {@link ref} - Директива ref
  */
-export declare function UpdateView():void
+export declare function UpdateView(): void

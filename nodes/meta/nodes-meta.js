@@ -1,6 +1,5 @@
 import {MetaFor} from "../../metafor.js"
 import ELK from "elkjs"
-import {repeat} from "../../html/directives/repeat.js"
 import "./node-meta.js"
 
 export default MetaFor("nodes-meta", {
@@ -17,7 +16,7 @@ export default MetaFor("nodes-meta", {
     snapshot: null,
   }))
   .view({
-    render: ({html, core: {snapshot}, context}) => repeat(context.nodes, id => html`
+    render: ({html, core: {snapshot}, context, repeat}) => repeat(context.nodes, id => html`
       <metafor-node-meta
         id=${id}
         class="backdrop"

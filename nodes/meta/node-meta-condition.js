@@ -1,5 +1,4 @@
 import {MetaFor} from "../../metafor.js"
-import {repeat} from "../../html/directives/repeat.js"
 
 export default MetaFor("node-meta-condition")
   .states('init','ready')
@@ -12,7 +11,7 @@ export default MetaFor("node-meta-condition")
     data: null
   }))
   .view({
-    render: ({html, context}) => html`
+    render: ({html, context, repeat}) => html`
       <metafor-node-meta-socket data-active=${false}></metafor-node-meta-socket>
       ${repeat(context.operators, i => html`
         <span class="noselect">
