@@ -12,7 +12,7 @@ import {ref} from "../html/directives/ref"
  @property [style] - Стили
  */
 export type ViewDefinition<I extends Record<string, any>, C extends ContextDefinition, S extends string> = {
-  render?: (params: ViewDefinitionParams<I, C, S>) => TemplateResult<1>
+  render?: (params: ViewDefinitionParams<I, C, S>) => (TemplateResult<1> | unknown) // FIXME: repeat directive
   onMount?: MountParams<C, I>
   onDestroy?: DestroyParams<I>
   /**
@@ -66,11 +66,11 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  * Обновляет представление компонента, рендеря его в Shadow DOM.
  * Метод оптимизирован для предотвращения множественных обновлений при одновременном
  * изменении контекста и состояния.
- * 
+ *
  * @private
  * @method
  * @returns {void}
- * 
+ *
  * @description
  * Метод отвечает за обновление визуального представления компонента. Он:
  * 1. Проверяет наличие view-функции
@@ -81,14 +81,14 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  *    - Ядро компонента
  *    - HTML-шаблонизатор
  *    - Директиву ref
- * 
+ *
  * @lifecycle
  * Обновление представления происходит в следующих случаях:
- * 
+ *
  * 1. При инициализации компонента (connectedCallback):
  *    - Если нет начального действия (transition?.action)
  *    - Это предотвращает двойное обновление при наличии начального действия
- * 
+ *
  * 2. При обновлении контекста (update/_update):
  *    - Если this.process = true:
  *      - Обновление происходит только при изменении контекста
@@ -99,7 +99,7 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  *        - Есть view
  *        - Есть изменения в контексте
  *        - Состояние не изменилось
- * 
+ *
  * 3. При переходе состояний (#transition):
  *    - Если есть переходы и выполняются условия:
  *      - При наличии действия:
@@ -110,7 +110,7 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  *      - Без действия:
  *        - Обновляется состояние
  *        - Обновляется представление
- * 
+ *
  * @optimization
  * Метод оптимизирован для предотвращения множественных обновлений:
  * 1. При инициализации:
@@ -121,7 +121,7 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  * 3. При изменении состояния:
  *    - Обновление происходит в #transition
  *    - Предотвращается повторное обновление в update/_update
- * 
+ *
  * @example
  * ```typescript
  * // Инициализация
@@ -131,7 +131,7 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  *   }
  *   view.onMount?.({...})
  * }
- * 
+ *
  * // Обновление контекста
  * update(ctx) {
  *   const upd = this.#updateContext({ctx})
@@ -145,7 +145,7 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  *     this.#updateView()
  *   }
  * }
- * 
+ *
  * // Переход состояний
  * #transition() {
  *   if (actionDefinition?.action) {
@@ -159,9 +159,9 @@ type ViewDefinitionParams<I extends Record<string, any>, C extends ContextDefini
  *   }
  * }
  * ```
- * 
+ *
  * @throws {Error} Если view не определен
- * 
+ *
  * @see {@link render} - Функция рендеринга
  * @see {@link html} - HTML-шаблонизатор
  * @see {@link ref} - Директива ref

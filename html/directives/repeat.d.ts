@@ -1,9 +1,8 @@
 export interface RepeatDirectiveFn {
-    <T>(items: Iterable<T>, keyFnOrTemplate: KeyFn<T> | ItemTemplate<T>, template?: ItemTemplate<T>): unknown
+  // <T>(items: Iterable<T>, keyFnOrTemplate: KeyFn<T> | ItemTemplate<T>, template?: ItemTemplate<T>): unknown
+  <T>(items: Iterable<T>, template: ItemTemplate<T>): unknown
 
-    <T>(items: Iterable<T>, template: ItemTemplate<T>): unknown
-
-    <T>(items: Iterable<T>, keyFn: KeyFn<T> | ItemTemplate<T>, template: ItemTemplate<T>): unknown
+  // <T>(items: Iterable<T>, keyFn: KeyFn<T> | ItemTemplate<T>, template: ItemTemplate<T>): unknown
 }
 
 export type KeyFn<T> = (item: T, index: number) => unknown
@@ -28,8 +27,8 @@ export declare function generateMap(list: unknown[], start: number, end: number)
  * @param template
  */
 export type _getValuesAndKeys<T> = (items: Iterable<T>, keyFnOrTemplate: keyFnOrTemplate<T>, template: ItemTemplate<T>) => {
-    values: unknown[],
-    keys: unknown[]
+  values: unknown[],
+  keys: unknown[]
 }
 
 /**

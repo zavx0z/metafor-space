@@ -11,9 +11,9 @@ export default MetaFor("node-meta-transition")
     conditions: null
   }))
   .view({
-    render: ({html, context}) => html`${repeat(context.conditions, c => html`
+    render: ({html, context}) => repeat(context.conditions, c => html`
       <metafor-meta-condition id=${c}/>
-    `)}`,
+    `),
     style: ({css}) => css`
       :host {
         --shadow-size: 0.5 !important;

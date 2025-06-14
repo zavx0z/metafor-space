@@ -20,7 +20,7 @@ export default MetaFor('node-meta-state', {
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
-        ${repeat(context.params, key => key, key => html`
+        ${repeat(context.params, key => html`
           <metafor-node-meta-param
               id=${key}
               .context=${{

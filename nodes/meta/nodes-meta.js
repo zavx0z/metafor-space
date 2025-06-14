@@ -17,15 +17,14 @@ export default MetaFor("nodes-meta", {
     snapshot: null,
   }))
   .view({
-    render: ({html, core: {snapshot}, context}) => html`
-      ${repeat(context.nodes, id => html`
-        <metafor-node-meta
-          id=${id}
-          class="backdrop"
-          .context=${{title: id}}
-          .core=${{snapshot}}
-        />
-      `)} `,
+    render: ({html, core: {snapshot}, context}) => repeat(context.nodes, id => html`
+      <metafor-node-meta
+        id=${id}
+        class="backdrop"
+        .context=${{title: id}}
+        .core=${{snapshot}}
+      />
+    `),
     style: ({css}) => css`
       :host {
         color: rgb(var(--surface-50));

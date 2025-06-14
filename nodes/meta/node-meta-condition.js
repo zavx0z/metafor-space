@@ -14,7 +14,7 @@ export default MetaFor("node-meta-condition")
   .view({
     render: ({html, context}) => html`
       <metafor-node-meta-socket data-active=${false}></metafor-node-meta-socket>
-      ${repeat(context.operators, i => i, i => html`
+      ${repeat(context.operators, i => html`
         <span class="noselect">
           <span>${"symbol"}</span>
           <span>${String("name")} - ${String("value")}</span>

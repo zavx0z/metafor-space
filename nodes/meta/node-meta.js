@@ -31,10 +31,10 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       </header>
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
-        ${repeat(context.transitions, i => i, i => html`
+        ${repeat(context.transitions, i => html`
           <metafor-node-meta-transition id=${i} .core=${{data: core.transitions.find(t => t.id === i)}}/>
         `)}
-        ${repeat(context.states, i => i, i => html`
+        ${repeat(context.states, i => html`
           <metafor-node-meta-state
               id=${i}
               .context=${{title: i}}
