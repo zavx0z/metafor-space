@@ -2,28 +2,25 @@ import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
 import {extractTransitions} from "../structure/transitions.js"
 import "./node-meta-state.js"
-import "./node-meta-conditions.js"
+import "./node-meta-transition.js"
 
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
     states: t.array({title: "Состояния", default: []}),
-    conditions: t.array({title: "Условия переходов", default: []})
+    transitions: t.array({title: "Переходы", default: []})
   }))
-  .core(() => ({
-    /** @type{SnapshotMetaForAny | null} */
-    data: null,
-    /** @type{import("../structure/transitions").ConditionsTransitionsPortsData} */
-    conditions: []
+  .core(() => /**@type{import("./node-meta.t").Core}*/ ({
+    snapshot: null,
+    transitions: []
   }))
   .view({
     render: ({html, context, core}) => html`
       <header data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.title}</h2>
-        <div>
-          <!--кнопки справа-->
+        <div><!--кнопки справа-->
           <button aria-label="Редактировать">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor">
               <path
@@ -34,8 +31,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       </header>
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
-        ${repeat(context.conditions, i => i, i => html`
-          <metafor-node-meta-conditions id=${i} .core=${{data: core.conditions.find(t => t.id === i)}}/>
+        ${repeat(context.transitions, i => i, i => html`
+          <metafor-node-meta-transition id=${i} .core=${{data: core.transitions.find(t => t.id === i)}}/>
         `)}
         ${repeat(context.states, i => i, i => html`
           <metafor-node-meta-state
@@ -43,8 +40,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
               .context=${{title: i}}
               .core=${{
                 data: {
-                  types: core.data?.types,
-                  context: core.data?.context,
+                  types: core.snapshot?.types,
+                  context: core.snapshot?.context,
                 }
               }}
           />
@@ -167,12 +164,12 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     {
       in: "init",
       action: ({update, core}) => {
-        if (core.data) {
-          const conditions = extractTransitions(core.data)
-          core.conditions = conditions
+        if (core.snapshot) {
+          const transitions = extractTransitions(core.snapshot)
+          core.transitions = transitions
           update({
-            conditions: conditions.map(i => i.id),
-            states: [...core.data?.states]
+            transitions: transitions.map(i => i.id),
+            states: [...core.snapshot?.states]
           })
         }
       },
@@ -180,7 +177,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
         state: "ready", when: {
           title: {isNull: false},
           states: {isEmpty: false},
-          conditions: {isEmpty: false}
+          transitions: {isEmpty: false}
         }
       }]
     },
@@ -188,8 +185,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       in: "ready",
       action: ({core}) => {
         requestAnimationFrame(() => {
-          core.data = null
-          core.conditions = []
+          core.snapshot = null
+          core.transitions = []
         })
       },
       to: [{state: "init", when: {title: null}}]

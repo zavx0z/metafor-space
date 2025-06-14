@@ -108,9 +108,9 @@ export type PartialContextData<C extends ContextDefinition> = Partial<{
  Принимает частичный объект с новыми значениями контекста.
 
  @template C - Тип контекста
- @property ctx - Новые данные контекста
+ @property context - Новые данные контекста
  */
-export type Update<C extends ContextDefinition> = (ctx: UpdateParameters<C>) => void
+export type Update<C extends ContextDefinition> = (context: UpdateParameters<C>) => void
 
 /**
  Функция обновления контекста

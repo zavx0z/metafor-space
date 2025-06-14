@@ -49,6 +49,11 @@ export declare function MetaFor(
     context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
       core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
         view: (view: ViewDefinition<I, C, S>) => {
+          /**
+           * Переходы состояний
+           * @param initialState - начальное состояние
+           * @param transitions - правила переходов
+           */
           transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
             reactions: (reactions: Reactions<C, I>) => {
               create: (options?: CreateParams<C, S, I>) => Meta<S, C>

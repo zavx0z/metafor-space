@@ -2,7 +2,10 @@ import {MetaFor} from "../../metafor.js"
 import {repeat} from "../../html/directives/repeat.js"
 import "./node-meta-param.js"
 
-export default MetaFor('node-meta-state')
+export default MetaFor('node-meta-state', {
+  description: "Нода состояния meta",
+  development: true
+})
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Название состояния", nullable: true}),
@@ -17,17 +20,16 @@ export default MetaFor('node-meta-state')
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
-        ${repeat(context.params, key => key, key => {
-          return html`
-            <metafor-node-meta-param
-                id=${key}
-                .context=${{
-                  name: key,
-                  title: core.data?.types[key].title,
-                  value: core.data?.context[key],
-                }}
-            /> `
-        })}
+        ${repeat(context.params, key => key, key => html`
+          <metafor-node-meta-param
+              id=${key}
+              .context=${{
+                name: key,
+                title: core.data?.types[key].title,
+                value: core.data?.context[key],
+              }}
+          />
+        `)}
       </section>
       <section>
         <button>

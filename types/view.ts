@@ -9,11 +9,16 @@ import {ref} from "../html/directives/ref"
  @property render - Коллбек для рендеринга компонента
  @property onMount - Коллбек для монтирования компонента
  @property onDestroy - Коллбек для размонтирования компонента
+ @property [style] - Стили
  */
 export type ViewDefinition<I extends Record<string, any>, C extends ContextDefinition, S extends string> = {
   render?: (params: ViewDefinitionParams<I, C, S>) => TemplateResult<1>
   onMount?: MountParams<C, I>
   onDestroy?: DestroyParams<I>
+  /**
+   * Стили
+   * @param css
+   */
   style?: ({css}: { css: (strings: TemplateStringsArray, ...values: any[]) => CSSStyleSheet }) => void
 }
 

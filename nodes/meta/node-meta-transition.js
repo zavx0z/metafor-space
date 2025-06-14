@@ -2,19 +2,17 @@ import {MetaFor} from "../../metafor.js"
 import "./node-meta-condition.js"
 import {repeat} from "../../html/directives/repeat.js"
 
-export default MetaFor("node-meta-conditions")
+export default MetaFor("node-meta-transition")
   .states('init', 'ready')
   .context(t => ({
     conditions: t.array({default: []})
   }))
-  .core(() => /**@type{import("./node-meta-conditions.t").Core}*/({
-    data: null
+  .core(() => /**@type{import("./node-meta-transition.t.js").Core}*/({
+    conditions: null
   }))
   .view({
-    render: ({html, context}) => html`${repeat(context.conditions, c => c, c => html`
-      <metafor-meta-condition
-          id=${c}
-      ></metafor-meta-condition>
+    render: ({html, context}) => html`${repeat(context.conditions, c => html`
+      <metafor-meta-condition id=${c}/>
     `)}`,
     style: ({css}) => css`
       :host {
