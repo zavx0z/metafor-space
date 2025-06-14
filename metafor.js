@@ -1,7 +1,5 @@
-/**
- * @typedef {import("./types/context").ContextDefinition} ContextDefinition
- * @typedef {import("./types/core").CoreObj} CoreObj
- */
+/** @typedef {import("./types/context").ContextDefinition} ContextDefinition
+ * @typedef {import("./types/core").CoreObj} CoreObj */
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 import {repeat} from "./html/directives/repeat.js"
@@ -231,7 +229,7 @@ function createMeta(
               listeners.delete(listener)
             }
           },
-          clear: listeners.clear,
+          clear: () => listeners.clear(),
         }
       })(initialState))
 
@@ -316,7 +314,7 @@ function createMeta(
 
       disconnectedCallback() {
         this.#sendPatches({op: "remove", path: "/", value: null})
-        if (this.#channel) {
+        if (this.#channel) { // TODO: перед удалением остановить асинхронные функции
           this.#channel.onmessage = null
           this.#channel.close()
           this.#channel = undefined
@@ -425,9 +423,7 @@ function createMeta(
         else finallyFn()
       }
 
-      /**
-       * Проверка условий перехода и выполнение действия
-       */
+      /** Проверка условий перехода и выполнение действия */
       #transition = () => {
         const transitionFrom = transitions.find((t) => t.in === this.state)
         if (transitionFrom) {
