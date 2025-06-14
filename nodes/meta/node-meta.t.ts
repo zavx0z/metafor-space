@@ -1,5 +1,5 @@
 import meta from "./node-meta.js"
-import type {ConditionsTransitionPortsData} from "./node-meta-transition.t.ts"
+import type {ConditionsTransitionsPortsData} from "./node-meta-transition.t.ts"
 
 const snapshot = meta.snapshot()
 
@@ -14,7 +14,3 @@ export interface Core {
   snapshot: SnapshotMetaForAny | null
   transitions: ConditionsTransitionsPortsData
 }
-
-
-/** Данные условий всех переходов для входных портов. */
-export type ConditionsTransitionsPortsData = ConditionsTransitionPortsData[]

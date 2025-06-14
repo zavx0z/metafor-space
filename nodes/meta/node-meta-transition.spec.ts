@@ -1,6 +1,7 @@
 import {describe, test, expect} from "bun:test"
 import {MetaFor} from "../../metafor"
-import {type ConditionsTransitionsPortsData, extractBaseConditions, extractTransitions} from "./transitions"
+import {type ConditionsTransitionsPortsData} from "./node-meta-transition.t.ts"
+import {extractBaseConditions, extractTransitions} from "./node-meta-transition.js"
 
 describe("Параметры условий переходов", () => {
   const tag = "01975c8r"
