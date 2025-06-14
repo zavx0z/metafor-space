@@ -903,8 +903,20 @@ export class PropertyPart extends AttributePart {
     // @ts-ignore
     if (this.name === "context" && value) this.element._updateContext(value)
     // @ts-ignore
-    else if (this.name === "core") this.element._updateCore(value)
-    else
+    else if (this.name === "core") {
+      try { //@ts-ignore
+        this.element._updateCore(value)
+      } catch (e) {
+        const {message} = /**@type{Error}*/ (e)
+        switch (message) {
+          case "this.element._updateCore is not a function":
+            const tag = this.element.tagName.toLowerCase()
+            throw new Error(`meta-компонент ${tag} не создан`)
+          default:
+            throw e
+        }
+      }
+    } else
       // @ts-ignore
       this.element[this.name] = value === nothing ? undefined : value
   }
