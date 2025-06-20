@@ -1,4 +1,5 @@
 import meta from "./node-meta-transition.js"
+import type {Operators} from "./node-meta-operator.t.ts"
 
 const snapshot = meta.snapshot()
 
@@ -35,13 +36,8 @@ export type ConditionsTransitionPortsData = {
 
 export type Port = {
   id: string,
-  operators: Operator
+  operators: Operators
 }
-export type Operator = Record<string, {
-  symbol: string,
-  title: string,
-  value: any
-}>
 
 /**
  * Извлекает все условия в переходах из снимка meta.

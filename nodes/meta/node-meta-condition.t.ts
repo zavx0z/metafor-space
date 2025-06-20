@@ -1,5 +1,5 @@
 import meta from "./node-meta-condition.js"
-import type {Port} from "./node-meta-transition.t.ts"
+import type {Operators} from "./node-meta-operator.t.ts"
 
 const snapshot = meta.snapshot()
 
@@ -11,5 +11,5 @@ declare global {
 export type MetaForNodeMetaCondition = typeof snapshot
 
 export interface Core {
-  operators?: Port['operators']
+  operators?: Operators
 }

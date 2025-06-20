@@ -1,5 +1,4 @@
 import meta from "./node-meta-operator.js"
-import type {Operator} from "./node-meta-transition.t.ts"
 
 const snapshot = meta.snapshot()
 
@@ -11,5 +10,11 @@ declare global {
 export type MetaForNodeMetaOperator = typeof snapshot
 
 export interface Core {
-  data?: Operator
+  data?: Operators
 }
+
+export type Operators = Record<string, {
+  symbol: string,
+  title: string,
+  value: any
+}>
