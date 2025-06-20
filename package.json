@@ -152,6 +152,6 @@
     "test:directives:async-append[debug]": "bun test tests/directives/async-append.spec.ts --inspect-brk",
     "test:directives:async-append[watch]": "bun test tests/directives/async-append.spec.ts --watch",
 
-    "test:node:layout:transitions": "bun test nodes/tests/conditions.input.ports.spec.ts"
+    "test:node-meta-transition": "bun test nodes/meta/node-meta-transition.spec.ts"
   }
 }

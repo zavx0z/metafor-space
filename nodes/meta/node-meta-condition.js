@@ -1,23 +1,23 @@
 import {MetaFor} from "../../metafor.js"
+import "./node-meta-operator.js"
 
 export default MetaFor("node-meta-condition")
-  .states('init','ready')
+  .states('init', 'ready')
   .context(t => ({
-    id: t.string({}),
     port: t.string({title: "ID порта"}),
-    operators: t.array({default: []})
+    operators: t.array({title: "Операторы сравнения", default: []})
   }))
   .core(() => /**@type{import("./node-meta-condition.t").Core}*/ ({
-    data: null
+    operators: undefined
   }))
   .view({
-    render: ({html, context, repeat}) => html`
+    render: ({html, context, repeat, core}) => html`
       <metafor-node-meta-socket data-active=${false}></metafor-node-meta-socket>
-      ${repeat(context.operators, i => html`
-        <span class="noselect">
-          <span>${"symbol"}</span>
-          <span>${String("name")} - ${String("value")}</span>
-        </span>
+      ${repeat(context.operators, id => html`
+        <metafor-node-meta-operator
+          id=${id}
+          .core=${{data: core.operators?.[id]}}
+        />
       `)}
     `,
     style: ({css}) => css`
@@ -26,6 +26,19 @@ export default MetaFor("node-meta-condition")
       }
     `
   })
-  .transitions('init', [])
+  .transitions('init', [
+    {
+      in: "init",
+      action({update, core}) {
+        if (core.operators)
+          update({operators: Object.keys(core.operators)})
+      },
+      to: [{state: "ready", when: {operators: {isEmpty: false}}}]
+    },
+    {
+      in: "ready",
+      to: [{state: "init", when: {operators: {isEmpty: true}}}]
+    }
+  ])
   .reactions([])
   .create()

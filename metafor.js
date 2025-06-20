@@ -4,7 +4,7 @@ import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 import {repeat} from "./html/directives/repeat.js"
 
-const debug = false
+const debug = localStorage.getItem('debug') === "true"
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
@@ -55,7 +55,7 @@ export const MetaFor = (tag, conf = {}) => {
                   }
                   return {
                     reactions: (reactions) => ({
-                      create: (options) => createMeta({
+                      create: (options={}) => createMeta({
                         states,
                         initialState,
                         contextDefinition,
@@ -68,7 +68,7 @@ export const MetaFor = (tag, conf = {}) => {
                         reactions
                       }),
                     }),
-                    create: (options) => createMeta({
+                    create: (options={}) => createMeta({
                       states,
                       initialState,
                       contextDefinition,
@@ -104,7 +104,7 @@ export const MetaFor = (tag, conf = {}) => {
                             reactions
                           }),
                         }),
-                        create: (options) => createMeta({
+                        create: (options={}) => createMeta({
                           states,
                           initialState,
                           contextDefinition,

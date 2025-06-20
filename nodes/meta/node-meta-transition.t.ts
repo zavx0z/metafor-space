@@ -7,11 +7,41 @@ declare global {
     'metafor-node-meta-transition': Meta<typeof snapshot.state, typeof snapshot.context>
   }
 }
+
 export type MetaForNodeMetaTransition = typeof snapshot
 
 export interface Core {
-  conditions: ConditionsTransitionPortsData | null
+  conditions: Port[]
 }
+
+/**
+ * Извлекает все условия в переходах из снимка meta.
+ * Формирует входные порты для каждого условия.
+ * Генерирует идентификаторы.
+ * Добавляет информацию операторов условий переходов.
+ *
+ * @param snapshot - Снимок meta.
+ * @returns {ConditionsTransitionsPortsData} - Данные условий всех переходов для входных портов.
+ *
+ * @includeExample ./node-meta-transition.spec.ts
+ */
+export declare function statesConditions(snapshot: SnapshotMetaForAny): Map<string, ConditionsTransitionPortsData>
+
+/** Данные условий перехода для входных портов. */
+export type ConditionsTransitionPortsData = {
+  id: string,
+  ports: Array<Port>
+}
+
+export type Port = {
+  id: string,
+  operators: Operator
+}
+export type Operator = Record<string, {
+  symbol: string,
+  title: string,
+  value: any
+}>
 
 /**
  * Извлекает все условия в переходах из снимка meta.
@@ -40,20 +70,6 @@ export declare function assignContent(transitionsConditionsPorts: ConditionsTran
 /** Данные условий всех переходов для входных портов. */
 export type ConditionsTransitionsPortsData = ConditionsTransitionPortsData[]
 
-/** Данные условий перехода для входных портов. */
-export type ConditionsTransitionPortsData = {
-  id: string,
-  ports: Array<{
-    id: string,
-    operators: {
-      [key: string]: {
-        symbol: string,
-        title: string,
-        value: any
-      }
-    }
-  }>
-}
 
 /**
  * Извлекает все условия в переходах из снимка meta.

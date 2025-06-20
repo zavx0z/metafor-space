@@ -111,14 +111,7 @@ export default MetaFor("nodes-meta", {
   ])
   .reactions([
     {
-      filter: ({patch}) =>
-        patch.op === "add" &&
-        patch.value.id !== "node-meta" &&
-        patch.value.id !== "node-meta-state" &&
-        patch.value.id !== "node-meta-socket" &&
-        patch.value.id !== "node-meta-transition" &&
-        patch.value.id !== "node-meta-condition" &&
-        patch.value.id !== "node-meta-param",
+      filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta"),
       action: ({context, patch, update, core}) => {
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})

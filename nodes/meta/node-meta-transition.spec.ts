@@ -1,7 +1,8 @@
 import {describe, test, expect} from "bun:test"
 import {MetaFor} from "../../metafor"
 import {type ConditionsTransitionsPortsData} from "./node-meta-transition.t.ts"
-import {extractBaseConditions, extractTransitions} from "./node-meta-transition.js"
+
+import {extractBaseConditions, extractTransitions} from "./node-meta"
 
 describe("Параметры условий переходов", () => {
   const tag = "01975c8r"
@@ -22,7 +23,9 @@ describe("Параметры условий переходов", () => {
         to: [{
           state: "start",
           when: {
-            process: "run",
+            // process: [{eq: "run"}], // TODO: logic or array
+            // process: {eq: ["run", "start"]},
+            process: {eq: "run"},
             count: 0
           }
         }]
@@ -59,6 +62,10 @@ describe("Параметры условий переходов", () => {
   const meta = document.querySelector(`metafor-${tag}`) as MetaAny
 
   const snapshot = meta.snapshot()
+
+  test("snapshot transitions", () => {
+    expect(snapshot.transitions).toMatchSnapshot()
+  })
 
   test("Извлечение всех условий и формирование входных портов", () => {
     const result = extractBaseConditions(snapshot)
