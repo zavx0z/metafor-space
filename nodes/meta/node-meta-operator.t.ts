@@ -1,23 +1,23 @@
-import meta, {operatorSymbols} from "./node-meta-operator.js"
-import type {StringEnumDefinition} from "../../types/context.ts"
+import meta from "./node-meta-operator.js"
 
 const snapshot = meta.snapshot()
-type ContextTypes = typeof snapshot.types
-type ContextData = typeof snapshot.context.op
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-node-meta-operator': Meta<typeof snapshot.state, ContextTypes>
+    'metafor-node-meta-operator': Meta<typeof snapshot.state, typeof snapshot.types>
   }
 }
-export type MetaForNodeMetaOperator = typeof snapshot
 
-export interface Core {
-  data?: Operators
-  // data?: Record<keyof typeof operatorSymbols, string>
-  operators: typeof operatorSymbols
-  // operators: Record<StringEnumDefinition<any, any>>
+export interface Core<C extends Record<string, unknown>> {
+  operators: Record<keyof C['op'], {
+    symbol: string,
+    title: string,
+    value: any
+  }>
+  data?: { op: keyof C['op'], value: unknown }
+  // init({op, value}: { op: keyof C['op'], value: unknown }): void
 }
+
 export type Operators = Record<string, {
   symbol: string,
   title: string,
