@@ -8,8 +8,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
   .context(t => ({
     title: t.string({title: "Заголовок", nullable: true}),
-    states: t.array({title: "Состояния", default: []}),
-    transitions: t.array({title: "Переходы", default: []})
+    states: t.array({title: "Состояния"}),
+    transitions: t.array({title: "Переходы"})
   }))
   .core(() => /**@type{import("./node-meta.t").Core}*/ ({
     snapshot: null,

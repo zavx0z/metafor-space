@@ -5,7 +5,7 @@ const snapshot = meta.snapshot()
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-node-meta-transition': Meta<typeof snapshot.state, typeof snapshot.context>
+    'metafor-node-meta-transition': Meta<typeof snapshot.state, typeof snapshot.types>
   }
 }
 

@@ -9,7 +9,7 @@ export default MetaFor("nodes-meta", {
   .states("ожидание патча", "добавление ноды", "удаление ноды")
   .context(t => ({
     op: t.enum("add", "remove")({title: "Тип патча", nullable: true}),
-    nodes: t.array({title: "Коллекция meta", default: []}),
+    nodes: t.array({title: "Коллекция meta"}),
   }))
   .core(() => /** @type{import("./nodes-meta.t").Core} */ ({
     elk: new ELK(),

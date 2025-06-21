@@ -8,7 +8,7 @@ export default MetaFor('node-meta-state', {
   .states("hide", "visible")
   .context(t => ({
     title: t.string({title: "Название состояния", nullable: true}),
-    params: t.array({title: "Параметры контекста", default: []})
+    params: t.array({title: "Параметры контекста"})
   }))
   .core(() => /** @type import("./node-meta-state.t").Core */ ({
     data: null
