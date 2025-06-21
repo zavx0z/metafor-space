@@ -329,7 +329,6 @@ export class Template {
            Предупреждает, если в элементе `<textarea>` присутствует выражение.
            Выбрасывает исключение для элемента `<template>`, так как привязки
            внутри него не поддерживаются.
-           *
            Проверка выполняется путём поиска в `innerHTML` специального маркера,
            указывающего на наличие привязки. Таким образом удаётся отследить случаи,
            когда выражения внутри `<textarea>` превращаются в текстовые узлы.
@@ -346,22 +345,33 @@ export class Template {
               const realName = attrNames[attrNameIndex++]
               const value = /**@type {string} */ (element.getAttribute(name))
               const statics = value.split(marker)
-              const m = /** @type {RegExpExecArray} */ (/([.?@])?(.*)/.exec(realName))
-              parts.push({
-                type: ATTRIBUTE_PART,
-                index: nodeIndex,
-                name: m[2],
-                strings: statics,
-                // @ts-ignore FIXME ctor
-                ctor:
-                  m[1] === "."
-                    ? PropertyPart
-                    : m[1] === "?"
-                      ? BooleanAttributePart
-                      : m[1] === "@"
-                        ? EventPart
-                        : AttributePart,
-              })
+              if (realName === "data") {
+                parts.push({
+                  type: ATTRIBUTE_PART,
+                  index: nodeIndex,
+                  name: realName,
+                  strings: statics,
+                  ctor: PropertyPart
+                })
+              } else {
+                const m = /** @type {RegExpExecArray} */ (/([.?@])?(.*)/.exec(realName))
+                parts.push({
+                  type: ATTRIBUTE_PART,
+                  index: nodeIndex,
+                  name: m[2],
+                  strings: statics,
+                  // @ts-ignore FIXME ctor
+                  ctor:
+                    m[1] === "."
+                      ? PropertyPart
+                      : m[1] === "?"
+                        ? BooleanAttributePart
+                        : m[1] === "@"
+                          ? EventPart
+                          : AttributePart,
+                })
+              }
+
               element.removeAttribute(name)
             } else if (name.startsWith(marker)) {
               parts.push({type: ELEMENT_PART, index: nodeIndex})
@@ -902,8 +912,9 @@ export class PropertyPart extends AttributePart {
     // console.log(this.element, this.name, value)
     // @ts-ignore
     if (this.name === "context" && value) this.element._updateContext(value)
-    // @ts-ignore
-    else if (this.name === "core") {
+    else if (this.name === "data") {  // @ts-ignore
+      this.element._updateCore({data: value})
+    } else if (this.name === "core") {
       try { //@ts-ignore
         this.element._updateCore(value)
       } catch (e) {
