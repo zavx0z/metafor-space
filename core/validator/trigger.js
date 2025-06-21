@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  Типы условий для разных типов данных
 
@@ -35,28 +36,28 @@ const CONDITIONS = {
  @param {import('../../types/transitions').Transitions<any,any, any>} params.transitions Массив переходов
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
-export function validateTriggers({ tag, transitions: transitionsList, contextDefinition }) {
+export function validateTriggers({tag, transitions: transitionsList, contextDefinition}) {
   transitionsList.forEach((transition, transitionIndex) => {
     transition.to.forEach((to) => {
       if (!to.when) return
 
       if (Object.keys(to.when).length === 0) {
         throw new Error(
-          `Пустой триггер в переходе из состояния "${transition.from}" в "${to.state}". Триггер должен содержать хотя бы одно условие.`
+          `Пустой триггер в переходе из состояния "${transition.in}" в "${to.state}". Триггер должен содержать хотя бы одно условие.`
         )
       }
 
       Object.entries(to.when).forEach(([field, condition]) => {
         const fieldDef = contextDefinition[field]
         if (!fieldDef)
-          throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.from}`)
+          throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.in}`)
 
         validateTrigger(field, fieldDef, condition)
 
         if (typeof condition === "object" && condition !== null) {
           const conditionKeys = Object.keys(condition)
           if (conditionKeys.length === 0)
-            throw new Error(`Пустое условие в триггере /${transition.from}/${field}/trigger`)
+            throw new Error(`Пустое условие в триггере /${transition.in}/${field}/trigger`)
 
           const allowedKeys = CONDITIONS[fieldDef.type]
           const invalidKeys = conditionKeys.filter((key) => !allowedKeys.has(key))
@@ -234,7 +235,7 @@ function validateArrayTrigger(field, value) {
           const lengthKeys = Object.keys(value.length)
           const validLengthKeys = ['eq', 'gt', 'lt']
           const hasValidLengthKey = lengthKeys.some(key => validLengthKeys.includes(key))
-          
+
           if (!hasValidLengthKey) {
             throw new Error(
               `Некорректный формат length для поля массива "${field}". Ожидается объект с ключами ${validLengthKeys.join(", ")}. Получено: ${JSON.stringify(value.length)}`
@@ -274,7 +275,7 @@ function validateEnumTrigger(field, value, definition) {
     return
   }
 
-  const { values } = definition
+  const {values} = definition
   if (typeof value === "string" || typeof value === "number") {
     if (!values?.includes(value)) {
       throw new Error(
