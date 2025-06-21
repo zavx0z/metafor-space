@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    body {
+      background: #1f2023;
+      color: aliceblue;
+    }
+  </style>
+</head>
+<body>
+<script type="module">
+  import {html, render} from "../html.js"
+  import {repeat} from "./repeat.js"
+
+  const items = new Map([[1, {name: "one", title: "1"}], [2, {name: "two", title: '2'}]])
+  const template = html`
+    <ul>
+      ${repeat(items, ([i, v]) => html`
+        <li title=${v.title}>${v.name}</li>
+      `)}
+    </ul>
+  `
+  render(template, document.body)
+  setTimeout(() => {
+    render(template, document.body)
+    console.log("без изменений")
+  }, 2000)
+  setTimeout(() => {
+    items.get(1).name = "any"
+    render(template, document.body)
+  }, 5000)
+  setTimeout(() => {
+    items.get(2).title = "any"
+    render(template, document.body)
+  }, 7000)
+  setTimeout(() => {
+    items.set(3, {name: "еще один", title: '3'})
+    render(template, document.body)
+  }, 10000)
+
+  setTimeout(() => {
+    items.delete(3)
+    render(template, document.body)
+  }, 15000)
+</script>
+</body>
+</html>

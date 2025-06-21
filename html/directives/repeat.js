@@ -269,7 +269,8 @@ class RepeatDirective extends Directive {
                     )
                     const oldPart = oldIndex !== undefined ? oldParts[oldIndex] : null
                     if (oldPart === null) {
-                        // Нет старой части для этого значения; создать новую и вставить её
+                        // Новый элемент!
+                        console.log('Создан новый элемент с ключом:', newKeys[newHead])
                         const newPart = insertPart(containerPart, oldParts[oldHead])
                         setChildPartValue(newPart, newValues[newHead])
                         newParts[newHead] = newPart
