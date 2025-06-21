@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   contextId,
   contextPortId,
@@ -46,24 +45,25 @@ const config = {
   }
 }
 
+// * @param {import("../../graph/types/index.ts").Metrics} metrics - метрики для расчета layout
+
 /**
  * Формирует триггеры для состояния
  * @param {string} state - текущее состояние
- * @param {import("../../types/meta").Snapshot<any, any, any>} snapshot - снапшот с данными
+ * @param {SnapshotMetaForAny} snapshot - снапшот с данными
  * @param {any} metrics - метрики для расчета layout
- // * @param {import("../../graph/types/index.ts").Metrics} metrics - метрики для расчета layout
  * @returns {Array<import('elkjs').ElkNode>} массив триггеров
  */
 function createTriggers(state, snapshot, metrics) {
   const triggers = new Map()
 
-  for (const collapse of snapshot.collapses) {
-    if (collapse.from === state) continue
+  for (const collapse of snapshot.transitions) {
+    if (collapse.in === state) continue
 
     for (const target of collapse.to) {
       if (target.state !== state) continue
 
-      for (const param of Object.keys(target.trigger)) {
+      for (const param of Object.keys(target.when)) {
         const id = conditionId({meta: snapshot.id, state: state, condition: param})
 
         const [width, height] = metrics.triggers.sizes[id]
@@ -74,12 +74,18 @@ function createTriggers(state, snapshot, metrics) {
 
         trigger.children.push({
           layoutOptions: config.triggerParameter,
-          id: triggerParameterId({atom: snapshot.id, from: collapse.from, to: state, param}),
+          id: triggerParameterId({atom: snapshot.id, from: collapse.in, to: state, param}),
           width: width,
           height: metrics.triggers.portSpacing,
           ports: [{
             layoutOptions: config.port.west,
-            id: conditionPortId({meta: snapshot.id, from: collapse.from, to: target.state, condition: param, direction: 'west'})
+            id: conditionPortId({
+              meta: snapshot.id,
+              from: collapse.in,
+              to: target.state,
+              condition: param,
+              direction: 'west'
+            })
           }]
         })
       }
@@ -88,10 +94,12 @@ function createTriggers(state, snapshot, metrics) {
   return Array.from(triggers.values())
 }
 
+// @param {import("../../graph/types/index.ts").Metrics} metrics - метрики для расчета layout
+
 /**
  * Преобразует формат collapses в формат ELK
- * @param {QMachineSnapshot} snapshot - объект с collapses и другими данными
- * @param {import("../../graph/types/index.ts").Metrics} metrics - метрики для расчета layout
+ * @param {SnapshotMetaForAny} snapshot - объект с collapses и другими данными
+ * @param {*} metrics - метрики для расчета layout
  */
 export function generate(snapshot, metrics) {
   /** @type {Array<import('elkjs').ElkNode>} */
@@ -166,10 +174,10 @@ export function generate(snapshot, metrics) {
           return {
             id: edgeId({
               sourceId: contextPortId({atom: snapshot.id, state: from, param: condition, direction: 'output'}),
-              targetId: conditionPortId({meta: snapshot.id, from, to, param: condition, direction: 'west'})
+              targetId: conditionPortId({meta: snapshot.id, from, to, condition, direction: 'west'})
             }),
             sources: [contextPortId({atom: snapshot.id, state: from, param: condition, direction: 'output'})],
-            targets: [conditionPortId({meta: snapshot.id, from, to, param: condition, direction: 'west'})]
+            targets: [conditionPortId({meta: snapshot.id, from, to, condition, direction: 'west'})]
           }
         })).flat()
   }
