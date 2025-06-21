@@ -9,7 +9,7 @@ declare global {
 }
 
 export interface Core<C extends Record<string, unknown>> {
-  operators: Record<keyof C['operators'], {
+  data: Record<keyof C['operators'], {
     symbol: string,
     title: string,
     value: any

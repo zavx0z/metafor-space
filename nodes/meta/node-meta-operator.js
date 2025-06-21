@@ -1,4 +1,5 @@
 import {MetaFor} from "../../metafor.js"
+import {nothing} from "../../html/html.js"
 
 export default MetaFor("node-meta-operator", {development: true})
   .states('init', 'ready')
@@ -166,7 +167,7 @@ export default MetaFor("node-meta-operator", {development: true})
     },
   }))
   .view({
-    render: ({context, html, state}) => state !== "ready" ? null : html`
+    render: ({context, html, state}) => state !== "ready" ? nothing : html`
       <span>${context.symbol}</span>
       <span>${context.title} - ${String(context.value)}</span>
     `,

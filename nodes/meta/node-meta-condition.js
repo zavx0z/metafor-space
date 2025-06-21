@@ -8,7 +8,7 @@ export default MetaFor("node-meta-condition")
     operators: t.array({title: "Операторы сравнения"})
   }))
   .core(({context}) => /**@type{import("./node-meta-condition.t").Core<typeof context>}*/ ({
-    operators: {},
+    data: {},
   }))
   .view({
     render: ({html, context, repeat, core}) => html`
@@ -16,7 +16,7 @@ export default MetaFor("node-meta-condition")
       ${repeat(context.operators, id => html`
         <metafor-node-meta-operator
           id=${id}
-          .context=${{op: id, value: core.operators[id].value}}
+          data=${{op: id, value: core.data[id].value}}
         />
       `)}
     `,
@@ -30,7 +30,7 @@ export default MetaFor("node-meta-condition")
     {
       in: "init",
       action({update, core}) {
-        update({operators: Object.keys(core.operators)})
+        update({operators: Object.keys(core.data)})
       },
       to: [{state: "ready", when: {operators: {isEmpty: false}}}]
     },
