@@ -1,6 +1,6 @@
 export interface RepeatDirectiveFn {
   // <T>(items: Iterable<T>, keyFnOrTemplate: KeyFn<T> | ItemTemplate<T>, template?: ItemTemplate<T>): unknown
-  <T>(items: Iterable<T>, template: ItemTemplate<T>): unknown
+  <T>(items: Iterable<T> | Array<number> | Array<string>, template: ItemTemplate<T>): unknown
 
   // <T>(items: Iterable<T>, keyFn: KeyFn<T> | ItemTemplate<T>, template: ItemTemplate<T>): unknown
 }

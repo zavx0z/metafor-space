@@ -36,7 +36,7 @@ export const MetaFor = (tag, conf = {}) => {
             string: (params) => ({type: "string", ...params}),
             number: (params) => ({type: "number", ...params}),
             boolean: (params) => ({type: "boolean", ...params}),
-            array: (params) => ({type: "array", ...params}),
+            array: (params) => ({type: "array", default: params.default ?? [], ...params}),
             enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
           })
           development && import("./core/validator/index.js").then((module) =>
@@ -55,7 +55,7 @@ export const MetaFor = (tag, conf = {}) => {
                   }
                   return {
                     reactions: (reactions) => ({
-                      create: (options={}) => createMeta({
+                      create: (options = {}) => createMeta({
                         states,
                         initialState,
                         contextDefinition,
@@ -68,7 +68,7 @@ export const MetaFor = (tag, conf = {}) => {
                         reactions
                       }),
                     }),
-                    create: (options={}) => createMeta({
+                    create: (options = {}) => createMeta({
                       states,
                       initialState,
                       contextDefinition,
@@ -104,7 +104,7 @@ export const MetaFor = (tag, conf = {}) => {
                             reactions
                           }),
                         }),
-                        create: (options={}) => createMeta({
+                        create: (options = {}) => createMeta({
                           states,
                           initialState,
                           contextDefinition,
@@ -384,18 +384,19 @@ function createMeta(
       }
 
       /** @type {import('./types/context')._Update<C>} */
-      _updateContext(ctx) {
+      _updateContext = (ctx) => {
         return Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
           if (!(key in this.context)) {
             console.warn(`${String(key)} отсутствует в контексте!`, this.context)
             return acc
           }
           if (this.context[key] !== ctx[key]) {
+            // @ts-ignore - Приведение типов для совместимости
             this.context[key] = ctx[key]
             return {...acc, [key]: ctx[key]}
           }
           return acc
-        }, {})
+        }, /** @type {import('./types/context').PartialContextData<C>} */ ({}))
       }
 
       #updateListeners = new Set()
@@ -489,7 +490,7 @@ export function conditions(when, context, types) {
 
     // Проверка null значений
     if (condition === null) {
-      if (!contextParam?.nullable) return false
+      if ("nullable" in contextParam && !contextParam.nullable) return false
       if (value !== null) return false
       continue
     }
@@ -507,10 +508,11 @@ export function conditions(when, context, types) {
     }
 
     // Если значение null, а условие не проверяет null - возвращаем false
-    if (value === null) return false
+    if (value === null || value === undefined) return false
 
     // Проверка прямых значений
     if (typeof condition !== "object") {
+      // @ts-ignore - Сравнение может быть некорректным из-за разных типов, но логически корректно
       if (value !== condition) return false
       continue
     }
@@ -518,10 +520,11 @@ export function conditions(when, context, types) {
     // Проверка объектных условий по типам
     switch (contextParamType) {
       case "string":
-        if ("include" in condition && !value?.includes(condition.include)) return false
-        if ("startsWith" in condition && !value?.startsWith(condition.startsWith)) return false
-        if ("endsWith" in condition && !value?.endsWith(condition.endsWith)) return false
-        if ("notEndsWith" in condition && value?.endsWith(condition.notEndsWith)) return false
+        if (typeof value !== "string") return false
+        if ("include" in condition && condition.include && !value.includes(condition.include)) return false
+        if ("startsWith" in condition && condition.startsWith && !value.startsWith(condition.startsWith)) return false
+        if ("endsWith" in condition && condition.endsWith && !value.endsWith(condition.endsWith)) return false
+        if ("notEndsWith" in condition && condition.notEndsWith && value.endsWith(condition.notEndsWith)) return false
         continue
       case "number":
         if ("eq" in condition && value !== condition.eq) return false
@@ -574,6 +577,7 @@ export function conditions(when, context, types) {
           return false
         continue
       case "array":
+        if (!Array.isArray(value)) return false
         if ("length" in condition) {
           // @ts-ignore
           if (typeof condition.length === "number" && value.length !== condition.length) return false

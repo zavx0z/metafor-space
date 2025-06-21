@@ -106,7 +106,7 @@ declare global {
     state: S
     context: ContextData<C>
     states: readonly S[]
-    types: Record<string, any>
+    types: ContextDefinition
     process: boolean
 
     update: (context: UpdateParameters<C>) => void
