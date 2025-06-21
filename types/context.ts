@@ -34,22 +34,14 @@ export type TypeDefinition =
 
  @template C - Тип определения контекста
  */
-export type ContextData<C extends ContextDefinition> = {
+ export type ContextData<C extends ContextDefinition> = {
     [K in keyof C]: C[K] extends ArrayDefinition
-        ? C[K]["default"] extends (string[] | number[])
-            ? C[K]["default"]
-            : (string[] | number[])
+        ? any[]
         : C[K] extends EnumDefinition<infer T>
-            ? C[K]["nullable"] extends true
-                ? T[number] | null
-                : T[number]
+            ? T[number] | null
             : C[K] extends TypeDefinition
-                ? "nullable" extends keyof C[K]
-                    ? C[K]["nullable"] extends true
-                        ? ExtractTypeValue<C[K]> | null
-                        : ExtractTypeValue<C[K]>
-                    : ExtractTypeValue<C[K]>
-                : ExtractTypeValue<C[K]>
+                ? ExtractTypeValue<C[K]> | null
+                : never
 }
 
 /**
@@ -103,16 +95,10 @@ export type UpdateParameters<C extends ContextDefinition> = Partial<{
     [K in keyof C]: C[K] extends ArrayDefinition
         ? Array<string|number>
         : C[K] extends EnumDefinition<infer T>
-            ? C[K]["nullable"] extends true
-                ? T[number] | null
-                : T[number]
+            ? T[number] | null
             : C[K] extends TypeDefinition
-                ? "nullable" extends keyof C[K]
-                    ? C[K]["nullable"] extends true
-                        ? ExtractTypeValue<C[K]> | null
-                        : ExtractTypeValue<C[K]>
-                    : ExtractTypeValue<C[K]>
-                : ExtractTypeValue<C[K]>
+                ? ExtractTypeValue<C[K]> | null
+                : never
 }>
 
 /**
@@ -163,7 +149,7 @@ export type ContextTypes = {
     string: (params: { title?: string; nullable?: boolean; default?: string }) => StringDefinition
     number: (params: { title?: string; nullable?: boolean; default?: number }) => NumberDefinition
     boolean: (params: { title?: string; nullable?: boolean; default?: boolean }) => BooleanDefinition
-    array: (params: { title?: string; nullable?: boolean; default?: any[] }) => ArrayDefinition
+    array: (params: { title?: string; default?: any[] }) => ArrayDefinition
     enum: <T extends string | number>(
         ...values: T[]
     ) => (options?: { title?: string; nullable?: boolean; default?: T }) => EnumDefinition<T[]>
