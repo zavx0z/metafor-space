@@ -36,18 +36,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
             id=${i}
             .core=${{conditions: core.transitions.find(t => t.id === i)?.ports}}
           />`)}
-        ${repeat(context.states, i => html`
-          <metafor-node-meta-state
-            id=${i}
-            .context=${{title: i}}
-            .core=${{
-              data: {
-                types: core.snapshot?.types,
-                context: core.snapshot?.context,
-              }
-            }}
-          />
-        `)}
+        <slot name="states"></slot>
       </section>
     `,
     style: ({css}) => {

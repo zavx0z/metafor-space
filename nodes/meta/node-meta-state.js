@@ -14,11 +14,15 @@ export default MetaFor('node-meta-state', {
     data: null
   }))
   .view({
+    onMount({component}){
+
+    },
     render: ({context, html, core, repeat}) => html`
       <header>
         <h2 class="noselect">${context.title}</h2>
       </header>
       <section>
+        <slot name="param"></slot>
         ${repeat(context.params, key => html`
           <metafor-node-meta-param
               id=${key}

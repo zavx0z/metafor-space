@@ -34,7 +34,7 @@ export default MetaFor("node-meta-transition")
     {
       in: "init",
       action: ({core, update}) => {
-        console.log(core.conditions)
+        // console.log(core.conditions)
         update({conditions: core.conditions.map(i => i.id)})
         requestAnimationFrame(() => core.conditions.length = 0)
       },

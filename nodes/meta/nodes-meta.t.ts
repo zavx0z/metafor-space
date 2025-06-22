@@ -4,7 +4,7 @@ import type {MetaForTest} from "../dev/meta.t.ts"
 
 const snapshot = meta.snapshot()
 
-export type MetaForNodesMeta = Meta<typeof snapshot.state, typeof snapshot.context>
+export type MetaForNodesMeta = Meta<typeof snapshot.state, typeof snapshot.types>
 
 declare global {
   export interface HTMLElementTagNameMap {
