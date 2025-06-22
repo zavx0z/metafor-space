@@ -44,28 +44,28 @@ export type Snapshot<S extends string, C extends ContextDefinition, I extends Co
  @property patch.value - Значение
  */
 export type BroadcastMessage = {
-  meta: {
-    tag: string
-    func?: string
-    target?: string
-    timestamp: number
-  }
-  patch: Patch
+  meta: MetaDataMessage
+  patch: PatchMetaFor
 }
 
-/**
- Патч для применения к частице
-
- @property path - Путь к частице
- @property op - Операция
- @property value - Значение
+/** Метаданные сообщения
+ @property tag -
+ @property user - Идентификатор пользователя.
+ @property device - Идентификатор устройства.
+ @property tab - Идентификатор вкладки или окна браузера. Полезно для управления данными в нескольких вкладках или окнах.
+ @property index - Уникальный идентификатор экземпляра компонента. Если не задан, генерируется автоматически.
+ @property timestamp - Время отправки.
  */
-export type Patch = {
-  path: string
-  op: "add" | "remove" | "replace" | "move" | "copy" | "test"
-  value: any
+type MetaDataMessage = {
+  tag: string
+  user?: number | null
+  device?: string
+  tab?: number
+  index?: number
+  func?: string
+  target?: string
+  timestamp?: number
 }
-
 /**
  * Уведомление об изменениях контекста
  *

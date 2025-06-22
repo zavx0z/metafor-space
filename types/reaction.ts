@@ -9,9 +9,9 @@ import type {Core, CoreData, CoreObj} from "./core.ts"
  @property timestamp - Время отправки.
  */
 type MetaDataType = {
+  tag: string
   user?: number | null
   device?: string
-  tag?: string
   tab?: number
   index?: number
   timestamp?: number

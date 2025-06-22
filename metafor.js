@@ -153,9 +153,11 @@ function createMeta(
   development && import("./core/validator/index.js").then(
     (module) => module.validateCreateOptions({tag, options, states}))
   const {onTransition, onUpdate} = options
+  let idx = 0
 
   customElements.define("metafor-" + tag,
     class extends HTMLElement {
+      index = 0
       #shadow = this.attachShadow({mode: "open"})
       /**@type{BroadcastChannel|undefined}*/
       #channel = undefined
@@ -260,6 +262,8 @@ function createMeta(
       }
 
       connectedCallback() {
+        if (!this.index) this.index = idx += 1
+        
         this.#channel = new BroadcastChannel('channel')
         if (reactions.length) this.#channel.onmessage = ({data: {meta, patch}}) => {
           reactions.forEach((reaction) => {
@@ -329,7 +333,7 @@ function createMeta(
       /**@param {PatchMetaFor} patches*/
       #sendPatches = (patches) => {
         /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {meta: {tag, timestamp: Date.now()}, patch: patches}
+        const message = {meta: {tag, index: this.index, timestamp: Date.now()}, patch: patches}
         if (!this.#channel) {
           console.warn("Нет канала!", message)
           return

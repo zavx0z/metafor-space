@@ -169,7 +169,11 @@ export default MetaFor("nodes-meta", {
   ])
   .reactions([
     {
-      filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta") && patch.value.id !== "node-elk",
+      filter: ({patch, meta}) =>
+        patch.op === "add"
+        && !meta.tag.includes("node-meta")
+        && meta.tag !== "node-elk"
+      ,
       action: ({context, patch, update, core}) => {
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
