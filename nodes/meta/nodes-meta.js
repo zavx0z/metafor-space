@@ -148,6 +148,7 @@ export default MetaFor("nodes-meta", {
           </metafor-node-meta>
         `, element)
         update({nodes: context.nodes.slice(1)})
+        core.snapshot = null
       },
       to: [
         {state: "ожидание патча", when: {nodes: {isEmpty: true}}},

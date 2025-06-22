@@ -172,12 +172,11 @@ export default MetaFor("node-meta-operator", {development: true})
     `,
     style: ({css}) => css`
       :host {
-        --padding: 12px;
         border-radius: var(--node-border-radius);
         background-color: rgb(var(--primary-900));
         display: flex;
-        gap: 12px;
-        padding: 0 12px;
+        gap: 8px;
+        padding: 0 8px;
 
         &:focus-within {
           border-color: rgba(var(--primary-500));

@@ -10,7 +10,10 @@
     import {html, render} from "../../html/html.js"
 
     render(html`
-      <metafor-node-meta-operator class="noselect" data=${{op: "eq", value: null}}/>
+      <metafor-node-meta-operator
+        class="noselect"
+        context=${{op: "eq", value: null}}
+      />
     `, document.body)
   </script>
 </head>

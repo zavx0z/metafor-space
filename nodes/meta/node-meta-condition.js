@@ -12,8 +12,21 @@ export default MetaFor("node-meta-condition")
     render: ({html}) => html`
       <metafor-node-meta-socket data-active=${false}></metafor-node-meta-socket>
       <slot name="operators"></slot>
+      <slot></slot>
     `,
     style: ({css}) => css`
+      :host {
+        --shadow-size: 0.5 !important;
+        --background-color: rgba(var(--surface-400)) !important;
+        position: absolute;
+        display: flex;
+        border-radius: 4px;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 2px;
+        width: auto;
+      }
+
       :host(:before) {
         --background-color: rgba(var(--surface-400));
       }
