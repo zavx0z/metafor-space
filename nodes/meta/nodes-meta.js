@@ -1,6 +1,6 @@
 import {MetaFor} from "../../metafor.js"
-import ELK from "elkjs"
 import "./node-meta.js"
+import "./node-layout.js"
 import {html, render} from "../../html/html.js"
 
 export default MetaFor("nodes-meta", {
@@ -13,13 +13,14 @@ export default MetaFor("nodes-meta", {
     nodes: t.array({title: "Коллекция meta"}),
   }))
   .core(() => ({
-    elk: new ELK(),
     /**@type{SnapshotMetaForAny|null}*/
     snapshot: null
   }))
   .view({
     render: ({html}) => html`
+      <metafor-node-elk></metafor-node-elk>
       <slot name="meta"/>
+      <slot></slot>
     `,
     style: ({css}) => css`
       :host {
@@ -93,37 +94,35 @@ export default MetaFor("nodes-meta", {
         if (!core.snapshot) return
         const snapshot = core.snapshot
         render(html`
-          <metafor-node-meta
-            id=${snapshot.id}
-            slot="meta"
-            class="backdrop"
-            .context=${{title: snapshot.id}}
-            .core=${{snapshot}}
+          <metafor-node-meta context=${{
+            tag: snapshot.id
+          }} class="backdrop"
           >
             ${snapshot.states.map(i => html`
-              <metafor-node-meta-state
-                id=${i}
-                slot="state"
-                .context=${{title: i}}
-                .core=${{data: {types: snapshot.types, context: snapshot.context}}}
-              >
+              <metafor-node-meta-state slot="state" context=${{
+                tag: snapshot.id,
+                state: i
+              }}>
                 ${Object.keys(snapshot.types).map(key => html`
-                  <metafor-node-meta-param
-                    id=${key}
-                    slot="context"
-                    .context=${{name: key, title: snapshot.types[key].title, value: snapshot.context[key]}}
-                  />
+                  <metafor-node-meta-param context=${{
+                    tag: snapshot.id,
+                    state: i,
+                    param: key,
+                    title: snapshot.types[key].title,
+                    value: snapshot.context[key]
+                  }}></metafor-node-meta-param>
                 `)}
               </metafor-node-meta-state>
             `)}
             ${snapshot.transitions.map((transition) => {
               const sourceState = transition.in
-              // console.log("sourceState: ", sourceState)
               return html`
-                <metafor-node-meta-condition slot="conditions">
+                <metafor-node-meta-condition slot="conditions" context=${{
+                  tag: snapshot.id,
+                  from: sourceState,
+                }}>
                   ${transition.to.map(condition => {
                     const destinationState = condition.state
-                    // console.log("destinationState: ", destinationState)
                     return Object.entries(condition.when).map(([key, value]) => {
                       let op
                       let val
@@ -139,7 +138,13 @@ export default MetaFor("nodes-meta", {
                         val = value
                       }
                       return html`
-                        <metafor-node-meta-operator slot="operators" .context=${{op: op, value: val}}/>
+                        <metafor-node-meta-operator context=${{
+                          tag: snapshot.id,
+                          from: sourceState,
+                          to: destinationState,
+                          op: op,
+                          value: val
+                        }}/>
                       `
                     })
                   })}
@@ -158,7 +163,7 @@ export default MetaFor("nodes-meta", {
   ])
   .reactions([
     {
-      filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta"),
+      filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta") && patch.value.id !== "node-elk",
       action: ({context, patch, update, core}) => {
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})

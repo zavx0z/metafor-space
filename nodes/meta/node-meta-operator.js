@@ -4,6 +4,10 @@ import {nothing} from "../../html/html.js"
 export default MetaFor("node-meta-operator", {development: true})
   .states('init', 'ready')
   .context(t => ({
+    tag: t.string({title: "Тэг meta"}),
+    from: t.string({title: "Исходное состояние"}),
+    to: t.string({title: "Текущее состояние"}),
+
     title: t.string({title: "Название оператора", nullable: true}),
     value: t.string({title: "Значение", nullable: true}),
     symbol: t.string({title: "Графический символ", nullable: true}),
@@ -12,7 +16,7 @@ export default MetaFor("node-meta-operator", {development: true})
       "notInclude", "pattern", "includes", "length", "every", "some", "logicalEq", "not",
       "isNull", "notNull")({title: "Операция сравнения", nullable: true})
   }))
-  .core(({context}) =>/**@type{import("./node-meta-operator.t").Core<typeof context>}*/ ({
+  .core(() => ({
     operators: {
       // Числовые операторы
       eq: {

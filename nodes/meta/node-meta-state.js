@@ -5,21 +5,20 @@ export default MetaFor('node-meta-state', {
   description: "Нода состояния meta",
   development: true
 })
-  .states("hide", "visible")
+  .states("ready")
   .context(t => ({
-    title: t.string({title: "Название состояния", nullable: true}),
-    params: t.array({title: "Параметры контекста"})
+    tag: t.string({title: "Тэг meta"}),
+    state: t.string({title: "Название состояния"}),
   }))
-  .core(() => /** @type import("./node-meta-state.t").Core */ ({
-    data: null
-  }))
+  .core(() => ({}))
   .view({
     render: ({context, html}) => html`
       <header>
-        <h2 class="noselect">${context.title}</h2>
+        <h2 class="noselect">${context.state}</h2>
       </header>
       <section>
         <slot name="context"></slot>
+        <slot></slot>
       </section>
       <section>
         <button>
@@ -110,28 +109,6 @@ export default MetaFor('node-meta-state', {
       }
     `
   })
-  .transitions("hide", [
-    {
-      in: "hide",
-      action: ({core, context, update}) => {
-        // console.log("state: ", context.title, core.data?.types)
-        if (core.data) update({params: Object.keys(core.data.types)})
-      },
-      to: [{
-        state: "visible", when: {
-          title: {isNull: false},
-          params: {isEmpty: false}
-        }
-      }]
-    },
-    {
-      in: "visible",
-      action: ({core}) => {
-        requestAnimationFrame(() => core.data = null)
-        // core.data = null
-      },
-      to: [{state: "hide", when: {title: null}}]
-    }
-  ])
+  .transitions("ready", [])
   .reactions([])
   .create({})

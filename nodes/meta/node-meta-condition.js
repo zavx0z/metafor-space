@@ -4,8 +4,8 @@ import "./node-meta-operator.js"
 export default MetaFor("node-meta-condition")
   .states('init', 'ready')
   .context(t => ({
-    port: t.string({title: "ID порта"}),
-    operators: t.array({title: "Операторы сравнения"})
+    tag: t.string({title: "Тэг meta"}),
+    from: t.string({title: "Исходное состояние"}),
   }))
   .core(() => ({}))
   .view({
@@ -35,11 +35,11 @@ export default MetaFor("node-meta-condition")
   .transitions('init', [
     {
       in: "init",
-      to: [{state: "ready", when: {operators: {isEmpty: false}}}]
+      to: [{state: "ready", when: {tag: {isNull: false}}}]
     },
     {
       in: "ready",
-      to: [{state: "init", when: {operators: {isEmpty: true}}}]
+      to: [{state: "init", when: {tag: {isNull: true}}}]
     }
   ])
   .reactions([])

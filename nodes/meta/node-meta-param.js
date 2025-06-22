@@ -4,23 +4,25 @@ import './node-meta-socket.js'
 export default MetaFor("node-meta-param")
   .states("init", "ready")
   .context(t => ({
-    title: t.string({title: "Название параметра", nullable: true}),
-    name: t.string({title: "Ключ параметра", nullable: true}),
+    tag: t.string({title: "Тэг meta"}),
+    state: t.string({title: "Название состояния"}),
+    param: t.string({title: "Ключ параметра"}),
+    title: t.string({title: "Название параметра"}),
     value: t.string({title: "Значение параметра", nullable: true}),
   }))
   .core()
   .view({
     render: ({context, html}) => html`
       <metafor-node-meta-socket
-          data-direction="input"
-          data-active="false"
+        data-direction="input"
+        data-active="false"
       ></metafor-node-meta-socket>
       <span class="noselect">${context.title}</span>
-      <input name=${context.name} value=${context.value}/>
+      <input name=${context.title} value=${context.value}/>
       <metafor-node-meta-socket
-          class="connected"
-          data-direction="output"
-          data-active="false"
+        class="connected"
+        data-direction="output"
+        data-active="false"
       /></metafor-node-meta-socket>
     `,
     style: ({css}) => css`
@@ -90,7 +92,7 @@ export default MetaFor("node-meta-param")
       to: [{
         state: "ready", when: {
           title: {isNull: false},
-          name: {isNull: false}
+          param: {isNull: false}
         }
       }]
     },
@@ -99,7 +101,7 @@ export default MetaFor("node-meta-param")
       to: [{
         state: "init", when: {
           title: null,
-          name: null
+          param: null
         }
       }]
     }

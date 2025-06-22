@@ -7,19 +7,14 @@ import {operatorSymbols} from "../operators.js"
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
   .context(t => ({
-    title: t.string({title: "Заголовок", nullable: true}),
-    states: t.array({title: "Состояния"}),
-    transitions: t.array({title: "Переходы"})
+    tag: t.string({title: "Тэг meta"}),
   }))
-  .core(() => /**@type{import("./node-meta.t").Core}*/ ({
-    snapshot: null,
-    transitions: []
-  }))
+  .core(() => ({}))
   .view({
     render: ({html, context}) => html`
       <header data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
-        <h2 class="noselect">${context.title}</h2>
+        <h2 class="noselect">${context.tag}</h2>
         <div><!--кнопки справа-->
           <button aria-label="Редактировать">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor">
@@ -150,39 +145,25 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
   .transitions("init", [
     {
       in: "init",
-      action: ({update, core}) => {
-        if (core.snapshot) {
-          const transitions = extractTransitions(core.snapshot)
-          core.transitions = transitions
-          update({
-            transitions: transitions.map(i => i.id),
-            states: [...core.snapshot?.states]
-          })
-        }
+      action: () => {
       },
       to: [{
         state: "ready", when: {
-          title: {isNull: false},
-          states: {isEmpty: false},
-          transitions: {isEmpty: false}
+          tag: {isNull: false},
         }
       }]
     },
     {
       in: "ready",
       action: ({core}) => {
-        requestAnimationFrame(() => {
-          core.snapshot = null
-          core.transitions = []
-        })
       },
-      to: [{state: "init", when: {title: null}}]
+      to: [{state: "init", when: {tag: null}}]
     }
   ])
   .reactions([
     {
-      filter: ({meta, context}) => meta.tag === context.title,
-      action: ({meta, patch}) => {
+      filter: ({meta, context}) => meta.tag === context.tag,
+      action: () => {
         // console.log("Node reaction", meta, patch)
       }
     }
