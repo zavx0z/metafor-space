@@ -6,6 +6,7 @@ export default MetaFor("node-meta-condition")
   .context(t => ({
     tag: t.string({title: "Тэг meta"}),
     from: t.string({title: "Исходное состояние"}),
+    to: t.string({title: "Текущее состояние"}),
   }))
   .core(() => ({}))
   .view({

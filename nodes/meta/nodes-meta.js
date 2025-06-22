@@ -116,14 +116,15 @@ export default MetaFor("nodes-meta", {
             `)}
             ${snapshot.transitions.map((transition) => {
               const sourceState = transition.in
-              return html`
-                <metafor-node-meta-condition slot="conditions" context=${{
-                  tag: snapshot.id,
-                  from: sourceState,
-                }}>
-                  ${transition.to.map(condition => {
-                    const destinationState = condition.state
-                    return Object.entries(condition.when).map(([key, value]) => {
+              return transition.to.map(condition => {
+                const destinationState = condition.state
+                return html`
+                  <metafor-node-meta-condition slot="conditions" context=${{
+                    tag: snapshot.id,
+                    from: sourceState,
+                    to: destinationState,
+                  }}>
+                    ${Object.entries(condition.when).map(([key, value]) => {
                       let op
                       let val
                       if (typeof value === "object" && value !== null) {
@@ -146,9 +147,10 @@ export default MetaFor("nodes-meta", {
                           value: val
                         }}/>
                       `
-                    })
-                  })}
-                </metafor-node-meta-condition>`
+                    })}
+                  </metafor-node-meta-condition>
+                `
+              })
             })}
           </metafor-node-meta>
         `, element)
