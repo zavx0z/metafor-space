@@ -6,11 +6,11 @@
  @throws {Error} Если поле не соответствует требованиям
  */
 function validateContextField(field, value) {
-  const RESERVED_KEYWORDS = ["state"]
-
-  if (RESERVED_KEYWORDS.includes(field)) {
-    throw new Error(`Поле "${field}" является зарезервированным ключевым словом`)
-  }
+  // const RESERVED_KEYWORDS = ["state"]
+  //
+  // if (RESERVED_KEYWORDS.includes(field)) {
+  //   throw new Error(`Поле "${field}" является зарезервированным ключевым словом`)
+  // }
 
   if (!value || typeof value !== "object" || !("type" in value)) {
     throw new Error(`Поле "${field}" в контексте должно иметь объявленный тип`)

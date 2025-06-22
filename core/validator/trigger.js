@@ -109,7 +109,7 @@ function validateTrigger(field, definition, value) {
   //@ts-ignore
   if (validator) {
     if (value === null && !definition.nullable) {
-      throw new Error(`Поле "${field}" не может быть null, так как оно не является nullable.`)
+      throw new Error(`Поле "${field}", в переходе, не может быть null, так как оно не является nullable.`)
     }
     //@ts-ignore
     validator(field, value, definition)

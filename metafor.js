@@ -40,13 +40,12 @@ export const MetaFor = (tag, conf = {}) => {
             enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
           })
           development && import("./core/validator/index.js").then((module) =>
-            module.validateContextDefinition({tag, context: contextDefinition})
-          )
+            module.validateContextDefinition({tag, context: contextDefinition}))
           return {
             core(core) {
               const coreDefinition = core || (() => Object.create({}))
-              development &&
-              import("./core/validator/index.js").then((module) => module.validateCore({tag, core: coreDefinition}))
+              development && import("./core/validator/index.js").then((module) =>
+                module.validateCore({tag, core: coreDefinition}))
               return {
                 transitions(initialState, transitions) {
                   if (development) {
@@ -389,7 +388,7 @@ function createMeta(
       _updateContext = (ctx) => {
         return Object.keys(ctx).reduce((acc, /** @type {keyof C} */ key) => {
           if (!(key in this.context)) {
-            console.warn(`${String(key)} отсутствует в контексте!`, this.context)
+            console.warn(`${tag}: ${String(key)} отсутствует в контексте!`, this.context)
             return acc
           }
           if (this.context[key] !== ctx[key]) {
