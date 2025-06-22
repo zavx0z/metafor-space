@@ -12,8 +12,10 @@ export default MetaFor("nodes-meta", {
     op: t.enum("add")({title: "Тип патча", nullable: true}),
     nodes: t.array({title: "Коллекция meta"}),
   }))
-  .core(() => /** @type{import("./nodes-meta.t").Core} */ ({
+  .core(() => ({
     elk: new ELK(),
+    /**@type{SnapshotMetaForAny|null}*/
+    snapshot: null
   }))
   .view({
     render: ({html}) => html`
@@ -87,19 +89,9 @@ export default MetaFor("nodes-meta", {
     },
     {
       in: "добавление ноды",
-      action: ({update}) => {
-        update({op: null})
-      },
-      to: [{state: "ожидание патча", when: {op: null}}],
-    }
-  ])
-  .reactions([
-    {
-      filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta"),
-      action: ({context, patch, update, element}) => {
-        /**@type{SnapshotMetaForAny}*/
-        const snapshot = patch.value
-
+      action: ({update, element, core, context}) => {
+        if (!core.snapshot) return
+        const snapshot = core.snapshot
         render(html`
           <metafor-node-meta
             id=${snapshot.id}
@@ -128,7 +120,7 @@ export default MetaFor("nodes-meta", {
               const sourceState = transition.in
               // console.log("sourceState: ", sourceState)
               return html`
-                <div slot="conditions">
+                <metafor-node-meta-condition slot="conditions">
                   ${transition.to.map(condition => {
                     const destinationState = condition.state
                     // console.log("destinationState: ", destinationState)
@@ -147,19 +139,29 @@ export default MetaFor("nodes-meta", {
                         val = value
                       }
                       return html`
-                        <metafor-node-meta-operator
-                          .context=${{op: op, value: val}}
-                        />
+                        <metafor-node-meta-operator slot="operators" .context=${{op: op, value: val}}/>
                       `
                     })
                   })}
-                </div>`
+                </metafor-node-meta-condition>`
             })}
           </metafor-node-meta>
         `, element)
-
-        update({op: "add", nodes: [...context.nodes, snapshot.id]})
+        update({nodes: context.nodes.slice(1)})
       },
+      to: [
+        {state: "ожидание патча", when: {nodes: {isEmpty: true}}},
+        {state: "добавление ноды", when: {nodes: {isEmpty: false}}}
+      ],
+    }
+  ])
+  .reactions([
+    {
+      filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta"),
+      action: ({context, patch, update, core}) => {
+        core.snapshot = patch.value
+        update({op: "add", nodes: [...context.nodes, patch.value.id]})
+      }
     },
   ])
   .create({})

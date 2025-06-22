@@ -269,7 +269,6 @@ function createMeta(
                 patch, meta,
                 context: this.context,
                 core: this.#core,
-                element: this,
                 update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
               })
             }
@@ -419,6 +418,7 @@ function createMeta(
       #runAction = (action) => {
         const result = action({
           context: this.context,
+          element: this,
           update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
           core: this.#core,
         })
