@@ -345,7 +345,7 @@ export class Template {
               const realName = attrNames[attrNameIndex++]
               const value = /**@type {string} */ (element.getAttribute(name))
               const statics = value.split(marker)
-              if (realName === "data") {
+              if (realName === "data" || realName === "context") {
                 parts.push({
                   type: ATTRIBUTE_PART,
                   index: nodeIndex,
