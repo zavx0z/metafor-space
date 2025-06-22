@@ -7,13 +7,9 @@ export default MetaFor("nodes-meta", {
   description: "No-code система визуализации и построения системы взаимодействия мета-компонентов.",
   development: true
 })
-  .states(
-    "ожидание патча",
-    "добавление ноды",
-    "удаление ноды"
-  )
+  .states("ожидание патча", "добавление ноды")
   .context(t => ({
-    op: t.enum("add", "remove")({title: "Тип патча", nullable: true}),
+    op: t.enum("add")({title: "Тип патча", nullable: true}),
     nodes: t.array({title: "Коллекция meta"}),
   }))
   .core(() => /** @type{import("./nodes-meta.t").Core} */ ({
@@ -87,22 +83,12 @@ export default MetaFor("nodes-meta", {
   .transitions("ожидание патча", [
     {
       in: "ожидание патча",
-      to: [
-        {state: "добавление ноды", when: {op: "add"}},
-        {state: "удаление ноды", when: {op: "remove"}},
-      ],
+      to: [{state: "добавление ноды", when: {op: "add"}}],
     },
     {
       in: "добавление ноды",
       action: ({update}) => {
         update({op: null})
-      },
-      to: [{state: "ожидание патча", when: {op: null}}],
-    },
-    {
-      in: "удаление ноды",
-      action: ({update}) => {
-        update({op: null, nodes: []})
       },
       to: [{state: "ожидание патча", when: {op: null}}],
     }

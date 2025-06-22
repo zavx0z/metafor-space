@@ -14,9 +14,6 @@ export default MetaFor('node-meta-state', {
     data: null
   }))
   .view({
-    onMount({component}){
-
-    },
     render: ({context, html, core, repeat}) => html`
       <header>
         <h2 class="noselect">${context.title}</h2>
