@@ -14,7 +14,8 @@ export default MetaFor("node-meta-operator", {development: true})
     op: t.enum("eq", "notEq", "gt", "gte", "lt", "lte", "between", "notGt", "notGte", "notLt", "notLte",
       "notMin", "notMax", "startsWith", "endsWith", "notStartsWith", "notEndsWith", "include",
       "notInclude", "pattern", "includes", "length", "every", "some", "logicalEq", "not",
-      "isNull", "notNull")({title: "Операция сравнения", nullable: true})
+      "isNull", "notNull")({title: "Операция сравнения", nullable: true}),
+    error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({
     operators: {

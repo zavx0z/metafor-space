@@ -11,6 +11,7 @@ export default MetaFor("nodes-meta", {
   .context(t => ({
     op: t.enum("add")({title: "Тип патча", nullable: true}),
     nodes: t.array({title: "Коллекция meta"}),
+    error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({
     /**@type{SnapshotMetaForAny|null}*/
@@ -91,7 +92,10 @@ export default MetaFor("nodes-meta", {
     {
       in: "добавление ноды",
       action: ({update, element, core, context}) => {
-        if (!core.snapshot) return
+        if (!core.snapshot) {
+          update({error: `Отсутствует снимок meta - ${context.nodes[context.nodes.length]}`})
+          return
+        }
         const snapshot = core.snapshot
         render(html`
           <metafor-node-meta context=${{

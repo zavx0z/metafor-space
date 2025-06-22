@@ -9,6 +9,7 @@ export default MetaFor("node-meta-param")
     param: t.string({title: "Ключ параметра"}),
     title: t.string({title: "Название параметра"}),
     value: t.string({title: "Значение параметра", nullable: true}),
+    error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
   .view({

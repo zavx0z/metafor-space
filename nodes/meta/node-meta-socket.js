@@ -2,7 +2,9 @@ import {MetaFor} from "../../metafor.js"
 
 export default MetaFor('node-meta-socket')
   .states('init', 'ready')
-  .context(t => ({}))
+  .context(t => ({
+    error: t.string({title: "Ошибка", nullable: true}),
+  }))
   .core()
   .view({
     style: ({css}) => {

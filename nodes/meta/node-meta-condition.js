@@ -8,6 +8,7 @@ export default MetaFor("node-meta-condition")
     tag: t.string({title: "Тэг meta"}),
     from: t.string({title: "Исходное состояние"}),
     to: t.string({title: "Текущее состояние"}),
+    error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
   .view({
@@ -26,7 +27,7 @@ export default MetaFor("node-meta-condition")
     style: ({css}) => css`
       :host {
         --shadow-size: 0.5 !important;
-        
+
         background-color: rgba(var(--surface-400));
         padding: 4px 8px;
         position: absolute;

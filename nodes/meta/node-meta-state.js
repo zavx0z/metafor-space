@@ -9,6 +9,7 @@ export default MetaFor('node-meta-state', {
   .context(t => ({
     tag: t.string({title: "Тэг meta"}),
     state: t.string({title: "Название состояния"}),
+    error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
   .view({
