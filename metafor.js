@@ -266,7 +266,7 @@ function createMeta(
           reactions.forEach((reaction) => {
             if (reaction.filter({meta, patch, context: this.context})) {
               reaction.action({
-                patch, context: this.context, meta, core: this.#core,
+                patch, context: this.context, meta, core: this.#core, element: this,
                 update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
               })
             }

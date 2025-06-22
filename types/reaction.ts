@@ -23,6 +23,7 @@ type ReactionActionParam<C extends ContextDefinition, I extends CoreData<I>> = {
   meta: MetaDataType
   update: Update<C>
   core: Core<I>
+  element: Element | ShadowRoot
 }
 
 type ReactionFilterParam<C extends ContextDefinition> = {
@@ -44,7 +45,7 @@ export type Reaction<C extends ContextDefinition, I extends CoreData<I>> = {
   // path?: string
   // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean
-  action: ({patch, context, update, core}: ReactionActionParam<C, I>) => void
+  action: ({patch, context, update, core, element}: ReactionActionParam<C, I>) => void
 } & Partial<MetaDataType>
 
 /** # Реакции

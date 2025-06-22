@@ -1,6 +1,7 @@
 import {MetaFor} from "../../metafor.js"
 import ELK from "elkjs"
 import "./node-meta.js"
+import {html, render} from "../../html/html.js"
 
 export default MetaFor("nodes-meta", {
   description: "No-code система визуализации и построения системы взаимодействия мета-компонентов.",
@@ -42,10 +43,7 @@ export default MetaFor("nodes-meta", {
           ></metafor-node-meta-state>
         `)}
       </metafor-node-meta>
-    `),
-    style: ({css}) => css`
-
-    `
+    `)
   })
   .transitions("ожидание патча", [
     {
@@ -74,7 +72,8 @@ export default MetaFor("nodes-meta", {
   .reactions([
     {
       filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta"),
-      action: ({context, patch, update, core}) => {
+      action: ({context, patch, update, core, element}) => {
+        render(html`<h1>hello</h1>`, element)
         core.snapshot = patch.value
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
       },
