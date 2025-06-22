@@ -18,32 +18,71 @@ export default MetaFor("nodes-meta", {
   }))
   .core(() => /** @type{import("./nodes-meta.t").Core} */ ({
     elk: new ELK(),
-    snapshot: null,
   }))
   .view({
-    render: ({html, core: {snapshot}, context, repeat}) => repeat(context.nodes, id => html`
-      <link href="../meta/nodes-meta.css" rel="stylesheet">
-      <metafor-node-meta
-        id=${id}
-        class="backdrop"
-        .context=${{title: id}}
-        .core=${{snapshot}}
-      >
-        ${repeat(snapshot.states, i => html`
-          <metafor-node-meta-state
-            slot="states"
-            id=${i}
-            .context=${{title: i}}
-            .core=${{
-              data: {
-                types: snapshot?.types,
-                context: snapshot?.context,
-              }
-            }}
-          ></metafor-node-meta-state>
-        `)}
-      </metafor-node-meta>
-    `)
+    render: ({html}) => html`
+      <slot name="meta"/>
+    `,
+    style: ({css}) => css`
+      :host {
+        color: rgb(var(--surface-50));
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+      }
+
+      button {
+        --button-border-color: rgb(var(--surface-400));
+        --background-color: rgb(var(--surface-500));
+        --button-hover-background: rgb(var(--surface-400));
+        --button-active-background: rgb(var(--surface-500));
+        --button-disabled-background: rgb(var(--surface-800));
+        /* height: 26px; */
+        border: 1px solid var(--button-border-color);
+        border-radius: 4px;
+        background-color: var(--background-color);
+        color: rgba(var(--surface-50));
+        cursor: pointer;
+        font-size: inherit;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: var(--button-hover-background);
+          border-color: var(--button-border-color);
+        }
+
+        &:active {
+          background-color: var(--button-active-background);
+          border-color: var(--button-border-color);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background-color: var(--button-disabled-background);
+          border-color: var(--button-border-color);
+        }
+      }
+
+      svg.connections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+
+        & path {
+          stroke: rgb(var(--surface-300));
+          stroke-width: 4px;
+          fill: none;
+          transition: stroke 0.3s ease;
+          stroke-dasharray: var(--dash-length) var(--gap-length);
+          stroke-dashoffset: 0;
+        }
+      }
+    `
   })
   .transitions("ожидание патча", [
     {
@@ -55,9 +94,8 @@ export default MetaFor("nodes-meta", {
     },
     {
       in: "добавление ноды",
-      action: ({update, core}) => {
+      action: ({update}) => {
         update({op: null})
-        requestAnimationFrame(() => core.snapshot = null)
       },
       to: [{state: "ожидание патча", when: {op: null}}],
     },
@@ -72,10 +110,30 @@ export default MetaFor("nodes-meta", {
   .reactions([
     {
       filter: ({patch}) => patch.op === "add" && !patch.value.id.includes("node-meta"),
-      action: ({context, patch, update, core, element}) => {
-        render(html`<h1>hello</h1>`, element)
-        core.snapshot = patch.value
-        update({op: "add", nodes: [...context.nodes, patch.value.id]})
+      action: ({context, patch, update, element}) => {
+        /**@type{SnapshotMetaForAny}*/
+        const snapshot = patch.value
+
+        render(html`
+          <metafor-node-meta
+            slot="meta"
+            id=${snapshot.id}
+            class="backdrop"
+            .context=${{title: snapshot.id}}
+            .core=${{snapshot}}
+          >
+            ${snapshot.states.map(i => html`
+              <metafor-node-meta-state
+                slot="state"
+                id=${i}
+                .context=${{title: i}}
+                .core=${{data: {types: snapshot.types, context: snapshot.context}}}
+              />
+            `)}
+          </metafor-node-meta>
+        `, element)
+
+        update({op: "add", nodes: [...context.nodes, snapshot.id]})
       },
     },
   ])

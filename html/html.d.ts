@@ -23,7 +23,7 @@ import type {Directive} from "./directive.t.ts"
  * если тот же тип результата был ранее отображен там.
  * @param [options] - См. документацию {@linkcode RenderOptions} для параметров.
  */
-export declare function render(value: any, container: HTMLElement | DocumentFragment, options?: RenderOptions): ChildPart
+export declare function render(value: any, container: Element | HTMLElement | DocumentFragment, options?: RenderOptions): ChildPart
 
 /**
  * Интерпретирует литерал шаблона как HTML-шаблон, который может эффективно отрисовываться и обновлять контейнер.

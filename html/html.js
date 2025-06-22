@@ -1046,11 +1046,7 @@ export class ElementPart {
   }
 }
 
-/**
- @param {unknown} value
- @param {HTMLElement|DocumentFragment} container
- @param {RenderOptions} options
- */
+/** @type{import("./html").render} */
 export const render = (value, container, options = {}) => {
   // TODO: Выдать более понятное сообщение об ошибке, чем Uncaught TypeError: Cannot read properties of null (reading '_$htmlPart$') которое выглядит как внутренняя ошибка @pkg.
   if (container == null) throw new TypeError(`Контейнер для рендеринга не может быть ${container}`)
@@ -1068,8 +1064,9 @@ export const render = (value, container, options = {}) => {
   part._$setValue(value)
   return part
 }
-
+//@ts-ignore
 render.setSanitizer = setSanitizer
+//@ts-ignore
 render.createSanitizer = createSanitizer
-/** Используется только во внутренних тестах, не является частью публичного API. */
+/** Используется только во внутренних тестах, не является частью публичного API. */ //@ts-ignore
 render._testOnlyClearSanitizerFactoryDoNotCallOrElse = () => (sanitizerFactoryInternal = noopSanitizer)

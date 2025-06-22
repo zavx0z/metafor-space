@@ -16,7 +16,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     transitions: []
   }))
   .view({
-    render: ({html, context, core, repeat}) => html`
+    render: ({html, context}) => html`
       <header data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.title}</h2>
@@ -31,12 +31,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       </header>
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
-        ${repeat(context.transitions, i => html`
-          <metafor-node-meta-transition
-            id=${i}
-            .core=${{conditions: core.transitions.find(t => t.id === i)?.ports}}
-          />`)}
-        <slot name="states"></slot>
+        <slot name="state"/>
       </section>
     `,
     style: ({css}) => {
