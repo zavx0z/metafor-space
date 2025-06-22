@@ -23,7 +23,7 @@ type ReactionActionParam<C extends ContextDefinition, I extends CoreData<I>> = {
   meta: MetaDataType
   update: Update<C>
   core: Core<I>
-  element: Element | ShadowRoot
+  element: HTMLElement
 }
 
 type ReactionFilterParam<C extends ContextDefinition> = {
