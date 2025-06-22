@@ -32,10 +32,9 @@ export default MetaFor("node-meta-param")
         background-color: var(--background-color);
         margin: 2px 0;
         padding: 0 2px;
-
         display: flex;
         align-items: center;
-
+        
         &:active {
           border-color: rgba(var(--primary-500));
         }
