@@ -102,20 +102,59 @@ export default MetaFor("nodes-meta", {
 
         render(html`
           <metafor-node-meta
-            slot="meta"
             id=${snapshot.id}
+            slot="meta"
             class="backdrop"
             .context=${{title: snapshot.id}}
             .core=${{snapshot}}
           >
             ${snapshot.states.map(i => html`
               <metafor-node-meta-state
-                slot="state"
                 id=${i}
+                slot="state"
                 .context=${{title: i}}
                 .core=${{data: {types: snapshot.types, context: snapshot.context}}}
-              />
+              >
+                ${Object.keys(snapshot.types).map(key => html`
+                  <metafor-node-meta-param
+                    id=${key}
+                    slot="context"
+                    .context=${{name: key, title: snapshot.types[key].title, value: snapshot.context[key]}}
+                  />
+                `)}
+              </metafor-node-meta-state>
             `)}
+            ${snapshot.transitions.map((transition) => {
+              const sourceState = transition.in
+              // console.log("sourceState: ", sourceState)
+              return html`
+                <div slot="conditions">
+                  ${transition.to.map(condition => {
+                    const destinationState = condition.state
+                    // console.log("destinationState: ", destinationState)
+                    return Object.entries(condition.when).map(([key, value]) => {
+                      let op
+                      let val
+                      if (typeof value === "object" && value !== null) {
+                        op = Object.keys(value)[0]
+                        // @ts-ignore
+                        val = value[op]
+                      } else if (value === null) {
+                        op = "isNull"
+                        value = true
+                      } else {
+                        op = "eq"
+                        val = value
+                      }
+                      return html`
+                        <metafor-node-meta-operator
+                          .context=${{op: op, value: val}}
+                        />
+                      `
+                    })
+                  })}
+                </div>`
+            })}
           </metafor-node-meta>
         `, element)
 

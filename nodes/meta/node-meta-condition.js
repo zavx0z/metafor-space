@@ -7,18 +7,11 @@ export default MetaFor("node-meta-condition")
     port: t.string({title: "ID порта"}),
     operators: t.array({title: "Операторы сравнения"})
   }))
-  .core(({context}) => /**@type{import("./node-meta-condition.t").Core<typeof context>}*/ ({
-    data: {},
-  }))
+  .core(() => ({}))
   .view({
-    render: ({html, context, repeat, core}) => html`
+    render: ({html}) => html`
       <metafor-node-meta-socket data-active=${false}></metafor-node-meta-socket>
-      ${repeat(context.operators, id => html`
-        <metafor-node-meta-operator
-          id=${id}
-          data=${{op: id, value: core.data[id].value}}
-        />
-      `)}
+      <slot name="operators"></slot>
     `,
     style: ({css}) => css`
       :host(:before) {
@@ -29,9 +22,6 @@ export default MetaFor("node-meta-condition")
   .transitions('init', [
     {
       in: "init",
-      action({update, core}) {
-        update({operators: Object.keys(core.data)})
-      },
       to: [{state: "ready", when: {operators: {isEmpty: false}}}]
     },
     {

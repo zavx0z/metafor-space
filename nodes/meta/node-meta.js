@@ -31,7 +31,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       </header>
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
-        <slot name="state"/>
+        <slot name="conditions"></slot>
+        <slot name="state"></slot>
       </section>
     `,
     style: ({css}) => {

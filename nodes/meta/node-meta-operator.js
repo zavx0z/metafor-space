@@ -13,7 +13,6 @@ export default MetaFor("node-meta-operator", {development: true})
       "isNull", "notNull")({title: "Операция сравнения", nullable: true})
   }))
   .core(({context}) =>/**@type{import("./node-meta-operator.t").Core<typeof context>}*/ ({
-    data: undefined,
     operators: {
       // Числовые операторы
       eq: {
@@ -200,12 +199,10 @@ export default MetaFor("node-meta-operator", {development: true})
   .transitions('init', [
     {
       in: "init",
-      action({core, update}) {
-        if (core.data) {
-          const operator = core.operators[core.data.op]
-          update({title: operator.title, symbol: operator.symbol, op: core.data.op})
-          requestAnimationFrame(() => core.data = undefined)
-        }
+      action({context, core, update}) {
+        if (!context.op) return
+        const operator = core.operators[context.op]
+        update({title: operator.title, symbol: operator.symbol})
       },
       to: [{
         state: "ready", when: {
