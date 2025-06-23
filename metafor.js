@@ -460,7 +460,7 @@ function createMeta(
 
       snapshot = () => {
         return {
-          id: tag,
+          id: `${tag}/${this.index}`,
           description,
           state: this.state,
           states: this.#states,
