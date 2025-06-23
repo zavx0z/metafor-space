@@ -5,11 +5,15 @@ export default MetaFor('node-meta-state', {
   description: "Нода состояния meta",
   development: true
 })
-  .states("ready", "error")
+  .states("рендер", "измерение", "установка положения")
   .context(t => ({
     id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
     error: t.string({title: "Ошибка", nullable: true}),
+    width: t.number({nullable: true}),
+    height: t.number({nullable: true}),
+    x: t.number({nullable: true}),
+    y: t.number({nullable: true}),
   }))
   .core(() => ({}))
   .view({
@@ -110,11 +114,28 @@ export default MetaFor('node-meta-state', {
       }
     `
   })
-  .transitions("ready", [
+  .transitions("рендер", [
     {
-      in: "ready",
-      to: [{state: "error", when: {error: {isNull: false}}}]
-    }
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
+    },
+    {
+      in: "измерение",
+      action({element, update}) {
+        requestAnimationFrame(() => {
+          const {width, height} = element.getBoundingClientRect()
+          update({width: Math.round(width), height: Math.round(height)})
+        })
+      },
+      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+    },
+    {
+      in: "установка положения",
+      action() {
+        console.log()
+      },
+      to: []
+    },
   ])
   .reactions([])
   .create({})

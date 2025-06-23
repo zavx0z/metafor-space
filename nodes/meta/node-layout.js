@@ -118,14 +118,14 @@ export default MetaFor("node-elk", {development: true})
     },
     {
       title: "конец создания meta",
-      filter: ({patch, meta}) =>
+      filter: ({patch, meta}) => (
         meta.tag === "nodes-meta"
         && patch.path === '/context'
         // && patch.op === 'remove'
         && patch.op === 'replace'
         && Object.hasOwn(patch.value, 'nodes')
         && !patch.value.nodes.length
-      ,
+      ),
       action({update}) {
         update({dataReceived: true})
       }
