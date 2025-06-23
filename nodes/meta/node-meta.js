@@ -8,7 +8,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
   .context(t => ({
     tag: t.string({title: "Тэг meta"}),
-    error: t.string({title: "Ошибка"}),
+    error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
   .view({
@@ -150,7 +150,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       },
       to: [{
         state: "ready", when: {
-          tag: {isNull: false},
+          error: null,
         }
       }]
     },
@@ -158,11 +158,12 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       in: "ready",
       action: ({core}) => {
       },
-      to: [{state: "init", when: {tag: null}}]
+      to: []
     }
   ])
   .reactions([
     {
+      title: "",
       filter: ({meta, context}) => meta.tag === context.tag,
       action: () => {
         // console.log("Node reaction", meta, patch)

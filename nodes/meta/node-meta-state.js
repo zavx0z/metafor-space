@@ -5,7 +5,7 @@ export default MetaFor('node-meta-state', {
   description: "Нода состояния meta",
   development: true
 })
-  .states("ready")
+  .states("ready", "error")
   .context(t => ({
     tag: t.string({title: "Тэг meta"}),
     state: t.string({title: "Название состояния"}),
@@ -110,6 +110,11 @@ export default MetaFor('node-meta-state', {
       }
     `
   })
-  .transitions("ready", [])
+  .transitions("ready", [
+    {
+      in: "ready",
+      to: [{state: "error", when: {error: {isNull: false}}}]
+    }
+  ])
   .reactions([])
   .create({})
