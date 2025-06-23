@@ -34,8 +34,10 @@ export default MetaFor("node-elk", {development: true})
     {
       in: "вычисление",
       action({context, update, core}) {
-        console.log(core.meta)
-        update({ready: context.process, process: null})
+        setTimeout(() => {
+          console.log(core.meta)
+        }, 1000)
+        // update({ready: context.process, process: null})
       },
       to: [{state: "ожидание", when: {process: null}}]
     }
@@ -79,7 +81,36 @@ export default MetaFor("node-elk", {development: true})
           entity.nodes[patch.value.id] = {
             state: patch.value.context.state
           }
-        // console.log(meta.tag)
+      }
+    },
+    {
+      title: "получение размеров",
+      filter: ({patch, meta}) =>
+        meta.tag.includes('node-meta')
+        && patch.path === "/context"
+        && patch.op === "replace"
+        && Object.hasOwn(patch.value, "width")
+        && Object.hasOwn(patch.value, "height")
+        && (meta.tag === "node-meta-condition" || meta.tag === "node-meta-state")
+      ,
+      action({meta, patch, core, update, context}) {
+        if (!context.process) {
+          update({error: `При получении размеров отсутствует process в контексте`})
+          return
+        }
+        const entity = core.meta.get(context.process)
+        if (!entity) {
+          update({error: `В карте данных мет, отсутствует мета: ${context.process}`})
+          return
+        }
+        const id = `${meta.tag}/${meta.index}`
+        if (meta.tag === "node-meta-condition") {
+          entity.edges[id]["width"] = patch.value.width
+          entity.edges[id]["height"] = patch.value.height
+        } else if (meta.tag === "node-meta-state") {
+          entity.nodes[id]["width"] = patch.value.width
+          entity.nodes[id]["height"] = patch.value.height
+        }
       }
     },
     {
