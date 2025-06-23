@@ -10,10 +10,10 @@ import type {Core, CoreData, CoreObj} from "./core.ts"
  */
 type MetaDataType = {
   tag: string
+  index: number
   user?: number | null
   device?: string
   tab?: number
-  index?: number
   timestamp?: number
 }
 
@@ -41,6 +41,7 @@ type ReactionFilterParam<C extends ContextDefinition> = {
  @property action - Функция, которая будет вызвана при изменении данных.
  */
 export type Reaction<C extends ContextDefinition, I extends CoreData<I>> = {
+  title: string
   // path?: string
   // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean

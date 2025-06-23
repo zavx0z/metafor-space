@@ -263,7 +263,7 @@ function createMeta(
 
       connectedCallback() {
         if (!this.index) this.index = idx += 1
-        
+
         this.#channel = new BroadcastChannel('channel')
         if (reactions.length) this.#channel.onmessage = ({data: {meta, patch}}) => {
           reactions.forEach((reaction) => {
