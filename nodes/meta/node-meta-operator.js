@@ -4,7 +4,7 @@ import {nothing} from "../../html/html.js"
 export default MetaFor("node-meta-operator", {development: true})
   .states('init', 'ready')
   .context(t => ({
-    tag: t.string({title: "Тэг meta"}),
+    id: t.string({title: "ID meta"}),
     from: t.string({title: "Исходное состояние"}),
     to: t.string({title: "Текущее состояние"}),
 

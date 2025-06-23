@@ -7,7 +7,7 @@ export default MetaFor('node-meta-state', {
 })
   .states("ready", "error")
   .context(t => ({
-    tag: t.string({title: "Тэг meta"}),
+    id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))

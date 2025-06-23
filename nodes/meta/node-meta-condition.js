@@ -2,13 +2,17 @@ import {MetaFor} from "../../metafor.js"
 import "./node-meta-operator.js"
 import "./node-meta-socket.js"
 
-export default MetaFor("node-meta-condition")
-  .states('init', 'ready')
+export default MetaFor("node-meta-condition", {development: true})
+  .states("рендер", "измерение", "установка положения")
   .context(t => ({
-    tag: t.string({title: "Тэг meta"}),
+    id: t.string({title: "ID meta"}),
     from: t.string({title: "Исходное состояние"}),
     to: t.string({title: "Текущее состояние"}),
-    error: t.string({title: "Ошибка", nullable: true}),
+    error: t.string({nullable: true}),
+    width: t.number({nullable: true}),
+    height: t.number({nullable: true}),
+    x: t.number({nullable: true}),
+    y: t.number({nullable: true}),
   }))
   .core(() => ({}))
   .view({
@@ -17,7 +21,6 @@ export default MetaFor("node-meta-condition")
         data-direction="input"
         data-active=${false}
       ></metafor-node-meta-socket>
-      <slot name="operators"></slot>
       <slot></slot>
       <metafor-node-meta-socket
         data-direction="output"
@@ -26,8 +29,6 @@ export default MetaFor("node-meta-condition")
     `,
     style: ({css}) => css`
       :host {
-        --shadow-size: 0.5 !important;
-
         background-color: rgba(var(--surface-400));
         padding: 4px 8px;
         position: absolute;
@@ -44,15 +45,28 @@ export default MetaFor("node-meta-condition")
       }
     `
   })
-  .transitions('init', [
+  .transitions('рендер', [
     {
-      in: "init",
-      to: [{state: "ready", when: {tag: {isNull: false}}}]
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
     },
     {
-      in: "ready",
-      to: [{state: "init", when: {tag: {isNull: true}}}]
-    }
+      in: "измерение",
+      action({element, update}) {
+        requestAnimationFrame(() => {
+          const {width, height} = element.getBoundingClientRect()
+          update({width: Math.round(width), height: Math.round(height)})
+        })
+      },
+      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+    },
+    {
+      in: "установка положения",
+      action() {
+        console.log()
+      },
+      to: []
+    },
   ])
   .reactions([])
   .create()

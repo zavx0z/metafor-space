@@ -4,7 +4,7 @@ import './node-meta-socket.js'
 export default MetaFor("node-meta-param")
   .states("init", "ready")
   .context(t => ({
-    tag: t.string({title: "Тэг meta"}),
+    id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
     param: t.string({title: "Ключ параметра"}),
     title: t.string({title: "Название параметра"}),

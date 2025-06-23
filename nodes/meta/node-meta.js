@@ -7,7 +7,7 @@ import {operatorSymbols} from "../operators.js"
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .states("init", "ready")
   .context(t => ({
-    tag: t.string({title: "Тэг meta"}),
+    id: t.string({title: "ID meta"}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
@@ -15,7 +15,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     render: ({html, context}) => html`
       <header data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
-        <h2 class="noselect">${context.tag}</h2>
+        <h2 class="noselect">${context.id}</h2>
         <div><!--кнопки справа-->
           <button aria-label="Редактировать">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor">
@@ -146,25 +146,19 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
   .transitions("init", [
     {
       in: "init",
-      action: () => {
-      },
       to: [{
-        state: "ready", when: {
-          error: null,
-        }
+        state: "ready", when: {error: null}
       }]
     },
     {
       in: "ready",
-      action: ({core}) => {
-      },
       to: []
     }
   ])
   .reactions([
     {
-      title: "",
-      filter: ({meta, context}) => meta.tag === context.tag,
+      title: "meta-источник",
+      filter: ({meta, context}) => `${meta.tag}/${meta.index}` === context.id,
       action: () => {
         // console.log("Node reaction", meta, patch)
       }

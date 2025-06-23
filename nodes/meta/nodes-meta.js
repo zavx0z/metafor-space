@@ -99,17 +99,17 @@ export default MetaFor("nodes-meta", {
         const snapshot = core.snapshot
         render(html`
           <metafor-node-meta context=${{
-            tag: snapshot.id
+            id: snapshot.id
           }} class="backdrop"
           >
             ${snapshot.states.map(i => html`
               <metafor-node-meta-state slot="state" context=${{
-                tag: snapshot.id,
+                id: snapshot.id,
                 state: i
               }}>
                 ${Object.keys(snapshot.types).map(key => html`
                   <metafor-node-meta-param context=${{
-                    tag: snapshot.id,
+                    id: snapshot.id,
                     state: i,
                     param: key,
                     title: snapshot.types[key].title,
@@ -124,7 +124,7 @@ export default MetaFor("nodes-meta", {
                 const destinationState = condition.state
                 return html`
                   <metafor-node-meta-condition slot="conditions" context=${{
-                    tag: snapshot.id,
+                    id: snapshot.id,
                     from: sourceState,
                     to: destinationState,
                   }}>
@@ -144,7 +144,7 @@ export default MetaFor("nodes-meta", {
                       }
                       return html`
                         <metafor-node-meta-operator context=${{
-                          tag: snapshot.id,
+                          id: snapshot.id,
                           from: sourceState,
                           to: destinationState,
                           op: op,
@@ -169,6 +169,7 @@ export default MetaFor("nodes-meta", {
   ])
   .reactions([
     {
+      title: "Создание всех мета кроме нодовых",
       filter: ({patch, meta}) =>
         patch.op === "add"
         && !meta.tag.includes("node-meta")
