@@ -73,8 +73,13 @@ export function log(message, core) {
     config.collapseAll ? console.groupCollapsed(...msg) : console.group(...msg)
   } else {
     // Стандартный вывод в группе
-    const msg = [`%c${tag}${index}%c | %c${op}%c | %c${path}`, "color: #3498db; font-weight: bold", "", "color: #e74c3c", "", "color: #2ecc71"]
-    config.collapseAll ? console.groupCollapsed(...msg) : console.group(...msg)
+    const isError = Object.hasOwn(patch.value, 'error')
+    const msg = [`%c${tag}${index}%c | %c${op}%c | %c${path}`,
+      `color: #3498db; font-weight: bold; ${isError ? "background: #7d4545" : ""}`,
+      "", "color: #e74c3c", "", "color: #2ecc71"]
+    if (isError) console.group(...msg)
+    else if (config.collapseAll) console.groupCollapsed(...msg)
+    else console.group(...msg)
   }
   if (typeof patch.value === 'object' && patch.value !== null) {
     console.log(formattedObj(patch.value))
