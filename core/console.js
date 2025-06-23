@@ -34,6 +34,9 @@ const logCore = (core) => {
   console.log("snapshot core: ", {...core})
   console.log("current  core: ", core)
 }
+const config = {
+  collapseAll: true
+}
 
 /**
  * @param {import("../metafor").BroadcastMessage} message
@@ -42,12 +45,13 @@ const logCore = (core) => {
 export function log(message, core) {
   const {meta, patch} = message
   // Ширины колонок
-  const TAG_WIDTH = 44
+  const TAG_WIDTH = 22
   const OP_WIDTH = 8
   const PATH_WIDTH = 15
 
   // tag выравниваем по левому краю, остальные по центру
   const tag = String(meta.tag).padEnd(TAG_WIDTH, ' ')
+  const index = String(meta.index).padEnd(4, ' ')
   const op = centerText(String(patch.op), OP_WIDTH)
   // const path = centerText(String(patch.path), PATH_WIDTH)
   const path = String(patch.path).padEnd(PATH_WIDTH, ' ')
@@ -59,39 +63,19 @@ export function log(message, core) {
       : typeof patch.value === 'object' && patch.value !== null
         ? JSON.stringify(patch.value, null, 2)
         : patch.value
-    console.groupCollapsed(
-      `%c${tag}%c | %c${op}%c | %c${path}%c %c${stateValue}`,
-      "color: #3498db; font-weight: bold",
-      "",
-      "color: #e74c3c",
-      "",
-      "color: #2ecc71",
-      "",
-      "color: lightskyblue; font-weight: bold"
-    )
+    const msg = [`%c${tag}${index}%c | %c${op}%c | %c${path}%c %c${stateValue}`, "color: #3498db; font-weight: bold", "", "color: #e74c3c", "", "color: #2ecc71", "", "color: lightskyblue; font-weight: bold"]
+    config.collapseAll ? console.groupCollapsed(...msg) : console.group(...msg)
     logCore(core)
     console.groupEnd()
     return
   } else if (patch.path === "/") {
-    console.groupCollapsed(
-      `%c${tag}%c | %c${op}%c | %c${path}`,
-      "color: #3498db; font-weight: bold",
-      "",
-      "color: #e74c3c",
-      "",
-      "color: #2ecc71"
-    );
-  } else
+    const msg = [`%c${tag}${index}%c | %c${op}%c | %c${path}`, "color: #3498db; font-weight: bold", "", "color: #e74c3c", "", "color: #2ecc71"]
+    config.collapseAll ? console.groupCollapsed(...msg) : console.group(...msg)
+  } else {
     // Стандартный вывод в группе
-    console.group(
-      `%c${tag}%c | %c${op}%c | %c${path}`,
-      "color: #3498db; font-weight: bold",
-      "",
-      "color: #e74c3c",
-      "",
-      "color: #2ecc71"
-    );
-
+    const msg = [`%c${tag}${index}%c | %c${op}%c | %c${path}`, "color: #3498db; font-weight: bold", "", "color: #e74c3c", "", "color: #2ecc71"]
+    config.collapseAll ? console.groupCollapsed(...msg) : console.group(...msg)
+  }
   if (typeof patch.value === 'object' && patch.value !== null) {
     console.log(formattedObj(patch.value))
     logCore(core)
