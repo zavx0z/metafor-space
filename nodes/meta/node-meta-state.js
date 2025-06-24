@@ -24,10 +24,14 @@ export default MetaFor('node-meta-state', {
     {
       in: "измерение",
       action({element, update}) {
-
         requestAnimationFrame(() => {
-          const {width, height} = element.getBoundingClientRect()
-          update({width: Math.round(width), height: Math.round(height)})
+          const {width, height, x, y} = element.getBoundingClientRect()
+          update({
+            width: Math.round(width),
+            height: Math.round(height),
+            x: Math.round(x),
+            y: Math.round(y),
+          })
         })
       },
       to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]

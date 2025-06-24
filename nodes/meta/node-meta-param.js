@@ -9,31 +9,37 @@ export default MetaFor("node-meta-param")
     title: t.string({title: "Название параметра"}),
     value: t.string({title: "Значение параметра", nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
+    width: t.number({nullable: true}),
+    height: t.number({nullable: true}),
+    x: t.number({nullable: true}),
+    y: t.number({nullable: true}),
   }))
   .core()
-  .states("init", "ready")
-  .transitions("init", [
+  .states("рендер", "измерение", "установка положения")
+  .transitions('рендер', [
     {
-      in: "init",
-      action: ({core}) => {
-        // console.log("param", core)
-      },
-      to: [{
-        state: "ready", when: {
-          title: {isNull: false},
-          param: {isNull: false}
-        }
-      }]
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
     },
     {
-      in: "ready",
-      to: [{
-        state: "init", when: {
-          title: null,
-          param: null
-        }
-      }]
-    }
+      in: "измерение",
+      action({element, update}) {
+        requestAnimationFrame(() => {
+          const {width, height, x, y} = element.getBoundingClientRect()
+          update({
+            width: Math.round(width),
+            height: Math.round(height),
+            x: Math.round(x),
+            y: Math.round(y),
+          })
+        })
+      },
+      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+    },
+    {
+      in: "установка положения",
+      to: []
+    },
   ])
   .reactions([])
   .view({

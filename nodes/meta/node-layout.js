@@ -56,19 +56,20 @@ export default MetaFor("node-elk", {development: true})
     {
       in: "получение данных",
       action({context, update, core}) {
-        console.log("iiiiiiii")
         if (!context.current) {
           update({error: "Нет ID мета для обработки данных"})
           return
         }
         let meta = core.meta.get(context.current)
-        if (!meta) core.meta.set(context.current, {states: {}, conditions: {}, sockets: {}})
+        if (!meta) core.meta.set(context.current, {
+          states: {}, conditions: {}, sockets: {}, params: {}
+        })
       },
       to: [{state: "форматирование данных", when: {dataReceived: true, count: 0}}]
     },
     {
       in: "форматирование данных",
-      action({core, element}) {
+      action({core}) {
         console.log(core.meta)
       },
       to: [{state: "вычисление", when: {current: null}}]
@@ -104,10 +105,8 @@ export default MetaFor("node-elk", {development: true})
         meta.tag.includes('node-meta')
         && patch.path === "/"
         && patch.op === "add"
-        && (meta.tag === "node-meta-condition"
-          || meta.tag === "node-meta-state"
-          || meta.tag === "node-meta-socket"
-        )
+        && meta.tag !== "node-meta"
+        && meta.tag !== "node-meta-operator"
       ),
       action({meta, patch, core, update, context}) {
         const entity = core.meta.get(patch.value.context.id)
@@ -129,7 +128,10 @@ export default MetaFor("node-elk", {development: true})
           entity.sockets[patch.value.id] = {
             state: patch.value.context.state
           }
-        // console.log(patch.value.context)
+        else if (meta.tag === "node-meta-param")
+          entity.params[patch.value.id] = {
+            state: patch.value.context.state
+          }
         update({count: context.count + 1})
       }
     },
@@ -141,10 +143,8 @@ export default MetaFor("node-elk", {development: true})
         && patch.op === "replace"
         && Object.hasOwn(patch.value, "width")
         && Object.hasOwn(patch.value, "height")
-        && (meta.tag === "node-meta-condition"
-          || meta.tag === "node-meta-state"
-          || meta.tag === "node-meta-socket"
-        )
+        && meta.tag !== "node-meta"
+        && meta.tag !== "node-meta-operator"
       ),
       action({meta, patch, core, update, context}) {
         if (!context.current) {
@@ -164,11 +164,18 @@ export default MetaFor("node-elk", {development: true})
         } else if (meta.tag === "node-meta-state") {
           entity.states[id]["width"] = patch.value.width
           entity.states[id]["height"] = patch.value.height
+          entity.states[id]["x"] = patch.value.x
+          entity.states[id]["y"] = patch.value.y
         } else if (meta.tag === "node-meta-socket") {
           entity.sockets[id]["width"] = patch.value.width
           entity.sockets[id]["height"] = patch.value.height
           entity.sockets[id]["x"] = patch.value.x
           entity.sockets[id]["y"] = patch.value.y
+        } else if (meta.tag === "node-meta-param") {
+          entity.params[id]["width"] = patch.value.width
+          entity.params[id]["height"] = patch.value.height
+          entity.params[id]["x"] = patch.value.x
+          entity.params[id]["y"] = patch.value.y
         }
         update({count: context.count - 1})
       }
