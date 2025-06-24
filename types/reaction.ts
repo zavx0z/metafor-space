@@ -1,32 +1,18 @@
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
-import type {Core, CoreData, CoreObj} from "./core.ts"
+import type {Core, CoreData} from "./core.ts"
+import type {MetaDataMessage} from "./meta.ts"
 
-/**
- @property user - Идентификатор пользователя.
- @property device - Идентификатор устройства.
- @property tab - Идентификатор вкладки или окна браузера. Полезно для управления данными в нескольких вкладках или окнах.
- @property index - Уникальный идентификатор экземпляра компонента. Если не задан, генерируется автоматически.
- @property timestamp - Время отправки.
- */
-type MetaDataType = {
-  tag: string
-  index: number
-  user?: number | null
-  device?: string
-  tab?: number
-  timestamp?: number
-}
 
 type ReactionActionParam<C extends ContextDefinition, I extends CoreData<I>> = {
-  patch: { path: string; op: "add" | "remove" | "update" | "replace"; value: any }
+  patch: PatchMetaFor
   context: ContextData<C>
-  meta: MetaDataType
+  meta: MetaDataMessage
   update: Update<C>
   core: Core<I>
 }
 
 type ReactionFilterParam<C extends ContextDefinition> = {
-  meta: MetaDataType
+  meta: MetaDataMessage
   context: ContextData<C>
   patch: PatchMetaFor
 }
@@ -46,7 +32,7 @@ export type Reaction<C extends ContextDefinition, I extends CoreData<I>> = {
   // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean
   action: ({patch, context, update, core}: ReactionActionParam<C, I>) => void
-} & Partial<MetaDataType>
+} & Partial<MetaDataMessage>
 
 /** # Реакции
 

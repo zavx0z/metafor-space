@@ -56,7 +56,7 @@ export type BroadcastMessage = {
  @property index - Уникальный идентификатор экземпляра компонента. Если не задан, генерируется автоматически.
  @property timestamp - Время отправки.
  */
-type MetaDataMessage = {
+export type MetaDataMessage = {
   tag: string
   user?: number | null
   device?: string

@@ -68,6 +68,7 @@ export default MetaFor("node-elk", {development: true})
     {
       in: "получение данных",
       action({context, update, core}) {
+        console.log("iiiiiiii")
         if (!context.current) {
           update({error: "Нет ID мета для обработки данных"})
           return

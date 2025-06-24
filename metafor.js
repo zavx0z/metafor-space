@@ -158,7 +158,7 @@ function createMeta(
   customElements.define("metafor-" + tag,
     class extends HTMLElement {
       index = 0
-      #shadow = this.attachShadow({mode: "open"})
+      #shadow = this.attachShadow({mode: "closed"})
       /**@type{BroadcastChannel|undefined}*/
       #channel = undefined
       #process = false
@@ -230,6 +230,7 @@ function createMeta(
                 return
               }
               this.#channel.postMessage(message)
+              if (debug) log(message, this.#core)
             }
           },
           value: () => state,
@@ -274,8 +275,9 @@ function createMeta(
         if (!this.index) this.index = idx += 1
 
         this.#channel = new BroadcastChannel('channel')
-        if (reactions.length) this.#channel.onmessage = ({data: {meta, patch}}) => {
-          reactions.forEach((reaction) => {
+        if (reactions.length) {
+          /**@param {import("./metafor").BroadcastMessage} message */
+          const reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
             if (reaction.filter({meta, patch, context: this.context})) {
               reaction.action({
                 patch, meta,
@@ -285,6 +287,9 @@ function createMeta(
               })
             }
           })
+          // @ts-ignore
+          this.#shadow.addEventListener("channel", (ev) => reactionCb(ev.detail))
+          this.#channel.onmessage = ({data}) => reactionCb(data)
         }
 
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
