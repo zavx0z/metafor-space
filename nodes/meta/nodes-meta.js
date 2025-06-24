@@ -3,6 +3,7 @@ import "./node-meta.js"
 import "./node-layout.js"
 import {html, render} from "../../html/html.js"
 
+
 export default MetaFor("nodes-meta", {
   description: "No-code система визуализации и построения системы взаимодействия мета-компонентов.",
   development: true
@@ -13,13 +14,21 @@ export default MetaFor("nodes-meta", {
     nodes: t.array({title: "Коллекция meta"}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
-  .core(() => ({
-    /**@type{SnapshotMetaForAny|null}*/
-    snapshot: null
-  }))
+  .core(({self, context, update}) => {
+    document.addEventListener("channel", (ev) => {
+      const {detail} = /** @type {CustomEvent} */ (ev)
+      const {meta, patch} =  /**@type {import("../../metafor").BroadcastMessage}*/(detail)
+      if (patch.op === "add" && meta.tag !== "nodes-meta" && !meta.tag.includes("node-meta") && meta.tag !== "node-elk") {
+        self.snapshot = patch.value
+        update({op: "add", nodes: [...context.nodes, patch.value.id]})
+      }
+    })
+    return {
+      snapshot: null
+    }
+  })
   .view({
     render: ({html}) => html`
-      <metafor-node-elk></metafor-node-elk>
       <slot name="meta"/>
       <slot></slot>
     `,
@@ -82,7 +91,10 @@ export default MetaFor("nodes-meta", {
           stroke-dashoffset: 0;
         }
       }
-    `
+    `,
+    onMount() {
+
+    }
   })
   .transitions("ожидание патча", [
     {
@@ -96,6 +108,7 @@ export default MetaFor("nodes-meta", {
           update({error: `Отсутствует снимок meta - ${context.nodes[context.nodes.length]}`})
           return
         }
+        /**@type{SnapshotMetaForAny}*/
         const snapshot = core.snapshot
         render(html`
           <metafor-node-meta context=${{
@@ -164,18 +177,5 @@ export default MetaFor("nodes-meta", {
       ],
     }
   ])
-  .reactions([
-    {
-      title: "Создание всех мета кроме нодовых",
-      filter: ({patch, meta}) =>
-        patch.op === "add"
-        && !meta.tag.includes("node-meta")
-        && meta.tag !== "node-elk"
-      ,
-      action: ({context, patch, update, core}) => {
-        core.snapshot = patch.value
-        update({op: "add", nodes: [...context.nodes, patch.value.id]})
-      }
-    },
-  ])
+  .reactions([])
   .create({})

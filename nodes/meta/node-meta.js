@@ -150,6 +150,10 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     },
     {
       in: "ready",
+      action({element}) {
+
+
+      },
       to: []
     }
   ])

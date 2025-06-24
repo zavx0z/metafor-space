@@ -122,6 +122,7 @@ export default MetaFor('node-meta-state', {
     {
       in: "измерение",
       action({element, update}) {
+
         requestAnimationFrame(() => {
           const {width, height} = element.getBoundingClientRect()
           update({width: Math.round(width), height: Math.round(height)})

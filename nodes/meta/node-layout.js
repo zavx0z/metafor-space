@@ -48,11 +48,21 @@ export default MetaFor("node-elk", {development: true})
       }
     }
   }))
+  .view({
+    render: ({html}) => html`
+      <metafor-nodes-meta>
+      </metafor-nodes-meta>
+    `,
+    style: ({css}) => css`
+      :host {
+        width: 100vw;
+        height: 100vh;
+      }
+    `
+  })
   .transitions('ожидание', [
     {
       in: "ожидание",
-      action({element}){
-      },
       to: [{state: "получение данных", when: {current: {isNull: false}}}]
     },
     {
@@ -70,7 +80,6 @@ export default MetaFor("node-elk", {development: true})
     {
       in: "форматирование данных",
       action({core, element}) {
-        console.log(element.parent.getElementsByTagName("metafor-node-meta")[0].childNodes)
         console.log(core.meta)
       },
       to: [{state: "вычисление", when: {current: null}}]
@@ -131,7 +140,7 @@ export default MetaFor("node-elk", {development: true})
           entity.sockets[patch.value.id] = {
             state: patch.value.context.state
           }
-          // console.log(patch.value.context)
+        // console.log(patch.value.context)
         update({count: context.count + 1})
       }
     },

@@ -99,12 +99,18 @@ export type OnUpdateContextData<C extends ContextDefinition> = {
  */
 export type UpdateParameters<C extends ContextDefinition> = Partial<{
     [K in keyof C]: C[K] extends ArrayDefinition
-        ? Array<string|number>
+        ? any[]
         : C[K] extends EnumDefinition<infer T>
-            ? T[number] | null
+            ? C[K]["nullable"] extends true
+                ? T[number] | null
+                : T[number]
             : C[K] extends TypeDefinition
-                ? ExtractTypeValue<C[K]> | null
-                : never
+                ? "nullable" extends keyof C[K]
+                    ? C[K]["nullable"] extends true
+                        ? ExtractTypeValue<C[K]> | null
+                        : ExtractTypeValue<C[K]>
+                    : ExtractTypeValue<C[K]>
+                : ExtractTypeValue<C[K]>
 }>
 
 /**

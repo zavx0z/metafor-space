@@ -13,6 +13,11 @@ export default MetaFor("node-meta-param")
   }))
   .core()
   .view({
+    onMount({component}) {
+
+
+
+    },
     render: ({context, html}) => html`
       <metafor-node-meta-socket
         context=${{

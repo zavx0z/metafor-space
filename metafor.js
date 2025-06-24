@@ -220,7 +220,16 @@ function createMeta(
               const oldValue = state
               state = next
               listeners.forEach((listener) => listener(oldValue, next))
-              this.#sendPatches({path: "/state", op: "replace", value: next})
+              /**@type {import("./metafor").BroadcastMessage}*/
+              const message = {
+                meta: {tag, index: this.index, timestamp: Date.now()},
+                patch: {path: "/state", op: "replace", value: next}
+              }
+              if (!this.#channel) {
+                console.warn("Нет канала!", message)
+                return
+              }
+              this.#channel.postMessage(message)
             }
           },
           value: () => state,
@@ -333,12 +342,13 @@ function createMeta(
       /**@param {PatchMetaFor} patches*/
       #sendPatches = (patches) => {
         /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {meta: {tag, index: this.index, timestamp: Date.now()}, patch: patches}
-        if (!this.#channel) {
-          console.warn("Нет канала!", message)
-          return
-        }
-        this.#channel.postMessage(message)
+        const message = {meta: {tag, index: this.index}, patch: patches}
+        this.#shadow.dispatchEvent(new CustomEvent('channel', {
+          detail: message,
+          bubbles: true,
+          cancelable: false,
+          composed: true
+        }))
         if (debug) log(message, this.#core)
       }
 
@@ -475,14 +485,6 @@ function createMeta(
             })),
           })),
         }
-      }
-
-      get parent() {
-        const root = this.getRootNode()
-        if (root instanceof ShadowRoot)
-          return root.host
-        else
-          return root
       }
     }
   )

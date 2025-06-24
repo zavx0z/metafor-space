@@ -74,6 +74,8 @@ export default MetaFor('node-meta-socket')
           }
         }
       `
+    },
+    onMount({component}){
     }
   })
   .transitions("рендер", [
