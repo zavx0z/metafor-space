@@ -110,7 +110,6 @@ export function generate(snapshot, metrics) {
     children: snapshot.states.map(state => {
       const triggers = createTriggers(state, snapshot, metrics)
       allTriggers.push(...triggers)
-
       return {
         layoutOptions: config.atom,
         id: stateId({atom: snapshot.id, state}),

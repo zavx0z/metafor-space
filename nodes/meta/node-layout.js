@@ -2,21 +2,57 @@ import ELK from "elkjs"
 import {MetaFor} from "../../metafor.js"
 
 export default MetaFor("node-elk", {development: true})
-  .states('ожидание', 'получение данных', 'вычисление')
+  .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
   .context(t => ({
-    current: t.string({title: "ID обрабатываемой ноды", nullable: true}),
-    ready: t.string({title: "ID готовой ноды", nullable: true}),
-    dataReceived: t.boolean({title: "Статус получения данных", default: false}),
+    current: t.string({title: "ID ноды meta передающий данные", nullable: true}),
+    ready: t.string({title: "ID готовой ноды meta", nullable: true}),
+    count: t.number({title: "Счетчик обрабатываемых элементов ноды meta", default: 0}),
+    dataReceived: t.boolean({title: "Статус получения данных элементов от nodes-meta", default: false}),
     error: t.string({nullable: true})
   }))
   .core(() => ({
     elk: new ELK(),
     /**@type{import("./node-layout.t").DataMetaMap}*/
-    meta: new Map()
+    meta: new Map(),
+    config: {
+      base: {
+        "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
+        "elk.spacing.edgeEdge": "36",
+        // "elk.spacing.edgeNode": "36",
+        "hierarchyHandling": "INCLUDE_CHILDREN",
+        'elk.layered.layering.strategy': 'LONGEST_PATH_SOURCE',
+        "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
+        "considerModelOrder.strategy": 'PREFER_NODES'
+      },
+      meta: {
+        'elk.spacing.nodeNode': "0",
+        'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+      },
+      state: {
+        'elk.spacing.nodeNode': "0",
+        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+        "portConstraints": "FIXED_POS"
+      },
+      condition: {
+        "elk.spacing.nodeNode": "0",
+        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]"
+      },
+      operator: {
+        "portConstraints": "FIXED_SIDE",
+        "portAlignment.west": "JUSTIFIED",
+      },
+      port: {
+        west: {
+          "port.side": "WEST"
+        }
+      }
+    }
   }))
   .transitions('ожидание', [
     {
       in: "ожидание",
+      action({element}){
+      },
       to: [{state: "получение данных", when: {current: {isNull: false}}}]
     },
     {
@@ -27,16 +63,22 @@ export default MetaFor("node-elk", {development: true})
           return
         }
         let meta = core.meta.get(context.current)
-        if (!meta) core.meta.set(context.current, {nodes: {}, edges: {}})
+        if (!meta) core.meta.set(context.current, {states: {}, conditions: {}, sockets: {}})
       },
-      to: [{state: "вычисление", when: {dataReceived: true}}]
+      to: [{state: "форматирование данных", when: {dataReceived: true, count: 0}}]
+    },
+    {
+      in: "форматирование данных",
+      action({core, element}) {
+        console.log(element.parent.getElementsByTagName("metafor-node-meta")[0].childNodes)
+        console.log(core.meta)
+      },
+      to: [{state: "вычисление", when: {current: null}}]
     },
     {
       in: "вычисление",
-      action({context, update, core}) {
-        setTimeout(() => {
-          console.log(core.meta)
-        }, 1000)
+      action({core}) {
+        console.log(core.meta)
         // update({ready: context.current, current: null})
       },
       to: [{state: "ожидание", when: {current: null}}]
@@ -56,7 +98,6 @@ export default MetaFor("node-elk", {development: true})
       action({patch, update}) {
         const meta = patch.value.nodes[patch.value.nodes.length - 1]
         update({current: meta})
-
       }
     },
     {
@@ -65,9 +106,12 @@ export default MetaFor("node-elk", {development: true})
         meta.tag.includes('node-meta')
         && patch.path === "/"
         && patch.op === "add"
-        && (meta.tag === "node-meta-condition" || meta.tag === "node-meta-state")
+        && (meta.tag === "node-meta-condition"
+          || meta.tag === "node-meta-state"
+          || meta.tag === "node-meta-socket"
+        )
       ),
-      action({meta, patch, core, update}) {
+      action({meta, patch, core, update, context}) {
         const entity = core.meta.get(patch.value.context.id)
         if (!entity) {
           update({error: `При получении элементов, в карте данных, отсутствует мета: ${patch.value.context.id}`})
@@ -75,14 +119,20 @@ export default MetaFor("node-elk", {development: true})
           return
         }
         if (meta.tag === "node-meta-condition")
-          entity.edges[patch.value.id] = {
+          entity.conditions[patch.value.id] = {
             from: patch.value.context.from,
             to: patch.value.context.to,
           }
         else if (meta.tag === "node-meta-state")
-          entity.nodes[patch.value.id] = {
+          entity.states[patch.value.id] = {
             state: patch.value.context.state
           }
+        else if (meta.tag === "node-meta-socket")
+          entity.sockets[patch.value.id] = {
+            state: patch.value.context.state
+          }
+          // console.log(patch.value.context)
+        update({count: context.count + 1})
       }
     },
     {
@@ -93,7 +143,10 @@ export default MetaFor("node-elk", {development: true})
         && patch.op === "replace"
         && Object.hasOwn(patch.value, "width")
         && Object.hasOwn(patch.value, "height")
-        && (meta.tag === "node-meta-condition" || meta.tag === "node-meta-state")
+        && (meta.tag === "node-meta-condition"
+          || meta.tag === "node-meta-state"
+          || meta.tag === "node-meta-socket"
+        )
       ),
       action({meta, patch, core, update, context}) {
         if (!context.current) {
@@ -108,12 +161,18 @@ export default MetaFor("node-elk", {development: true})
         }
         const id = `${meta.tag}/${meta.index}`
         if (meta.tag === "node-meta-condition") {
-          entity.edges[id]["width"] = patch.value.width
-          entity.edges[id]["height"] = patch.value.height
+          entity.conditions[id]["width"] = patch.value.width
+          entity.conditions[id]["height"] = patch.value.height
         } else if (meta.tag === "node-meta-state") {
-          entity.nodes[id]["width"] = patch.value.width
-          entity.nodes[id]["height"] = patch.value.height
+          entity.states[id]["width"] = patch.value.width
+          entity.states[id]["height"] = patch.value.height
+        } else if (meta.tag === "node-meta-socket") {
+          entity.sockets[id]["width"] = patch.value.width
+          entity.sockets[id]["height"] = patch.value.height
+          entity.sockets[id]["x"] = patch.value.x
+          entity.sockets[id]["y"] = patch.value.y
         }
+        update({count: context.count - 1})
       }
     },
     {

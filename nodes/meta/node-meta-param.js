@@ -15,12 +15,26 @@ export default MetaFor("node-meta-param")
   .view({
     render: ({context, html}) => html`
       <metafor-node-meta-socket
+        context=${{
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "west"
+        }}
         data-direction="input"
         data-active="false"
       ></metafor-node-meta-socket>
       <span class="noselect">${context.title}</span>
       <input name=${context.title} value=${context.value}/>
       <metafor-node-meta-socket
+        context=${{
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "east"
+        }}
         class="connected"
         data-direction="output"
         data-active="false"
@@ -35,7 +49,7 @@ export default MetaFor("node-meta-param")
         padding: 0 2px;
         display: flex;
         align-items: center;
-        
+
         &:active {
           border-color: rgba(var(--primary-500));
         }

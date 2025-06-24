@@ -19,7 +19,7 @@ export type Action<C extends ContextDefinition, I extends Record<string, unknown
   update,
 }: {
   context: ContextData<C>
-  element: HTMLElement
+  element: Meta<any, any>
   update: Update<C>
   core: Core<I>
 }) => void | Promise<void>

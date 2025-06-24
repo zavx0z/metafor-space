@@ -1,8 +1,17 @@
 import {MetaFor} from "../../metafor.js"
 
 export default MetaFor('node-meta-socket')
-  .states('init', 'ready')
+  .states("рендер", "измерение")
   .context(t => ({
+    id: t.string({title: "ID meta"}),
+    state: t.string({title: "Название состояния"}),
+    param: t.string({title: "Ключ параметра"}),
+    direction: t.enum("west", "east")({title: "Вход/Выход"}),
+    parent: t.enum("state", "condition")({title: "Принадлежность"}),
+    width: t.number({nullable: true}),
+    height: t.number({nullable: true}),
+    x: t.number({nullable: true}),
+    y: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
@@ -67,6 +76,26 @@ export default MetaFor('node-meta-socket')
       `
     }
   })
-  .transitions('init', [])
+  .transitions("рендер", [
+    {
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
+    },
+    {
+      in: "измерение",
+      action({element, update}) {
+        requestAnimationFrame(() => {
+          const {width, height, x, y} = element.getBoundingClientRect()
+          update({
+            width: Math.round(width),
+            height: Math.round(height),
+            x: Math.round(x),
+            y: Math.round(y),
+          })
+        })
+      },
+      to: []
+    },
+  ])
   .reactions([])
   .create({})

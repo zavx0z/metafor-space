@@ -8,6 +8,7 @@ export default MetaFor("node-meta-condition", {development: true})
     id: t.string({title: "ID meta"}),
     from: t.string({title: "Исходное состояние"}),
     to: t.string({title: "Текущее состояние"}),
+    param: t.string({title: "Ключ параметра"}),
     error: t.string({nullable: true}),
     width: t.number({nullable: true}),
     height: t.number({nullable: true}),
@@ -16,13 +17,27 @@ export default MetaFor("node-meta-condition", {development: true})
   }))
   .core(() => ({}))
   .view({
-    render: ({html}) => html`
+    render: ({html, context}) => html`
       <metafor-node-meta-socket
+        context=${{
+          id: context.id,
+          state: context.to,
+          param: context.param,
+          parent: "condition",
+          direction: "west"
+        }}
         data-direction="input"
         data-active=${false}
       ></metafor-node-meta-socket>
       <slot></slot>
       <metafor-node-meta-socket
+        context=${{
+          id: context.id,
+          state: context.to,
+          param: context.param,
+          parent: "condition",
+          direction: "east"
+        }}
         data-direction="output"
         data-active=${false}
       ></metafor-node-meta-socket>
@@ -48,6 +63,9 @@ export default MetaFor("node-meta-condition", {development: true})
   .transitions('рендер', [
     {
       in: "рендер",
+      action({element}){
+
+      },
       to: [{state: "измерение", when: {error: null}}]
     },
     {

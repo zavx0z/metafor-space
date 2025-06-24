@@ -476,6 +476,14 @@ function createMeta(
           })),
         }
       }
+
+      get parent() {
+        const root = this.getRootNode()
+        if (root instanceof ShadowRoot)
+          return root.host
+        else
+          return root
+      }
     }
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))

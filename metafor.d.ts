@@ -108,6 +108,7 @@ declare global {
     states: readonly S[]
     types: ContextDefinition
     process: boolean
+    parent: HTMLElement
 
     update: (context: UpdateParameters<C>) => void
     onUpdate: OnUpdate<C>
