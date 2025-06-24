@@ -6,12 +6,12 @@ describe("Пайплайн", () => {
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("IDLE", "ACTIVE", "COMPLETE")
     .context((t) => ({
       username: t.string({title: "Имя пользователя", nullable: true, default: ""}),
       progress: t.number({title: "Прогресс", nullable: true, default: 0}),
     }))
     .core()
+    .states("IDLE", "ACTIVE", "COMPLETE")
     .transitions("IDLE", [
       {
         in: "IDLE",

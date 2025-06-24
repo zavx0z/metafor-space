@@ -5,11 +5,11 @@ describe("View", () => {
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("init")
     .context((t) => ({
       param: t.boolean({default: false}),
     }))
     .core()
+    .states("init")
     .transitions("init", [])
     .reactions([])
     .view({

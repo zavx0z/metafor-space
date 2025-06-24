@@ -1,7 +1,6 @@
 import {MetaFor} from "../../metafor.js"
 
 export default MetaFor('node-meta-socket')
-  .states("рендер", "измерение")
   .context(t => ({
     id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
@@ -15,6 +14,7 @@ export default MetaFor('node-meta-socket')
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
+  .states("рендер", "измерение")
   .transitions("рендер", [
     {
       in: "рендер",

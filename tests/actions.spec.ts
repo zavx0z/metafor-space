@@ -8,13 +8,13 @@ describe("Actions", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
         email: string({title: "Email", nullable: true, default: "zavx0z@ya.ru"}),
         password: string({title: "Пароль", nullable: true, default: "123456"}),
       }))
       .core()
+      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
           in: "АНОНИМНЫЙ",
@@ -52,13 +52,13 @@ describe("Actions", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
         email: string({title: "Email", nullable: true}),
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
+      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
           in: "АНОНИМНЫЙ",
@@ -98,13 +98,13 @@ describe("Actions", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
         email: string({title: "Email", nullable: true}),
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
+      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
           in: "АНОНИМНЫЙ",
@@ -144,13 +144,13 @@ describe("Actions", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .context(({string}) => ({
         nickname: string({title: "Имя", nullable: true}),
         email: string({title: "Email", nullable: true}),
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
+      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
           in: "АНОНИМНЫЙ",

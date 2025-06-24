@@ -5,7 +5,6 @@ export default MetaFor('node-meta-state', {
   description: "Нода состояния meta",
   development: true
 })
-  .states("рендер", "измерение", "установка положения")
   .context(t => ({
     id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
@@ -16,6 +15,7 @@ export default MetaFor('node-meta-state', {
     y: t.number({nullable: true}),
   }))
   .core(() => ({}))
+  .states("рендер", "измерение", "установка положения")
   .transitions("рендер", [
     {
       in: "рендер",

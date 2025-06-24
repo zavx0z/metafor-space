@@ -2,7 +2,6 @@ import {MetaFor} from "../../metafor.js"
 import "./node-meta-condition.js"
 
 export default MetaFor("node-meta-transition")
-  .states('init', 'ready')
   .context(t => ({
     conditions: t.array({title: "Условия сравнения"}),
     error: t.string({title: "Ошибка", nullable: true}),
@@ -10,6 +9,7 @@ export default MetaFor("node-meta-transition")
   .core(() => /**@type{import("./node-meta-transition.t.js").Core}*/({
     conditions: []
   }))
+  .states('init', 'ready')
   .transitions('init', [
     {
       in: "init",

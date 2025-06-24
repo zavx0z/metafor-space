@@ -7,11 +7,11 @@ describe("Enum тип", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("INITIAL", "FINAL")
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({title: "Статус", nullable: true, default: "inactive"}),
       }))
       .core()
+      .states("INITIAL", "FINAL")
       .transitions("INITIAL", [
         {
           in: "INITIAL",
@@ -29,11 +29,11 @@ describe("Enum тип", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("INITIAL", "ACTIVE")
       .context((t) => ({
         status: t.enum("active", "inactive")({default: "inactive"}),
       }))
       .core()
+      .states("INITIAL", "ACTIVE")
       .transitions("INITIAL", [
         {
           in: "INITIAL",
@@ -52,7 +52,6 @@ describe("Enum тип", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("INITIAL", "ACTIVE", "INACTIVE")
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({default: "pending"}),
       }))
@@ -61,6 +60,7 @@ describe("Enum тип", () => {
           update({status: "inactive"})
         },
       }))
+      .states("INITIAL", "ACTIVE", "INACTIVE")
       .transitions("INITIAL", [
         {
           in: "INITIAL",
@@ -86,11 +86,11 @@ describe("Enum тип", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("INITIAL", "FINAL")
       .context((t) => ({
         status: t.enum(1, 2, 3)({title: "Статус", nullable: true, default: 1}),
       }))
       .core()
+      .states("INITIAL", "FINAL")
       .transitions("INITIAL", [])
       .reactions([])
       .view({})
@@ -103,11 +103,11 @@ describe("Enum тип", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("INITIAL", "ACTIVE")
       .context((t) => ({
         status: t.enum(1, 2)({default: 1}),
       }))
       .core()
+      .states("INITIAL", "ACTIVE")
       .transitions("INITIAL", [
         {
           in: "INITIAL",

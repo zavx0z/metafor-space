@@ -28,24 +28,24 @@ export const MetaFor = (tag, conf = {}) => {
     // todo: добавить проверку имени
   }
   return {
-    states(...states) {
-      development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
+    context(context) {
+      const contextDefinition = context({
+        string: (params) => ({type: "string", ...params}),
+        number: (params) => ({type: "number", ...params}),
+        boolean: (params) => ({type: "boolean", ...params}),
+        array: (params) => ({type: "array", default: params.default ?? [], ...params}),
+        enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
+      })
+      development && import("./core/validator/index.js").then((module) =>
+        module.validateContextDefinition({tag, context: contextDefinition}))
       return {
-        context(context) {
-          const contextDefinition = context({
-            string: (params) => ({type: "string", ...params}),
-            number: (params) => ({type: "number", ...params}),
-            boolean: (params) => ({type: "boolean", ...params}),
-            array: (params) => ({type: "array", default: params.default ?? [], ...params}),
-            enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
-          })
+        core(core) {
+          const coreDefinition = core || (() => Object.create({}))
           development && import("./core/validator/index.js").then((module) =>
-            module.validateContextDefinition({tag, context: contextDefinition}))
+            module.validateCore({tag, core: coreDefinition}))
           return {
-            core(core) {
-              const coreDefinition = core || (() => Object.create({}))
-              development && import("./core/validator/index.js").then((module) =>
-                module.validateCore({tag, core: coreDefinition}))
+            states(...states) {
+              development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
               return {
                 transitions(initialState, transitions) {
                   if (development) {
@@ -55,16 +55,16 @@ export const MetaFor = (tag, conf = {}) => {
                   return {
                     reactions: (reactions) => ({
                       view: (view) => createMeta({
-                          states,
-                          initialState,
-                          contextDefinition,
-                          view,
-                          transitions,
-                          development,
-                          description,
-                          tag,
-                          coreDefinition,
-                          reactions
+                        states,
+                        initialState,
+                        contextDefinition,
+                        view,
+                        transitions,
+                        development,
+                        description,
+                        tag,
+                        coreDefinition,
+                        reactions
                       })
                     })
                   }
@@ -100,7 +100,7 @@ function createMeta(
     view
   }) {
   development && import("./core/validator/index.js").then(
-    (module) => module.validateCreateOptions({tag,  states}))
+    (module) => module.validateCreateOptions({tag, states}))
   let idx = 0
 
   customElements.define("metafor-" + tag,

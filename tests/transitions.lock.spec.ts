@@ -7,11 +7,11 @@ test("Блокировка переходов перед входом в нов�
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
       value: t.number({nullable: true}),
     }))
     .core()
+    .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", [
       {
         in: "INIT",
@@ -57,11 +57,11 @@ test("Блокировка переходов для асинхронного д
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INIT", "PROCESS", "DONE")
     .context((t) => ({
       value: t.number({nullable: true}),
     }))
     .core()
+    .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", [
       {
         in: "INIT",
@@ -83,11 +83,11 @@ test("Снятие блокировки после действия", async () =
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INIT", "DONE")
     .context((t) => ({
       value: t.number({nullable: true, default: 2}),
     }))
     .core()
+    .states("INIT", "DONE")
     .transitions("INIT", [
       {
         in: "INIT",

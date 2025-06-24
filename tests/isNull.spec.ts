@@ -7,11 +7,11 @@ describe("null условие перехода", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -29,7 +29,6 @@ describe("null условие перехода", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "число", "строка", "булево")
       .context((t) => ({
         size: t.number({nullable: false, default: 0}),
         name: t.string({nullable: false, default: ""}),
@@ -37,6 +36,7 @@ describe("null условие перехода", () => {
         status: t.enum("active", "inactive")({nullable: false, default: "active"}),
       }))
       .core()
+      .states("ОЖИДАНИЕ", "число", "строка", "булево")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -68,9 +68,9 @@ describe("null условие перехода", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({name: t.string({nullable: true})}))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ", to: [{state: "ДОБАВИТЬ", when: {name: null}}]
@@ -87,9 +87,9 @@ describe("null условие перехода", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({active: t.boolean({nullable: true})}))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -107,10 +107,10 @@ describe("null условие перехода", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({
         status: t.enum("active", "inactive")({nullable: true})
       })).core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -130,11 +130,11 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({
         size: t.number({nullable: true})
       }))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -152,9 +152,9 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({size: t.number({nullable: true})}))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -171,9 +171,9 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({size: t.number({nullable: true})}))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -212,15 +212,16 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({size: t.number({nullable: true})}))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5, lt: 15}}}],
         },
-      ]).reactions([])
+      ])
+      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -232,9 +233,9 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({size: t.number({nullable: true})}))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         /* FIXME: валидатор не должен пропускать такой триггер */
         {
@@ -255,11 +256,11 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({
         size: t.number({nullable: true, default: 1})
       }))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",

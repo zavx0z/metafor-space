@@ -6,13 +6,13 @@ describe("Корректные переходы состояний при заг
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("IDLE", "LOADING", "SUCCESS", "ERROR")
     .context((t) => ({
       url: t.string({title: "URL", nullable: true, default: "https://api.example.com/data"}),
       responseTime: t.number({title: "Время ответа", nullable: true, default: 0}),
       code: t.number({title: "Код ошибки", nullable: true, default: 0}),
     }))
     .core()
+    .states("IDLE", "LOADING", "SUCCESS", "ERROR")
     .transitions("IDLE", [
       {
         in: "IDLE",

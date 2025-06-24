@@ -5,13 +5,13 @@ import {MetaFor} from "@metafor/space"
 const tag = Bun.randomUUIDv7()
 document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
 const Meta = MetaFor(tag)
-  .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
   .context((t) => ({
     url: t.string({title: "URL", nullable: true}),
     responseTime: t.number({title: "Время ответа", nullable: true, default: 0}),
     errorCode: t.number({title: "Код ошибки", nullable: true, default: 0}),
   }))
   .core()
+  .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
   .transitions("IDLE", [
     {
       in: "IDLE",

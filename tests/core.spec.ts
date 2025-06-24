@@ -7,7 +7,6 @@ describe("core", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", "отпуск элемента")
       .context(({boolean}) => ({
         actionUpdate: boolean({title: "Обновление контекста из action", nullable: true, default: false}),
         isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
@@ -24,6 +23,7 @@ describe("core", () => {
           }
         },
       }))
+      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", "отпуск элемента")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -71,7 +71,6 @@ describe("core", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({boolean}) => ({
         isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
       }))
@@ -87,6 +86,7 @@ describe("core", () => {
           parameter: coreState.parameter,
         }
       })
+      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -111,7 +111,6 @@ describe("core", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .context(({boolean}) => ({
         isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
       }))
@@ -124,6 +123,7 @@ describe("core", () => {
         },
         parameter: true,
       }))
+      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -149,7 +149,6 @@ describe("core", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ПАРАМЕТР ОБНОВЛЕН")
       .context(({number}) => ({
         parameter: number({default: 0}),
         other: number({default: 1})
@@ -158,6 +157,7 @@ describe("core", () => {
         parameter: context.parameter,
         updateOther: () => update({other: self.parameter})
       }))
+      .states("ОЖИДАНИЕ", "ПАРАМЕТР ОБНОВЛЕН")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
@@ -185,7 +185,6 @@ describe("core", () => {
       const tag = Bun.randomUUIDv7()
       document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
       const Meta = MetaFor(tag)
-        .states("INITIAL", "MODIFIED")
         .context(({boolean}) => ({
           isUpdated: boolean({title: "Обновлено ли", default: false}),
         }))
@@ -196,6 +195,7 @@ describe("core", () => {
           },
           getData: () => sharedArray,
         }))
+        .states("INITIAL", "MODIFIED")
         .transitions("INITIAL", [
           {
             in: "INITIAL",
@@ -220,7 +220,6 @@ describe("core", () => {
       const tag = Bun.randomUUIDv7()
       document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
       const Meta = MetaFor(tag)
-        .states("INITIAL", "UPDATED")
         .context((t) => ({
           coreParameter: t.number({nullable: true})
         }))
@@ -231,6 +230,7 @@ describe("core", () => {
             update({coreParameter: self.coreParameter})
           },
         }))
+        .states("INITIAL", "UPDATED")
         .transitions("INITIAL", [
           {
             in: "INITIAL",

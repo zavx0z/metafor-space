@@ -9,7 +9,6 @@ describe("update", async () => {
 
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INITIAL", "action", "core", "core complex", "final", "reaction")
     .context((t) => ({
       field1: t.string({nullable: true}),
       field2: t.number({default: 0}),
@@ -23,6 +22,7 @@ describe("update", async () => {
         update({field1: "test1", field2: 1})
       },
     }))
+    .states("INITIAL", "action", "core", "core complex", "final", "reaction")
     .transitions("INITIAL", [
       {
         in: "INITIAL",

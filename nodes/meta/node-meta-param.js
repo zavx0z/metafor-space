@@ -2,7 +2,6 @@ import {MetaFor} from "../../metafor.js"
 import './node-meta-socket.js'
 
 export default MetaFor("node-meta-param")
-  .states("init", "ready")
   .context(t => ({
     id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
@@ -12,6 +11,7 @@ export default MetaFor("node-meta-param")
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
+  .states("init", "ready")
   .transitions("init", [
     {
       in: "init",

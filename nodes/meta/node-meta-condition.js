@@ -3,7 +3,6 @@ import "./node-meta-operator.js"
 import "./node-meta-socket.js"
 
 export default MetaFor("node-meta-condition", {development: true})
-  .states("рендер", "измерение", "установка положения")
   .context(t => ({
     id: t.string({title: "ID meta"}),
     from: t.string({title: "Исходное состояние"}),
@@ -16,6 +15,7 @@ export default MetaFor("node-meta-condition", {development: true})
     y: t.number({nullable: true}),
   }))
   .core(() => ({}))
+  .states("рендер", "измерение", "установка положения")
   .transitions('рендер', [
     {
       in: "рендер",

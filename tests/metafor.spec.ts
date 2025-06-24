@@ -9,7 +9,6 @@ describe("Конструктор MetaFor", () => {
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Fabric = MetaFor(tag)
-    .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
     .context((t) => ({
       nickname: t.string({title: "Имя", nullable: true}),
       email: t.string({title: "Email", nullable: true, default: email}),
@@ -18,6 +17,7 @@ describe("Конструктор MetaFor", () => {
     .core(() => ({
       password: "123456",
     }))
+    .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
     .transitions("АНОНИМНЫЙ", [
       {
         in: "АНОНИМНЫЙ",

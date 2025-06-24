@@ -3,12 +3,12 @@ import "./node-meta-state.js"
 import "./node-meta-transition.js"
 
 export default MetaFor("node-meta", {development: true, description: "Node"})
-  .states("init", "ready")
   .context(t => ({
     id: t.string({title: "ID meta"}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
+  .states("init", "ready")
   .transitions("init", [
     {
       in: "init",

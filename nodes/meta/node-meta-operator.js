@@ -2,7 +2,6 @@ import {MetaFor} from "../../metafor.js"
 import {nothing} from "../../html/html.js"
 
 export default MetaFor("node-meta-operator", {development: true})
-  .states('init', 'ready')
   .context(t => ({
     id: t.string({title: "ID meta"}),
     from: t.string({title: "Исходное состояние"}),
@@ -170,6 +169,7 @@ export default MetaFor("node-meta-operator", {development: true})
       }
     },
   }))
+  .states('init', 'ready')
   .transitions('init', [
     {
       in: "init",

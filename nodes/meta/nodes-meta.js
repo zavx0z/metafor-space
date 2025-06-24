@@ -8,7 +8,6 @@ export default MetaFor("nodes-meta", {
   description: "No-code система визуализации и построения системы взаимодействия мета-компонентов.",
   development: true
 })
-  .states("ожидание патча", "добавление ноды")
   .context(t => ({
     op: t.enum("add")({title: "Тип патча", nullable: true}),
     nodes: t.array({title: "Коллекция meta"}),
@@ -27,6 +26,7 @@ export default MetaFor("nodes-meta", {
       snapshot: null
     }
   })
+  .states("ожидание патча", "добавление ноды")
   .transitions("ожидание патча", [
     {
       in: "ожидание патча",

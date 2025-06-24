@@ -2,7 +2,6 @@ import ELK from "elkjs"
 import {MetaFor} from "../../metafor.js"
 
 export default MetaFor("node-elk", {development: true})
-  .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
   .context(t => ({
     current: t.string({title: "ID ноды meta передающий данные", nullable: true}),
     ready: t.string({title: "ID готовой ноды meta", nullable: true}),
@@ -48,6 +47,7 @@ export default MetaFor("node-elk", {development: true})
       }
     }
   }))
+  .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
   .transitions('ожидание', [
     {
       in: "ожидание",

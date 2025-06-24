@@ -17,11 +17,11 @@ describe("Инициализация c действием", async () => {
 
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INITIAL", "OTHER", "NEXT")
     .context((t) => ({
       value: t.string({nullable: true, default: initialContext.value}),
     }))
     .core()
+    .states("INITIAL", "OTHER", "NEXT")
     .transitions(initialState, [
       {
         in: "INITIAL",

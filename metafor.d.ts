@@ -45,9 +45,9 @@ export declare function MetaFor(
     development?: boolean
   }
 ): {
-  states: <S extends string>(...states: S[]) => {
-    context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
-      core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
+  context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
+    core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
+      states: <S extends string>(...states: S[]) => {
         /**
          * Переходы состояний
          * @param initialState - начальное состояние

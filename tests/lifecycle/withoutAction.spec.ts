@@ -11,11 +11,11 @@ describe("Инициализация без действия", async () => {
   const initialContext = {value: "initial"}
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("INITIAL", "OTHER")
     .context((t) => ({
       value: t.string({nullable: true, default: initialContext.value})
     }))
     .core()
+    .states("INITIAL", "OTHER")
     .transitions(initialState, [])
     .reactions([])
     .view({})

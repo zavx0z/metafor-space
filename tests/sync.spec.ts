@@ -6,7 +6,6 @@ describe("Синхронизация core и context", async () => {
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
   const Meta = MetaFor(tag)
-    .states("IDLE", "push", "pop")
     .context((t) => ({
       process: t.enum("pop", "push")({nullable: true}),
       dataLength: t.number({default: 0}),
@@ -23,6 +22,7 @@ describe("Синхронизация core и context", async () => {
         update({dataLength: this.data.length, process: null})
       },
     }))
+    .states("IDLE", "push", "pop")
     .transitions("IDLE", [
       {
         in: "IDLE",
@@ -73,4 +73,7 @@ describe("Синхронизация core и context", async () => {
     }
   })
   await Bun.sleep(1500)
+
+  type ProcessType = typeof meta.context.process;
+  // наведи курсор на ProcessType — должен быть "pop" | "push" | null
 })
