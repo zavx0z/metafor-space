@@ -62,41 +62,46 @@ export default MetaFor("nodes-meta", {
                 `)}
               </metafor-node-meta-state>
             `)}
-            ${snapshot.transitions.map((transition) =>
-              transition.to.map(condition =>
-                Object.entries(condition.when).map(([key, value]) => {
-                  let op
-                  let val
-                  if (typeof value === "object" && value !== null) {
-                    op = Object.keys(value)[0]
-                    // @ts-ignore
-                    val = value[op]
-                  } else if (value === null) {
-                    op = "isNull"
-                    value = true
-                  } else {
-                    op = "eq"
-                    val = value
-                  }
-                  return html`
-                    <metafor-node-meta-condition slot="conditions" context=${{
+            ${snapshot.transitions.map((transition) => transition.to.map(condition =>
+              Object.entries(condition.when).map(([key, value]) => {
+                let op
+                let val
+                if (typeof value === "object" && value !== null) {
+                  return html`${Object.entries(/**@param{[string, string]} param*/([key, value]) => html`
+                    <metafor-node-meta-operator context=${{
                       id: snapshot.id,
                       from: transition.in,
                       to: condition.state,
-                      param: key
+                      op: key,
+                      value: value
                     }}>
-                      <metafor-node-meta-operator context=${{
-                        id: snapshot.id,
-                        from: transition.in,
-                        to: condition.state,
-                        op: op,
-                        value: val
-                      }}/>
-                    </metafor-node-meta-condition>
-                  `
-                })
-              )
-            )}
+                    </metafor-node-meta-operator>
+                  `)}`
+                } else if (value === null) {
+                  op = "isNull"
+                  value = true
+                } else {
+                  op = "eq"
+                  val = value
+                }
+                return html`
+                  <metafor-node-meta-condition slot="conditions" context=${{
+                    id: snapshot.id,
+                    from: transition.in,
+                    to: condition.state,
+                    param: key
+                  }}>
+                    <metafor-node-meta-operator context=${{
+                      id: snapshot.id,
+                      from: transition.in,
+                      to: condition.state,
+                      op: op,
+                      value: val
+                    }}>
+                    </metafor-node-meta-operator>
+                  </metafor-node-meta-condition>
+                `
+              })))}
           </metafor-node-meta>
         `, element)
         update({nodes: context.nodes.slice(1)})
