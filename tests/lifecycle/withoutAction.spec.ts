@@ -17,8 +17,9 @@ describe("Инициализация без действия", async () => {
     }))
     .core()
     .transitions(initialState, [])
-    .create({})
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    .reactions([])
+    .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   const messages = await waitForMessages(10)
   describe("Присваивание контекста/состояния и отправка snapshot meta", async () => {

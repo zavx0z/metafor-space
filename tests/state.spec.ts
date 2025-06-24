@@ -33,8 +33,9 @@ describe("Корректные переходы состояний при заг
         in: "SUCCESS",
         to: [{state: "IDLE", when: {url: {include: "complete"}}}],
       },
-    ]).create({})
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    ])      .reactions([])
+      .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   describe("Инициализация и начальные состояния", () => {
     test("Начальное состояние должно быть IDLE", () => {

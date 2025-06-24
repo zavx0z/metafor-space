@@ -170,6 +170,24 @@ export default MetaFor("node-meta-operator", {development: true})
       }
     },
   }))
+  .transitions('init', [
+    {
+      in: "init",
+      action({context, core, update}) {
+        if (!context.op) return
+        const operator = core.operators[context.op]
+        update({title: operator.title, symbol: operator.symbol})
+      },
+      to: [{
+        state: "ready", when: {
+          op: {isNull: false},
+          title: {isNull: false},
+          symbol: {isNull: false},
+        }
+      }]
+    }
+  ])
+  .reactions([])
   .view({
     render: ({context, html, state}) => state !== "ready" ? nothing : html`
       <span>${context.symbol}</span>
@@ -200,21 +218,3 @@ export default MetaFor("node-meta-operator", {development: true})
       }
     `
   })
-  .transitions('init', [
-    {
-      in: "init",
-      action({context, core, update}) {
-        if (!context.op) return
-        const operator = core.operators[context.op]
-        update({title: operator.title, symbol: operator.symbol})
-      },
-      to: [{
-        state: "ready", when: {
-          op: {isNull: false},
-          title: {isNull: false},
-          symbol: {isNull: false},
-        }
-      }]
-    }
-  ])
-  .create()

@@ -45,8 +45,10 @@ describe("core", () => {
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false, actionUpdate: false}}],
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     test("Проверяем начальное состояние", () => {
       expect(meta.context.isSpacePressed).toBe(false)
@@ -97,8 +99,10 @@ describe("core", () => {
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({isSpacePressed: true})
     expect(meta.context.isSpacePressed).toBe(true)
@@ -132,8 +136,10 @@ describe("core", () => {
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({isSpacePressed: true})
     expect(meta.context.isSpacePressed).toBe(true)
@@ -162,8 +168,10 @@ describe("core", () => {
           action: ({core}) => core.updateOther(),
           to: [{state: "ОЖИДАНИЕ", when: {other: 0}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.context.other).toBe(0)
   })
@@ -196,8 +204,10 @@ describe("core", () => {
             },
             to: [{state: "MODIFIED", when: {isUpdated: true}}],
           },
-        ]).create({})
-      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+        ])
+        .reactions([])
+        .view({})
+      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
       expect(meta.context.isUpdated).toBe(true)
       expect(meta.state).toBe("MODIFIED")
@@ -227,8 +237,10 @@ describe("core", () => {
             action: ({core}) => core.update(),
             to: [{state: "UPDATED", when: {coreParameter: null}}]
           }
-        ]).create({})
-      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+        ])
+        .reactions([])
+        .view({})
+      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
       expect(meta.context.coreParameter).toEqual(1)
     })

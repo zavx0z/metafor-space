@@ -48,18 +48,6 @@ export default MetaFor("node-elk", {development: true})
       }
     }
   }))
-  .view({
-    render: ({html}) => html`
-      <metafor-nodes-meta>
-      </metafor-nodes-meta>
-    `,
-    style: ({css}) => css`
-      :host {
-        width: 100vw;
-        height: 100vh;
-      }
-    `
-  })
   .transitions('ожидание', [
     {
       in: "ожидание",
@@ -200,4 +188,15 @@ export default MetaFor("node-elk", {development: true})
       }
     }
   ])
-  .create()
+  .view({
+    render: ({html}) => html`
+      <metafor-nodes-meta>
+      </metafor-nodes-meta>
+    `,
+    style: ({css}) => css`
+      :host {
+        width: 100vw;
+        height: 100vh;
+      }
+    `
+  })

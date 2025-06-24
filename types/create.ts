@@ -86,7 +86,6 @@ export type FabricCallbackCreateFuncHelper<
   development?: boolean
   description?: string
   tag: string
-  options: CreateParams<C, S, I>
   states: S[]
   initialState: S
   contextDefinition: ContextDefinition

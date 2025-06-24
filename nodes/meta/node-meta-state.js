@@ -16,6 +16,31 @@ export default MetaFor('node-meta-state', {
     y: t.number({nullable: true}),
   }))
   .core(() => ({}))
+  .transitions("рендер", [
+    {
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
+    },
+    {
+      in: "измерение",
+      action({element, update}) {
+
+        requestAnimationFrame(() => {
+          const {width, height} = element.getBoundingClientRect()
+          update({width: Math.round(width), height: Math.round(height)})
+        })
+      },
+      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+    },
+    {
+      in: "установка положения",
+      action() {
+        console.log()
+      },
+      to: []
+    },
+  ])
+  .reactions([])
   .view({
     render: ({context, html}) => html`
       <header>
@@ -114,29 +139,3 @@ export default MetaFor('node-meta-state', {
       }
     `
   })
-  .transitions("рендер", [
-    {
-      in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
-    },
-    {
-      in: "измерение",
-      action({element, update}) {
-
-        requestAnimationFrame(() => {
-          const {width, height} = element.getBoundingClientRect()
-          update({width: Math.round(width), height: Math.round(height)})
-        })
-      },
-      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
-    },
-    {
-      in: "установка положения",
-      action() {
-        console.log()
-      },
-      to: []
-    },
-  ])
-  .reactions([])
-  .create({})

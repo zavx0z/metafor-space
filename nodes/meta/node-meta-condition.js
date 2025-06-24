@@ -16,50 +16,6 @@ export default MetaFor("node-meta-condition", {development: true})
     y: t.number({nullable: true}),
   }))
   .core(() => ({}))
-  .view({
-    render: ({html, context}) => html`
-      <metafor-node-meta-socket
-        context=${{
-          id: context.id,
-          state: context.to,
-          param: context.param,
-          parent: "condition",
-          direction: "west"
-        }}
-        data-direction="input"
-        data-active=${false}
-      ></metafor-node-meta-socket>
-      <slot></slot>
-      <metafor-node-meta-socket
-        context=${{
-          id: context.id,
-          state: context.to,
-          param: context.param,
-          parent: "condition",
-          direction: "east"
-        }}
-        data-direction="output"
-        data-active=${false}
-      ></metafor-node-meta-socket>
-    `,
-    style: ({css}) => css`
-      :host {
-        background-color: rgba(var(--surface-400));
-        padding: 4px 8px;
-        position: absolute;
-        display: flex;
-        border-radius: 8px;
-        flex-direction: row;
-        align-items: center;
-        gap: 2px;
-        width: auto;
-      }
-
-      :host(:before) {
-        background-color: rgba(var(--surface-400));
-      }
-    `
-  })
   .transitions('рендер', [
     {
       in: "рендер",
@@ -87,4 +43,47 @@ export default MetaFor("node-meta-condition", {development: true})
     },
   ])
   .reactions([])
-  .create()
+  .view({
+    render: ({html, context}) => html`
+      <metafor-node-meta-socket
+        context=${{
+      id: context.id,
+      state: context.to,
+      param: context.param,
+      parent: "condition",
+      direction: "west"
+    }}
+        data-direction="input"
+        data-active=${false}
+      ></metafor-node-meta-socket>
+      <slot></slot>
+      <metafor-node-meta-socket
+        context=${{
+      id: context.id,
+      state: context.to,
+      param: context.param,
+      parent: "condition",
+      direction: "east"
+    }}
+        data-direction="output"
+        data-active=${false}
+      ></metafor-node-meta-socket>
+    `,
+    style: ({css}) => css`
+      :host {
+        background-color: rgba(var(--surface-400));
+        padding: 4px 8px;
+        position: absolute;
+        display: flex;
+        border-radius: 8px;
+        flex-direction: row;
+        align-items: center;
+        gap: 2px;
+        width: auto;
+      }
+
+      :host(:before) {
+        background-color: rgba(var(--surface-400));
+      }
+    `
+  })

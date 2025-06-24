@@ -5,12 +5,7 @@ export default MetaFor("test", {description: "Nodes", development: false})
   .context((t) => ({
     status: t.enum("start", "end")({title: "Status", default: "end"}),
   }))
-  .core(() => ({})
-  )
-  .view({
-    render: ({html, context}) => html`
-    `
-  })
+  .core()
   .transitions("начало", [
     {
       in: "начало",
@@ -37,11 +32,8 @@ export default MetaFor("test", {description: "Nodes", development: false})
       to: [{state: "начало", when: {status: "start"}}],
     },
   ])
-  .create({
-    onTransition: (preview, current, meta) => {
-      // console.log(preview, current, meta)
-    },
-    onUpdate: (value) => {
-      // console.log(value)
-    },
+  .reactions([])
+  .view({
+    render: ({html, context}) => html`
+    `
   })

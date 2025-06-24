@@ -1,5 +1,5 @@
-import { afterAll } from "bun:test"
-import { type BroadcastMessage } from "../metafor"
+import {afterAll} from "bun:test"
+import {type BroadcastMessage} from "../metafor"
 
 export const messagesFixture = (options?: {
   meta: string
@@ -12,16 +12,27 @@ export const messagesFixture = (options?: {
   afterAll(() => channel.close())
   const messages: BroadcastMessage[] = []
 
-  channel.addEventListener("message", ({ data }) => {
+  channel.addEventListener("message", ({data}) => {
     if (!options?.meta || data.meta?.tag === options.meta) {
       messages.push(data)
     }
   })
-
+  // @ts-ignore
+  document.addEventListener('channel', ({detail}: CustomEvent) => {
+    if (!options?.meta || detail.meta?.tag === options.meta) {
+      messages.push(detail)
+    }
+  })
   const onmessage = (cb: (message: BroadcastMessage) => void) => {
-    channel.addEventListener("message", ({ data }) => {
+    channel.addEventListener("message", ({data}) => {
       if (!options?.meta || data.meta?.particle === options.meta) {
         cb(data)
+      }
+    })
+    // @ts-ignore
+    document.addEventListener('channel', ({detail}: CustomEvent) => {
+      if (!options?.meta || detail.meta?.tag === options.meta) {
+        cb(detail)
       }
     })
   }
@@ -39,12 +50,16 @@ export const messagesFixture = (options?: {
         setTimeout(checkMessages, 100)
       }
 
-      channel.addEventListener("message", ({ data }: MessageEvent) => {
+      channel.addEventListener("message", ({data}: MessageEvent) => {
         if (!options?.meta || data.meta?.particle === options.meta) lastMessageTime = Date.now()
+      })
+      // @ts-ignore
+      document.addEventListener('channel', ({detail}: CustomEvent) => {
+        if (!options?.meta || detail.meta?.particle === options.meta) lastMessageTime = Date.now()
       })
       checkMessages()
     })
   }
 
-  return { messages, onmessage, waitForMessages }
+  return {messages, onmessage, waitForMessages}
 }

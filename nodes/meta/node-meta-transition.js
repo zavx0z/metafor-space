@@ -10,6 +10,24 @@ export default MetaFor("node-meta-transition")
   .core(() => /**@type{import("./node-meta-transition.t.js").Core}*/({
     conditions: []
   }))
+  .transitions('init', [
+    {
+      in: "init",
+      action: ({core, update}) => {
+        // console.log(core.conditions)
+        update({conditions: core.conditions.map(i => i.id)})
+        requestAnimationFrame(() => core.conditions.length = 0)
+      },
+      to: [{state: "ready", when: {conditions: {isEmpty: false}}}]
+    },
+    {
+      in: "ready",
+      action({core}) {
+      },
+      to: []
+    }
+  ])
+  .reactions([])
   .view({
     render: ({html, context, repeat, core}) => repeat(context.conditions, id => html`
       <metafor-node-meta-condition
@@ -31,23 +49,4 @@ export default MetaFor("node-meta-transition")
       }
     `
   })
-  .transitions('init', [
-    {
-      in: "init",
-      action: ({core, update}) => {
-        // console.log(core.conditions)
-        update({conditions: core.conditions.map(i => i.id)})
-        requestAnimationFrame(() => core.conditions.length = 0)
-      },
-      to: [{state: "ready", when: {conditions: {isEmpty: false}}}]
-    },
-    {
-      in: "ready",
-      action({core}) {
-      },
-      to: []
-    }
-  ])
-  .reactions([])
-  .create()
 

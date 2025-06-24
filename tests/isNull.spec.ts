@@ -17,8 +17,10 @@ describe("null условие перехода", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: null}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
     meta.update({size: null})
     expect(meta.state).toBe("ДОБАВИТЬ")
   })
@@ -44,8 +46,9 @@ describe("null условие перехода", () => {
             {state: "булево", when: {active: null}},
           ]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({size: null})
     expect(meta.state, "не должен обновлять на null если не nullable").toBe("ОЖИДАНИЕ")
@@ -72,8 +75,9 @@ describe("null условие перехода", () => {
         {
           in: "ОЖИДАНИЕ", to: [{state: "ДОБАВИТЬ", when: {name: null}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({name: null})
     expect(meta.state).toBe("ДОБАВИТЬ")
@@ -91,8 +95,9 @@ describe("null условие перехода", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {active: null}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({active: null})
     expect(meta.state).toBe("ДОБАВИТЬ")
@@ -111,8 +116,9 @@ describe("null условие перехода", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {status: null}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({status: null})
     expect(meta.state).toBe("ДОБАВИТЬ")
@@ -134,8 +140,9 @@ describe("isNull триггер", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 4}}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({size: 10})
     expect(meta.state).toBe("ДОБАВИТЬ")
@@ -153,8 +160,9 @@ describe("isNull триггер", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 4}}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.state).toBe("ОЖИДАНИЕ")
   })
@@ -171,8 +179,9 @@ describe("isNull триггер", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({size: null})
     expect(meta.state).toBe("ДОБАВИТЬ")
@@ -192,8 +201,9 @@ describe("isNull триггер", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.state).toBe("ОЖИДАНИЕ")
   })
@@ -210,8 +220,9 @@ describe("isNull триггер", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5, lt: 15}}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({size: 10})
     expect(meta.state).toBe("ДОБАВИТЬ")
@@ -233,8 +244,9 @@ describe("isNull триггер", () => {
             when: {size: {isNull: false, gt: 5, lt: 15}}
           }]
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.state).toBe("ОЖИДАНИЕ")
   })
@@ -253,8 +265,9 @@ describe("isNull триггер", () => {
           in: "ОЖИДАНИЕ",
           to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
         }
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({size: null})
     expect(meta.state).toBe("ДОБАВИТЬ")

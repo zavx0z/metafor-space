@@ -23,13 +23,9 @@ describe("Пайплайн", () => {
         action: ({update}) => update({progress: 101}),
         to: [{state: "COMPLETE", when: {progress: {gt: 100}}}],
       },
-    ]).create({
-      description: "Управление прогрессом пользователя",
-      // onTransition: (preview, current) => {
-      //   console.log(preview, current)
-      // },
-    })
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    ]).reactions([])
+    .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   test("Обновление контекста и переход в COMPLETE", () => {
     expect(meta.context).toEqual({username: "user123", progress: 101})

@@ -40,8 +40,9 @@ describe("Инициализация c действием", async () => {
         to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
     ])
-    .create({})
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    .reactions([])
+    .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   test.todo("Условия meta заблокированы до окончания автопереходов")
   test.todo("Независимо от блокировки, сообщения с изменениями отправляются")

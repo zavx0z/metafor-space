@@ -38,8 +38,10 @@ describe("Actions", () => {
             },
           ],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     await Bun.sleep(200)
     expect(meta.state).toBe("АВТОРИЗОВАН")
@@ -80,8 +82,11 @@ describe("Actions", () => {
             },
           ],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({email: "test@test.com", password: "password"})
     await new Promise((resolve) => setTimeout(resolve, 150))
@@ -125,8 +130,9 @@ describe("Actions", () => {
             },
           ],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({email: "initial@email.com", password: "password"})
     expect(meta.context.nickname).toBe("multi_update")
@@ -145,7 +151,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .transitions("АНОНИМНЫЙ",[
+      .transitions("АНОНИМНЫЙ", [
         {
           in: "АНОНИМНЫЙ",
           to: [
@@ -168,8 +174,10 @@ describe("Actions", () => {
             },
           ],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({email: "test@test.com"})
     expect(meta.state).toBe("АНОНИМНЫЙ")

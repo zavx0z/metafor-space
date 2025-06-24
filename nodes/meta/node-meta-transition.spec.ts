@@ -58,7 +58,8 @@ describe("Параметры условий переходов", () => {
         ],
       },
     ])
-    .create({})
+          .reactions([])
+      .view({})
   const meta = document.querySelector(`metafor-${tag}`) as MetaAny
 
   const snapshot = meta.snapshot()

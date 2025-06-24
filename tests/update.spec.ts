@@ -50,17 +50,15 @@ describe("update", async () => {
       }
     ]).reactions([
       {
+        title: "",
         filter: ({patch}) => patch.op === "add",
         action: ({update}) => {
           update({state: "reaction"})
         }
       }
-    ]).create({
-      onTransition: (prev, current) => {
-        // console.log(prev, current)
-      }
-    })
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    ])
+    .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   const messages = await waitForMessages()
 

@@ -36,12 +36,9 @@ describe("Конструктор MetaFor", () => {
   test("reactions", () =>
     expect(Object.hasOwn(Fabric, "reactions"), "Функция-конструктор реакций должна быть присутствовать").toBe(true))
 
-  test("create", () =>
-    expect(Object.hasOwn(Fabric, "create"), "Функция-конструктор создания должна быть присутствовать").toBe(true))
-
   test("Инициализация состояния без действия с контекстом который соответствует условию перехода", () => {
-    const Meta = Fabric.create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    const Meta = Fabric.reactions([]).view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.context, "Контекст должен быть обновлен").toEqual({email, nickname, password})
     expect(meta.state, "Триггеры должны быть обработаны и состояние должно измениться").toBe("АВТОРИЗОВАН")

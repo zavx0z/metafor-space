@@ -9,6 +9,31 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
+  .transitions("init", [
+    {
+      in: "init",
+      to: [{
+        state: "ready", when: {error: null}
+      }]
+    },
+    {
+      in: "ready",
+      action({element}) {
+
+
+      },
+      to: []
+    }
+  ])
+  .reactions([
+    {
+      title: "meta-источник",
+      filter: ({meta, context}) => `${meta.tag}/${meta.index}` === context.id,
+      action: () => {
+        // console.log("Node reaction", meta, patch)
+      }
+    }
+  ])
   .view({
     render: ({html, context}) => html`
       <header data-drag-selector="graph-atom">
@@ -141,29 +166,3 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       `
     }
   })
-  .transitions("init", [
-    {
-      in: "init",
-      to: [{
-        state: "ready", when: {error: null}
-      }]
-    },
-    {
-      in: "ready",
-      action({element}) {
-
-
-      },
-      to: []
-    }
-  ])
-  .reactions([
-    {
-      title: "meta-источник",
-      filter: ({meta, context}) => `${meta.tag}/${meta.index}` === context.id,
-      action: () => {
-        // console.log("Node reaction", meta, patch)
-      }
-    }
-  ])
-  .create({})

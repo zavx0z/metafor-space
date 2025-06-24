@@ -1,4 +1,4 @@
-import type {ContextData, ContextDefinition, ContextTypes, UpdateParameters} from "./types/context.ts"
+import type {ContextData, ContextDefinition, ContextTypes, Update, UpdateParameters} from "./types/context.ts"
 import type {Transitions} from "./types/transitions.ts"
 import type {CoreDefinition, CoreObj} from "./types/core.ts"
 import type {Reactions} from "./types/reaction.ts"
@@ -48,24 +48,15 @@ export declare function MetaFor(
   states: <S extends string>(...states: S[]) => {
     context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
       core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
-        view: (view: ViewDefinition<I, C, S>) => {
-          /**
-           * Переходы состояний
-           * @param initialState - начальное состояние
-           * @param transitions - правила переходов
-           */
-          transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
-            reactions: (reactions: Reactions<C, I>) => {
-              create: (options?: CreateParams<C, S, I>) => Meta<S, C>
-            }
-            create: (options?: CreateParams<C, S, I>) => Meta<S, C>
-          }
-        }
+        /**
+         * Переходы состояний
+         * @param initialState - начальное состояние
+         * @param transitions - правила переходов
+         */
         transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
           reactions: (reactions: Reactions<C, I>) => {
-            create: (options?: CreateParams<C, S, I>) => Meta<S, C>
+            view: (view: ViewDefinition<I, C, S>) => Meta<S, C>
           }
-          create: (options?: CreateParams<C, S, I>) => Meta<S, C>
         }
       }
     }
@@ -110,7 +101,7 @@ declare global {
     process: boolean
     parent: HTMLElement
 
-    update: (context: UpdateParameters<C>) => void
+    update: Update<C>
     onUpdate: OnUpdate<C>
     onTransition: OnTransition<S>
     snapshot: () => Snapshot<S, C, any>

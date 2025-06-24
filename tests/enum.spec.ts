@@ -17,8 +17,10 @@ describe("Enum тип", () => {
           in: "INITIAL",
           to: [{state: "FINAL", when: {status: "active"}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.context.status).toBe("inactive")
   })
@@ -37,8 +39,10 @@ describe("Enum тип", () => {
           in: "INITIAL",
           to: [{state: "ACTIVE", when: {status: "active"}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({status: "active"})
     expect(meta.state).toBe("ACTIVE")
@@ -66,8 +70,10 @@ describe("Enum тип", () => {
           in: "ACTIVE",
           to: [{state: "INACTIVE", when: {status: "inactive"}}],
         },
-      ]).create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({status: "active"})
     expect(meta.state).toBe("ACTIVE")
@@ -86,8 +92,9 @@ describe("Enum тип", () => {
       }))
       .core()
       .transitions("INITIAL", [])
-      .create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.context.status).toBe(1)
   })
@@ -107,8 +114,9 @@ describe("Enum тип", () => {
           to: [{state: "ACTIVE", when: {status: 2}}],
         },
       ])
-      .create({})
-    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     meta.update({status: 2})
     expect(meta.state).toBe("ACTIVE")

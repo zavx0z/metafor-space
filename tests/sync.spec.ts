@@ -45,8 +45,9 @@ describe("Синхронизация core и context", async () => {
         action: ({core}) => core.popData(),
         to: [{state: "IDLE", when: {process: null}}]
       }
-    ]).create({})
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    ])      .reactions([])
+      .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
   let count = 50
   const delay = 20
   const interval = setInterval(() => {

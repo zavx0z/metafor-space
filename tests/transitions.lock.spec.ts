@@ -35,16 +35,18 @@ test("Блокировка переходов перед входом в нов�
         ],
       },
     ])
-    .create({
-      onTransition: async (_, newState, meta) => {
-        if (newState === "PROCESS") {
-          const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
-          meta.update({value: 1}) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
-          value = meta.context.value
-        }
-      },
-    })
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    .reactions([])
+    .view({})
+    // .create({
+    //   onTransition: async (_, newState, meta) => {
+    //     if (newState === "PROCESS") {
+    //       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+    //       meta.update({value: 1}) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
+    //       value = meta.context.value
+    //     }
+    //   },
+    // })
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   await Bun.sleep(1000)
   expect(value).toBe(1)
@@ -69,8 +71,9 @@ test("Блокировка переходов для асинхронного д
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
-    ]).create({})
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    ])      .reactions([])
+      .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   meta.update({value: 1})
   expect(meta.state).toBe("INIT") // Проверяем что переходы заблокированы во время действия
@@ -94,8 +97,9 @@ test("Снятие блокировки после действия", async () =
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
-    ]).create({})
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+    ])      .reactions([])
+      .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   expect(meta.state).toBe("INIT")
   expect(meta.process).toBe(true)

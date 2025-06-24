@@ -54,56 +54,7 @@ export const MetaFor = (tag, conf = {}) => {
                   }
                   return {
                     reactions: (reactions) => ({
-                      create: (options = {}) => createMeta({
-                        states,
-                        initialState,
-                        contextDefinition,
-                        transitions,
-                        development,
-                        description,
-                        tag,
-                        options,
-                        coreDefinition,
-                        reactions
-                      }),
-                    }),
-                    create: (options = {}) => createMeta({
-                      states,
-                      initialState,
-                      contextDefinition,
-                      transitions,
-                      development,
-                      description,
-                      tag,
-                      options,
-                      coreDefinition,
-                    }),
-                  }
-                },
-                view(view) {
-                  return {
-                    transitions(initialState, transitions) {
-                      if (development) {
-                        const data = {tag, transitions: [...transitions], contextDefinition}
-                        import("./core/validator/index.js").then((module) => module.validateTransitions(data))
-                      }
-                      return {
-                        reactions: (reactions) => ({
-                          create: (options = {}) => createMeta({
-                            states,
-                            initialState,
-                            contextDefinition,
-                            view,
-                            transitions,
-                            development,
-                            description,
-                            tag,
-                            options,
-                            coreDefinition,
-                            reactions
-                          }),
-                        }),
-                        create: (options = {}) => createMeta({
+                      view: (view) => createMeta({
                           states,
                           initialState,
                           contextDefinition,
@@ -112,11 +63,10 @@ export const MetaFor = (tag, conf = {}) => {
                           development,
                           description,
                           tag,
-                          options,
                           coreDefinition,
-                        }),
-                      }
-                    }
+                          reactions
+                      })
+                    })
                   }
                 }
               }
@@ -141,7 +91,6 @@ function createMeta(
     development,
     description = "",
     tag,
-    options,
     states,
     initialState,
     contextDefinition,
@@ -151,8 +100,7 @@ function createMeta(
     view
   }) {
   development && import("./core/validator/index.js").then(
-    (module) => module.validateCreateOptions({tag, options, states}))
-  const {onTransition, onUpdate} = options
+    (module) => module.validateCreateOptions({tag,  states}))
   let idx = 0
 
   customElements.define("metafor-" + tag,
@@ -291,14 +239,7 @@ function createMeta(
           this.#shadow.addEventListener("channel", (ev) => reactionCb(ev.detail))
           this.#channel.onmessage = ({data}) => reactionCb(data)
         }
-
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
-        if (onTransition) {
-          this.#state.onChange((oldValue, newValue) => {
-            if (newValue !== undefined) onTransition(oldValue, newValue, this.snapshot())
-          })
-        }
-        if (onUpdate) this.onUpdate(onUpdate)
 
         const transition = transitions.find((i) => i.in === initialState)
         if (transition?.action) {

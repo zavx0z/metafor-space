@@ -32,8 +32,9 @@ const Meta = MetaFor(tag)
       in: "SUCCESS",
       to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
     },
-  ]).create({})
-const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.context>
+  ])      .reactions([])
+      .view({})
+const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
 describe("Подписка на изменения состояния (onTransition)", () => {
   describe("Базовая работа подписки", () => {

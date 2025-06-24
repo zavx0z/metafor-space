@@ -15,6 +15,28 @@ export default MetaFor('node-meta-socket')
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
+  .transitions("рендер", [
+    {
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
+    },
+    {
+      in: "измерение",
+      action({element, update}) {
+        requestAnimationFrame(() => {
+          const {width, height, x, y} = element.getBoundingClientRect()
+          update({
+            width: Math.round(width),
+            height: Math.round(height),
+            x: Math.round(x),
+            y: Math.round(y),
+          })
+        })
+      },
+      to: []
+    },
+  ])
+  .reactions([])
   .view({
     style: ({css}) => {
       const position = -6
@@ -78,26 +100,3 @@ export default MetaFor('node-meta-socket')
     onMount({component}){
     }
   })
-  .transitions("рендер", [
-    {
-      in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
-    },
-    {
-      in: "измерение",
-      action({element, update}) {
-        requestAnimationFrame(() => {
-          const {width, height, x, y} = element.getBoundingClientRect()
-          update({
-            width: Math.round(width),
-            height: Math.round(height),
-            x: Math.round(x),
-            y: Math.round(y),
-          })
-        })
-      },
-      to: []
-    },
-  ])
-  .reactions([])
-  .create({})

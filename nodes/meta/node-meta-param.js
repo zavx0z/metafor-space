@@ -12,21 +12,40 @@ export default MetaFor("node-meta-param")
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
-  .view({
-    onMount({component}) {
-
-
-
+  .transitions("init", [
+    {
+      in: "init",
+      action: ({core}) => {
+        // console.log("param", core)
+      },
+      to: [{
+        state: "ready", when: {
+          title: {isNull: false},
+          param: {isNull: false}
+        }
+      }]
     },
+    {
+      in: "ready",
+      to: [{
+        state: "init", when: {
+          title: null,
+          param: null
+        }
+      }]
+    }
+  ])
+  .reactions([])
+  .view({
     render: ({context, html}) => html`
       <metafor-node-meta-socket
         context=${{
-          id: context.id,
-          state: context.state,
-          param: context.param,
-          parent: "state",
-          direction: "west"
-        }}
+      id: context.id,
+      state: context.state,
+      param: context.param,
+      parent: "state",
+      direction: "west"
+    }}
         data-direction="input"
         data-active="false"
       ></metafor-node-meta-socket>
@@ -34,12 +53,12 @@ export default MetaFor("node-meta-param")
       <input name=${context.title} value=${context.value}/>
       <metafor-node-meta-socket
         context=${{
-          id: context.id,
-          state: context.state,
-          param: context.param,
-          parent: "state",
-          direction: "east"
-        }}
+      id: context.id,
+      state: context.state,
+      param: context.param,
+      parent: "state",
+      direction: "east"
+    }}
         class="connected"
         data-direction="output"
         data-active="false"
@@ -102,28 +121,3 @@ export default MetaFor("node-meta-param")
       }
     `
   })
-  .transitions("init", [
-    {
-      in: "init",
-      action: ({core}) => {
-        // console.log("param", core)
-      },
-      to: [{
-        state: "ready", when: {
-          title: {isNull: false},
-          param: {isNull: false}
-        }
-      }]
-    },
-    {
-      in: "ready",
-      to: [{
-        state: "init", when: {
-          title: null,
-          param: null
-        }
-      }]
-    }
-  ])
-  .reactions([])
-  .create({})
