@@ -13,6 +13,7 @@ export default MetaFor('node-meta-state', {
     height: t.number({nullable: true}),
     x: t.number({nullable: true}),
     y: t.number({nullable: true}),
+    collected: t.boolean({default: false})
   }))
   .core(() => ({
     /**@type{import("./node-meta-state.t").Params}*/
@@ -25,22 +26,27 @@ export default MetaFor('node-meta-state', {
   .transitions("рендер", [
     {
       in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
+      to: [{state: "измерение", when: {error: null, collected: true}}]
     },
     {
       in: "измерение",
-      action({element, update}) {
-        requestAnimationFrame(() => {
-          const {width, height, x, y} = element.getBoundingClientRect()
-          update({
-            width: Math.round(width),
-            height: Math.round(height),
-            x: Math.round(x),
-            y: Math.round(y),
-          })
+      action({element, update, core}) {
+        console.log(core.params)
+        console.log(core.sockets)
+        const {width, height, x, y} = element.getBoundingClientRect()
+        console.log(width, height)
+        update({
+          width: Math.round(width),
+          height: Math.round(height),
+          x: Math.round(x),
+          y: Math.round(y),
         })
       },
-      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+      to: [{
+        state: "установка положения", when: {
+          x: {isNull: false}, y: {isNull: false}
+        }
+      }]
     },
     {
       in: "установка положения",
@@ -80,7 +86,7 @@ export default MetaFor('node-meta-state', {
         param.x = patch.value.x
         param.y = patch.value.y
         core.count -= 1
-        if (!core.count) update({})
+        if (!core.count) update({collected: true})
       }
     },
     {
@@ -105,7 +111,7 @@ export default MetaFor('node-meta-state', {
         socket.x = patch.value.x
         socket.y = patch.value.y
         core.count -= 1
-        if (!core.count) update({})
+        if (!core.count) update({collected: true})
       }
     },
     // if (meta.tag === "node-meta-param") {
@@ -127,7 +133,6 @@ export default MetaFor('node-meta-state', {
     //   }
     // }
     // console.log(core.params)
-
     // console.log(patch.value.context.param)
     // if (!core.params[patch.value.context.param]) core.params[patch.value.context.param] = {}
     // if (meta.tag === "node-meta-param") {
@@ -140,12 +145,6 @@ export default MetaFor('node-meta-state', {
     // core.count += 1
   ])
   .view({
-    onMount({core}) {
-      setTimeout(() => {
-        // console.log(core.params)
-        // console.log(core.sockets)
-      }, 1000)
-    },
     render: ({context, html}) => html`
       <header>
         <h2 class="noselect">${context.state}</h2>
