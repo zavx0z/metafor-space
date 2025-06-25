@@ -44,15 +44,25 @@ export default MetaFor('node-meta-state', {
       to: []
     },
   ])
-  .reactions([])
+  .reactions([
+    {
+      title: "Вычисление размеров",
+      filter: () => true,
+      action({patch}) {
+      }
+    }
+  ])
   .view({
     render: ({context, html}) => html`
       <header>
         <h2 class="noselect">${context.state}</h2>
       </header>
       <section>
-        <slot name="context"></slot>
-        <slot></slot>
+        <slot @channel=${/**@param{CustomEvent} ev */ (ev) => {
+          ev.preventDefault()
+          ev.stopPropagation()
+          console.log(ev.detail.meta)
+        }}></slot>
       </section>
       <section>
         <button>

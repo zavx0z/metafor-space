@@ -165,9 +165,15 @@ describe("форматирование", () => {
               id: keyState,
               width: valState.width,
               height: valState.height,
-              ports: [
-
-              ]
+              ports: Object.entries(dataMeta.sockets)
+                .filter(([_, socket]) => socket.state === valState.state)
+                .map(([keySocket, socket]) => ({
+                  id: keySocket,
+                  x: socket.x,
+                  y: socket.y,
+                  width: socket.width,
+                  height: socket.height
+                }))
             }
           ],
           edges: []

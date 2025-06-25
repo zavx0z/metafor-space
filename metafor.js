@@ -235,8 +235,11 @@ function createMeta(
               })
             }
           })
-          // @ts-ignore
-          this.#shadow.addEventListener("channel", (ev) => reactionCb(ev.detail))
+
+          this.#shadow.addEventListener("channel", (ev) => {
+            const {meta, patch} = /**@type{CustomEvent} */ (ev).detail
+            reactionCb({meta, patch})
+          })
           this.#channel.onmessage = ({data}) => reactionCb(data)
         }
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
