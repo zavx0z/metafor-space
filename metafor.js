@@ -168,17 +168,7 @@ function createMeta(
               const oldValue = state
               state = next
               listeners.forEach((listener) => listener(oldValue, next))
-              /**@type {import("./metafor").BroadcastMessage}*/
-              const message = {
-                meta: {tag, index: this.index, timestamp: Date.now()},
-                patch: {path: "/state", op: "replace", value: next}
-              }
-              if (!this.#channel) {
-                console.warn("Нет канала!", message)
-                return
-              }
-              this.#channel.postMessage(message)
-              if (debug) log(message, this.#core)
+              this.#broadcastState(next)
             }
           },
           value: () => state,
@@ -228,7 +218,7 @@ function createMeta(
           this.#shadow.addEventListener("channel", this.#reactionCustomEventCb)
         }
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
-
+        this.#broadcastState(initialState)
         const transition = transitions.find((i) => i.in === initialState)
         if (transition?.action) {
           this.process = true
@@ -406,6 +396,20 @@ function createMeta(
             })),
           })),
         }
+      }
+      /**@param{S}state*/
+      #broadcastState = (state) => {
+        /**@type {import("./metafor").BroadcastMessage}*/
+        const message = {
+          meta: {tag, index: this.index, timestamp: Date.now()},
+          patch: {path: "/state", op: "replace", value: state}
+        }
+        if (!this.#channel) {
+          console.warn("Нет канала!", message)
+          return
+        }
+        this.#channel.postMessage(message)
+        if (debug) log(message, this.#core)
       }
       /**@param {PatchMetaFor} patches*/
       #sendPatches = (patches) => {
