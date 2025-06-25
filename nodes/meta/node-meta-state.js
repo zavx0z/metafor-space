@@ -59,9 +59,9 @@ export default MetaFor('node-meta-state', {
       </header>
       <section>
         <slot @channel=${/**@param{CustomEvent} ev */ (ev) => {
-          ev.preventDefault()
-          ev.stopPropagation()
-          console.log(ev.detail.meta)
+          // ev.preventDefault()
+          // ev.stopPropagation()
+          // console.log(ev.detail.meta)
         }}></slot>
       </section>
       <section>

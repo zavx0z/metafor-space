@@ -219,28 +219,31 @@ function createMeta(
         })
       }
 
+      /**@param{Event} ev*/
+      #reactionCustomEventCb = (ev) => {
+        const {meta, patch} = /**@type {import("./metafor").BroadcastMessage}*/(/**@type{CustomEvent}*/(ev).detail)
+        if (meta.tag === tag && meta.index === this.index) return
+        this.#reactionCb({meta, patch})
+      }
+      /**@param {import("./metafor").BroadcastMessage} message */
+      #reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
+        if (reaction.filter({meta, patch, context: this.context})) {
+          reaction.action({
+            patch, meta,
+            context: this.context,
+            core: this.#core,
+            update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
+          })
+        }
+      })
+
       connectedCallback() {
         if (!this.index) this.index = idx += 1
 
         this.#channel = new BroadcastChannel('channel')
         if (reactions.length) {
-          /**@param {import("./metafor").BroadcastMessage} message */
-          const reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
-            if (reaction.filter({meta, patch, context: this.context})) {
-              reaction.action({
-                patch, meta,
-                context: this.context,
-                core: this.#core,
-                update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
-              })
-            }
-          })
-
-          this.#shadow.addEventListener("channel", (ev) => {
-            const {meta, patch} = /**@type{CustomEvent} */ (ev).detail
-            reactionCb({meta, patch})
-          })
-          this.#channel.onmessage = ({data}) => reactionCb(data)
+          this.#channel.onmessage = ({data}) => this.#reactionCb(data)
+          this.#shadow.addEventListener("channel", this.#reactionCustomEventCb)
         }
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
 
