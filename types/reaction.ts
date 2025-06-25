@@ -28,6 +28,7 @@ type ReactionFilterParam<C extends ContextDefinition> = {
  */
 export type Reaction<C extends ContextDefinition, I extends CoreData<I>> = {
   title: string
+  block?: boolean
   // path?: string
   // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean

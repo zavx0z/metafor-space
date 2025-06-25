@@ -48,6 +48,7 @@ export default MetaFor('node-meta-state', {
     {
       title: "Вычисление размеров",
       filter: () => true,
+      block: true,
       action({patch}) {
       }
     }
@@ -58,7 +59,7 @@ export default MetaFor('node-meta-state', {
         <h2 class="noselect">${context.state}</h2>
       </header>
       <section>
-        <slot @channel=${/**@param{CustomEvent} ev */ (ev) => {
+        <slot @channel=${/**@param{CustomEvent} ev */(ev) => {
           // ev.preventDefault()
           // ev.stopPropagation()
           // console.log(ev.detail.meta)

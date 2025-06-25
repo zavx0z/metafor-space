@@ -219,24 +219,6 @@ function createMeta(
         })
       }
 
-      /**@param{Event} ev*/
-      #reactionCustomEventCb = (ev) => {
-        const {meta, patch} = /**@type {import("./metafor").BroadcastMessage}*/(/**@type{CustomEvent}*/(ev).detail)
-        if (meta.tag === tag && meta.index === this.index) return
-        this.#reactionCb({meta, patch})
-      }
-      /**@param {import("./metafor").BroadcastMessage} message */
-      #reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
-        if (reaction.filter({meta, patch, context: this.context})) {
-          reaction.action({
-            patch, meta,
-            context: this.context,
-            core: this.#core,
-            update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
-          })
-        }
-      })
-
       connectedCallback() {
         if (!this.index) this.index = idx += 1
 
@@ -289,19 +271,6 @@ function createMeta(
         this.#core =/**@type{import("./types/core").Core<I>}*/(/**@type{unknown}*/(undefined))
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
         // meta.destroy()
-      }
-
-      /**@param {PatchMetaFor} patches*/
-      #sendPatches = (patches) => {
-        /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {meta: {tag, index: this.index}, patch: patches}
-        this.#shadow.dispatchEvent(new CustomEvent('channel', {
-          detail: message,
-          bubbles: true,
-          cancelable: false,
-          composed: true
-        }))
-        if (debug) log(message, this.#core)
       }
 
       /** @param {import("./types/core").CoreData<I>} value*/
@@ -438,6 +407,49 @@ function createMeta(
           })),
         }
       }
+      /**@param {PatchMetaFor} patches*/
+      #sendPatches = (patches) => {
+        /**@type {import("./metafor").BroadcastMessage}*/
+        const message = {meta: {tag, index: this.index}, patch: patches}
+        this.#shadow.dispatchEvent(new CustomEvent('channel', {
+          detail: message,
+          bubbles: true,
+          cancelable: false,
+          composed: true
+        }))
+        if (debug) log(message, this.#core)
+      }
+      /**@param{Event} ev*/
+      #reactionCustomEventCb = (ev) => {
+        const {meta, patch} = /**@type {import("./metafor").BroadcastMessage}*/(/**@type{CustomEvent}*/(ev).detail)
+        if (meta.tag === tag && meta.index === this.index) return
+        this.#reactionCb({meta, patch})
+        reactions.forEach((reaction) => {
+          if (reaction.filter({meta, patch, context: this.context})) {
+            reaction.action({
+              patch, meta,
+              context: this.context,
+              core: this.#core,
+              update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
+            })
+            if (reaction.block) {
+              ev.preventDefault()
+              ev.stopPropagation()
+            }
+          }
+        })
+      }
+      /**@param {import("./metafor").BroadcastMessage} message */
+      #reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
+        if (reaction.filter({meta, patch, context: this.context})) {
+          reaction.action({
+            patch, meta,
+            context: this.context,
+            core: this.#core,
+            update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
+          })
+        }
+      })
     }
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
