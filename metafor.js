@@ -260,6 +260,7 @@ function createMeta(
         this.#shadow.adoptedStyleSheets = []
         this.#core =/**@type{import("./types/core").Core<I>}*/(/**@type{unknown}*/(undefined))
         view?.onDestroy?.({component: this.#shadow.host, core: this.#core})
+        this.#shadow.removeEventListener("channel", this.#reactionCustomEventCb)
         // meta.destroy()
       }
 
@@ -397,13 +398,15 @@ function createMeta(
           })),
         }
       }
+
+      get #meta() {
+        return {tag, index: this.index, timestamp: Date.now()}
+      }
+
       /**@param{S}state*/
       #broadcastState = (state) => {
         /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {
-          meta: {tag, index: this.index, timestamp: Date.now()},
-          patch: {path: "/state", op: "replace", value: state}
-        }
+        const message = {meta: this.#meta, patch: {path: "/state", op: "replace", value: state}}
         if (!this.#channel) {
           console.warn("Нет канала!", message)
           return
@@ -414,7 +417,7 @@ function createMeta(
       /**@param {PatchMetaFor} patches*/
       #sendPatches = (patches) => {
         /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {meta: {tag, index: this.index}, patch: patches}
+        const message = {meta: this.#meta, patch: patches}
         this.#shadow.dispatchEvent(new CustomEvent('channel', {
           detail: message,
           bubbles: true,
