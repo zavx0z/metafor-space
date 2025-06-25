@@ -25,12 +25,14 @@ describe("форматирование", () => {
         "conditions": {
           "node-meta-condition/1": {
             "from": "начало",
+            "param": "status",
             "to": "конец",
             "width": 133,
             "height": 32
           },
           "node-meta-condition/2": {
             "from": "конец",
+            "param": "status",
             "to": "начало",
             "width": 138,
             "height": 32
@@ -39,57 +41,57 @@ describe("форматирование", () => {
         "sockets": {
           "node-meta-socket/1": {
             "state": "начало",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": -6,
             "y": 96
           },
           "node-meta-socket/2": {
             "state": "начало",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": 192,
             "y": 96
           },
           "node-meta-socket/3": {
             "state": "конец",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": -6,
             "y": 96
           },
           "node-meta-socket/4": {
             "state": "конец",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": 192,
             "y": 96
           },
           "node-meta-socket/5": {
             "state": "конец",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": -6,
             "y": 50
           },
           "node-meta-socket/6": {
             "state": "конец",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": 127,
             "y": 50
           },
           "node-meta-socket/7": {
             "state": "начало",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": -6,
             "y": 50
           },
           "node-meta-socket/8": {
             "state": "начало",
-            "width": 12,
-            "height": 12,
+            "param": "status",
+            "size": 12,
             "x": 132,
             "y": 50
           }
@@ -97,6 +99,7 @@ describe("форматирование", () => {
         "params": {
           "node-meta-param/1": {
             "state": "начало",
+            "param": "status",
             "width": 182,
             "height": 24,
             "x": 8,
@@ -104,6 +107,7 @@ describe("форматирование", () => {
           },
           "node-meta-param/2": {
             "state": "конец",
+            "param": "status",
             "width": 182,
             "height": 24,
             "x": 8,
