@@ -8,19 +8,21 @@ export type DataMetaMap = Map<string, {
   }>,
   conditions: Record<string, {
     from: string
+    param: string
     to: string
     width?: number
     height?: number
   }>
   sockets: Record<string, {
     state: string
-    width?: number
-    height?: number
+    param: string
+    size?: number
     x?: number
     y?: number
   }>
   params: Record<string, {
     state: string
+    param: string
     width?: number
     height?: number
     x?: number

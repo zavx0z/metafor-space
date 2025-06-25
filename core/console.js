@@ -1,6 +1,9 @@
 const config = {
   collapseAll: true,
-  tag: ["node-meta-state"],
+  /**@type{Array<string>}*/
+  tag: [
+    // "node-meta-state"
+  ],
   patch: [
     "add",
     "remove",
@@ -11,8 +14,8 @@ const config = {
   ],
   /**@type{Array< "/" | "/context" | "/state" >}*/
   path: [
-    // "/",
-    // "/context",
+    "/",
+    "/context",
     "/state",
   ]
 }
@@ -38,7 +41,7 @@ export function log(message, core) {
   // Специальная обработка для /state
   if (patch.path === "/state"
     && config.path.includes("/state")
-    && (config.tag.length && config.tag.includes(meta.tag))
+    && ((!config.tag.length) || (config.tag.length && config.tag.includes(meta.tag)))
   ) {
     const stateValue = Array.isArray(patch.value)
       ? JSON.stringify(patch.value, null, 2)
@@ -52,7 +55,7 @@ export function log(message, core) {
 
   } else if (patch.path === "/"
     && config.path.includes("/")
-    && (config.tag.length && config.tag.includes(meta.tag))
+    && ((!config.tag.length) || (config.tag.length && config.tag.includes(meta.tag)))
   ) {
     const msg = [`%c${tag}${index}%c | %c${op}%c | %c${path}`, "color: #3498db; font-weight: bold", "", "color: #e74c3c", "", "color: #2ecc71"]
     config.collapseAll ? console.groupCollapsed(...msg) : console.group(...msg)
@@ -65,7 +68,7 @@ export function log(message, core) {
 
   } else if (patch.path === "/context"
     && config.path.includes("/context")
-    && (config.tag.length && config.tag.includes(meta.tag))
+    && ((!config.tag.length) || (config.tag.length && config.tag.includes(meta.tag)))
   ) {
     // Стандартный вывод в группе
     const isError = Object.hasOwn(patch.value, 'error')

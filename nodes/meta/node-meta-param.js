@@ -46,29 +46,31 @@ export default MetaFor("node-meta-param")
     render: ({context, html}) => html`
       <metafor-node-meta-socket
         context=${{
-      id: context.id,
-      state: context.state,
-      param: context.param,
-      parent: "state",
-      direction: "west"
-    }}
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "west"
+        }}
         data-direction="input"
         data-active="false"
-      ></metafor-node-meta-socket>
+      >
+      </metafor-node-meta-socket>
       <span class="noselect">${context.title}</span>
       <input name=${context.title} value=${context.value}/>
       <metafor-node-meta-socket
         context=${{
-      id: context.id,
-      state: context.state,
-      param: context.param,
-      parent: "state",
-      direction: "east"
-    }}
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "east"
+        }}
         class="connected"
         data-direction="output"
         data-active="false"
-      /></metafor-node-meta-socket>
+      />
+      </metafor-node-meta-socket>
     `,
     style: ({css}) => css`
       :host {

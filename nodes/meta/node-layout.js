@@ -122,22 +122,25 @@ export default MetaFor("node-elk", {development: true})
           console.error(meta, patch)
           return
         }
-        if (meta.tag === "node-meta-condition")
-          entity.conditions[patch.value.id] = {
-            from: patch.value.context.from,
-            to: patch.value.context.to,
-          }
-        else if (meta.tag === "node-meta-state")
+        if (meta.tag === "node-meta-state")
           entity.states[patch.value.id] = {
             state: patch.value.context.state
           }
+        else if (meta.tag === "node-meta-condition")
+          entity.conditions[patch.value.id] = {
+            from: patch.value.context.from,
+            param: patch.value.context.param,
+            to: patch.value.context.to,
+          }
         else if (meta.tag === "node-meta-socket")
           entity.sockets[patch.value.id] = {
-            state: patch.value.context.state
+            state: patch.value.context.state,
+            param: patch.value.context.param,
           }
         else if (meta.tag === "node-meta-param")
           entity.params[patch.value.id] = {
-            state: patch.value.context.state
+            state: patch.value.context.state,
+            param: patch.value.context.param,
           }
         update({count: context.count + 1})
       }
@@ -148,8 +151,8 @@ export default MetaFor("node-elk", {development: true})
         meta.tag.includes('node-meta')
         && patch.path === "/context"
         && patch.op === "replace"
-        && Object.hasOwn(patch.value, "width")
-        && Object.hasOwn(patch.value, "height")
+        // && Object.hasOwn(patch.value, "x")
+        // && Object.hasOwn(patch.value, "y")
         && meta.tag !== "node-meta"
         && meta.tag !== "node-meta-operator"
       ),
@@ -165,17 +168,16 @@ export default MetaFor("node-elk", {development: true})
           return
         }
         const id = `${meta.tag}/${meta.index}`
-        if (meta.tag === "node-meta-condition") {
-          entity.conditions[id]["width"] = patch.value.width
-          entity.conditions[id]["height"] = patch.value.height
-        } else if (meta.tag === "node-meta-state") {
+        if (meta.tag === "node-meta-state") {
           entity.states[id]["width"] = patch.value.width
           entity.states[id]["height"] = patch.value.height
           entity.states[id]["x"] = patch.value.x
           entity.states[id]["y"] = patch.value.y
+        } else if (meta.tag === "node-meta-condition") {
+          entity.conditions[id]["width"] = patch.value.width
+          entity.conditions[id]["height"] = patch.value.height
         } else if (meta.tag === "node-meta-socket") {
-          entity.sockets[id]["width"] = patch.value.width
-          entity.sockets[id]["height"] = patch.value.height
+          entity.sockets[id]["size"] = patch.value.size
           entity.sockets[id]["x"] = patch.value.x
           entity.sockets[id]["y"] = patch.value.y
         } else if (meta.tag === "node-meta-param") {

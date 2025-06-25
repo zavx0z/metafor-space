@@ -13,7 +13,6 @@ export default MetaFor('node-meta-state', {
     height: t.number({nullable: true}),
     x: t.number({nullable: true}),
     y: t.number({nullable: true}),
-    collected: t.boolean({default: false})
   }))
   .core(() => ({
     /**@type{import("./node-meta-state.t").Params}*/
@@ -26,20 +25,19 @@ export default MetaFor('node-meta-state', {
   .transitions("рендер", [
     {
       in: "рендер",
-      to: [{state: "измерение", when: {error: null, collected: true}}]
+      to: [{state: "измерение", when: {error: null}}]
     },
     {
       in: "измерение",
-      action({element, update, core}) {
-        console.log(core.params)
-        console.log(core.sockets)
-        const {width, height, x, y} = element.getBoundingClientRect()
-        console.log(width, height)
-        update({
-          width: Math.round(width),
-          height: Math.round(height),
-          x: Math.round(x),
-          y: Math.round(y),
+      action({element, update}) {
+        requestAnimationFrame(() => {
+          const {width, height, x, y} = element.getBoundingClientRect()
+          update({
+            width: Math.round(width),
+            height: Math.round(height),
+            x: Math.round(x),
+            y: Math.round(y),
+          })
         })
       },
       to: [{
@@ -56,94 +54,7 @@ export default MetaFor('node-meta-state', {
       to: []
     },
   ])
-  .reactions([
-    {
-      title: "Блокировка",
-      filter: () => true,
-      block: true,
-      action() {
-      }
-    },
-    {
-      title: "Элементы параметров",
-      filter: ({meta, patch}) => patch.path === '/' && meta.tag === "node-meta-param",
-      action: ({patch, core}) => {
-        core.params.set(patch.value.id, {param: patch.value.context.param, width: 0, height: 0, x: 0, y: 0})
-        core.count += 1
-      }
-    },
-    {
-      title: "Размеры параметров",
-      filter: ({meta, patch}) => patch.path === '/context' && meta.tag === "node-meta-param",
-      action({meta, patch, core, update}) {
-        const param = core.params.get(`${meta.tag}/${meta.index}`)
-        if (!param) {
-          update({error: `Отсутствует параметр: ${meta.tag}/${meta.index}`})
-          return
-        }
-        param.width = patch.value.width
-        param.height = patch.value.height
-        param.x = patch.value.x
-        param.y = patch.value.y
-        core.count -= 1
-        if (!core.count) update({collected: true})
-      }
-    },
-    {
-      title: "Элементы сокетов",
-      filter: ({patch, meta}) => patch.path === '/' && meta.tag === "node-meta-socket",
-      action: ({patch, core}) => {
-        core.sockets.set(patch.value.id,
-          {param: patch.value.context.param, direction: patch.value.context.direction, size: 0, x: 0, y: 0})
-        core.count += 1
-      }
-    },
-    {
-      title: "Размеры сокетов",
-      filter: ({meta, patch}) => patch.path === '/context' && meta.tag === "node-meta-socket",
-      action({meta, patch, core, update}) {
-        const socket = core.sockets.get(`${meta.tag}/${meta.index}`)
-        if (!socket) {
-          update({error: `Отсутствует сокет: ${meta.tag}/${meta.index}`})
-          return
-        }
-        socket.size = patch.value.size
-        socket.x = patch.value.x
-        socket.y = patch.value.y
-        core.count -= 1
-        if (!core.count) update({collected: true})
-      }
-    },
-    // if (meta.tag === "node-meta-param") {
-    //   /**@type{import("./node-meta-param.t").MetaParam['context']}*/
-    //   const value = patch.value
-    //   core.params[value.param] = {
-    //     width: value.width,
-    //     height: value.height,
-    //     x: value.x,
-    //     y: value.y
-    //   }
-    // } else if (meta.tag === "node-meta-socket") {
-    //   /**@type{import("./node-meta-socket.t").MetaSocket['context']}*/
-    //   const value = patch.value
-    //   // core.params[value.param].socketSize = value.size
-    //   core.params[value.param][value.direction] = {
-    //     x: value.x,
-    //     y: value.y
-    //   }
-    // }
-    // console.log(core.params)
-    // console.log(patch.value.context.param)
-    // if (!core.params[patch.value.context.param]) core.params[patch.value.context.param] = {}
-    // if (meta.tag === "node-meta-param") {
-    //   core.params[patch.value.context.param] = {id: patch.value.id}
-    // } else if (meta.tag === "node-meta-socket") {
-    //   /**@type{import("./node-meta-socket.t").MetaSocket}*/
-    //   const snapshot = patch.value
-    //   core.params[snapshot.context.param][snapshot.context.direction] = {id: patch.value.id}
-    // }
-    // core.count += 1
-  ])
+  .reactions([])
   .view({
     render: ({context, html}) => html`
       <header>
