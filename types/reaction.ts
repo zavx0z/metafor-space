@@ -3,7 +3,7 @@ import type {Core, CoreData} from "./core.ts"
 import type {MetaDataMessage} from "./meta.ts"
 
 
-type ReactionActionParam<C extends ContextDefinition, I extends CoreData<I>> = {
+type ReactionActionParam<C extends ContextDefinition, I extends Record<string, unknown>> = {
   patch: PatchMetaFor
   context: ContextData<C>
   meta: MetaDataMessage
@@ -26,14 +26,16 @@ type ReactionFilterParam<C extends ContextDefinition> = {
  @property op - Тип операции.
  @property action - Функция, которая будет вызвана при изменении данных.
  */
-export type Reaction<C extends ContextDefinition, I extends CoreData<I>> = {
+export type Reaction<C extends ContextDefinition, I extends Record<string, unknown>> = {
   title: string
   block?: boolean
   // path?: string
   // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean
   action: ({patch, context, update, core}: ReactionActionParam<C, I>) => void
-} & Partial<MetaDataMessage>
+}
+
+// & Partial<MetaDataMessage>
 
 /** # Реакции
 

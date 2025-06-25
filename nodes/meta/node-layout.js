@@ -85,6 +85,13 @@ export default MetaFor("node-elk", {development: true})
   ])
   .reactions([
     {
+      title: "Блокировка всплытия",
+      filter: () => true,
+      block: true,
+      action() {
+      }
+    },
+    {
       title: "начало создания meta",
       filter: ({patch, meta}) => (
         meta.tag === "nodes-meta"

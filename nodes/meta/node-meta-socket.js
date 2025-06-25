@@ -7,8 +7,7 @@ export default MetaFor('node-meta-socket')
     param: t.string({title: "Ключ параметра"}),
     direction: t.enum("west", "east")({title: "Вход/Выход"}),
     parent: t.enum("state", "condition")({title: "Принадлежность"}),
-    width: t.number({nullable: true}),
-    height: t.number({nullable: true}),
+    size: t.number({nullable: true}),
     x: t.number({nullable: true}),
     y: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
@@ -26,8 +25,7 @@ export default MetaFor('node-meta-socket')
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
           update({
-            width: Math.round(width),
-            height: Math.round(height),
+            size: Math.round(width),
             x: Math.round(x),
             y: Math.round(y),
           })

@@ -1,17 +1,26 @@
 import meta from "./node-meta-state.js"
-import type {ContextDefinition, ContextData} from "../../types/context.ts"
+import type NodeMetaParam from "./node-meta-param"
+import type NodeMetaSocket from "./node-meta-socket"
 
 const snapshot = meta.snapshot()
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-node-meta-state': Meta<typeof snapshot.state, typeof snapshot.context>
+    'metafor-node-meta-state': Meta<typeof snapshot.state, typeof snapshot.types>
   }
 }
+export type Params = Map<typeof NodeMetaParam['id'], {
+  param: typeof NodeMetaParam['context']['param']
+  width: number
+  height: number
+  x: number
+  y: number
+}>
 
-export interface Core {
-  data: null | {
-    types: ContextDefinition
-    context: ContextData<any>
-  }
-}
+export type Sockets = Map<typeof NodeMetaSocket['id'], {
+  direction: "west" | "east"
+  param: string
+  size: number
+  x: number
+  y: number
+}>

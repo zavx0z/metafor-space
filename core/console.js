@@ -8,8 +8,9 @@ const config = {
     "copy",
     "test"
   ],
+  /**@type{Array< "/" | "/context" | "/state" >}*/
   path: [
-    "/",
+    // "/",
     // "/context",
     // "/state",
   ]

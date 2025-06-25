@@ -7,7 +7,3 @@ declare global {
     'metafor-node-meta-param': Meta<typeof snapshot.state, typeof snapshot.types>
   }
 }
-export type MetaForNodeMetaParam = typeof snapshot
-
-export interface Core {
-}
