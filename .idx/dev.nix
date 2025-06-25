@@ -7,7 +7,7 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [
     # pkgs.go
-    # pkgs.python311
+    pkgs.python311
     pkgs.bun
   ];
 
@@ -23,16 +23,10 @@
     previews = {
       enable = true;
       previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
+        web = {
+          command = ["python3" "-m" "http.server" "$PORT" "--bind" "0.0.0.0"];
+          manager = "web";
+        };
       };
     };
 
@@ -42,6 +36,7 @@
       onCreate = {
         # Example: install JS dependencies from NPM
         # npm-install = "npm install";
+        default.openFiles = [ "./nodes/dev/index.html" ];
       };
       # Runs when the workspace is (re)started
       onStart = {
