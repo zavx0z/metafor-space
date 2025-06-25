@@ -61,9 +61,10 @@ export default MetaFor('node-meta-state', {
     {
       title: "Элементы параметров",
       filter: ({meta, patch}) => patch.path === '/' && meta.tag === "node-meta-param",
-      action: ({patch, core}) => core.params.set(patch.value.id,
-        {param: patch.value.context.param, width: 0, height: 0, x: 0, y: 0}
-      )
+      action: ({patch, core}) => {
+        core.params.set(patch.value.id, {param: patch.value.context.param, width: 0, height: 0, x: 0, y: 0})
+        core.count += 1
+      }
     },
     {
       title: "Размеры параметров",
@@ -78,14 +79,18 @@ export default MetaFor('node-meta-state', {
         param.height = patch.value.height
         param.x = patch.value.x
         param.y = patch.value.y
+        core.count -= 1
+        if (!core.count) update({})
       }
     },
     {
       title: "Элементы сокетов",
       filter: ({patch, meta}) => patch.path === '/' && meta.tag === "node-meta-socket",
-      action: ({patch, core}) => core.sockets.set(patch.value.id,
-        {param: patch.value.context.param, direction: patch.value.context.direction, size: 0, x: 0, y: 0}
-      )
+      action: ({patch, core}) => {
+        core.sockets.set(patch.value.id,
+          {param: patch.value.context.param, direction: patch.value.context.direction, size: 0, x: 0, y: 0})
+        core.count += 1
+      }
     },
     {
       title: "Размеры сокетов",
@@ -99,6 +104,8 @@ export default MetaFor('node-meta-state', {
         socket.size = patch.value.size
         socket.x = patch.value.x
         socket.y = patch.value.y
+        core.count -= 1
+        if (!core.count) update({})
       }
     },
     // if (meta.tag === "node-meta-param") {
@@ -135,8 +142,8 @@ export default MetaFor('node-meta-state', {
   .view({
     onMount({core}) {
       setTimeout(() => {
-        console.log(core.params)
-        console.log(core.sockets)
+        // console.log(core.params)
+        // console.log(core.sockets)
       }, 1000)
     },
     render: ({context, html}) => html`
