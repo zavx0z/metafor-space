@@ -225,33 +225,37 @@ describe("форматирование", () => {
       })
     expect(condition).toMatchSnapshot()
   })
+
   test("ребра между conditions -> state", () => {
-    const edges = Object.entries(dataMeta.sockets)
-      .filter(([_, socket]) =>
-        socket.state === valState.state
-        && socket.parent === "condition"
-        && socket.direction === "east"
-      )
-      .map(([key, socketCond]) => {
-        const target = Object.entries(dataMeta.sockets)
-          .find(([_, socketState]) =>
-            socketState.state === valState.state
-            && socketState.param === socketCond.param
-            && socketState.parent === "state"
-            && socketState.direction === "west"
-          )![0]
-        return {
-          sources: [key],
-          targets: [target]
-        }
-      })
+    const edges = createEdges("condition", "state")
     expect(edges).toMatchSnapshot()
   })
+
+  test("ребра между state -> conditions", () => {
+    const edges = createEdges("state", "condition")
+    expect(edges).toMatchSnapshot()
+  })
+  const createEdges = (from: "condition" | "state", to: "condition" | "state") => Object.entries(dataMeta.sockets)
+    .filter(([_, socket]) =>
+      socket.state === valState.state
+      && socket.parent === from
+      && socket.direction === "east"
+    )
+    .map(([key, socketCond]) => {
+      const target = Object.entries(dataMeta.sockets)
+        .find(([_, socketState]) =>
+          socketState.state === valState.state
+          && socketState.param === socketCond.param
+          && socketState.parent === to
+          && socketState.direction === "west"
+        )![0]
+      return {
+        sources: [key],
+        targets: [target]
+      }
+    })
+
   test("подготовка данных", () => {
-
-
-    const conditionsAll = []
-
     const result = {
       id: "test/1",
       layoutOptions: config.base,
@@ -298,10 +302,10 @@ describe("форматирование", () => {
                 }
               })
           ],
-          edges: []
+          edges: createEdges("condition", "state")
         }
       }),
-      edges: []
+      edges: createEdges("state", "condition")
     }
     expect(result).toMatchSnapshot()
   })
