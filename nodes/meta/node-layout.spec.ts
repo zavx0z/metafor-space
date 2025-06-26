@@ -227,33 +227,53 @@ describe("форматирование", () => {
   })
 
   test("ребра между conditions -> state", () => {
-    const edges = createEdges("condition", "state")
+    const edges = Object.entries(dataMeta.sockets)
+      .filter(([_, socket]) =>
+        socket.state === valState.state
+        && socket.parent === "condition"
+        && socket.direction === "east"
+      )
+      .map(([key, socketCond]) => {
+        const target = Object.entries(dataMeta.sockets)
+          .find(([_, socketState]) =>
+            socketState.state === valState.state
+            && socketState.param === socketCond.param
+            && socketState.parent === "state"
+            && socketState.direction === "west"
+          )
+        if (typeof target === 'undefined') return
+        return {
+          id: `${key}->${target[0]}`,
+          sources: [key],
+          targets: [target[0]]
+        }
+      })
     expect(edges).toMatchSnapshot()
   })
 
   test("ребра между state -> conditions", () => {
-    const edges = createEdges("state", "condition")
+    const edges = Object.entries(dataMeta.sockets)
+      .filter(([_, socket]) =>
+        socket.parent === "state"
+        && socket.direction === "east"
+      )
+      .map(([key, socketCond]) => {
+        const target = Object.entries(dataMeta.sockets)
+          .find(([_, socketState]) =>
+            socketState.param === socketCond.param
+            && socketState.parent === "condition"
+            && socketState.direction === "west"
+          )
+        if (typeof target === 'undefined') return
+        return {
+          id: `${key}->${target[0]}`,
+          sources: [key],
+          targets: [target[0]]
+        }
+      })
     expect(edges).toMatchSnapshot()
   })
-  const createEdges = (from: "condition" | "state", to: "condition" | "state") => Object.entries(dataMeta.sockets)
-    .filter(([_, socket]) =>
-      socket.state === valState.state
-      && socket.parent === from
-      && socket.direction === "east"
-    )
-    .map(([key, socketCond]) => {
-      const target = Object.entries(dataMeta.sockets)
-        .find(([_, socketState]) =>
-          socketState.state === valState.state
-          && socketState.param === socketCond.param
-          && socketState.parent === to
-          && socketState.direction === "west"
-        )![0]
-      return {
-        sources: [key],
-        targets: [target]
-      }
-    })
+
 
   test("подготовка данных", () => {
     const result = {
@@ -302,10 +322,48 @@ describe("форматирование", () => {
                 }
               })
           ],
-          edges: createEdges("condition", "state")
+          edges: Object.entries(dataMeta.sockets)
+            .filter(([_, socket]) =>
+              socket.state === valState.state
+              && socket.parent === "condition"
+              && socket.direction === "east"
+            )
+            .map(([key, socketCond]) => {
+              const target = Object.entries(dataMeta.sockets)
+                .find(([_, socketState]) =>
+                  socketState.state === valState.state
+                  && socketState.param === socketCond.param
+                  && socketState.parent === "state"
+                  && socketState.direction === "west"
+                )
+              if (typeof target === 'undefined') return
+              return {
+                id: `${key}->${target[0]}`,
+                sources: [key],
+                targets: [target[0]]
+              }
+            })
         }
       }),
-      edges: createEdges("state", "condition")
+      edges: Object.entries(dataMeta.sockets)
+        .filter(([_, socket]) =>
+          socket.parent === "state"
+          && socket.direction === "east"
+        )
+        .map(([key, socketCond]) => {
+          const target = Object.entries(dataMeta.sockets)
+            .find(([_, socketState]) =>
+              socketState.param === socketCond.param
+              && socketState.parent === "condition"
+              && socketState.direction === "west"
+            )
+          if (typeof target === 'undefined') return
+          return {
+            id: `${key}->${target[0]}`,
+            sources: [key],
+            targets: [target[0]]
+          }
+        })
     }
     expect(result).toMatchSnapshot()
   })

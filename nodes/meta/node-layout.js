@@ -13,6 +13,7 @@ export default MetaFor("node-elk", {development: true})
     elk: new ELK(),
     /**@type{import("./node-layout.t").DataMetaMap}*/
     meta: new Map(),
+    data: {},
     config: {
       base: {
         "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
@@ -43,6 +44,9 @@ export default MetaFor("node-elk", {development: true})
       port: {
         west: {
           "port.side": "WEST"
+        },
+        east: {
+          "port.side": "EAST"
         }
       }
     }
@@ -69,15 +73,109 @@ export default MetaFor("node-elk", {development: true})
     },
     {
       in: "форматирование данных",
-      action({core}) {
-        console.log(core.meta)
+      action({core, context, update}) {
+        const dataMeta = core.meta.get(context.current)
+        if (!dataMeta) return
+        core.data = {
+          id: context.current,
+          layoutOptions: core.config.base,
+          children: Object.entries(dataMeta.states).map(([keyState, valState]) => {
+            return {
+              layoutOptions: core.config.meta,
+              id: valState.state,
+              children: [
+                {
+                  layoutOptions: core.config.state,
+                  id: keyState,
+                  width: valState.width,
+                  height: valState.height,
+                  ports: Object.entries(dataMeta.sockets)
+                    .filter(([_, socket]) =>
+                      socket.state === valState.state && socket.parent === "state"
+                    )
+                    .map(([keySocket, socket]) => ({
+                      id: keySocket,
+                      x: /**@type{number}*/(socket.x) - /**@type{number}*/(valState.x),
+                      y: /**@type{number}*/(socket.y) - /**@type{number}*/(valState.y),
+                      width: socket.size,
+                      height: socket.size
+                    }))
+                },
+                ...Object.entries(dataMeta.conditions)
+                  .filter(([_, val]) => val.to === valState.state)
+                  .map(([key, val]) => {
+                    return {
+                      layoutOptions: core.config.condition,
+                      id: key,
+                      width: val.width,
+                      height: val.height,
+                      children: Object.entries(dataMeta.sockets)
+                        .filter(([_, socket]) =>
+                          socket.state === valState.state && socket.parent === "condition"
+                        )
+                        .map(([keySocket, socket]) => ({
+                          id: keySocket,
+                          layoutOptions: socket.direction === 'west' ? core.config.port.west : core.config.port.east,
+                          width: socket.size,
+                          height: socket.size
+                        }))
+                    }
+                  })
+              ],
+              edges: Object.entries(dataMeta.sockets)
+                .filter(([_, socket]) =>
+                  socket.state === valState.state
+                  && socket.parent === "condition"
+                  && socket.direction === "east"
+                )
+                .map(([key, socketCond]) => {
+                  const target = Object.entries(dataMeta.sockets)
+                    .find(([_, socketState]) =>
+                      socketState.state === valState.state
+                      && socketState.param === socketCond.param
+                      && socketState.parent === "state"
+                      && socketState.direction === "west"
+                    )
+                  if (typeof target === 'undefined') return
+                  return {
+                    id: `${key}->${target[0]}`,
+                    sources: [key],
+                    targets: [target[0]]
+                  }
+                })
+            }
+          }),
+          edges: Object.entries(dataMeta.sockets)
+            .filter(([_, socket]) =>
+              socket.parent === "condition"
+              && socket.direction === "east"
+            )
+            .map(([key, socketCond]) => {
+              const target = Object.entries(dataMeta.sockets)
+                .find(([_, socketState]) =>
+                  socketState.param === socketCond.param
+                  && socketState.parent === "state"
+                  && socketState.direction === "west"
+                )
+              if (typeof target === 'undefined') return
+              return {
+                id: `${key}->${target[0]}`,
+                sources: [key],
+                targets: [target[0]]
+              }
+            })
+        }
+        update({current: null})
       },
       to: [{state: "вычисление", when: {current: null}}]
     },
     {
       in: "вычисление",
-      action({core}) {
-        console.log(core.meta)
+      action({core, context}) {
+        return new Promise(async (resolve) => {
+          const layout = await core.elk.layout(core.data)
+          console.log(layout)
+        })
         // update({ready: context.current, current: null})
       },
       to: [{state: "ожидание", when: {current: null}}]
