@@ -54,7 +54,19 @@ export default MetaFor('node-meta-state', {
       to: []
     },
   ])
-  .reactions([])
+  .reactions([
+    {
+      title: "вычисленное положение",
+      filter: ({meta, patch}) => meta.tag === "node-layout"
+        && patch.path === "/state"
+        && patch.value === "ожидание"
+      ,
+      action({patch}) {
+
+        console.log(patch)
+      }
+    }
+  ])
   .view({
     render: ({context, html}) => html`
       <header>

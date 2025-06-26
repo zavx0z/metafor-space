@@ -1,7 +1,7 @@
 import ELK from "elkjs"
 import {MetaFor} from "../../metafor.js"
 
-export default MetaFor("node-elk", {development: true})
+export default MetaFor("node-layout", {development: true})
   .context(t => ({
     current: t.string({title: "ID ноды meta передающий данные", nullable: true}),
     ready: t.string({title: "ID готовой ноды meta", nullable: true}),
@@ -170,6 +170,7 @@ export default MetaFor("node-elk", {development: true})
               })
           ))
         }
+        // @ts-ignore
         update({current: null})
       },
       to: [{state: "вычисление", when: {current: null}}]
@@ -183,6 +184,7 @@ export default MetaFor("node-elk", {development: true})
           }
           const layout = await core.elk.layout(core.data)
           console.log(layout)
+          sessionStorage.setItem(core.data.id, JSON.stringify(core.data))
           return resolve()
         })
         // update({ready: context.current, current: null})

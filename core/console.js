@@ -3,6 +3,7 @@ const config = {
   /**@type{Array<string>}*/
   tag: [
     // "node-meta-state"
+    "node-layout"
   ],
   patch: [
     "add",
