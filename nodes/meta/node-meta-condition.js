@@ -19,7 +19,7 @@ export default MetaFor("node-meta-condition", {development: true})
   .transitions('рендер', [
     {
       in: "рендер",
-      action({element}){
+      action({element}) {
 
       },
       to: [{state: "измерение", when: {error: null}}]
@@ -36,35 +36,58 @@ export default MetaFor("node-meta-condition", {development: true})
     },
     {
       in: "установка положения",
-      action() {
-        console.log()
+      action({element, context}) {
+        element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
       to: []
     },
   ])
-  .reactions([])
+  .reactions([
+    {
+      title: "вычисленное положение",
+      filter: ({meta, patch}) => meta.tag === "node-layout"
+        && patch.path === "/state"
+        && patch.value === "ожидание"
+      ,
+      action({id, context, update}) {
+        const data = sessionStorage.getItem(context.id)
+        if (!data) {
+          update({error: "Нет данных разметки"})
+          return
+        }
+        /**@type{import("elkjs").ElkNode}*/
+        const layout = JSON.parse(data)
+        const layoutState = layout.children?.find(i => i.id === context.to)
+        const layoutCondition = layoutState?.children?.find(i => i.id === id)
+
+        // @ts-ignore
+        update({x: layoutCondition.x, y: layoutCondition.y})
+        console.log(layoutCondition)
+      }
+    }
+  ])
   .view({
     render: ({html, context}) => html`
       <metafor-node-meta-socket
         context=${{
-      id: context.id,
-      state: context.to,
-      param: context.param,
-      parent: "condition",
-      direction: "west"
-    }}
+          id: context.id,
+          state: context.to,
+          param: context.param,
+          parent: "condition",
+          direction: "west"
+        }}
         data-direction="input"
         data-active=${false}
       ></metafor-node-meta-socket>
       <slot></slot>
       <metafor-node-meta-socket
         context=${{
-      id: context.id,
-      state: context.to,
-      param: context.param,
-      parent: "condition",
-      direction: "east"
-    }}
+          id: context.id,
+          state: context.to,
+          param: context.param,
+          parent: "condition",
+          direction: "east"
+        }}
         data-direction="output"
         data-active=${false}
       ></metafor-node-meta-socket>

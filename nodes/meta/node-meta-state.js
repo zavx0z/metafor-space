@@ -48,8 +48,8 @@ export default MetaFor('node-meta-state', {
     },
     {
       in: "установка положения",
-      action() {
-        console.log()
+      action({element, context}) {
+        element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
       to: []
     },
@@ -61,9 +61,17 @@ export default MetaFor('node-meta-state', {
         && patch.path === "/state"
         && patch.value === "ожидание"
       ,
-      action({patch}) {
-
-        console.log(patch)
+      action({context, update}) {
+        const data = sessionStorage.getItem(context.id)
+        if (!data) {
+          update({error: "Нет данных разметки"})
+          return
+        }
+        /**@type{import("elkjs").ElkNode}*/
+        const layout = JSON.parse(data)
+        const layoutState = layout.children?.find(i => i.id === context.state)
+        // @ts-ignore
+        update({x: layoutState.x, y: layoutState.y})
       }
     }
   ])

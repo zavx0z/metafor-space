@@ -382,7 +382,7 @@ function createMeta(
 
       snapshot = () => {
         return {
-          id: `${tag}/${this.index}`,
+          id: this.id,
           description,
           state: this.state,
           states: this.#states,
@@ -434,6 +434,7 @@ function createMeta(
         reactions.forEach((reaction) => {
           if (reaction.filter({meta, patch, context: this.context})) {
             reaction.action({
+              id: this.id,
               patch, meta,
               context: this.context,
               core: this.#core,
@@ -446,10 +447,16 @@ function createMeta(
           }
         })
       }
+
+      get id() {
+        return `${tag}/${this.index}`
+      }
+
       /**@param {import("./metafor").BroadcastMessage} message */
       #reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
         if (reaction.filter({meta, patch, context: this.context})) {
           reaction.action({
+            id: this.id,
             patch, meta,
             context: this.context,
             core: this.#core,

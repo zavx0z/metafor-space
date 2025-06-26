@@ -2,7 +2,7 @@ const config = {
   collapseAll: true,
   /**@type{Array<string>}*/
   tag: [
-    // "node-meta-state"
+    "node-meta-state",
     "node-layout"
   ],
   patch: [

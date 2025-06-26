@@ -1,5 +1,6 @@
 import {test, describe, expect} from "bun:test"
 import type {DataMetaMap} from "./node-layout.t.ts"
+import ELK, {type ElkExtendedEdge, type ElkNode} from "elkjs"
 
 describe("форматирование", () => {
   const data: DataMetaMap = new Map([
@@ -154,7 +155,8 @@ describe("форматирование", () => {
     },
     condition: {
       "elk.spacing.nodeNode": "0",
-      "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]"
+      "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+      "portConstraints": "FIXED_SIDE",
     },
     operator: {
       "portConstraints": "FIXED_SIDE",
@@ -211,7 +213,7 @@ describe("форматирование", () => {
           id: key,
           width: val.width,
           height: val.height,
-          children: Object.entries(dataMeta.sockets)
+          ports: Object.entries(dataMeta.sockets)
             .filter(([_, socket]) =>
               socket.state === valState.state && socket.parent === "condition"
             )
@@ -274,9 +276,10 @@ describe("форматирование", () => {
     expect(edges).toMatchSnapshot()
   })
 
+  let result: ElkNode
 
   test("подготовка данных", () => {
-    const result = {
+    result = {
       id: "test/1",
       layoutOptions: config.base,
       children: Object.entries(dataMeta.states).map(([keyState, valState]) => {
@@ -284,22 +287,26 @@ describe("форматирование", () => {
           layoutOptions: config.meta,
           id: valState.state,
           children: [
+
             {
               layoutOptions: config.state,
               id: keyState,
               width: valState.width,
               height: valState.height,
-              ports: Object.entries(dataMeta.sockets)
-                .filter(([_, socket]) =>
-                  socket.state === valState.state && socket.parent === "state"
-                )
-                .map(([keySocket, socket]) => ({
-                  id: keySocket,
-                  x: socket.x! - valState.x!,
-                  y: socket.y! - valState.y!,
-                  width: socket.size,
-                  height: socket.size
-                }))
+              ports:
+
+                Object.entries(dataMeta.sockets)
+                  .filter(([_, socket]) =>
+                    socket.state === valState.state && socket.parent === "state"
+                  )
+                  .map(([keySocket, socket]) => ({
+                    id: keySocket,
+                    labels: [{text: keySocket.split("/")[1]}],
+                    x: socket.x! - valState.x!,
+                    y: socket.y! - valState.y!,
+                    width: socket.size,
+                    height: socket.size
+                  }))
             },
             ...Object.entries(dataMeta.conditions)
               .filter(([_, val]) => val.to === valState.state)
@@ -309,62 +316,77 @@ describe("форматирование", () => {
                   id: key,
                   width: val.width,
                   height: val.height,
-                  children: Object.entries(dataMeta.sockets)
+                  ports: Object.entries(dataMeta.sockets)
                     .filter(([_, socket]) =>
                       socket.state === valState.state && socket.parent === "condition"
                     )
                     .map(([keySocket, socket]) => ({
                       id: keySocket,
+                      labels: [{text: keySocket.split("/")[1]}],
                       layoutOptions: socket.direction === 'west' ? config.port.west : config.port.east,
                       width: socket.size,
                       height: socket.size
                     }))
                 }
               })
+
           ],
-          edges: Object.entries(dataMeta.sockets)
-            .filter(([_, socket]) =>
-              socket.state === valState.state
-              && socket.parent === "condition"
-              && socket.direction === "east"
-            )
-            .map(([key, socketCond]) => {
-              const target = Object.entries(dataMeta.sockets)
-                .find(([_, socketState]) =>
-                  socketState.state === valState.state
-                  && socketState.param === socketCond.param
-                  && socketState.parent === "state"
-                  && socketState.direction === "west"
-                )
-              if (typeof target === 'undefined') return
-              return {
-                id: `${key}->${target[0]}`,
-                sources: [key],
-                targets: [target[0]]
-              }
-            })
+          edges:
+
+            Object.entries(dataMeta.sockets)
+              .filter(([_, socket]) =>
+                socket.state === valState.state
+                && socket.parent === "condition"
+                && socket.direction === "east"
+              )
+              .map(([key, socketCond]) => {
+                const target = Object.entries(dataMeta.sockets)
+                  .find(([_, socketState]) =>
+                    socketState.state === valState.state
+                    && socketState.param === socketCond.param
+                    && socketState.parent === "state"
+                    && socketState.direction === "west"
+                  )
+                if (typeof target === 'undefined') return
+                return {
+                  id: `${key}->${target[0]}`,
+                  sources: [key],
+                  targets: [target[0]]
+                }
+              }) as ElkExtendedEdge[]
         }
       }),
-      edges: Object.entries(dataMeta.sockets)
-        .filter(([_, socket]) =>
-          socket.parent === "state"
-          && socket.direction === "east"
-        )
-        .map(([key, socketCond]) => {
-          const target = Object.entries(dataMeta.sockets)
-            .find(([_, socketState]) =>
-              socketState.param === socketCond.param
-              && socketState.parent === "condition"
-              && socketState.direction === "west"
-            )
-          if (typeof target === 'undefined') return
-          return {
-            id: `${key}->${target[0]}`,
-            sources: [key],
-            targets: [target[0]]
-          }
-        })
+      edges:
+
+        Object.entries(dataMeta.sockets)
+          .filter(([_, socket]) =>
+            socket.parent === "state"
+            && socket.direction === "east"
+          )
+          .map(([key, socketCond]) => {
+            const target = Object.entries(dataMeta.sockets)
+              .find(([_, socketState]) =>
+                socketState.param === socketCond.param
+                && socketState.state !== socketCond.state
+                && socketState.parent === "condition"
+                && socketState.direction === "west"
+              )
+            if (typeof target === 'undefined') return
+            return {
+              id: `${key}->${target[0]}`,
+              sources: [key],
+              targets: [target[0]]
+            }
+          }) as ElkExtendedEdge[]
+
     }
     expect(result).toMatchSnapshot()
+  })
+
+  const elk = new ELK()
+  test("elk layout", async () => {
+  // test.skip("elk layout", async () => {
+    const layout = await elk.layout(result)
+    expect(layout).toMatchSnapshot()
   })
 })

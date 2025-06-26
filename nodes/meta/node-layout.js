@@ -36,7 +36,8 @@ export default MetaFor("node-layout", {development: true})
       },
       condition: {
         "elk.spacing.nodeNode": "0",
-        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]"
+        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+        "portConstraints": "FIXED_SIDE",
       },
       operator: {
         "portConstraints": "FIXED_SIDE",
@@ -85,22 +86,25 @@ export default MetaFor("node-layout", {development: true})
               layoutOptions: core.config.meta,
               id: valState.state,
               children: [
+
                 {
                   layoutOptions: core.config.state,
                   id: keyState,
                   width: valState.width,
                   height: valState.height,
-                  ports: Object.entries(dataMeta.sockets)
-                    .filter(([_, socket]) =>
-                      socket.state === valState.state && socket.parent === "state"
-                    )
-                    .map(([keySocket, socket]) => ({
-                      id: keySocket,
-                      x: /**@type{number}*/(socket.x) - /**@type{number}*/(valState.x),
-                      y: /**@type{number}*/(socket.y) - /**@type{number}*/(valState.y),
-                      width: socket.size,
-                      height: socket.size
-                    }))
+                  ports:
+
+                    Object.entries(dataMeta.sockets)
+                      .filter(([_, socket]) =>
+                        socket.state === valState.state && socket.parent === "state"
+                      )
+                      .map(([keySocket, socket]) => ({
+                        id: keySocket,
+                        x: /**@type{number}*/(socket.x) - /**@type{number}*/(valState.x),
+                        y: /**@type{number}*/(socket.y) - /**@type{number}*/(valState.y),
+                        width: socket.size,
+                        height: socket.size
+                      }))
                 },
                 ...Object.entries(dataMeta.conditions)
                   .filter(([_, val]) => val.to === valState.state)
@@ -110,7 +114,7 @@ export default MetaFor("node-layout", {development: true})
                       id: key,
                       width: val.width,
                       height: val.height,
-                      children: Object.entries(dataMeta.sockets)
+                      ports: Object.entries(dataMeta.sockets)
                         .filter(([_, socket]) =>
                           socket.state === valState.state && socket.parent === "condition"
                         )
@@ -122,8 +126,10 @@ export default MetaFor("node-layout", {development: true})
                         }))
                     }
                   })
+
               ],
               edges:/**@type{import("elkjs").ElkExtendedEdge[]}*/(/**@type{unknown}*/(
+
                 Object.entries(dataMeta.sockets)
                   .filter(([_, socket]) =>
                     socket.state === valState.state
@@ -145,20 +151,23 @@ export default MetaFor("node-layout", {development: true})
                       targets: [target[0]]
                     }
                   })
+
               ))
             }
           }),
           edges:/**@type{import("elkjs").ElkExtendedEdge[]}*/(/**@type{unknown}*/(
+
             Object.entries(dataMeta.sockets)
               .filter(([_, socket]) =>
-                socket.parent === "condition"
+                socket.parent === "state"
                 && socket.direction === "east"
               )
               .map(([key, socketCond]) => {
                 const target = Object.entries(dataMeta.sockets)
                   .find(([_, socketState]) =>
                     socketState.param === socketCond.param
-                    && socketState.parent === "state"
+                    && socketState.state !== socketCond.state
+                    && socketState.parent === "condition"
                     && socketState.direction === "west"
                   )
                 if (typeof target === 'undefined') return
@@ -168,6 +177,7 @@ export default MetaFor("node-layout", {development: true})
                   targets: [target[0]]
                 }
               })
+
           ))
         }
         // @ts-ignore
@@ -177,17 +187,16 @@ export default MetaFor("node-layout", {development: true})
     },
     {
       in: "вычисление",
-      action({core, context}) {
+      action({core, update}) {
         return new Promise(async (resolve, reject) => {
           if (!core.data) {
             return reject()
           }
           const layout = await core.elk.layout(core.data)
-          console.log(layout)
-          sessionStorage.setItem(core.data.id, JSON.stringify(core.data))
+          sessionStorage.setItem(core.data.id, JSON.stringify(layout))
+          update({ready: core.data.id})
           return resolve()
         })
-        // update({ready: context.current, current: null})
       },
       to: [{state: "ожидание", when: {current: null}}]
     }
@@ -258,8 +267,9 @@ export default MetaFor("node-layout", {development: true})
     },
     {
       title: "размеры",
-      filter: ({patch, meta}) => (
-        meta.tag.includes('node-meta')
+      filter: ({patch, meta, context}) => (
+        context.current
+        && meta.tag.includes('node-meta')
         && patch.path === "/context"
         && patch.op === "replace"
         // && Object.hasOwn(patch.value, "x")
@@ -268,10 +278,6 @@ export default MetaFor("node-layout", {development: true})
         && meta.tag !== "node-meta-operator"
       ),
       action({meta, patch, core, update, context}) {
-        if (!context.current) {
-          update({error: `При получении размеров отсутствует current в контексте`})
-          return
-        }
         const entity = core.meta.get(context.current)
         if (!entity) {
           update({error: `При получении размеров в карте данных, отсутствует мета: ${context.current}`})

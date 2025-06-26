@@ -4,6 +4,7 @@ import type {MetaDataMessage} from "./meta.ts"
 
 
 type ReactionActionParam<C extends ContextDefinition, I extends Record<string, unknown>> = {
+  id: string
   patch: PatchMetaFor
   context: ContextData<C>
   meta: MetaDataMessage
@@ -32,7 +33,7 @@ export type Reaction<C extends ContextDefinition, I extends Record<string, unkno
   // path?: string
   // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean
-  action: ({patch, context, update, core}: ReactionActionParam<C, I>) => void
+  action: ({id, patch, context, update, core}: ReactionActionParam<C, I>) => void
 }
 
 // & Partial<MetaDataMessage>
