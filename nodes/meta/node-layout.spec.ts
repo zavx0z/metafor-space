@@ -42,6 +42,7 @@ describe("форматирование", () => {
           "node-meta-socket/1": {
             "state": "начало",
             "parent": "state",
+            "direction": "west",
             "param": "status",
             "size": 12,
             "x": -6,
@@ -50,6 +51,7 @@ describe("форматирование", () => {
           "node-meta-socket/2": {
             "state": "начало",
             "parent": "state",
+            "direction": "east",
             "param": "status",
             "size": 12,
             "x": 192,
@@ -58,6 +60,7 @@ describe("форматирование", () => {
           "node-meta-socket/3": {
             "state": "конец",
             "parent": "state",
+            "direction": "west",
             "param": "status",
             "size": 12,
             "x": -6,
@@ -66,6 +69,7 @@ describe("форматирование", () => {
           "node-meta-socket/4": {
             "state": "конец",
             "parent": "state",
+            "direction": "east",
             "param": "status",
             "size": 12,
             "x": 192,
@@ -74,6 +78,7 @@ describe("форматирование", () => {
           "node-meta-socket/5": {
             "state": "конец",
             "parent": "condition",
+            "direction": "west",
             "param": "status",
             "size": 12,
             "x": -6,
@@ -82,6 +87,7 @@ describe("форматирование", () => {
           "node-meta-socket/6": {
             "state": "конец",
             "parent": "condition",
+            "direction": "east",
             "param": "status",
             "size": 12,
             "x": 127,
@@ -90,6 +96,7 @@ describe("форматирование", () => {
           "node-meta-socket/7": {
             "state": "начало",
             "parent": "condition",
+            "direction": "west",
             "param": "status",
             "size": 12,
             "x": -6,
@@ -98,6 +105,7 @@ describe("форматирование", () => {
           "node-meta-socket/8": {
             "state": "начало",
             "parent": "condition",
+            "direction": "east",
             "param": "status",
             "size": 12,
             "x": 132,
@@ -155,15 +163,19 @@ describe("форматирование", () => {
     port: {
       west: {
         "port.side": "WEST"
+      },
+      east: {
+        "port.side": "EAST"
       }
     }
   }
   const metaName = "test/1"
   const dataMeta = data.get(metaName)!
 
+  const keyState = "node-meta-state/1"
+  const valState = dataMeta.states[keyState]
+
   test("state", () => {
-    const keyState = "node-meta-state/1"
-    const valState = dataMeta.states[keyState]
     const result = {
       layoutOptions: config.meta,
       id: valState.state,
@@ -191,27 +203,27 @@ describe("форматирование", () => {
 
 
   test("conditions", () => {
-    const conds = Object.entries(dataMeta.conditions)
-      .filter(([_, val]) => val.to === "начало")
+    const condition = Object.entries(dataMeta.conditions)
+      .filter(([_, val]) => val.to === valState.state)
       .map(([key, val]) => {
         return {
           layoutOptions: config.condition,
           id: key,
           width: val.width,
           height: val.height,
-          children: [
-            {
-              layoutOptions: config.operator,
-
-              ports: [{
-                layoutOptions: config.port.west,
-                id: key + "/port"
-              }]
-            }
-          ]
+          children: Object.entries(dataMeta.sockets)
+            .filter(([_, socket]) =>
+              socket.state === valState.state && socket.parent === "condition"
+            )
+            .map(([keySocket, socket]) => ({
+              id: keySocket,
+              layoutOptions: socket.direction === 'west' ? config.port.west : config.port.east,
+              width: socket.size,
+              height: socket.size
+            }))
         }
       })
-    expect(conds).toMatchSnapshot()
+    expect(condition).toMatchSnapshot()
   })
 
   test("подготовка данных", () => {
@@ -252,16 +264,16 @@ describe("форматирование", () => {
                   id: key,
                   width: val.width,
                   height: val.height,
-                  children: [
-                    {
-                      layoutOptions: config.operator,
-
-                      ports: [{
-                        layoutOptions: config.port.west,
-                        id: key + "/port"
-                      }]
-                    }
-                  ]
+                  children: Object.entries(dataMeta.sockets)
+                    .filter(([_, socket]) =>
+                      socket.state === valState.state && socket.parent === "condition"
+                    )
+                    .map(([keySocket, socket]) => ({
+                      id: keySocket,
+                      layoutOptions: socket.direction === 'west' ? config.port.west : config.port.east,
+                      width: socket.size,
+                      height: socket.size
+                    }))
                 }
               })
           ],

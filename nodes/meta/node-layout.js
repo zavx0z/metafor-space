@@ -136,7 +136,7 @@ export default MetaFor("node-elk", {development: true})
           entity.sockets[patch.value.id] = {
             state: patch.value.context.state,
             parent: patch.value.context.parent,
-            // direction: patch.value.context.direction,
+            direction: patch.value.context.direction,
             param: patch.value.context.param,
           }
         else if (meta.tag === "node-meta-param")

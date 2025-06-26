@@ -14,7 +14,7 @@ export type DataMetaMap = Map<string, {
     height?: number
   }>
   sockets: Record<string, {
-    // direction: "west" | "east"
+    direction: "west" | "east"
     parent: "state" | "condition"
     state: string
     param: string
