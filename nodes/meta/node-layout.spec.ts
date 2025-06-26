@@ -225,7 +225,28 @@ describe("форматирование", () => {
       })
     expect(condition).toMatchSnapshot()
   })
-
+  test("ребра между conditions -> state", () => {
+    const edges = Object.entries(dataMeta.sockets)
+      .filter(([_, socket]) =>
+        socket.state === valState.state
+        && socket.parent === "condition"
+        && socket.direction === "east"
+      )
+      .map(([key, socketCond]) => {
+        const target = Object.entries(dataMeta.sockets)
+          .find(([_, socketState]) =>
+            socketState.state === valState.state
+            && socketState.param === socketCond.param
+            && socketState.parent === "state"
+            && socketState.direction === "west"
+          )![0]
+        return {
+          sources: [key],
+          targets: [target]
+        }
+      })
+    expect(edges).toMatchSnapshot()
+  })
   test("подготовка данных", () => {
 
 
