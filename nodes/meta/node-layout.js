@@ -13,7 +13,8 @@ export default MetaFor("node-elk", {development: true})
     elk: new ELK(),
     /**@type{import("./node-layout.t").DataMetaMap}*/
     meta: new Map(),
-    data: {},
+    /**@type{import("elkjs").ElkNode|null}*/
+    data: null,
     config: {
       base: {
         "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
@@ -122,48 +123,52 @@ export default MetaFor("node-elk", {development: true})
                     }
                   })
               ],
-              edges: Object.entries(dataMeta.sockets)
-                .filter(([_, socket]) =>
-                  socket.state === valState.state
-                  && socket.parent === "condition"
-                  && socket.direction === "east"
-                )
-                .map(([key, socketCond]) => {
-                  const target = Object.entries(dataMeta.sockets)
-                    .find(([_, socketState]) =>
-                      socketState.state === valState.state
-                      && socketState.param === socketCond.param
-                      && socketState.parent === "state"
-                      && socketState.direction === "west"
-                    )
-                  if (typeof target === 'undefined') return
-                  return {
-                    id: `${key}->${target[0]}`,
-                    sources: [key],
-                    targets: [target[0]]
-                  }
-                })
+              edges:/**@type{import("elkjs").ElkExtendedEdge[]}*/(/**@type{unknown}*/(
+                Object.entries(dataMeta.sockets)
+                  .filter(([_, socket]) =>
+                    socket.state === valState.state
+                    && socket.parent === "condition"
+                    && socket.direction === "east"
+                  )
+                  .map(([key, socketCond]) => {
+                    const target = Object.entries(dataMeta.sockets)
+                      .find(([_, socketState]) =>
+                        socketState.state === valState.state
+                        && socketState.param === socketCond.param
+                        && socketState.parent === "state"
+                        && socketState.direction === "west"
+                      )
+                    if (typeof target === 'undefined') return
+                    return {
+                      id: `${key}->${target[0]}`,
+                      sources: [key],
+                      targets: [target[0]]
+                    }
+                  })
+              ))
             }
           }),
-          edges: Object.entries(dataMeta.sockets)
-            .filter(([_, socket]) =>
-              socket.parent === "condition"
-              && socket.direction === "east"
-            )
-            .map(([key, socketCond]) => {
-              const target = Object.entries(dataMeta.sockets)
-                .find(([_, socketState]) =>
-                  socketState.param === socketCond.param
-                  && socketState.parent === "state"
-                  && socketState.direction === "west"
-                )
-              if (typeof target === 'undefined') return
-              return {
-                id: `${key}->${target[0]}`,
-                sources: [key],
-                targets: [target[0]]
-              }
-            })
+          edges:/**@type{import("elkjs").ElkExtendedEdge[]}*/(/**@type{unknown}*/(
+            Object.entries(dataMeta.sockets)
+              .filter(([_, socket]) =>
+                socket.parent === "condition"
+                && socket.direction === "east"
+              )
+              .map(([key, socketCond]) => {
+                const target = Object.entries(dataMeta.sockets)
+                  .find(([_, socketState]) =>
+                    socketState.param === socketCond.param
+                    && socketState.parent === "state"
+                    && socketState.direction === "west"
+                  )
+                if (typeof target === 'undefined') return
+                return {
+                  id: `${key}->${target[0]}`,
+                  sources: [key],
+                  targets: [target[0]]
+                }
+              })
+          ))
         }
         update({current: null})
       },
@@ -172,9 +177,13 @@ export default MetaFor("node-elk", {development: true})
     {
       in: "вычисление",
       action({core, context}) {
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve, reject) => {
+          if (!core.data) {
+            return reject()
+          }
           const layout = await core.elk.layout(core.data)
           console.log(layout)
+          return resolve()
         })
         // update({ready: context.current, current: null})
       },
