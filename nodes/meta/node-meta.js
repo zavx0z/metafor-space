@@ -5,32 +5,47 @@ import "./node-meta-transition.js"
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .context(t => ({
     id: t.string({title: "ID meta"}),
+    width: t.number({default: 4444}),
+    height: t.number({default: 4444}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
-  .states("init", "ready")
-  .transitions("init", [
+  .states("рендер", "изменение размера")
+  .transitions("рендер", [
     {
-      in: "init",
+      in: "рендер",
       to: [{
-        state: "ready", when: {error: null}
+        state: "изменение размера", when: {width: {isNull: false}, height: {isNull: false}}
       }]
     },
     {
-      in: "ready",
-      action({element}) {
-
-
+      in: "изменение размера",
+      action({element, context, update}) {
+        setTimeout(()=>update({width: 100}), 2000)
+        // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
       },
       to: []
     }
   ])
   .reactions([
     {
-      title: "meta-источник",
-      filter: ({meta, context}) => `${meta.tag}/${meta.index}` === context.id,
-      action: () => {
-        // console.log("Node reaction", meta, patch)
+      title: "вычисленное положение",
+      filter: ({meta, patch}) => meta.tag === "node-layout"
+        && patch.path === "/state"
+        && patch.value === "ожидание"
+      ,
+      action({context, update}) {
+        const data = sessionStorage.getItem(context.id)
+        if (!data) {
+          update({error: "Нет данных разметки"})
+          return
+        }
+        /**@type{import("elkjs").ElkNode}*/
+        const layout = JSON.parse(data)
+        console.log(layout)
+        // const layoutState = layout.children?.find(i => i.id === context.state)
+        // @ts-ignore
+        update({width: layout.width, height: layout.height})
       }
     }
   ])
@@ -53,10 +68,14 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
         <slot name="conditions"></slot>
         <slot name="state"></slot>
       </section>
+      <style>
+        :host {
+          width: ${context.width}px;
+          height: ${context.height}px;
+        }
+      </style>
     `,
     style: ({css}) => {
-      const width = "444px"
-      const height = "444px"
       const borderRadius = "7px"
       return css`
         :host {
@@ -71,7 +90,6 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           will-change: transform;
           box-sizing: border-box;
           border-radius: ${borderRadius};
-
           opacity: 0;
           transition: opacity 1s ease-in-out;
         }
@@ -80,7 +98,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           --background-color: rgba(var(--surface-900) / var(--background-alpha));
         }
 
-        :host([data-state="ready"]) {
+        :host([data-state="изменение размера"]) {
           opacity: 1;
         }
 
@@ -144,8 +162,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           display: flex;
           position: relative;
           background-color: var(--background-color);
-          width: ${width};
-          height: ${height};
+          width: 100%;
+          height: 100%;
           border-bottom-right-radius: inherit;
           border-bottom-left-radius: inherit;
         }

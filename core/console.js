@@ -2,8 +2,9 @@ const config = {
   collapseAll: true,
   /**@type{Array<string>}*/
   tag: [
-    "node-meta-state",
-    "node-layout"
+    "node-meta"
+    // "node-meta-state",
+    // "node-layout"
   ],
   patch: [
     "add",

@@ -1,7 +1,7 @@
 import {AttributePart, html, render} from "../../html.js"
 import {directive} from "../../directive.js"
 import {styleMap} from "../../directives/style-map.js"
-// import {styleMap} from "../../metafor/directives/style-map.ts"
+// import {styleMap} from "../../metafor/directives/style-map.js"
 
 import {beforeEach, describe, expect, test} from "bun:test"
 import type {StyleInfo} from "../../directive.ts"
@@ -111,7 +111,7 @@ describe("styleMap", () => {
     expect(el.style.zIndex).toBe("1")
   })
 
-  test.skip("удаляет свойства", () => {
+  test("удаляет свойства", () => {
     renderStyleMap({
       cssInfo: {
         marginTop: "2px",
@@ -132,7 +132,7 @@ describe("styleMap", () => {
     expect(el.style.borderColor).toBe("")
   })
 
-  test.skip("работает со статическими свойствами", () => {
+  test("работает со статическими свойствами", () => {
     renderStyleMapStatic({marginTop: "2px", "padding-bottom": "4px"})
     const el = container.firstElementChild as HTMLElement
     expect(el.style.height).toBe("1px")
@@ -186,7 +186,7 @@ describe("styleMap", () => {
     expect(el.style.paddingBottom).toBe("8px")
   })
 
-  test.skip("работает когда один и тот же объект добавляет и удаляет свойства", () => {
+  test("работает когда один и тот же объект добавляет и удаляет свойства", () => {
     const styleInfo: StyleInfo = {marginTop: "2px", "padding-bottom": "4px"}
 
     renderStyleMap({cssInfo: styleInfo})

@@ -1,54 +1,74 @@
-import {type AttributePart, noChange} from '../html.js'
-import {directive, PartType,} from '../directive.js'
-import type {DirectiveParameters, PartInfo, StyleInfo} from "../directive.ts"
-import {Directive} from "../directive.t.ts";
+import {AttributePart, noChange} from '../html.js'
+import {directive, PartType, Directive} from '../directive.js'
 
+/**
+ * Константа для обозначения важности стиля
+ * @type {string}
+ */
 const important = 'important'
-// Ведущий пробел важен
+
+/**
+ * Строка флага !important с ведущим пробелом
+ * @type {string}
+ */
 const importantFlag = ' !' + important
-// Сколько символов удалить из значения (отрицательное число)
+
+/**
+ * Количество символов для удаления при обработке флага
+ * @type {number}
+ */
 const flagTrim = 0 - importantFlag.length
 
+/**
+ * Директива для применения CSS-стилей к элементу
+ * @extends {Directive}
+ */
 class StyleMapDirective extends Directive {
-  private _previousStyleProperties?: Set<string>
+  /**
+   * @type {Set<string>|undefined}
+   * @private
+   */
+  _previousStyleProperties = undefined
 
-  constructor(partInfo: PartInfo) {
+  /**
+   * @param {import("../directive").PartInfo} partInfo
+   */
+  constructor(partInfo) {
     super(partInfo)
     if (
       partInfo.type !== PartType.ATTRIBUTE ||
-      // @ts-ignore
       partInfo.name !== 'style' ||
-      // @ts-ignore
-      (partInfo.strings?.length as number) > 2
+      (partInfo.strings?.length ?? 0) > 2
     ) {
-      throw new Error('Директива `styleMap` должна использоваться в атрибуте `style` и должна быть единственной частью в атрибуте.')
+      throw new Error(
+        'Директива `styleMap` должна использоваться в атрибуте `style` и быть единственной частью'
+      )
     }
   }
 
-  render(styleInfo: Readonly<StyleInfo>) {
+  /**
+   * @param {{[key: string]: any}} styleInfo
+   * @return {string}
+   */
+  render(styleInfo) {
     return Object.keys(styleInfo).reduce((style, prop) => {
       const value = styleInfo[prop]
-      if (value == null) {
-        return style
-      }
-      // Преобразование имен свойств из camel-case в dash-case, например:
-      //  `backgroundColor` -> `background-color`
-      // Имена с вендорными префиксами требуют дополнительный `-` в начале:
-      //  `webkitAppearance` -> `-webkit-appearance`
-      // Исключением являются имена свойств, содержащие дефис, включая
-      // пользовательские свойства; мы предполагаем, что они уже в формате dash-case:
-      //  `--my-button-color` --> `--my-button-color`
-      prop = prop.includes('-')
+      if (value == null) return style
+      const processedProp = prop.includes('-')
         ? prop
-        : prop
-          .replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, '-$&')
-          .toLowerCase()
-      return style + `${prop}:${value};`
+        : prop.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, '-$&').toLowerCase()
+      return style + `${processedProp}:${value};`
     }, '')
   }
 
-  override update(part: AttributePart, [styleInfo]: DirectiveParameters<this>) {
-    const {style} = part.element as HTMLElement
+  /**
+   * @param {import('../html.js').AttributePart} part
+   * @param {[{[key: string]: any}]} params
+   * @return {string|symbol}
+   */
+  update(part, [styleInfo]) {
+    const element = /** @type {HTMLElement} */ (part.element)
+    const style = element.style
 
     if (this._previousStyleProperties === undefined) {
       this._previousStyleProperties = new Set(Object.keys(styleInfo))
@@ -56,12 +76,11 @@ class StyleMapDirective extends Directive {
     }
 
     // Удаляем старые свойства, которых больше нет в styleInfo
-    for (const name of this._previousStyleProperties) {
-      // Если имя отсутствует в styleInfo или его значение null/undefined
+    for (const name of Array.from(this._previousStyleProperties)) {
       if (styleInfo[name] == null) {
-        this._previousStyleProperties!.delete(name)
+        this._previousStyleProperties.delete(name)
         if (name.includes('-')) style.removeProperty(name)
-        else (style as any)[name] = null
+        else /** @type {any} */ (style)[name] = ""
       }
     }
 
@@ -72,16 +91,17 @@ class StyleMapDirective extends Directive {
         this._previousStyleProperties.add(name)
         const isImportant = typeof value === 'string' && value.endsWith(importantFlag)
         if (name.includes('-') || isImportant) {
-          style.setProperty(
-            name,
-            isImportant
-              ? (value as string).slice(0, flagTrim)
-              : (value as string),
-            isImportant ? important : ''
-          )
-        } else (style as any)[name] = value
+          const cleanValue = isImportant
+            ? /** @type {string} */ (value).slice(0, flagTrim)
+            : /** @type {string} */ (value)
+          const priority = isImportant ? important : ''
+          style.setProperty(name, cleanValue, priority)
+        } else {
+          /** @type {any} */ (style)[name] = value
+        }
       }
     }
+
     return noChange
   }
 }
