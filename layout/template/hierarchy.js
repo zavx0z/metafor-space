@@ -69,7 +69,13 @@ function createTriggers(state, snapshot, metrics) {
         const [width, height] = metrics.triggers.sizes[id]
 
         if (!triggers.get(param))
-          triggers.set(param, {id, layoutOptions: config.trigger, children: [], width: width, height: height})
+          triggers.set(param, {
+            id,
+            layoutOptions: config.trigger,
+            children: [],
+            width: width,
+            height: height
+          })
         const trigger = triggers.get(param)
 
         trigger.children.push({
@@ -79,13 +85,7 @@ function createTriggers(state, snapshot, metrics) {
           height: metrics.triggers.portSpacing,
           ports: [{
             layoutOptions: config.port.west,
-            id: conditionPortId({
-              meta: snapshot.id,
-              from: collapse.in,
-              to: target.state,
-              condition: param,
-              direction: 'west'
-            })
+            id: conditionPortId({meta: snapshot.id, from: collapse.in, to: target.state, condition: param, direction: 'west'})
           }]
         })
       }
