@@ -50,20 +50,25 @@ export default MetaFor("nodes-meta", {
           }} class="backdrop"
           >
             ${snapshot.states.map(i => html`
-              <metafor-node-meta-context slot="state" context=${{
+              <metafor-node-meta-state slot="state" ${{
                 id: snapshot.id,
                 state: i
               }}>
-                ${Object.keys(snapshot.types).map(key => html`
-                  <metafor-node-meta-param context=${{
-                    id: snapshot.id,
-                    state: i,
-                    param: key,
-                    title: snapshot.types[key].title,
-                    value: snapshot.context[key]
-                  }}></metafor-node-meta-param>
-                `)}
-              </metafor-node-meta-context>
+                <metafor-node-meta-context context=${{
+                  id: snapshot.id,
+                  state: i
+                }}>
+                  ${Object.keys(snapshot.types).map(key => html`
+                    <metafor-node-meta-param context=${{
+                      id: snapshot.id,
+                      state: i,
+                      param: key,
+                      title: snapshot.types[key].title,
+                      value: snapshot.context[key]
+                    }}></metafor-node-meta-param>
+                  `)}
+                </metafor-node-meta-context>
+              </metafor-node-meta-state>
             `)}
             ${snapshot.transitions.map((transition) => transition.to.map(condition =>
               Object.entries(condition.when).map(([key, value]) => {
@@ -119,7 +124,6 @@ export default MetaFor("nodes-meta", {
   .reactions([])
   .view({
     render: ({html}) => html`
-      <slot name="meta"/>
       <slot></slot>
     `,
     style: ({css}) => css`
