@@ -60,7 +60,7 @@ export default MetaFor("node-meta-condition", {development: true})
         const layoutCondition = layoutState?.children?.find(i => i.id === id)
 
         // @ts-ignore
-        update({x: layoutState?.x + layoutCondition?.x, y: layoutState?.y + layoutCondition?.y})
+        update({x: layoutCondition?.x, y: layoutCondition?.y})
         // console.log(layoutCondition)
       }
     }
@@ -95,13 +95,13 @@ export default MetaFor("node-meta-condition", {development: true})
       :host {
         background-color: rgba(var(--surface-400));
         padding: 4px 8px;
-        position: relative;
+        position: fixed;
         display: flex;
         border-radius: 8px;
         flex-direction: row;
         align-items: center;
         gap: 2px;
-        width: fit-content;
+        min-width: max-content;
         height: fit-content;
       }
 

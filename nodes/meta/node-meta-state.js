@@ -29,28 +29,27 @@ export default MetaFor("node-meta-state", {development: true})
     },
   ])
   .reactions([
-    // {
-    //   title: "вычисленное положение",
-    //   filter: ({meta, patch}) => meta.tag === "node-layout"
-    //     && patch.path === "/state"
-    //     && patch.value === "ожидание"
-    //   ,
-    //   action({id, context, update}) {
-    //     const data = sessionStorage.getItem(context.id)
-    //     if (!data) {
-    //       update({error: "Нет данных разметки"})
-    //       return
-    //     }
-    //     /**@type{import("elkjs").ElkNode}*/
-    //     const layout = JSON.parse(data)
-    //     const layoutState = layout.children?.find(i => i.id === context.to)
-    //     const layoutCondition = layoutState?.children?.find(i => i.id === id)
-    //
-    //     // @ts-ignore
-    //     update({x: layoutState?.x + layoutCondition?.x, y: layoutState?.y + layoutCondition?.y})
-    //     // console.log(layoutCondition)
-    //   }
-    // }
+    {
+      title: "вычисленное положение",
+      filter: ({meta, patch}) => meta.tag === "node-layout"
+        && patch.path === "/state"
+        && patch.value === "ожидание"
+      ,
+      action({id, context, update}) {
+        const data = sessionStorage.getItem(context.id)
+        if (!data) {
+          update({error: "Нет данных разметки"})
+          return
+        }
+        /**@type{import("elkjs").ElkNode}*/
+        const layout = JSON.parse(data)
+        const layoutState = layout.children?.find(i => i.id === context.state)
+
+        // @ts-ignore
+        update({x: layoutState?.x, y: layoutState?.y})
+        // console.log(layoutCondition)
+      }
+    }
   ])
   .view({
     render: ({html}) => html`

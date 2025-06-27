@@ -72,7 +72,7 @@ export default MetaFor('node-meta-context', {
         const layoutContext = layoutState?.children?.find(i => i.id === id)
         console.log(layoutContext)
         // @ts-ignore
-        update({x: layoutState.x + layoutContext.x, y: layoutState.y + layoutState.y})
+        update({x: layoutContext.x, y:  layoutState.y})
       }
     }
   ])
@@ -94,9 +94,10 @@ export default MetaFor('node-meta-context', {
       :host {
         --background-color: rgba(var(--surface-600) / var(--background-alpha));
 
-        position: relative;
+        position: fixed;
         display: flex;
         flex-direction: column;
+        min-width: max-content;
         border-radius: var(--node-border-radius);
         transition: box-shadow 0.3s ease-in-out;
         box-sizing: border-box;

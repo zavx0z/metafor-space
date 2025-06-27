@@ -149,6 +149,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           background-color: var(--background-color);
           border-bottom-right-radius: inherit;
           border-bottom-left-radius: inherit;
+          width: 100%;
+          height: 100%;
         }
 
         svg.connections path {

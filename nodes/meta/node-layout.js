@@ -222,7 +222,7 @@ export default MetaFor("node-layout", {development: true})
       ),
       action({patch, update}) {
         const meta = patch.value.nodes[patch.value.nodes.length - 1]
-        // update({current: meta})
+        update({current: meta})
       }
     },
     {
@@ -232,8 +232,7 @@ export default MetaFor("node-layout", {development: true})
         && meta.tag.includes('node-meta')
         && patch.path === "/"
         && patch.op === "add"
-        && meta.tag !== "node-meta"
-        && meta.tag !== "node-meta-operator"
+        && !["node-meta", "node-meta-state", "node-meta-operator"].includes(meta.tag)
       ),
       action({meta, patch, core, update, context}) {
         const entity = core.meta.get(patch.value.context.id)
@@ -276,8 +275,7 @@ export default MetaFor("node-layout", {development: true})
         && patch.op === "replace"
         // && Object.hasOwn(patch.value, "x")
         // && Object.hasOwn(patch.value, "y")
-        && meta.tag !== "node-meta"
-        && meta.tag !== "node-meta-operator"
+        && !["node-meta", "node-meta-state", "node-meta-operator"].includes(meta.tag)
       ),
       action({meta, patch, core, update, context}) {
         const entity = core.meta.get(context.current)
