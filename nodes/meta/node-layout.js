@@ -240,7 +240,7 @@ export default MetaFor("node-layout", {development: true})
           console.error(meta, patch)
           return
         }
-        if (meta.tag === "node-meta-state")
+        if (meta.tag === "node-meta-context")
           entity.states[patch.value.id] = {
             state: patch.value.context.state
           }
@@ -285,7 +285,7 @@ export default MetaFor("node-layout", {development: true})
           return
         }
         const id = `${meta.tag}/${meta.index}`
-        if (meta.tag === "node-meta-state") {
+        if (meta.tag === "node-meta-context") {
           entity.states[id]["width"] = patch.value.width
           entity.states[id]["height"] = patch.value.height
           entity.states[id]["x"] = patch.value.x

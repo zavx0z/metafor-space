@@ -1,8 +1,8 @@
 import {MetaFor} from "../../metafor.js"
 import "./node-meta-param.js"
 
-export default MetaFor('node-meta-state', {
-  description: "Нода состояния meta",
+export default MetaFor('node-meta-context', {
+  description: "Контекст",
   development: true
 })
   .context(t => ({
@@ -15,9 +15,9 @@ export default MetaFor('node-meta-state', {
     y: t.number({nullable: true}),
   }))
   .core(() => ({
-    /**@type{import("./node-meta-state.t").Params}*/
+    /**@type{import("./node-meta-context.t.js").Params}*/
     params: new Map(),
-    /**@type{import("./node-meta-state.t").Sockets}*/
+    /**@type{import("./node-meta-context.t.js").Sockets}*/
     sockets: new Map(),
     count: 0
   }))

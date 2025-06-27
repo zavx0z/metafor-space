@@ -1,5 +1,5 @@
 import {MetaFor} from "../../metafor.js"
-import "./node-meta-state.js"
+import "./node-meta-context.js"
 import "./node-meta-transition.js"
 
 export default MetaFor("node-meta", {development: true, description: "Node"})

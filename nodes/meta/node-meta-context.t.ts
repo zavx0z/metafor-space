@@ -1,4 +1,4 @@
-import meta from "./node-meta-state.js"
+import meta from "./node-meta-context.js"
 import type NodeMetaParam from "./node-meta-param"
 import type NodeMetaSocket from "./node-meta-socket"
 
@@ -6,7 +6,7 @@ const snapshot = meta.snapshot()
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-node-meta-state': Meta<typeof snapshot.state, typeof snapshot.types>
+    'metafor-node-meta-context': Meta<typeof snapshot.state, typeof snapshot.types>
   }
 }
 export type Params = Map<typeof NodeMetaParam['id'], {
