@@ -1,5 +1,4 @@
 import {MetaFor} from "../../metafor.js"
-import "./node-meta-condition.js"
 
 export default MetaFor("node-meta-transition")
   .context(t => ({

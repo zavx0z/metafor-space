@@ -1,9 +1,11 @@
+import {html, render} from "../../html/html.js"
 import {MetaFor} from "../../metafor.js"
 import "./node-meta.js"
 import "./node-meta-state.js"
-import "./node-layout.js"
-import {html, render} from "../../html/html.js"
-
+import "./node-meta-context.js"
+import "./node-meta-param.js"
+import "./node-meta-condition.js"
+import "./node-meta-operator.js"
 
 export default MetaFor("nodes-meta", {
   description: "No-code система визуализации и построения системы взаимодействия мета-компонентов.",
@@ -48,7 +50,7 @@ export default MetaFor("nodes-meta", {
           }} class="backdrop"
           >
             ${snapshot.states.map(i => html`
-              <metafor-node-meta-context slot="context" context=${{
+              <metafor-node-meta-context slot="state" context=${{
                 id: snapshot.id,
                 state: i
               }}>

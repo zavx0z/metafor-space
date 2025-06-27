@@ -11,27 +11,17 @@ export default MetaFor("node-meta-state", {development: true})
     y: t.number({nullable: true}),
   }))
   .core(() => ({}))
-  .states("рендер", "измерение", "позиционирование")
+  .states("рендер", "изменение размера", "перемещение")
   .transitions('рендер', [
     {
       in: "рендер",
       action({element}) {
 
       },
-      to: [{state: "измерение", when: {error: null}}]
+      to: [{state: "перемещение", when: {x: {isNull: false}, y: {isNull: false}}}]
     },
     {
-      in: "измерение",
-      action({element, update}) {
-        requestAnimationFrame(() => {
-          const {width, height} = element.getBoundingClientRect()
-          update({width: Math.round(width), height: Math.round(height)})
-        })
-      },
-      to: [{state: "позиционирование", when: {x: {isNull: false}, y: {isNull: false}}}]
-    },
-    {
-      in: "позиционирование",
+      in: "перемещение",
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
@@ -68,13 +58,12 @@ export default MetaFor("node-meta-state", {development: true})
     `,
     style: ({css}) => css`
       :host {
+        width: 4444px;
+        height: 4444px;
         position: relative;
         display: flex;
-        border-radius: 8px;
         flex-direction: row;
         align-items: center;
-        gap: 2px;
-        width: auto;
       }
     `
   })

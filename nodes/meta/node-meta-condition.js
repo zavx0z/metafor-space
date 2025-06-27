@@ -1,5 +1,4 @@
 import {MetaFor} from "../../metafor.js"
-import "./node-meta-operator.js"
 import "./node-meta-socket.js"
 
 export default MetaFor("node-meta-condition", {development: true})

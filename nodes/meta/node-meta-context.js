@@ -1,5 +1,4 @@
 import {MetaFor} from "../../metafor.js"
-import "./node-meta-param.js"
 
 export default MetaFor('node-meta-context', {
   description: "Контекст",

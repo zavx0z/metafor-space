@@ -1,5 +1,6 @@
 import ELK from "elkjs"
 import {MetaFor} from "../../metafor.js"
+import "./nodes-meta.js"
 
 export default MetaFor("node-layout", {development: true})
   .context(t => ({
