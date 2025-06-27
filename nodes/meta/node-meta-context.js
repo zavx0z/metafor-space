@@ -94,7 +94,7 @@ export default MetaFor('node-meta-context', {
       :host {
         --background-color: rgba(var(--surface-600) / var(--background-alpha));
 
-        position: absolute;
+        position: relative;
         display: flex;
         flex-direction: column;
         border-radius: var(--node-border-radius);

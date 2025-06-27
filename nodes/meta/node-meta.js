@@ -62,8 +62,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       </header>
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
-        <slot name="conditions"></slot>
-        <slot name="state"></slot>
+        <slot></slot>
       </section>
     `,
     style: ({css}) => {
@@ -72,17 +71,14 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
         :host([data-state="позиционирование"]) {
           opacity: 1;
         }
-        
+
         :host {
           --font-color: rgb(var(--surface-50));
           --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
 
-          width: 4444px;
-          height: 4444px;
-          position: absolute;
+          position: fixed;
           display: flex;
           flex-direction: column;
-          min-width: fit-content;
           user-select: none;
           will-change: transform;
           box-sizing: border-box;
@@ -151,8 +147,6 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           display: flex;
           position: relative;
           background-color: var(--background-color);
-          width: 100%;
-          height: 100%;
           border-bottom-right-radius: inherit;
           border-bottom-left-radius: inherit;
         }

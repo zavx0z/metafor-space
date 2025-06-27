@@ -95,13 +95,14 @@ export default MetaFor("node-meta-condition", {development: true})
       :host {
         background-color: rgba(var(--surface-400));
         padding: 4px 8px;
-        position: absolute;
+        position: relative;
         display: flex;
         border-radius: 8px;
         flex-direction: row;
         align-items: center;
         gap: 2px;
-        width: auto;
+        width: fit-content;
+        height: fit-content;
       }
 
       :host(:before) {

@@ -58,12 +58,8 @@ export default MetaFor("node-meta-state", {development: true})
     `,
     style: ({css}) => css`
       :host {
-        width: 444px;
-        height: 444px;
         position: relative;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
+        height: fit-content;
       }
     `
   })
