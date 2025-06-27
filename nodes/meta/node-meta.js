@@ -65,12 +65,16 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
       <section class="content" data-drag-selector="graph-atom">
         <atom-svg></atom-svg>
         <slot name="conditions"></slot>
-        <slot name="state"></slot>
+        <slot name="context"></slot>
       </section>
     `,
     style: ({css}) => {
       const borderRadius = "7px"
       return css`
+        :host([data-state="позиционирование"]) {
+          opacity: 1;
+        }
+        
         :host {
           --font-color: rgb(var(--surface-50));
           --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
@@ -85,12 +89,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           will-change: transform;
           box-sizing: border-box;
           border-radius: ${borderRadius};
-          opacity: 0;
-          transition: opacity 1s ease-in-out;
-        }
-
-        :host([data-state="позиционирование"]) {
           opacity: 1;
+          transition: opacity 1s ease-in-out;
         }
 
         header {

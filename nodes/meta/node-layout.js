@@ -221,13 +221,14 @@ export default MetaFor("node-layout", {development: true})
       ),
       action({patch, update}) {
         const meta = patch.value.nodes[patch.value.nodes.length - 1]
-        update({current: meta})
+        // update({current: meta})
       }
     },
     {
       title: "элементы",
-      filter: ({patch, meta}) => (
-        meta.tag.includes('node-meta')
+      filter: ({patch, meta, context}) => (
+        context.current
+        && meta.tag.includes('node-meta')
         && patch.path === "/"
         && patch.op === "add"
         && meta.tag !== "node-meta"
@@ -308,8 +309,9 @@ export default MetaFor("node-layout", {development: true})
     },
     {
       title: "конец создания meta",
-      filter: ({patch, meta}) => (
-        meta.tag === "nodes-meta"
+      filter: ({patch, meta, context}) => (
+        context.current
+        && meta.tag === "nodes-meta"
         && patch.path === '/context'
         // && patch.op === 'remove'
         && patch.op === 'replace'

@@ -1,5 +1,6 @@
 import {MetaFor} from "../../metafor.js"
 import "./node-meta.js"
+import "./node-meta-state.js"
 import "./node-layout.js"
 import {html, render} from "../../html/html.js"
 
@@ -47,7 +48,7 @@ export default MetaFor("nodes-meta", {
           }} class="backdrop"
           >
             ${snapshot.states.map(i => html`
-              <metafor-node-meta-context slot="state" context=${{
+              <metafor-node-meta-context slot="context" context=${{
                 id: snapshot.id,
                 state: i
               }}>
