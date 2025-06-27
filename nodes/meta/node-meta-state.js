@@ -21,7 +21,7 @@ export default MetaFor('node-meta-state', {
     sockets: new Map(),
     count: 0
   }))
-  .states("рендер", "измерение", "установка положения")
+  .states("рендер", "измерение", "позиционирование")
   .transitions("рендер", [
     {
       in: "рендер",
@@ -41,13 +41,13 @@ export default MetaFor('node-meta-state', {
         })
       },
       to: [{
-        state: "установка положения", when: {
+        state: "позиционирование", when: {
           x: {isNull: false}, y: {isNull: false}
         }
       }]
     },
     {
-      in: "установка положения",
+      in: "позиционирование",
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
@@ -61,7 +61,7 @@ export default MetaFor('node-meta-state', {
         && patch.path === "/state"
         && patch.value === "ожидание"
       ,
-      action({context, update}) {
+      action({id, context, update}) {
         const data = sessionStorage.getItem(context.id)
         if (!data) {
           update({error: "Нет данных разметки"})
@@ -70,8 +70,10 @@ export default MetaFor('node-meta-state', {
         /**@type{import("elkjs").ElkNode}*/
         const layout = JSON.parse(data)
         const layoutState = layout.children?.find(i => i.id === context.state)
+        const layoutContext = layoutState?.children?.find(i => i.id === id)
+        console.log(layoutContext)
         // @ts-ignore
-        update({x: layoutState.x, y: layoutState.y})
+        update({x: layoutState.x + layoutContext.x, y: layoutState.y + layoutState.y})
       }
     }
   ])

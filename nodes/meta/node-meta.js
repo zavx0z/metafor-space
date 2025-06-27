@@ -5,24 +5,23 @@ import "./node-meta-transition.js"
 export default MetaFor("node-meta", {development: true, description: "Node"})
   .context(t => ({
     id: t.string({title: "ID meta"}),
-    width: t.number({default: 4444}),
-    height: t.number({default: 4444}),
+    width: t.number({nullable: true}),
+    height: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core(() => ({}))
-  .states("рендер", "изменение размера")
+  .states("рендер", "позиционирование")
   .transitions("рендер", [
     {
       in: "рендер",
       to: [{
-        state: "изменение размера", when: {width: {isNull: false}, height: {isNull: false}}
+        state: "позиционирование", when: {width: {isNull: false}, height: {isNull: false}}
       }]
     },
     {
-      in: "изменение размера",
+      in: "позиционирование",
       action({element, context, update}) {
-        setTimeout(()=>update({width: 100}), 2000)
-        // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
       },
       to: []
     }
@@ -68,12 +67,6 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
         <slot name="conditions"></slot>
         <slot name="state"></slot>
       </section>
-      <style>
-        :host {
-          width: ${context.width}px;
-          height: ${context.height}px;
-        }
-      </style>
     `,
     style: ({css}) => {
       const borderRadius = "7px"
@@ -82,6 +75,8 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           --font-color: rgb(var(--surface-50));
           --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
 
+          width: 4444px;
+          height: 4444px;
           position: absolute;
           display: flex;
           flex-direction: column;
@@ -94,11 +89,7 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           transition: opacity 1s ease-in-out;
         }
 
-        :host(.theme-dark) {
-          --background-color: rgba(var(--surface-900) / var(--background-alpha));
-        }
-
-        :host([data-state="изменение размера"]) {
+        :host([data-state="позиционирование"]) {
           opacity: 1;
         }
 

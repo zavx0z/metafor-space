@@ -15,7 +15,7 @@ export default MetaFor("node-meta-condition", {development: true})
     y: t.number({nullable: true}),
   }))
   .core(() => ({}))
-  .states("рендер", "измерение", "установка положения")
+  .states("рендер", "измерение", "позиционирование")
   .transitions('рендер', [
     {
       in: "рендер",
@@ -32,10 +32,10 @@ export default MetaFor("node-meta-condition", {development: true})
           update({width: Math.round(width), height: Math.round(height)})
         })
       },
-      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+      to: [{state: "позиционирование", when: {x: {isNull: false}, y: {isNull: false}}}]
     },
     {
-      in: "установка положения",
+      in: "позиционирование",
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
@@ -61,8 +61,8 @@ export default MetaFor("node-meta-condition", {development: true})
         const layoutCondition = layoutState?.children?.find(i => i.id === id)
 
         // @ts-ignore
-        update({x: layoutCondition.x, y: layoutCondition.y})
-        console.log(layoutCondition)
+        update({x: layoutState?.x + layoutCondition?.x, y: layoutState?.y + layoutCondition?.y})
+        // console.log(layoutCondition)
       }
     }
   ])
