@@ -72,11 +72,9 @@
     "test:transitions:lock": "bun test tests/transitions.lock.spec.ts",
     "test:update": "bun test tests/update.spec.ts",
     "test:view": "bun test tests/view.spec.ts",
-
     "test:serialize": "bun test tests/serialize.spec.ts",
     "test:dev": "bun test tests/dev.spec.ts",
     "test:extract": "bun test tests/extract.spec.ts",
-
     "test:html": "bun test ./html",
     "test:html[watch]": "bun test tests/html --watch",
     "test:html:marker": "bun test tests/html/marker.spec.ts",
@@ -151,8 +149,11 @@
     "test:directives:async-append": "bun test tests/directives/async-append.spec.ts",
     "test:directives:async-append[debug]": "bun test tests/directives/async-append.spec.ts --inspect-brk",
     "test:directives:async-append[watch]": "bun test tests/directives/async-append.spec.ts --watch",
-
     "test:node-meta-transition": "bun test nodes/meta/node-meta-transition.spec.ts",
     "test:node-layout": "bun test nodes/meta/node-layout.spec.ts"
+  },
+  "dependencies": {
+    "@types/three": "^0.177.0",
+    "three": "^0.177.0"
   }
 }

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaFor Virtual Office</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      overflow: hidden;
+    }
+    
+    #office-container {
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    #ui-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+    
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+    }
+    
+    button {
+      background: #00d4ff;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="office-container"></div>
+  
+  <div id="ui-overlay">
+    <h1>Virtual Office</h1>
+    <p>Виртуальный офис MetaFor</p>
+    <p>Размер: 8м × 6м × 3м</p>
+  </div>
+  
+  <div id="controls">
+    <button onclick="addWorkstation()">Добавить стол</button>
+    <button onclick="toggleLighting()">Освещение</button>
+    <button onclick="toggleDay()">День/Ночь</button>
+  </div>
+
+  <script>
+    // Создадим простой виртуальный офис
+    console.log('Загружаем виртуальный офис...')
+  </script>
+</body>
+</html> 

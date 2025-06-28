@@ -126,6 +126,23 @@ class BaseThreePart {
       }
     }
 
+    // Специальная обработка Vector3 свойств (position, rotation, scale)
+    if (['position', 'rotation', 'scale'].includes(key) && this._object[key]) {
+      if (Array.isArray(value)) {
+        // Если передан массив [x, y, z]
+        this._object[key].set(...value)
+      } else if (value && typeof value === 'object' && ('x' in value || 'y' in value || 'z' in value)) {
+        // Если передан объект {x, y, z}
+        if ('x' in value) this._object[key].x = value.x
+        if ('y' in value) this._object[key].y = value.y
+        if ('z' in value) this._object[key].z = value.z
+      } else if (value && value.isVector3) {
+        // Если передан Vector3
+        this._object[key].copy(value)
+      }
+      return
+    }
+
     // Обработка методов set (setX, setY, etc.)
     const setterName = `set${key.charAt(0).toUpperCase()}${key.slice(1)}`
     if (typeof this._object[setterName] === 'function') {

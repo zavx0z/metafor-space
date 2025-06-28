@@ -112,6 +112,27 @@ const server = Bun.serve({
             })
         }
         
+        // Обработка node_modules - для локальных библиотек
+        if (url.pathname.startsWith("/node_modules/")) {
+            const modulePath = join(PROJECT_DIR, url.pathname.slice(1))
+            const file = Bun.file(modulePath)
+            
+            if (await file.exists()) {
+                let contentType = "application/javascript"
+                if (url.pathname.endsWith(".json")) contentType = "application/json"
+                else if (url.pathname.endsWith(".css")) contentType = "text/css"
+                else if (url.pathname.endsWith(".wasm")) contentType = "application/wasm"
+                
+                return new Response(file, {
+                    headers: { 
+                        "content-type": contentType,
+                        "Access-Control-Allow-Origin": "*",
+                        "Cache-Control": "public, max-age=31536000" // кэшируем модули на год
+                    }
+                })
+            }
+        }
+        
         // Статические файлы из корня проекта
         const filePath = join(PROJECT_DIR, url.pathname.slice(1))
         const file = Bun.file(filePath)

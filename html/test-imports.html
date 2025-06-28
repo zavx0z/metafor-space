@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Local Three.js Imports</title>
+  
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/node_modules/three/build/three.module.js",
+      "three/addons/": "/node_modules/three/examples/jsm/"
+    }
+  }
+  </script>
+  
+  <style>
+    body {
+      font-family: monospace;
+      background: #000;
+      color: #0f0;
+      padding: 20px;
+    }
+    .status {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #333;
+      background: #111;
+    }
+    .success { border-color: #0f0; }
+    .error { border-color: #f00; color: #f00; }
+  </style>
+</head>
+<body>
+  <h1>MetaFor - Test Local Imports</h1>
+  
+  <div id="results"></div>
+  
+  <script type="module">
+    const results = document.getElementById('results')
+    
+    function addResult(test, success, details = '') {
+      const div = document.createElement('div')
+      div.className = `status ${success ? 'success' : 'error'}`
+      div.innerHTML = `
+        <strong>${test}:</strong> ${success ? '✅ SUCCESS' : '❌ FAILED'}
+        ${details ? `<br><small>${details}</small>` : ''}
+      `
+      results.appendChild(div)
+    }
+    
+    try {
+      // Тест 1: Импорт Three.js
+      const THREE = await import('three')
+      addResult('Three.js import', !!THREE.Scene, `Version: ${THREE.REVISION}`)
+      
+      // Тест 2: Создание базовых объектов
+      const scene = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
+      const renderer = new THREE.WebGLRenderer()
+      addResult('Basic Three.js objects', true, 'Scene, Camera, Renderer created')
+      
+      // Тест 3: Импорт addons
+      const { OrbitControls } = await import('three/addons/controls/OrbitControls.js')
+      addResult('OrbitControls import', !!OrbitControls, 'Controls addon loaded')
+      
+      // Тест 4: Импорт нашей three`` системы
+      const threeSystem = await import('../html/three.js')
+      addResult('MetaFor three`` system', !!(threeSystem.three && threeSystem.render3d), 
+        `Functions: ${Object.keys(threeSystem).join(', ')}`)
+      
+      // Тест 5: Создание объекта через нашу систему
+      const mesh = threeSystem.createMesh(
+        threeSystem.createGeometry('sphereGeometry', [1, 16, 16]),
+        threeSystem.createMaterial('meshStandardMaterial', { color: 0xff0000 })
+      )
+      const object = mesh.createObject()
+      addResult('MetaFor object creation', !!object, `Created: ${object.type}`)
+      
+      console.log('🚀 All tests passed! Three.js with local modules works perfectly.')
+      console.log('Three.js revision:', THREE.REVISION)
+      console.log('MetaFor three`` system ready:', threeSystem)
+      
+    } catch (error) {
+      addResult('Import test', false, error.message)
+      console.error('❌ Import error:', error)
+    }
+  </script>
+</body>
+</html> 
