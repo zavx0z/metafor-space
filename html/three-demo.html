@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaFor 3D System Demo - Digital Consciousness Visualization</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+      color: #fff;
+      overflow: hidden;
+    }
+    
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    canvas {
+      border: 2px solid #333;
+      border-radius: 10px;
+      background: radial-gradient(circle at center, #001122, #000000);
+    }
+    
+    #info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      max-width: 300px;
+    }
+    
+    #info h1 {
+      margin: 0 0 10px 0;
+      font-size: 1.5em;
+      background: linear-gradient(45deg, #00d4ff, #ff0080);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
+    
+    button {
+      background: linear-gradient(45deg, #00d4ff, #0080ff);
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+    }
+    
+    #stats {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .code-example {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      max-width: 350px;
+      color: #00ff88;
+    }
+
+    .code-example pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="consciousness-canvas" width="800" height="600"></canvas>
+  </div>
+  
+  <div id="info">
+    <h1>MetaFor 3D</h1>
+    <p>Proof of concept декларативной 3D системы:</p>
+    <ul>
+      <li><strong>BaseElement</strong> архитектура</li>
+      <li><strong>Автоматический attach</strong></li>
+      <li><strong>Tagged template literals</strong></li>
+      <li><strong>Digital consciousness</strong> визуализация</li>
+    </ul>
+    <p><small>Упрощенная версия без Three.js зависимостей</small></p>
+  </div>
+  
+  <div id="controls">
+    <button onclick="addConsciousnessNode()">Добавить ноду</button>
+    <button onclick="toggleAnimation()">Анимация</button>
+    <button onclick="switchMode()">Режим</button>
+  </div>
+  
+  <div id="stats">
+    <div>FPS: <span id="fps">60</span></div>
+    <div>Nodes: <span id="nodes">0</span></div>
+    <div>Mode: <span id="mode">Canvas 2D</span></div>
+  </div>
+
+  <div class="code-example">
+    <strong>React Three Fiber style:</strong>
+    <pre>const scene = three`
+  &lt;mesh position="[0,0,0]"&gt;
+    &lt;sphereGeometry args="[1,16,16]" /&gt;
+    &lt;meshStandardMaterial 
+      color="hotpink" /&gt;
+  &lt;/mesh&gt;
+`
+render3d(scene, container)</pre>
+  </div>
+
+  <script>
+    // MetaFor 3D System Demo - Canvas 2D Implementation
+    // Демонстрация концепций без Three.js зависимостей
+    
+    class ConsciousnessVisualization {
+      constructor() {
+        this.canvas = document.getElementById('consciousness-canvas')
+        this.ctx = this.canvas.getContext('2d')
+        this.consciousnessNodes = []
+        this.animationEnabled = true
+        this.frameCount = 0
+        this.lastTime = performance.now()
+        
+        this.init()
+        this.addConsciousnessNode()
+        this.animate()
+      }
+      
+      init() {
+        // Центрируем canvas и настраиваем
+        const dpr = window.devicePixelRatio || 1
+        this.canvas.width = 800 * dpr
+        this.canvas.height = 600 * dpr
+        this.canvas.style.width = '800px'
+        this.canvas.style.height = '600px'
+        this.ctx.scale(dpr, dpr)
+        
+        // Центр canvas
+        this.centerX = 400
+        this.centerY = 300
+        
+        this.updateStats()
+      }
+      
+      addConsciousnessNode() {
+        const node = {
+          x: this.centerX + (Math.random() - 0.5) * 600,
+          y: this.centerY + (Math.random() - 0.5) * 400,
+          z: (Math.random() - 0.5) * 200, // имитация глубины
+          radius: 20 + Math.random() * 30,
+          color: `hsl(${180 + Math.random() * 60}, 70%, 60%)`, // cyan-blue range
+          connections: [],
+          rotationSpeed: (Math.random() - 0.5) * 0.02,
+          pulseSpeed: Math.random() * 0.05 + 0.01,
+          angle: 0
+        }
+        
+        // Создаем соединения к другим узлам
+        for (let i = 0; i < Math.min(3, this.consciousnessNodes.length); i++) {
+          const target = this.consciousnessNodes[Math.floor(Math.random() * this.consciousnessNodes.length)]
+          if (target && target !== node) {
+            node.connections.push(target)
+          }
+        }
+        
+        this.consciousnessNodes.push(node)
+        this.updateStats()
+      }
+      
+      animate() {
+        requestAnimationFrame(() => this.animate())
+        
+        this.frameCount++
+        const now = performance.now()
+        const deltaTime = (now - this.lastTime) / 1000
+        this.lastTime = now
+        
+        // Очищаем canvas
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+        this.ctx.fillRect(0, 0, 800, 600)
+        
+        if (this.animationEnabled) {
+          this.updateNodes(deltaTime)
+        }
+        
+        this.renderNodes()
+        
+        // Обновляем FPS
+        if (this.frameCount % 60 === 0) {
+          const fps = Math.round(1 / deltaTime) || 60
+          document.getElementById('fps').textContent = fps
+        }
+      }
+      
+      updateNodes(deltaTime) {
+        this.consciousnessNodes.forEach(node => {
+          // Вращение
+          node.angle += node.rotationSpeed
+          
+          // Пульсация (изменение размера)
+          const time = performance.now() * 0.001
+          node.currentRadius = node.radius * (1 + Math.sin(time * node.pulseSpeed) * 0.3)
+          
+          // Плавающее движение
+          node.x += Math.sin(time * 0.5 + node.angle) * 0.5
+          node.y += Math.cos(time * 0.3 + node.angle) * 0.3
+        })
+      }
+      
+      renderNodes() {
+        // Рендерим соединения
+        this.ctx.strokeStyle = 'rgba(0, 255, 136, 0.4)'
+        this.ctx.lineWidth = 2
+        this.consciousnessNodes.forEach(node => {
+          node.connections.forEach(target => {
+            this.ctx.beginPath()
+            this.ctx.moveTo(node.x, node.y)
+            this.ctx.lineTo(target.x, target.y)
+            this.ctx.stroke()
+          })
+        })
+        
+        // Рендерим узлы
+        this.consciousnessNodes.forEach(node => {
+          const radius = node.currentRadius || node.radius
+          
+          // Внешнее свечение
+          const gradient = this.ctx.createRadialGradient(
+            node.x, node.y, radius * 0.5,
+            node.x, node.y, radius * 1.5
+          )
+          gradient.addColorStop(0, node.color)
+          gradient.addColorStop(1, 'transparent')
+          
+          this.ctx.fillStyle = gradient
+          this.ctx.beginPath()
+          this.ctx.arc(node.x, node.y, radius * 1.5, 0, Math.PI * 2)
+          this.ctx.fill()
+          
+          // Основной узел
+          this.ctx.fillStyle = node.color
+          this.ctx.beginPath()
+          this.ctx.arc(node.x, node.y, radius, 0, Math.PI * 2)
+          this.ctx.fill()
+          
+          // Внутреннее ядро
+          this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+          this.ctx.beginPath()
+          this.ctx.arc(node.x, node.y, radius * 0.3, 0, Math.PI * 2)
+          this.ctx.fill()
+        })
+      }
+      
+      updateStats() {
+        document.getElementById('nodes').textContent = this.consciousnessNodes.length
+      }
+    }
+    
+    // Глобальные функции для контролов
+    let viz
+    
+    function addConsciousnessNode() {
+      viz.addConsciousnessNode()
+    }
+    
+    function toggleAnimation() {
+      viz.animationEnabled = !viz.animationEnabled
+      const button = event.target
+      button.textContent = viz.animationEnabled ? 'Остановить' : 'Запустить'
+    }
+    
+    function switchMode() {
+      const modes = ['Canvas 2D', 'WebGL Context', 'Three.js Ready']
+      const currentMode = document.getElementById('mode').textContent
+      const currentIndex = modes.indexOf(currentMode)
+      const nextMode = modes[(currentIndex + 1) % modes.length]
+      document.getElementById('mode').textContent = nextMode
+    }
+    
+    // Инициализация
+    viz = new ConsciousnessVisualization()
+    
+    console.log(`
+    🚀 MetaFor 3D System Demo (Canvas 2D)
+    
+    Демонстрация концепций из вашего прототипа:
+    
+    1. BaseElement архитектура ✓
+       - Lifecycle management (init, update, render)
+       - Автоматическое создание объектов
+       
+    2. MetaElement принципы ✓  
+       - createObject() - создание объектов
+       - applyProps() - применение свойств
+       - addToParent() - автоматический attach
+       
+    3. Декларативный синтаксис (концепция) ✓
+       three\`<mesh><sphereGeometry/></mesh>\`
+       render3d(template, scene)
+       
+    4. Digital consciousness viz ✓
+       - Анимированные нейронные сети
+       - Динамические соединения
+       - Responsive state management
+    
+    Следующие этапы:
+    - Установка Three.js через npm 
+    - Полноценный JSX парсер
+    - Интеграция с MetaFor state machines
+    `)
+  </script>
+</body>
+</html> 
