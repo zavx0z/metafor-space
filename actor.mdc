@@ -211,7 +211,7 @@ flowchart TD
 **Обязательная последовательность вызовов конструктора MetaFor:**
 
 ```javascript
-const MyActor = MetaFor("actor-name", {development: true})
+export default MetaFor("actor-name", {development: true})
   .context(t => ({...}))        // 1. Определение контекста
   .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные  
   .states("state1", "state2")   // 3. Список состояний
@@ -326,8 +326,8 @@ const MyActor = MetaFor("actor-name", {development: true})
 Для параллельной обработки создавайте мета (актора-помощника):
 
 ```javascript
-// Основной актор - координатор
-const DataProcessor = MetaFor("data-processor")
+// Основной актор - координатор. Взаимодействие через сообщения, не через переменные
+export default MetaFor("data-processor")
   .context(t => ({
     tasks: t.array({default: []}),
     completed: t.number({default: 0}),
@@ -371,8 +371,8 @@ const DataProcessor = MetaFor("data-processor")
     `
   })
 
-// Актор-помощник для параллельной обработки
-const TaskWorker = MetaFor("task-worker")
+// Актор-помощник для параллельной обработки. Взаимодействие только через сообщения
+export default MetaFor("task-worker")
   .context(t => ({
     taskId: t.string(), // Передается при инициализации актора
     result: t.string({nullable: true}),
@@ -574,7 +574,7 @@ const html = `
 ### 6. Тег и регистрация элемента
 ```javascript
 // Создание актора с автоматической регистрацией
-const EmergencyButton = MetaFor("emergency-button")
+export default MetaFor("emergency-button")
 // Система создает: <metafor-emergency-button></metafor-emergency-button>
 ```
 
@@ -603,7 +603,7 @@ render: ({html, context}) => html`
 
 **Использование переданного контекста:**
 ```javascript
-const TaskWorker = MetaFor("task-worker")
+export default MetaFor("task-worker")
   .context(t => ({
     taskId: t.string(), // Будет установлен из переданного объекта
     priority: t.enum("low", "high")({default: "low"}),
@@ -640,7 +640,7 @@ const TaskWorker = MetaFor("task-worker")
 
 ```javascript
 // 1. Простая кнопка передает глобальные состояния
-const EmergencyButton = MetaFor("emergency-button")
+export default MetaFor("emergency-button")
   .context(t => ({pressed: t.boolean({default: false})}))
   .core(({update}) => ({
     press: () => update({pressed: true})
@@ -664,7 +664,7 @@ const EmergencyButton = MetaFor("emergency-button")
 <metafor-emergency-button></metafor-emergency-button>
   
 // 3. Сложная система слушает состояния простой кнопки:
-const SystemController = MetaFor("system-controller")
+export default MetaFor("system-controller")
   .context(t => ({
     mode: t.enum("normal", "emergency")({default: "normal"}),
     services: t.array({default: ["api", "database", "cache"]})
@@ -747,7 +747,7 @@ const SystemController = MetaFor("system-controller")
 
 ```javascript
 // Счетчик как актор
-const Counter = MetaFor("counter")
+export default MetaFor("counter")
   .context(t => ({
     value: t.number({default: 0}),
     step: t.number({default: 1}),
@@ -849,7 +849,7 @@ const Counter = MetaFor("counter")
 
 ```javascript
 // UI контроллер
-const UIController = MetaFor("ui-controller")
+export default MetaFor("ui-controller")
   .context(t => ({
     selectedCounter: t.string({nullable: true}),
     counters: t.array({default: []}),
@@ -957,7 +957,7 @@ const UIController = MetaFor("ui-controller")
 
 ```javascript
 // Простая кнопка - может влиять на всю систему
-const EmergencyButton = MetaFor("emergency-button")
+export default MetaFor("emergency-button")
   .context(t => ({
     pressed: t.boolean({default: false})
   }))
@@ -982,7 +982,7 @@ const EmergencyButton = MetaFor("emergency-button")
   })
 
 // Сложная система - слушает простую кнопку
-const SystemController = MetaFor("system-controller")
+export default MetaFor("system-controller")
   .context(t => ({
     mode: t.enum("normal", "emergency", "shutdown")({default: "normal"}),
     services: t.array({default: ["api", "database", "cache"]}),
