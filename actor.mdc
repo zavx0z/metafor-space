@@ -5,6 +5,37 @@ alwaysApply: true
 ---
 # MetaFor Actor System
 
+## MetaFor - создание актора
+
+**Функция MetaFor создает актор с типизированным контекстом и автоматической регистрацией веб-компонента.**
+
+```javascript
+MetaFor(tag, conf?)
+```
+
+### Параметры:
+
+- **`tag`** `string` - Имя актора. Система автоматически создает кастомный элемент `<metafor-{tag}>`
+- **`conf`** `object` (опционально) - Конфигурация актора:
+  - **`description`** `string` - Описание актора для отладки и документации
+  - **`development`** `boolean` - Режим разработки с валидацией и отладкой
+
+### Пример:
+```javascript
+export default MetaFor("my-actor", {
+  description: "Мой первый актор", 
+  development: true
+})
+  .context(t => ({...}))        // 1. Определение контекста
+  .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные  
+  .states("state1", "state2")   // 3. Список состояний
+  .transitions("state1", [...]) // 4. Переходы и actions
+  .reactions([...])             // 5. Реакции на события
+  .view({...})                  // 6. Представление UI
+```
+
+**Результат:** Система создает веб-компонент `<metafor-my-actor>`, который можно использовать в HTML.
+
 ## Обзор
 
 MetaFor реализует акторную модель вычислений, где каждый Meta компонент является независимым актором. Акторы взаимодействуют исключительно через передачу сообщений, обеспечивая изоляцию состояния и масштабируемость системы.
@@ -259,7 +290,37 @@ export default MetaFor("actor-name", {development: true})
 
 **Важно:** В array контекста должны быть только простые типы без вложенности (строки, числа, булевы значения). Сложные данные хранятся в core с доступом по ключу или с поиском в списках.
 
-**Пример работы с блокировкой (встроенный механизм):**
+### 2. Состояния и переходы (State Machine)
+**Состояния глобальны** - видны всем в main thread, worker, service worker, tabs, windows и могут передаваться между устройствами:
+```javascript
+.states("idle", "working", "done", "emergency")
+.transitions("idle", [
+  {
+    in: "idle", 
+    to: [{state: "working", when: {data: {isEmpty: false}}}]
+  },
+  {
+    in: "working",
+    action: ({update, context}) => {
+      // Обработка данных из контекста
+      const result = processData(context.data)
+      update({result, active: false})
+    },
+    to: [
+      {state: "done", when: {active: false}},
+      {state: "emergency", when: {error: true}} // Глобально для всех
+    ]
+  }
+])
+```
+
+**Глобальность состояний:**
+- Все акторы видят изменения состояний в main thread, worker, service worker
+- Состояния синхронизируются между tabs и windows
+- Могут передаваться на сервер, другие устройства
+- BroadcastChannel для синхронизации между потоками, WebSocket/WebRTC для межустройственной синхронизации
+
+**Механизм блокировки при выполнении actions:**
 ```javascript
 // ⚠️ Блокировка переходов во время выполнения action - это встроенный механизм MetaFor
 // Разработчику НЕ нужно создавать булевые флаги типа "processing" в контексте
@@ -322,127 +383,6 @@ export default MetaFor("actor-name", {development: true})
 - Обновление контекста и хранилищ в едином коллбеке
 - Накопление изменений во время выполнения action
 
-**Рекомендация для параллельных выполнений:**
-Для параллельной обработки создавайте мета (актора-помощника):
-
-```javascript
-// Основной актор - координатор. Взаимодействие через сообщения, не через переменные
-export default MetaFor("data-processor")
-  .context(t => ({
-    tasks: t.array({default: []}),
-    completed: t.number({default: 0}),
-    results: t.array({default: []})
-  }))
-  .core(({update, context}) => ({
-    addTask: (taskData) => {
-      // Создаем актора-помощника для каждой задачи
-      const taskId = Date.now()
-      update({tasks: [...context.tasks, taskId]})
-    }
-  }))
-  .reactions([
-    {
-      title: "Получение результата от актора-помощника",
-      filter: ({meta}) => meta.tag === "task-worker",
-      action: ({patch, update, context}) => {
-        // Актор-помощник завершил работу
-        update({
-          completed: context.completed + 1,
-          results: [...context.results, patch.value]
-        })
-      }
-    }
-  ])
-  .view({
-    render: ({html, context, core, repeat}) => html`
-      <div class="data-processor">
-        <h3>Обработчик данных</h3>
-        <div>Задач: ${context.tasks.length}</div>
-        <div>Завершено: ${context.completed}</div>
-        <button @click=${() => core.addTask({data: "example"})}>
-          Добавить задачу
-        </button>
-        
-        <!-- Акторы-помощники создаются декларативно с передачей контекста -->
-        ${repeat(context.tasks, (taskId) => taskId, (taskId) => html`
-          <metafor-task-worker context=${{taskId}}></metafor-task-worker>
-        `)}
-      </div>
-    `
-  })
-
-// Актор-помощник для параллельной обработки. Взаимодействие только через сообщения
-export default MetaFor("task-worker")
-  .context(t => ({
-    taskId: t.string(), // Передается при инициализации актора
-    result: t.string({nullable: true}),
-    status: t.string({default: "pending"}) // НЕ используем processing - блокировка встроена в MetaFor
-  }))
-  .core(({update, context}) => ({
-    processTask: async () => {
-      const result = await heavyProcessing(context.taskId)
-      update({result, status: "completed"})
-    }
-  }))
-  .states("idle", "working", "completed")
-  .transitions("idle", [
-    {
-      in: "idle",
-      action: async ({update, core}) => {
-        // Встроенная блокировка активируется автоматически при входе в action
-        update({status: "working"})
-        
-        // Параллельная обработка через core
-        await core.processTask()
-        // Блокировка снимается автоматически после завершения action
-      },
-      to: [{state: "working", when: {status: "working"}}]
-    },
-    {
-      in: "working",
-      to: [{state: "completed", when: {status: "completed"}}]
-    }
-  ])
-  .reactions([])
-  .view({})
-```
-
-**Преимущества подхода с актором-помощником:**
-- Каждая задача выполняется в изолированном акторе
-- Параллельное выполнение без блокировки основного актора
-- Автоматическая коммуникация через реакции
-- Возможность независимого управления жизненным циклом задач
-
-### 2. Состояния и переходы (State Machine)
-**Состояния глобальны** - видны всем в main thread, worker, service worker, tabs, windows и могут передаваться между устройствами:
-```javascript
-.states("idle", "working", "done", "emergency")
-.transitions("idle", [
-  {
-    in: "idle", 
-    to: [{state: "working", when: {data: {isEmpty: false}}}]
-  },
-  {
-    in: "working",
-    action: ({update, context}) => {
-      // Обработка данных из контекста
-      const result = processData(context.data)
-      update({result, active: false})
-    },
-    to: [
-      {state: "done", when: {active: false}},
-      {state: "emergency", when: {error: true}} // Глобально для всех
-    ]
-  }
-])
-```
-
-**Глобальность состояний:**
-- Все акторы видят изменения состояний в main thread, worker, service worker
-- Состояния синхронизируются между tabs и windows
-- Могут передаваться на сервер, другие устройства
-- BroadcastChannel для синхронизации между потоками, WebSocket для межустройственной синхронизации
-
 ### 3. Реакции (Event Handlers) - события меняют контекст
 Обработка событий с учетом очередности коллбеков:
 ```javascript
@@ -478,6 +418,15 @@ export default MetaFor("task-worker")
 **Отличие от Actions:**
 - **Core** - переиспользуемые методы, доступные из любого состояния
 - **Actions** - функции для конкретных состояний, которые не переиспользуются
+
+**Core можно оставлять пустым:**
+```javascript
+// Если актор не использует переиспользуемые методы или данные
+.core(() => ({}))
+
+// Или если нужен доступ к параметрам, но методы не используются  
+.core(({update, context, self}) => ({}))
+```
 
 ```javascript
 .core(({update, context, self}) => ({
@@ -527,6 +476,9 @@ export default MetaFor("task-worker")
 - Переиспользуются во всех состояниях актора
 
 ### 5. Представление (View) - отображение контекста
+
+**Шаблонизация основана на lit-html** - эффективной библиотеке для создания HTML шаблонов.
+
 ```javascript
 .view({
   render: ({html, context, state, repeat}) => html`
@@ -627,6 +579,7 @@ export default MetaFor("task-worker")
     priority: t.enum("low", "high")({default: "low"}),
     data: t.string({nullable: true})
   }))
+  .core(({update}) => ({}))
   .states("idle")
   .transitions("idle", [
     {
@@ -641,6 +594,8 @@ export default MetaFor("task-worker")
       }
     }
   ])
+  .reactions([])
+  .view({})
 ```
 
 ## Коммуникационная система
@@ -1078,3 +1033,116 @@ export default MetaFor("system-controller")
 4. **Используйте типизацию** - определяйте четкие контракты сообщений
 5. **Обрабатывайте ошибки** - любой может сломаться, все должны это учитывать
 6. **Логируйте сообщения** - включайте development режим для отладки взаимодействий
+
+## Пример параллельной обработки
+
+**Координация через акторов-помощников с результатами через sessionStorage:**
+
+```javascript
+// Основной актор - координатор. Взаимодействие через сообщения, не через переменные
+export default MetaFor("data-processor")
+  .context(t => ({
+    tasks: t.array({default: []}),
+    completed: t.number({default: 0}),
+    results: t.array({default: []})
+  }))
+  .core(({update, context}) => ({
+    addTask: (taskData) => {
+      // Создаем актора-помощника для каждой задачи
+      const taskId = Date.now()
+      update({tasks: [...context.tasks, taskId]})
+    }
+  }))
+  .states("idle", "processing")
+  .transitions("idle", [
+    {
+      in: "idle", 
+      to: [{state: "processing", when: {tasks: {length: {min: 1}}}}]
+    },
+    {
+      in: "processing",
+      to: [{state: "idle", when: {tasks: {isEmpty: true}}}]
+    }
+  ])
+  .reactions([
+    {
+      title: "Получение результата от актора-помощника через sessionStorage",
+      filter: ({meta, patch}) => 
+        meta.tag === "task-worker" && 
+        patch.path === "/state" && 
+        patch.value === "completed",
+      action: ({meta, update, context}) => {
+        // Актор-помощник завершил работу, читаем результат из sessionStorage
+        const result = JSON.parse(sessionStorage.getItem(`${meta.index}-task-result`) || 'null')
+        if (result) {
+          update({
+            completed: context.completed + 1,
+            results: [...context.results, result.id]
+          })
+          sessionStorage.removeItem(`${meta.index}-task-result`) // Очищаем после использования
+        }
+      }
+    }
+  ])
+  .view({
+    render: ({html, context, core, repeat}) => html`
+      <div class="data-processor">
+        <h3>Обработчик данных</h3>
+        <div>Задач: ${context.tasks.length}</div>
+        <div>Завершено: ${context.completed}</div>
+        <button @click=${() => core.addTask({data: "example"})}>
+          Добавить задачу
+        </button>
+        
+        <!-- Акторы-помощники создаются декларативно с передачей контекста -->
+        ${repeat(context.tasks, (taskId) => taskId, (taskId) => html`
+          <metafor-task-worker context=${{taskId}}></metafor-task-worker>
+        `)}
+      </div>
+    `
+  })
+
+// Актор-помощник для параллельной обработки. Взаимодействие только через сообщения
+export default MetaFor("task-worker")
+  .context(t => ({
+    taskId: t.string(), // Передается при инициализации актора
+    status: t.string({default: "pending"}) // НЕ используем processing - блокировка встроена в MetaFor
+  }))
+  .core(({update, context}) => ({
+    processTask: async (actorIndex) => {
+      // Имитация тяжелой обработки данных
+      const result = await heavyProcessing(context.taskId) // Promise-функция обработки
+      // Сохраняем результат в sessionStorage для родительского актора
+      sessionStorage.setItem(`${actorIndex}-task-result`, JSON.stringify(result))
+      update({status: "completed"}) // Меняем состояние для уведомления родителя
+    }
+  }))
+  .states("idle", "working", "completed")
+  .transitions("idle", [
+    {
+      in: "idle",
+      action: async ({update, core, element}) => {
+        // Встроенная блокировка активируется автоматически при входе в action
+        update({status: "working"})
+        
+        // Параллельная обработка через core, передаем индекс актора
+        await core.processTask(element.index)
+        // Блокировка снимается автоматически после завершения action
+      },
+      to: [{state: "working", when: {status: "working"}}]
+    },
+    {
+      in: "working",
+      to: [{state: "completed", when: {status: "completed"}}]
+    }
+  ])
+  .reactions([])
+  .view({})
+```
+
+**Преимущества подхода с актором-помощником:**
+- Каждая задача выполняется в изолированном акторе
+- Параллельное выполнение без блокировки основного актора
+- Автоматическая коммуникация через реакции
+- Возможность независимого управления жизненным циклом задач
+- Результаты передаются через sessionStorage при изменении состояния
