@@ -3,20 +3,20 @@ import type {Transitions} from "./transitions.ts"
 import type {CoreObj} from "./core.ts"
 
 /**
- Снимок состояния частицы
+ Снимок состояния актора
 
- @template C - Тип контекста
  @template S - Тип состояния
+ @template C - Тип контекста  
+ @template I - Тип ядра
 
- @property id - Идентификатор снимка
- @property title - Заголовок снимка
- @property description - Описание снимка
- @property state - Текущее состояние
- @property states - Доступные состояния
- @property context - Данные контекста
+ @property id - Идентификатор актора
+ @property description - Описание актора
+ @property state - Текущее состояние актора
+ @property states - Доступные состояния актора
+ @property context - Данные контекста актора
  @property types - Определение типов контекста
- @property transitions - Переходы
- @property core - Ядро
+ @property transitions - Переходы между состояниями
+ @property core - Данные ядра актора
  */
 export type Snapshot<S extends string, C extends ContextDefinition, I extends CoreObj> = {
   id: string
@@ -31,30 +31,35 @@ export type Snapshot<S extends string, C extends ContextDefinition, I extends Co
 }
 
 /**
- Сообщение для обмена данными между частицами
+ Сообщение для обмена данными между акторами
 
  @property meta - Метаданные сообщения
- @property meta.meta - Имя частицы
- @property meta.func - Имя функции
- @property meta.target - Цель функции
+ @property meta.tag - Имя типа актора  
+ @property meta.index - Индекс экземпляра актора
+ @property meta.func - Имя функции, инициировавшей сообщение
+ @property meta.target - Цель сообщения
  @property meta.timestamp - Время отправки сообщения
- @property patch - Патч для применения к частице
- @property patch.path - Путь к частице
- @property patch.op - Операция
- @property patch.value - Значение
+ @property patch - Патч для применения к актору
+ @property patch.path - Путь к изменяемому свойству актора
+ @property patch.op - Операция (add, remove, replace, move, copy, test)
+ @property patch.value - Значение для операции
  */
 export type BroadcastMessage = {
   meta: MetaDataMessage
   patch: PatchMetaFor
 }
 
-/** Метаданные сообщения
- @property tag -
- @property user - Идентификатор пользователя.
- @property device - Идентификатор устройства.
- @property tab - Идентификатор вкладки или окна браузера. Полезно для управления данными в нескольких вкладках или окнах.
- @property index - Уникальный идентификатор экземпляра компонента. Если не задан, генерируется автоматически.
- @property timestamp - Время отправки.
+/**
+ Метаданные сообщения
+
+ @property tag - Имя типа актора (компонента)
+ @property user - Идентификатор пользователя
+ @property device - Идентификатор устройства
+ @property tab - Идентификатор вкладки или окна браузера. Полезно для управления данными в нескольких вкладках или окнах
+ @property index - Уникальный идентификатор экземпляра актора. Если не задан, генерируется автоматически
+ @property func - Имя функции, инициировавшей сообщение
+ @property target - Цель сообщения
+ @property timestamp - Время отправки сообщения в миллисекундах
  */
 export type MetaDataMessage = {
   tag: string
@@ -67,19 +72,21 @@ export type MetaDataMessage = {
   timestamp?: number
 }
 /**
- * Уведомление об изменениях контекста
- *
- * @param cb - Коллбек
- * @returns - Функция для отписки от уведомлений
+ Уведомление об изменениях контекста
+
+ @template C - Тип определения контекста
+ @param cb - Коллбек для обработки изменений контекста
+ @returns Функция для отписки от уведомлений
  */
 export type OnUpdate<C extends ContextDefinition> = (cb: OnUpdateCallBack<C>) => () => void
 
 /**
- * Коллбек обрабатывающий изменения контекста
- *
- * @param context - Контекст
- * @param srcName - Имя источника
- * @param funcName - Имя функции
+ Коллбек обрабатывающий изменения контекста
+
+ @template C - Тип определения контекста
+ @param context - Измененные данные контекста
+ @param srcName - Имя источника изменения (action, core, reaction, view)
+ @param funcName - Имя функции, инициировавшей изменение
  */
 export type OnUpdateCallBack<C extends ContextDefinition> = (
   context: ContextData<C>,
@@ -88,25 +95,22 @@ export type OnUpdateCallBack<C extends ContextDefinition> = (
 ) => void
 
 /**
- * Уведомление о переходах между состояниями
- *
- * @param cb - Коллбек
- * @returns - Функция для отписки от уведомлений
+ Уведомление о переходах между состояниями
+
+ @template S - Тип состояний
+ @param cb - Коллбек для обработки переходов между состояниями
+ @returns Функция для отписки от уведомлений
  */
 export type OnTransition<S extends string> = (
   cb: OnTransitionCallBack<S>
 ) => () => void
 
 /**
- * Коллбек обрабатывающий изменения состояний
- *
- * @template S - Тип состояний
- * @template C - Тип контекста
- * @template I - Тип действий
- *
- * @param preview - Предыдущее состояние
- * @param current - Текущее состояние
- * @param meta - Мета
+ Коллбек обрабатывающий переходы между состояниями
+
+ @template S - Тип состояний
+ @param preview - Предыдущее состояние
+ @param current - Текущее состояние
  */
 export type OnTransitionCallBack<S extends string> = (
   preview: S | undefined,
@@ -114,15 +118,14 @@ export type OnTransitionCallBack<S extends string> = (
 ) => void
 
 /**
- * Коллбек обрабатывающий изменения состояний
- *
- * @template S - Тип состояний
- * @template C - Тип контекста
- * @template I - Тип действий
- *
- * @param preview - Предыдущее состояние
- * @param current - Текущее состояние
- * @param snapshot - Мета
+ Коллбек обрабатывающий переходы между состояниями с доступом к снимку
+
+ @template S - Тип состояний
+ @template C - Тип контекста
+ @template I - Тип ядра
+ @param preview - Предыдущее состояние
+ @param current - Текущее состояние
+ @param snapshot - Снимок состояния актора
  */
 export type CreateOnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
   preview: S | undefined,

@@ -90,8 +90,6 @@ export type OnUpdateContextData<C extends ContextDefinition> = {
                 : ExtractTypeValue<C[K]>
 }
 
-// FIXME: не должен обновлять на null если не nullable
-
 /**
  Тип параметров для обновления контекста
 
@@ -161,7 +159,7 @@ export type ContextTypes = {
     string: (params: { title?: string; nullable?: boolean; default?: string }) => StringDefinition
     number: (params: { title?: string; nullable?: boolean; default?: number }) => NumberDefinition
     boolean: (params: { title?: string; nullable?: boolean; default?: boolean }) => BooleanDefinition
-    array: (params: { title?: string; default?: any[] }) => ArrayDefinition
+    array: (params: { title?: string; default?: any[]; nullable?: boolean }) => ArrayDefinition
     enum: <T extends string | number>(
         ...values: T[]
     ) => (options?: { title?: string; nullable?: boolean; default?: T }) => EnumDefinition<T[]>
@@ -232,6 +230,7 @@ export type ArrayDefinition = {
     type: "array"
     title?: string
     default?: string[] | number[]
+    nullable?: boolean
 }
 
 /**

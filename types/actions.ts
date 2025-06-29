@@ -11,12 +11,15 @@ import type { Core } from "./core.ts"
  @template I - Тип внутренних данных
 
  @property context - Данные контекста
+ @property element - HTML элемент актора
  @property update - Функция обновления контекста
  @property core - Внутренние данные и сервисы
  */
 export type Action<C extends ContextDefinition, I extends Record<string, unknown>> = ({
   context,
+  element,
   update,
+  core
 }: {
   context: ContextData<C>
   element: HTMLElement

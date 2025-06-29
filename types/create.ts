@@ -5,34 +5,34 @@ import type { Reactions } from "./reaction.ts"
 import type { CreateOnTransitionCallBack, OnUpdateCallBack } from "./meta.ts"
 import type {ViewDefinition} from "./view.ts";
 /**
- Опции создания частицы в коллбеке create
+ Опции создания экземпляра актора
 
- @typeParam C - Тип определения контекста
- @typeParam S - Тип строки состояния
- @typeParam I - Тип записи с произвольными значениями
+ @template C - Тип определения контекста
+ @template S - Тип строки состояния  
+ @template I - Тип ядра актора
 
  @remarks
- Объект конфигурации определяет все необходимые параметры для создания новой частицы
+ Объект конфигурации определяет все необходимые параметры для создания нового экземпляра актора
 
  @example
  ```javascript
  .create({
    state: "idle",
-   meta: {name: "myParticle"}
+   meta: {name: "myActor"}
  })
  ```
  */
 export type CreateParams<C extends ContextDefinition, S extends string, I extends Record<string, any>> = {
-  /** Метаданные частицы */
+  /** Метаданные актора */
   meta?: {
-    /** Имя частицы */
+    /** Имя актора */
     name?: string
   }
-  /** Заголовок частицы */
+  /** Заголовок актора */
   title?: string
-  /** Описание частицы */
+  /** Описание актора */
   description?: string
-  /** Начальные данные ядра */
+  /** Начальные данные ядра актора */
   core?: CoreData<I> | Record<string, any>
   /**
      Опции отладки
@@ -61,22 +61,23 @@ export type CreateParams<C extends ContextDefinition, S extends string, I extend
 }
 
 /**
- Параметры для функции используемой в коллбеке create
- @hidden
+ Внутренние параметры для создания актора
+ @internal
 
- @template C - контекст
- @template S - состояние
- @template I - core
+ @template S - Тип состояний
+ @template C - Тип контекста
+ @template I - Тип ядра
 
- @property development - режим разработки
- @property description - описание
- @property tag - тег
- @property options - опции
- @property states - состояния
- @property contextDefinition - определение контекста
- @property transitions - переходы
- @property coreDefinition - определение ядра
- @property [reactions=[]] - реакции
+ @property development - Режим разработки с валидацией
+ @property description - Описание актора
+ @property tag - Тег (имя типа) актора
+ @property states - Массив доступных состояний
+ @property initialState - Начальное состояние актора
+ @property contextDefinition - Определение типов контекста
+ @property transitions - Переходы между состояниями
+ @property coreDefinition - Определение ядра актора
+ @property reactions - Реакции на изменения других акторов
+ @property view - Определение представления актора
  */
 export type FabricCallbackCreateFuncHelper<
   S extends string,
