@@ -354,7 +354,7 @@ export default MetaFor("data-processor")
     }
   ])
   .view({
-    render: ({html, context, core}) => html`
+    render: ({html, context, core, repeat}) => html`
       <div class="data-processor">
         <h3>Обработчик данных</h3>
         <div>Задач: ${context.tasks.length}</div>
@@ -364,7 +364,7 @@ export default MetaFor("data-processor")
         </button>
         
         <!-- Акторы-помощники создаются декларативно с передачей контекста -->
-        ${context.tasks.map(taskId => html`
+        ${repeat(context.tasks, (taskId) => taskId, (taskId) => html`
           <metafor-task-worker context=${{taskId}}></metafor-task-worker>
         `)}
       </div>
@@ -529,14 +529,14 @@ export default MetaFor("task-worker")
 ### 5. Представление (View) - отображение контекста
 ```javascript
 .view({
-  render: ({html, context, state}) => html`
+  render: ({html, context, state, repeat}) => html`
     <div class="actor-${state}">
       <h3>${context.name}</h3>
       <div>Счетчик: ${context.counter}</div>
       <div>Активен: ${context.active ? 'Да' : 'Нет'}</div>
       
       <!-- Создание дочерних акторов с передачей контекста -->
-      ${context.childTasks.map(task => html`
+      ${repeat(context.childTasks, (task) => task.id, (task) => html`
         <metafor-child-worker context=${{
           taskId: task.id,
           parentName: context.name,
@@ -546,6 +546,24 @@ export default MetaFor("task-worker")
     </div>
       `
   })
+```
+
+**🔄 repeat vs map для списков:**
+- **repeat()** - для изменяющихся списков (добавление/удаление/переупорядочивание)
+  - Доступен в render: `({html, context, repeat}) => html`
+  - Оптимизирует производительность за счет переиспользования DOM элементов
+  - Требует уникальный ключ для отслеживания элементов: `repeat(items, keyFn, templateFn)`
+  - Рекомендуется для динамических списков акторов
+  ```javascript
+  ${repeat(context.tasks, (task) => task.id, (task) => html`
+    <metafor-worker context=${{taskId: task.id}}></metafor-worker>
+  `)}
+  ```
+
+- **map()** - для статических списков или когда производительность не критична
+  - Проще в использовании, не требует ключей
+  - Пересоздает все элементы при изменении списка
+  - Подходит для статических списков: `items.map(item => html`...`)`
 
 // HTML использование - акторы как соседние элементы
 const html = `
@@ -592,7 +610,7 @@ render: ({html, context}) => html`
   }}></metafor-task-worker>
   
   <!-- Или с использованием переменных из контекста -->
-  ${context.tasks.map(task => html`
+  ${repeat(context.tasks, (task) => task.id, (task) => html`
     <metafor-worker context=${{
       workerId: task.id,
       taskType: task.type
@@ -877,12 +895,12 @@ export default MetaFor("ui-controller")
     }
   ])
   .view({
-    render: ({html, context, core}) => html`
+    render: ({html, context, core, repeat}) => html`
       <div class="controller">
         <h3>Управление счетчиками</h3>
         <select @change=${(e) => update({selectedCounter: e.target.value})}>
           <option value="">Выберите счетчик</option>
-          ${context.counters.map(counter => html`
+          ${repeat(context.counters, (counter) => counter, (counter) => html`
             <option value="${counter}">${counter}</option>
           `)}
         </select>
