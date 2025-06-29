@@ -252,21 +252,22 @@ const MyActor = MetaFor("actor-name", {development: true})
   active: t.boolean({default: true}),
   // В array контекста только простые типы без вложенности
   selectedItems: t.array({title: "Выбранные элементы"}), // массив простых типов. Объекты в контексте не предусмотрены. Array не может быть nullable и всегда по умолчанию []. Параметр title необязательный (отображается в ui для пользователя)
-  processing: t.boolean({default: false}),
+  status: t.string({default: "idle"}),
   error: t.string({nullable: true}) // nullable позволяет null значения для проверки {isNull: true/false}
 }))
 ```
 
 **Важно:** В array контекста должны быть только простые типы без вложенности (строки, числа, булевы значения). Сложные данные хранятся в core с доступом по ключу или с поиском в списках.
 
-**Пример работы с блокировкой:**
+**Пример работы с блокировкой (встроенный механизм):**
 ```javascript
-// В action происходит блокировка проверки состояний
+// ⚠️ Блокировка переходов во время выполнения action - это встроенный механизм MetaFor
+// Разработчику НЕ нужно создавать булевые флаги типа "processing" в контексте
 {
   in: "processing",
   action: async ({update, context}) => {
     // Блокировка активна - переходы не проверяются
-    // Обновления накапливаются, но не применяются сразу
+    // Контекст в это время может быть обновлен.
     
     const step1Result = await processStep1()
     const step2Result = await processStep2()
@@ -278,19 +279,18 @@ const MyActor = MetaFor("actor-name", {development: true})
       status: "completed",
       step1Data: step1Result,
       step2Data: step2Result,
-      finalResult: finalData,
-      processing: false
+      finalResult: finalData
     })
     
     // ⚠️ ВАЖНО: async функция автоматически возвращает промис
     // Это предотвратит проблемы с множественным накоплением обновлений
     // и корректно снимет блокировку после завершения всех await
     
-    // После завершения action - блокировка снимается
-    // Автоматически проверяются условия переходов
+    // После завершения action - блокировка снимается автоматически (встроенный механизм)
+    // Автоматически проверяются условия переходов с возможно обновленным контекстом во время блокировки
   },
   to: [
-    {state: "idle", when: {processing: false}} // Проверится после action
+    {state: "idle", when: {status: "completed"}} // Проверится после action
   ]
 }
 
@@ -376,12 +376,12 @@ const TaskWorker = MetaFor("task-worker")
   .context(t => ({
     taskId: t.string(), // Передается при инициализации актора
     result: t.string({nullable: true}),
-    processing: t.boolean({default: false})
+    status: t.string({default: "pending"}) // НЕ используем processing - блокировка встроена в MetaFor
   }))
   .core(({update, context}) => ({
     processTask: async () => {
       const result = await heavyProcessing(context.taskId)
-      update({result, processing: false})
+      update({result, status: "completed"})
     }
   }))
   .states("idle", "working", "completed")
@@ -389,17 +389,18 @@ const TaskWorker = MetaFor("task-worker")
     {
       in: "idle",
       action: async ({update, core}) => {
-        // taskId передан через контекст при инициализации
-        update({processing: true})
+        // Встроенная блокировка активируется автоматически при входе в action
+        update({status: "working"})
         
         // Параллельная обработка через core
         await core.processTask()
+        // Блокировка снимается автоматически после завершения action
       },
-      to: [{state: "working", when: {processing: true}}]
+      to: [{state: "working", when: {status: "working"}}]
     },
     {
       in: "working",
-      to: [{state: "completed", when: {processing: false}}]
+      to: [{state: "completed", when: {status: "completed"}}]
     }
   ])
   .reactions([])
