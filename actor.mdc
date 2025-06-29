@@ -251,7 +251,7 @@ const MyActor = MetaFor("actor-name", {development: true})
   counter: t.number({default: 0}),
   active: t.boolean({default: true}),
   // В array контекста только простые типы без вложенности
-  selectedIds: t.array({default: []}), // массив ID, а не объектов
+  selectedItems: t.array({title: "Выбранные элементы"}), // массив простых типов. Объекты в контексте не предусмотрены. Array не может быть nullable и всегда по умолчанию []. Параметр title необязательный (отображается в ui для пользователя)
   processing: t.boolean({default: false}),
   error: t.string({nullable: true}) // nullable позволяет null значения для проверки {isNull: true/false}
 }))
