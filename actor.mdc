@@ -310,7 +310,7 @@ MetaFor(tag, conf?)
 
 ## 3. Ядро - переиспользуемые методы и данные
 
-Для методов, сервисов и временных структур, доступных из любого состояния.
+Для методов, сервисов подписки и временных структур, доступных из любого состояния.
 
 **Отличие от Actions:**
 - **Core** - переиспользуемые методы для всех состояний
@@ -323,9 +323,28 @@ MetaFor(tag, conf?)
   products: [],
   config: {},
   
+  // Сервисы подписки
+  eventSource: null,
+  websocket: null,
+  subscriptions: new Set(),
+  
   // Переиспользуемые методы
   getUserById: (id) => self.users.get(id),
   updateCounter: () => update({counter: context.counter + 1}),
+  
+  // Сервисы подписки
+  subscribe: (eventName, callback) => {
+    self.subscriptions.add({eventName, callback})
+    return () => self.subscriptions.delete({eventName, callback})
+  },
+  
+  connectWebSocket: (url) => {
+    self.websocket = new WebSocket(url)
+    self.websocket.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      update({lastMessage: data})
+    }
+  },
   
   // Связь контекста с core
   getSelectedUsers: () => 
