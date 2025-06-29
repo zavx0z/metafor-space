@@ -72,6 +72,11 @@ const indexHTML = `
         </p>
         
         <div class="demo-links">
+            <a href="/space/virtual-space.html" class="demo-card">
+                <h3>🌌 MetaFor Space</h3>
+                <p>Виртуальное пространство с цветами темы MetaFor для цифрового бессмертия</p>
+            </a>
+            
             <a href="/html/three-demo.html" class="demo-card">
                 <h3>🚀 3D Demo</h3>
                 <p>Digital Consciousness visualization с декларативной 3D системой</p>
@@ -162,6 +167,10 @@ const server = Bun.serve({
                 contentType = "image/svg+xml"
             } else if (url.pathname.endsWith(".ico")) {
                 contentType = "image/x-icon"
+            } else if (url.pathname.endsWith(".glb")) {
+                contentType = "model/gltf-binary"
+            } else if (url.pathname.endsWith(".gltf")) {
+                contentType = "model/gltf+json"
             }
             
             return new Response(file, {
@@ -180,4 +189,5 @@ const server = Bun.serve({
     // },
 })
 console.log(`Server started on http://${server.hostname}:${server.port}`)
-console.log(`3D Demo available at: http://${server.hostname}:${server.port}/html/three-demo.html`)
+console.log(`🌌 MetaFor Space: http://${server.hostname}:${server.port}/space/virtual-space.html`)
+console.log(`🚀 3D Demo: http://${server.hostname}:${server.port}/html/three-demo.html`)

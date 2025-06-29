@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaFor Virtual Office - Backup</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      color: white;
+    }
+    
+    #controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    #info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <button onclick="addHumanoid()">Добавить сотрудника 🤖</button>
+    <button onclick="addWorkstation()">Рабочее место</button>
+    <button onclick="toggleDay()">День/Ночь</button>
+  </div>
+  
+  <div id="info">
+    <div><strong>FPS:</strong> <span id="fps">60</span></div>
+    <div><strong>Сотрудники:</strong> <span id="humanoids">0</span></div>
+  </div>
+
+  <script>
+    // Простые OrbitControls без внешних зависимостей
+    class SimpleOrbitControls {
+      constructor(camera, domElement) {
+        this.camera = camera
+        this.domElement = domElement
+        this.enabled = true
+        
+        this.target = new THREE.Vector3()
+        
+        this.minDistance = 0
+        this.maxDistance = Infinity
+        this.enableDamping = false
+        this.dampingFactor = 0.05
+        
+        this.enableZoom = true
+        this.zoomSpeed = 1.0
+        
+        this.enableRotate = true
+        this.rotateSpeed = 1.0
+        
+        this.enablePan = true
+        this.panSpeed = 1.0
+        
+        this.autoRotate = false
+        this.autoRotateSpeed = 2.0
+        
+        this.spherical = new THREE.Spherical()
+        this.sphericalDelta = new THREE.Spherical()
+        
+        this.scale = 1
+        this.panOffset = new THREE.Vector3()
+        
+        this.state = { NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2 }
+        this.currentState = this.state.NONE
+        
+        this.rotateStart = new THREE.Vector2()
+        this.rotateEnd = new THREE.Vector2()
+        this.rotateDelta = new THREE.Vector2()
+        
+        this.panStart = new THREE.Vector2()
+        this.panEnd = new THREE.Vector2()
+        this.panDelta = new THREE.Vector2()
+        
+        this.dollyStart = new THREE.Vector2()
+        this.dollyEnd = new THREE.Vector2()
+        this.dollyDelta = new THREE.Vector2()
+        
+        this.bindEvents()
+        this.update()
+      }
+      
+      bindEvents() {
+        this.domElement.addEventListener('contextmenu', this.onContextMenu.bind(this))
+        this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this))
+        this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this))
+        this.domElement.addEventListener('touchstart', this.onTouchStart.bind(this))
+        this.domElement.addEventListener('touchend', this.onTouchEnd.bind(this))
+        this.domElement.addEventListener('touchmove', this.onTouchMove.bind(this))
+      }
+      
+      onContextMenu(event) {
+        if (!this.enabled) return
+        event.preventDefault()
+      }
+      
+      onMouseDown(event) {
+        if (!this.enabled) return
+        
+        event.preventDefault()
+        
+        switch (event.button) {
+          case 0: // left
+            this.currentState = this.state.ROTATE
+            this.rotateStart.set(event.clientX, event.clientY)
+            break
+          case 1: // middle
+            this.currentState = this.state.DOLLY
+            this.dollyStart.set(event.clientX, event.clientY)
+            break
+          case 2: // right
+            this.currentState = this.state.PAN
+            this.panStart.set(event.clientX, event.clientY)
+            break
+        }
+        
+        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this))
+        this.domElement.addEventListener('mouseup', this.onMouseUp.bind(this))
+      }
+      
+      onMouseMove(event) {
+        if (!this.enabled) return
+        
+        event.preventDefault()
+        
+        if (this.currentState === this.state.ROTATE) {
+          this.rotateEnd.set(event.clientX, event.clientY)
+          this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed)
+          
+          this.sphericalDelta.theta -= 2 * Math.PI * this.rotateDelta.x / this.domElement.clientHeight
+          this.sphericalDelta.phi -= 2 * Math.PI * this.rotateDelta.y / this.domElement.clientHeight
+          
+          this.rotateStart.copy(this.rotateEnd)
+          this.update()
+        }
+      }
+      
+      onMouseUp() {
+        if (!this.enabled) return
+        
+        this.domElement.removeEventListener('mousemove', this.onMouseMove.bind(this))
+        this.domElement.removeEventListener('mouseup', this.onMouseUp.bind(this))
+        
+        this.currentState = this.state.NONE
+      }
+      
+      onMouseWheel(event) {
+        if (!this.enabled || !this.enableZoom) return
+        
+        event.preventDefault()
+        
+        if (event.deltaY < 0) {
+          this.scale /= Math.pow(0.95, this.zoomSpeed)
+        } else if (event.deltaY > 0) {
+          this.scale *= Math.pow(0.95, this.zoomSpeed)
+        }
+        
+        this.update()
+      }
+      
+      onTouchStart(event) {
+        if (!this.enabled) return
+        
+        switch (event.touches.length) {
+          case 1:
+            this.currentState = this.state.ROTATE
+            this.rotateStart.set(event.touches[0].pageX, event.touches[0].pageY)
+            break
+          case 2:
+            this.currentState = this.state.DOLLY
+            const dx = event.touches[0].pageX - event.touches[1].pageX
+            const dy = event.touches[0].pageY - event.touches[1].pageY
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            this.dollyStart.set(0, distance)
+            break
+        }
+      }
+      
+      onTouchMove(event) {
+        if (!this.enabled) return
+        
+        event.preventDefault()
+        
+        switch (event.touches.length) {
+          case 1:
+            this.rotateEnd.set(event.touches[0].pageX, event.touches[0].pageY)
+            this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed)
+            
+            this.sphericalDelta.theta -= 2 * Math.PI * this.rotateDelta.x / this.domElement.clientHeight
+            this.sphericalDelta.phi -= 2 * Math.PI * this.rotateDelta.y / this.domElement.clientHeight
+            
+            this.rotateStart.copy(this.rotateEnd)
+            this.update()
+            break
+          case 2:
+            const dx = event.touches[0].pageX - event.touches[1].pageX
+            const dy = event.touches[0].pageY - event.touches[1].pageY
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            
+            this.dollyEnd.set(0, distance)
+            this.dollyDelta.set(0, Math.pow(this.dollyEnd.y / this.dollyStart.y, this.zoomSpeed))
+            
+            this.scale *= this.dollyDelta.y
+            this.dollyStart.copy(this.dollyEnd)
+            this.update()
+            break
+        }
+      }
+      
+      onTouchEnd() {
+        if (!this.enabled) return
+        this.currentState = this.state.NONE
+      }
+      
+      update() {
+        const offset = new THREE.Vector3()
+        const position = this.camera.position
+        
+        offset.copy(position).sub(this.target)
+        
+        this.spherical.setFromVector3(offset)
+        
+        if (this.autoRotate && this.currentState === this.state.NONE) {
+          this.sphericalDelta.theta -= 2 * Math.PI / 60 / 60 * this.autoRotateSpeed
+        }
+        
+        this.spherical.theta += this.sphericalDelta.theta
+        this.spherical.phi += this.sphericalDelta.phi
+        
+        this.spherical.phi = Math.max(0.000001, Math.min(Math.PI - 0.000001, this.spherical.phi))
+        
+        this.spherical.radius *= this.scale
+        this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius))
+        
+        this.target.add(this.panOffset)
+        
+        offset.setFromSpherical(this.spherical)
+        position.copy(this.target).add(offset)
+        
+        this.camera.lookAt(this.target)
+        
+        if (this.enableDamping) {
+          this.sphericalDelta.theta *= (1 - this.dampingFactor)
+          this.sphericalDelta.phi *= (1 - this.dampingFactor)
+        } else {
+          this.sphericalDelta.set(0, 0, 0)
+        }
+        
+        this.scale = 1
+        this.panOffset.set(0, 0, 0)
+      }
+    }
+    
+    // Виртуальный офис с встроенными контролами
+    class VirtualOffice {
+      constructor() {
+        this.scene = new THREE.Scene()
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100)
+        this.renderer = new THREE.WebGLRenderer({ antialias: true })
+        this.controls = null
+        
+        this.humanoids = []
+        this.clock = new THREE.Clock()
+        this.isDayTime = true
+        
+        this.frameCount = 0
+        this.lastTime = performance.now()
+        
+        this.init()
+        this.createOfficeStructure()
+        this.setupLighting()
+        this.setupControls()
+        this.createInitialHumanoids()
+        this.animate()
+      }
+      
+      init() {
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.renderer.setClearColor(0x87CEEB, 1)
+        this.renderer.shadowMap.enabled = true
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        
+        document.body.appendChild(this.renderer.domElement)
+        
+        this.camera.position.set(0, 1.7, 3)
+        
+        window.addEventListener('resize', () => this.handleResize())
+      }
+      
+      createOfficeStructure() {
+        // Пол
+        const floorGeometry = new THREE.PlaneGeometry(8, 6)
+        const floorMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 })
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial)
+        floor.rotation.x = -Math.PI / 2
+        floor.receiveShadow = true
+        this.scene.add(floor)
+        
+        // Стены
+        const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xE6E6FA })
+        
+        // Задняя стена
+        const backWall = new THREE.Mesh(new THREE.PlaneGeometry(8, 3), wallMaterial)
+        backWall.position.set(0, 1.5, -3)
+        this.scene.add(backWall)
+        
+        // Боковые стены
+        const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), wallMaterial)
+        leftWall.position.set(-4, 1.5, 0)
+        leftWall.rotation.y = Math.PI / 2
+        this.scene.add(leftWall)
+        
+        const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), wallMaterial)
+        rightWall.position.set(4, 1.5, 0)
+        rightWall.rotation.y = -Math.PI / 2
+        this.scene.add(rightWall)
+      }
+      
+      setupLighting() {
+        this.ambientLight = new THREE.AmbientLight(0x404040, 0.3)
+        this.scene.add(this.ambientLight)
+        
+        this.sunLight = new THREE.DirectionalLight(0xffffff, 1)
+        this.sunLight.position.set(10, 10, 5)
+        this.sunLight.castShadow = true
+        this.scene.add(this.sunLight)
+      }
+      
+      setupControls() {
+        this.controls = new SimpleOrbitControls(this.camera, this.renderer.domElement)
+        this.controls.enableDamping = true
+        this.controls.dampingFactor = 0.05
+      }
+      
+      createInitialHumanoids() {
+        this.addSimpleHumanoid('Alpha', { x: 2, y: 0, z: 1 }, 0xff6b6b)
+        this.addSimpleHumanoid('Beta', { x: -2, y: 0, z: -1 }, 0x4ecdc4)
+      }
+      
+      addSimpleHumanoid(name, position, color) {
+        const group = new THREE.Group()
+        
+        // Тело
+        const body = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.3, 0.3, 1.2),
+          new THREE.MeshLambertMaterial({ color: color })
+        )
+        body.position.y = 0.6
+        body.castShadow = true
+        group.add(body)
+        
+        // Голова
+        const head = new THREE.Mesh(
+          new THREE.SphereGeometry(0.2),
+          new THREE.MeshLambertMaterial({ color: 0xffdbac })
+        )
+        head.position.y = 1.4
+        head.castShadow = true
+        group.add(head)
+        
+        group.position.set(position.x, position.y, position.z)
+        group.scale.setScalar(0.8)
+        
+        group.userData = {
+          name: name,
+          originalY: position.y,
+          time: Math.random() * Math.PI * 2
+        }
+        
+        this.scene.add(group)
+        this.humanoids.push({
+          name,
+          object: group,
+          position
+        })
+        
+        this.updateStats()
+      }
+      
+      addWorkstation() {
+        const x = (Math.random() - 0.5) * 6
+        const z = (Math.random() - 0.5) * 4
+        
+        const desk = new THREE.Mesh(
+          new THREE.BoxGeometry(1.5, 0.05, 0.8),
+          new THREE.MeshLambertMaterial({ color: 0x8B4513 })
+        )
+        desk.position.set(x, 0.75, z)
+        desk.castShadow = true
+        this.scene.add(desk)
+      }
+      
+      toggleDay() {
+        this.isDayTime = !this.isDayTime
+        
+        if (this.isDayTime) {
+          this.renderer.setClearColor(0x87CEEB, 1)
+          this.sunLight.intensity = 1
+        } else {
+          this.renderer.setClearColor(0x191970, 1)
+          this.sunLight.intensity = 0.1
+        }
+      }
+      
+      addHumanoid() {
+        const colors = [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0xf9ca24, 0x6c5ce7]
+        const randomColor = colors[Math.floor(Math.random() * colors.length)]
+        
+        const position = {
+          x: (Math.random() - 0.5) * 6,
+          y: 0,
+          z: (Math.random() - 0.5) * 4
+        }
+        
+        const name = `Employee_${Date.now()}`
+        this.addSimpleHumanoid(name, position, randomColor)
+      }
+      
+      animate() {
+        requestAnimationFrame(() => this.animate())
+        
+        const deltaTime = this.clock.getDelta()
+        
+        // Простая анимация гуманоидов
+        this.humanoids.forEach(humanoid => {
+          if (humanoid.object.userData) {
+            humanoid.object.userData.time += deltaTime
+            const bobOffset = Math.sin(humanoid.object.userData.time * 2) * 0.05
+            humanoid.object.position.y = humanoid.object.userData.originalY + bobOffset
+          }
+        })
+        
+        this.controls.update()
+        
+        // Обновляем FPS
+        this.frameCount++
+        if (this.frameCount % 60 === 0) {
+          const fps = Math.round(60 / deltaTime) || 60
+          document.getElementById('fps').textContent = fps
+        }
+        
+        this.renderer.render(this.scene, this.camera)
+      }
+      
+      handleResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight
+        this.camera.updateProjectionMatrix()
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+      }
+      
+      updateStats() {
+        document.getElementById('humanoids').textContent = this.humanoids.length
+      }
+    }
+    
+    // Глобальные функции для кнопок
+    window.addHumanoid = () => window.office?.addHumanoid()
+    window.addWorkstation = () => window.office?.addWorkstation()
+    window.toggleDay = () => window.office?.toggleDay()
+    
+    // Инициализация
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.THREE) {
+        alert('Three.js не загружен!')
+        return
+      }
+      
+      console.log('✅ Запускаем backup офис...')
+      window.office = new VirtualOffice()
+    })
+  </script>
+</body>
+</html> 

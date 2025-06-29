@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaFor Virtual Space</title>
+  
+  <script src="../office/lib/three.min.js"></script>
+  <script src="../office/lib/GLTFLoader.js"></script>
+  
+  <style>
+    /* MetaFor цвета темы */
+    :root {
+      --primary-500: #87ceeb;    /* небесно-голубой */
+      --secondary-500: #47bd74;  /* зеленый */
+      --surface-900: #1b2634;    /* темный фон */
+      --surface-800: #222e40;    /* темнее */
+      --surface-50: #e1e4e9;     /* светлый */
+      --surface-400: #748297;    /* серый */
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Russo One', monospace, sans-serif;
+      background: var(--surface-900);
+      color: var(--surface-50);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    
+    #space-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    
+    #ui-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(27, 38, 52, 0.9);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--surface-400);
+      backdrop-filter: blur(10px);
+      font-size: 14px;
+      max-width: 280px;
+    }
+    
+    #ui-overlay h1 {
+      color: var(--primary-500);
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    #info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(27, 38, 52, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--surface-400);
+      backdrop-filter: blur(10px);
+      font-family: monospace;
+      font-size: 12px;
+      max-width: 250px;
+    }
+  </style>
+</head>
+<body>
+  <div id="space-container"></div>
+  
+  <div id="ui-overlay">
+    <h1>🌌 MetaFor Space</h1>
+    <p>Виртуальное пространство для цифрового бессмертия</p>
+    <p><strong>Тема:</strong> MetaFor Design System</p>
+    <p><strong>Управление:</strong> Мышь для вращения</p>
+  </div>
+  
+  <div id="info">
+    <div><strong>FPS:</strong> <span id="fps">60</span></div>
+    <div><strong>Агенты:</strong> <span id="agents">0</span></div>
+    <div><strong>Тема:</strong> <span id="theme">Темная</span></div>
+  </div>
+
+  <script>
+    let space = null
+    
+    // Простая версия OrbitControls
+    class SimpleOrbitControls {
+      constructor(camera, domElement) {
+        this.camera = camera
+        this.domElement = domElement
+        this.target = new THREE.Vector3()
+        
+        this.spherical = new THREE.Spherical()
+        this.sphericalDelta = new THREE.Spherical()
+        this.scale = 1
+        
+        this.rotateStart = new THREE.Vector2()
+        this.rotateEnd = new THREE.Vector2()
+        
+        this.isDown = false
+        
+        this.minDistance = 2
+        this.maxDistance = 50
+        
+        this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this))
+        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this))
+        this.domElement.addEventListener('mouseup', this.onMouseUp.bind(this))
+        this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this))
+        this.domElement.addEventListener('contextmenu', (e) => e.preventDefault())
+        
+        this.update()
+      }
+      
+      onMouseDown(event) {
+        if (event.button === 0) {
+          this.isDown = true
+          this.rotateStart.set(event.clientX, event.clientY)
+        }
+      }
+      
+      onMouseMove(event) {
+        if (!this.isDown) return
+        
+        this.rotateEnd.set(event.clientX, event.clientY)
+        const rotateDelta = new THREE.Vector2()
+        rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(0.005)
+        
+        this.sphericalDelta.theta -= rotateDelta.x
+        this.sphericalDelta.phi -= rotateDelta.y
+        
+        this.rotateStart.copy(this.rotateEnd)
+        this.update()
+      }
+      
+      onMouseUp() {
+        this.isDown = false
+      }
+      
+      onMouseWheel(event) {
+        if (event.deltaY < 0) {
+          this.scale /= 0.95
+        } else {
+          this.scale *= 0.95
+        }
+        this.update()
+      }
+      
+      update() {
+        const offset = new THREE.Vector3()
+        offset.copy(this.camera.position).sub(this.target)
+        
+        this.spherical.setFromVector3(offset)
+        this.spherical.theta += this.sphericalDelta.theta
+        this.spherical.phi += this.sphericalDelta.phi
+        this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.spherical.phi))
+        this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius * this.scale))
+        
+        offset.setFromSpherical(this.spherical)
+        this.camera.position.copy(this.target).add(offset)
+        this.camera.lookAt(this.target)
+        
+        this.sphericalDelta.set(0, 0, 0)
+        this.scale = 1
+      }
+    }
+    
+    // MetaFor Virtual Space
+    class VirtualSpace {
+      constructor() {
+        this.scene = new THREE.Scene()
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+        this.renderer = new THREE.WebGLRenderer({ antialias: true })
+        this.controls = null
+        
+        this.agents = []
+        this.clock = new THREE.Clock()
+        this.gltfLoader = new THREE.GLTFLoader()
+        this.isDarkTheme = true
+        this.loadedGLBModel = null  // Храним загруженную GLB модель
+        this.loadedGLBAnimations = [] // Храним анимации GLB модели
+        this.animationMixers = []     // Массив миксеров для анимаций
+        
+        this.frameCount = 0
+        this.lastTime = performance.now()
+        
+        this.init()
+        this.createSpace()
+        this.setupLighting()
+        this.setupControls()
+        this.loadInitialAgents()
+        this.animate()
+      }
+      
+      init() {
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.renderer.setClearColor(0x1b2634, 1) // surface-900
+        this.renderer.shadowMap.enabled = true
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        
+        const container = document.getElementById('space-container')
+        container.appendChild(this.renderer.domElement)
+        
+        this.camera.position.set(3, 2, 4)
+        this.camera.lookAt(0, 0, 0) // Смотрим на центр координат
+        
+        console.log('📷 Камера настроена максимально близко:', {
+          position: this.camera.position,
+          lookAt: '(0, 0, 0)'
+        })
+        
+        window.addEventListener('resize', () => this.handleResize())
+      }
+      
+      createSpace() {
+        // Добавляем простые ориентиры для понимания пространства
+        
+        // Центральная точка - красный куб
+        const centerCube = new THREE.Mesh(
+          new THREE.BoxGeometry(0.1, 0.1, 0.1),
+          new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        )
+        centerCube.position.set(0, 0, 0)
+        this.scene.add(centerCube)
+        
+        // Оси координат
+        const axesHelper = new THREE.AxesHelper(2)
+        this.scene.add(axesHelper)
+        
+        // Простая сетка для ориентации
+        const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222)
+        this.scene.add(gridHelper)
+        
+        console.log('🌌 Пространство с ориентирами создано')
+        console.log('🔴 Красный куб = центр (0,0,0)')
+        console.log('🎯 Цветные оси: X=красный, Y=зеленый, Z=синий')
+        console.log('📏 Сетка 10x10 для масштаба')
+      }
+      
+      setupLighting() {
+        // Мягкий ambient свет для GLB моделей
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+        this.scene.add(ambientLight)
+        
+        // Основной направленный свет для четкости моделей
+        this.mainLight = new THREE.DirectionalLight(0xffffff, 0.8)
+        this.mainLight.position.set(5, 10, 5)
+        this.scene.add(this.mainLight)
+        
+        console.log('💡 Минимальное освещение для GLB моделей настроено')
+      }
+      
+      setupControls() {
+        this.controls = new SimpleOrbitControls(this.camera, this.renderer.domElement)
+        this.controls.target.set(0, 0, 0)   // Смотрим на центр координат
+        this.controls.minDistance = 1       // Максимально близкое расстояние
+        this.controls.maxDistance = 15      // Близкое максимальное расстояние
+        
+        console.log('🎮 Управление настроено - цель в центре координат, диапазон: 1-15')
+      }
+      
+      loadInitialAgents() {
+        console.log('🤖 Создаем AI агентов...')
+        
+        // Загружаем GLB ботов
+        this.loadGLBAgents()
+        
+        console.log('✅ AI агенты создаются...')
+      }
+      
+      createTestAgents() {
+        console.log('🎯 Создаем тестовых агентов (геометрические объекты)...')
+        
+        // Агент Alpha - голубой
+        const alphaGroup = new THREE.Group()
+        
+        // Тело агента
+        const alphaBody = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.4, 0.5, 2, 16),
+          new THREE.MeshStandardMaterial({ 
+            color: 0x87ceeb, // MetaFor primary
+            metalness: 0.3,
+            roughness: 0.7
+          })
+        )
+        alphaBody.position.y = 1
+        alphaGroup.add(alphaBody)
+        
+        // Голова агента
+        const alphaHead = new THREE.Mesh(
+          new THREE.SphereGeometry(0.3, 16, 16),
+          new THREE.MeshStandardMaterial({ 
+            color: 0x87ceeb,
+            metalness: 0.2,
+            roughness: 0.8
+          })
+        )
+        alphaHead.position.y = 2.5
+        alphaGroup.add(alphaHead)
+        
+        // Глаза агента
+        const alphaEye1 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.05, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        )
+        alphaEye1.position.set(-0.1, 2.6, 0.25)
+        alphaGroup.add(alphaEye1)
+        
+        const alphaEye2 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.05, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        )
+        alphaEye2.position.set(0.1, 2.6, 0.25)
+        alphaGroup.add(alphaEye2)
+        
+        alphaGroup.position.set(2, 0, 0)
+        alphaGroup.userData = {
+          name: 'Alpha Test Agent',
+          originalY: 0,
+          time: 0
+        }
+        
+        this.scene.add(alphaGroup)
+        
+        // Агент Beta - зеленый 
+        const betaGroup = new THREE.Group()
+        
+        // Тело агента
+        const betaBody = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.4, 0.5, 2, 16),
+          new THREE.MeshStandardMaterial({ 
+            color: 0x47bd74, // MetaFor secondary
+            metalness: 0.3,
+            roughness: 0.7
+          })
+        )
+        betaBody.position.y = 1
+        betaGroup.add(betaBody)
+        
+        // Голова агента
+        const betaHead = new THREE.Mesh(
+          new THREE.SphereGeometry(0.3, 16, 16),
+          new THREE.MeshStandardMaterial({ 
+            color: 0x47bd74,
+            metalness: 0.2,
+            roughness: 0.8
+          })
+        )
+        betaHead.position.y = 2.5
+        betaGroup.add(betaHead)
+        
+        // Глаза агента
+        const betaEye1 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.05, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        )
+        betaEye1.position.set(-0.1, 2.6, 0.25)
+        betaGroup.add(betaEye1)
+        
+        const betaEye2 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.05, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        )
+        betaEye2.position.set(0.1, 2.6, 0.25)
+        betaGroup.add(betaEye2)
+        
+        betaGroup.position.set(-2, 0, 0)
+        betaGroup.userData = {
+          name: 'Beta Test Agent',
+          originalY: 0,
+          time: Math.PI // Сдвиг фазы для разной анимации
+        }
+        
+        this.scene.add(betaGroup)
+        
+        // Добавляем в массив агентов
+        this.agents.push({
+          name: 'Alpha Test Agent',
+          object: alphaGroup,
+          type: 'TEST',
+          position: { x: 2, y: 0, z: 0 }
+        })
+        
+        this.agents.push({
+          name: 'Beta Test Agent',
+          object: betaGroup,
+          type: 'TEST',
+          position: { x: -2, y: 0, z: 0 }
+        })
+        
+        console.log('✅ Тестовые агенты созданы! Alpha (голубой) и Beta (зеленый)')
+        console.log('👀 Глаза: Alpha - зеленые, Beta - красные')
+        
+        this.updateStats()
+      }
+      
+      loadGLBAgents() {
+        console.log('🤖 Загружаем только GLB модели в пространство...')
+        
+        // Правильные пути из space/ папки
+        const glbPaths = [
+          '../assets/models/humanoids/bots.glb',
+          'assets/models/humanoids/bots.glb',
+          '/assets/models/humanoids/bots.glb'
+        ]
+        
+        console.log('📂 Пробуем загрузить GLB по путям:', glbPaths)
+        
+        // Пробуем первый путь
+        this.tryLoadGLB(glbPaths, 0)
+      }
+      
+      tryLoadGLB(paths, index) {
+        if (index >= paths.length) {
+          console.error('❌ Все пути к GLB файлу не сработали!')
+          console.log('🟣 Используем только тестовые агенты')
+          return
+        }
+        
+        const currentPath = paths[index]
+        console.log(`🔍 Загружаем GLB: ${currentPath} (попытка ${index + 1}/${paths.length})`)
+        
+        this.gltfLoader.load(
+          currentPath,
+          (gltf) => {
+            console.log(`✅ GLB УСПЕШНО ЗАГРУЖЕН: ${currentPath}`)
+            console.log('📊 GLB содержит:', {
+              children: gltf.scene.children.length,
+              animations: gltf.animations.length
+            })
+            
+            this.handleGLBSuccess(gltf)
+          },
+          (progress) => {
+            const percent = progress.total > 0 ? Math.round((progress.loaded / progress.total) * 100) : '?'
+            console.log(`⏳ Загрузка GLB: ${percent}% (${progress.loaded} байт)`)
+          },
+          (error) => {
+            console.warn(`❌ Путь ${currentPath} не сработал:`, error)
+            
+            // CORS ошибка?
+            if (error.message && error.message.includes('CORS')) {
+              console.error('🚫 CORS ОШИБКА! Проверьте настройки сервера')
+            }
+            
+            // Пробуем следующий путь
+            this.tryLoadGLB(paths, index + 1)
+          }
+        )
+      }
+      
+      handleGLBSuccess(gltf) {
+        console.log('🎉 Обрабатываем GLB модель...')
+        
+        // Сохраняем оригинальную сцену и анимации
+        this.loadedGLBModel = gltf.scene
+        this.loadedGLBAnimations = gltf.animations || []
+        
+        console.log(`🎬 Найдено анимаций: ${this.loadedGLBAnimations.length}`)
+        this.loadedGLBAnimations.forEach((animation, index) => {
+          console.log(`  ${index + 1}. ${animation.name} (${animation.duration.toFixed(2)}s)`)
+        })
+        
+        // Подробная диагностика содержимого
+        console.log('🔍 ДИАГНОСТИКА GLB:')
+        let meshCount = 0
+        gltf.scene.traverse((child) => {
+          if (child.isMesh) {
+            meshCount++
+            console.log(`  Mesh ${meshCount}: ${child.name || 'unnamed'}`)
+            console.log(`    Тип: ${child.type}`)
+            console.log(`    Геометрия: ${child.geometry.type}`)
+            console.log(`    Vertices: ${child.geometry.attributes.position?.count || 'unknown'}`)
+            console.log(`    Материал: ${child.material?.type || 'none'}`)
+            console.log(`    Позиция: (${child.position.x}, ${child.position.y}, ${child.position.z})`)
+            console.log(`    Масштаб: (${child.scale.x}, ${child.scale.y}, ${child.scale.z})`)
+            console.log(`    Видимый: ${child.visible}`)
+            
+            // Вычисляем bounding box
+            if (!child.geometry.boundingBox) {
+              child.geometry.computeBoundingBox()
+            }
+            const box = child.geometry.boundingBox
+            if (box) {
+              const size = new THREE.Vector3()
+              box.getSize(size)
+              console.log(`    Размер: ${size.x.toFixed(2)} x ${size.y.toFixed(2)} x ${size.z.toFixed(2)}`)
+            }
+          }
+        })
+        
+        console.log(`📊 Всего mesh объектов в GLB: ${meshCount}`)
+        
+        // Создаем простой GLB агент в центре
+        this.createSimpleGLBAgent(gltf.scene)
+      }
+      
+      createSimpleGLBAgent(originalScene) {
+        console.log('🤖 Создаем простого GLB агента...')
+        
+        // Клонируем сцену
+        const agent = originalScene.clone()
+        
+        // Возвращаем нормальный масштаб для правильного отображения
+        agent.scale.set(.0001, .0001, .0001)  // Оригинальный размер
+        agent.position.set(0, 0, -5) // Отодвигаем от центра
+        
+        // Принудительно делаем все mesh видимыми с яркими материалами
+        let meshCounter = 0
+        agent.traverse((child) => {
+          if (child.isMesh) {
+            meshCounter++
+            
+            console.log(`🔍 Обрабатываем mesh ${meshCounter}: ${child.name}`)
+            console.log(`   Тип: ${child.type}`)
+            console.log(`   isSkinnedMesh: ${child.isSkinnedMesh}`)
+            console.log(`   Geometry: ${child.geometry.type}`)
+            console.log(`   Оригинальный материал: ${child.material.type}`)
+            
+            // Сохраняем оригинальные материалы модели
+            console.log(`   🎨 Сохраняем оригинальный материал для: ${child.name}`)
+            
+            if (child.isSkinnedMesh) {
+              console.log(`   🦴 SkinnedMesh: ${child.name}`)
+              console.log(`   Skeleton: ${child.skeleton ? 'есть' : 'НЕТ'}`)
+              if (child.skeleton) {
+                console.log(`   Bones: ${child.skeleton.bones.length}`)
+                
+                // НЕ устанавливаем базовую позу - это мешает анимациям!
+                // child.skeleton.pose() - убираем это!
+                console.log(`   🎬 Скелет готов для анимации (поза НЕ сброшена)`)
+              }
+              
+              // Только настраиваем skinning для оригинального материала
+              if (child.material && child.material.skinning !== true) {
+                child.material.skinning = true
+                child.material.needsUpdate = true
+                console.log(`   🦴 Включен skinning для оригинального материала`)
+              }
+            }
+            
+            console.log(`   ✅ Оригинальный материал сохранен: ${child.material?.type || 'none'}`)
+            
+            // Принудительно включаем видимость
+            child.visible = true
+            child.frustumCulled = false
+            child.castShadow = true
+            child.receiveShadow = true
+            
+            // Принудительно обновляем материал
+            child.material.needsUpdate = true
+            
+            console.log(`✨ GLB Mesh ${meshCounter}: ${child.name} -> обработан`)
+          }
+        })
+        
+        this.scene.add(agent)
+        
+        // Создаем миксер для анимаций GLB
+        let mixer = null
+        if (this.loadedGLBAnimations.length > 0) {
+          mixer = new THREE.AnimationMixer(agent)
+          this.animationMixers.push(mixer)
+          
+          console.log(`🎬 Создан AnimationMixer для ${this.loadedGLBAnimations.length} анимаций`)
+          
+          // Запускаем все анимации танца с правильными настройками
+          this.loadedGLBAnimations.forEach((animation, index) => {
+            const action = mixer.clipAction(animation)
+            
+            // Настройка для танцевальных анимаций
+            action.setLoop(THREE.LoopRepeat)  // Зацикливаем
+            action.clampWhenFinished = false  // Не останавливаемся в конце
+            action.reset()                    // Сбрасываем состояние
+            action.play()                     // Запускаем
+            
+            console.log(`💃 Запущена танцевальная анимация ${index + 1}: "${animation.name}" (${animation.duration.toFixed(2)}s)`)
+          })
+        }
+        
+        // Добавляем в массив агентов
+        this.agents.push({
+          name: 'GLB Agent',
+          object: agent,
+          type: 'GLB',
+          position: { x: 0, y: 0, z: -5 },
+          mixer: mixer  // Сохраняем миксер
+        })
+        
+        // Анимация покачивания (дополнительная)
+        agent.userData = {
+          name: 'GLB Agent',
+          originalY: 0,
+          time: 0,
+          mixer: mixer
+        }
+        
+        console.log(`🎉 GLB агент создан! ${meshCounter} mesh объектов`)
+        console.log('📍 Позиция GLB агента: (0, 0, -5), масштаб: 1x - оригинальный размер')
+        console.log('🎨 Оригинальные материалы модели сохранены')
+        console.log('🦴 Скелет готов для анимации (поза НЕ сброшена)')
+        if (this.loadedGLBAnimations.length > 0) {
+          console.log(`💃 GLB танцевальные анимации АКТИВНЫ: ${this.loadedGLBAnimations.length} анимаций`)
+          console.log('🎬 Если танца не видно - вызовите showAnimations() для диагностики')
+        } else {
+          console.log('❌ GLB анимации не найдены - статичная модель')
+        }
+        
+        this.updateStats()
+        
+        // Камера максимально близко для детального обзора
+        this.camera.position.set(3, 2, 4)        // Максимально близко к объектам
+        this.camera.lookAt(0, 0, 0)               // Смотрим на центр
+        this.controls.target.set(0, 0, 0)         // Центр управления в начале координат
+        this.controls.minDistance = 1             // Максимально близкое расстояние
+        this.controls.maxDistance = 15            // Ближнее максимальное расстояние
+        
+        console.log('📷 КАМЕРА МАКСИМАЛЬНО ПРИБЛИЖЕНА К GLB!')
+        console.log('📷 Позиция камеры: (3, 2, 4)')  
+        console.log('📷 Цель камеры: (0, 0, 0) - центр координат')
+        console.log('📷 GLB модель в позиции: (0, 0, -5)')
+        console.log('📷 Диапазон зума: 1-15 единиц')
+        
+        // Дополнительная диагностика сцены
+        console.log('🔍 ПОЛНАЯ ДИАГНОСТИКА СЦЕНЫ:')
+        let totalObjects = 0
+        this.scene.traverse((child) => {
+          if (child.isMesh) {
+            totalObjects++
+            const pos = child.position
+            const worldPos = new THREE.Vector3()
+            child.getWorldPosition(worldPos)
+            console.log(`  Объект ${totalObjects}: ${child.name || 'unnamed'} в (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}) мировая: (${worldPos.x.toFixed(1)}, ${worldPos.y.toFixed(1)}, ${worldPos.z.toFixed(1)})`)
+            
+            // Дополнительная информация для GLB объектов
+            if (child.name && (child.name.includes('Alpha') || child.name.includes('Beta'))) {
+              console.log(`    🤖 GLB объект: материал ${child.material.type}, цвет ${child.material.color ? child.material.color.getHexString() : 'none'}`)
+              console.log(`    🤖 Видимый: ${child.visible}, frustumCulled: ${child.frustumCulled}`)
+            }
+          }
+        })
+        console.log(`📊 ВСЕГО ОБЪЕКТОВ В СЦЕНЕ: ${totalObjects}`)
+        
+        // Принудительно рендерим сцену
+        console.log('🔄 Принудительный рендер...')
+        setTimeout(() => {
+          console.log('⚡ Попытка принудительного обновления рендера через 1 сек')
+        }, 1000)
+      }
+      
+      animate() {
+        try {
+          requestAnimationFrame(() => this.animate())
+          
+          this.frameCount++
+          const now = performance.now()
+          const deltaTime = Math.min((now - this.lastTime) / 1000, 0.1)
+          this.lastTime = now
+          
+          const animationDelta = this.clock.getDelta()
+          
+          // Обновляем GLB анимации
+          this.animationMixers.forEach(mixer => {
+            if (mixer) {
+              mixer.update(animationDelta)
+            }
+          })
+          
+          // Дополнительная анимация агентов (покачивание)
+          this.agents.forEach(agent => {
+            if (agent.object && agent.object.userData) {
+              agent.object.userData.time += animationDelta
+              
+              // Для GLB агентов НЕ добавляем покачивание - пусть танцуют!
+              if (agent.type === 'GLB') {
+                // Танцевальные анимации сами управляют позицией
+                // НЕ добавляем никаких дополнительных движений
+              } else {
+                // Для не-GLB агентов оставляем прежнюю анимацию
+                const bobOffset = Math.sin(agent.object.userData.time * 2) * 0.2
+                agent.object.position.y = agent.object.userData.originalY + bobOffset
+                agent.object.rotation.y += Math.sin(agent.object.userData.time * 1.5) * 0.01
+              }
+            }
+          })
+          
+          this.renderer.render(this.scene, this.camera)
+          
+          // Обновляем статистику
+          if (this.frameCount % 60 === 0) {
+            const fps = Math.round(1 / deltaTime) || 60
+            document.getElementById('fps').textContent = fps
+          }
+          
+        } catch (error) {
+          console.error('❌ Ошибка анимации:', error)
+        }
+      }
+      
+      handleResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight
+        this.camera.updateProjectionMatrix()
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+      }
+      
+      addAgent() {
+        const position = {
+          x: (Math.random() - 0.5) * 5,  // Уменьшаем радиус размещения
+          y: 0,
+          z: (Math.random() - 0.5) * 5
+        }
+        
+        const name = `GLB_Agent_${Date.now()}`
+        
+        // Создаем только GLB агентов
+        if (this.loadedGLBModel) {
+          console.log('🤖 Создаем новый GLB агент:', name)
+          const agent = this.createGLBAgent(name, position)
+          console.log(`✅ Добавлен новый GLB агент: ${name}`)
+          this.updateStats()
+          return agent
+        } else {
+          console.log('❌ GLB модель не загружена, невозможно создать агента')
+          return null
+        }
+      }
+      
+      createTestAgent(name, position) {
+        console.log('🎯 Создаем одного тестового агента:', name)
+        
+        const agentGroup = new THREE.Group()
+        
+        // Случайный цвет агента
+        const colors = [0x87ceeb, 0x47bd74, 0xff6b6b, 0xffd93d, 0x6bcf7f]
+        const color = colors[Math.floor(Math.random() * colors.length)]
+        const eyeColors = [0x00ff00, 0xff0000, 0x0099ff, 0xff9900, 0xff00ff]
+        const eyeColor = eyeColors[Math.floor(Math.random() * eyeColors.length)]
+        
+        // Тело агента
+        const body = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.3, 0.4, 1.8, 16),
+          new THREE.MeshStandardMaterial({ 
+            color: color,
+            metalness: 0.4,
+            roughness: 0.6
+          })
+        )
+        body.position.y = 1
+        agentGroup.add(body)
+        
+        // Голова агента
+        const head = new THREE.Mesh(
+          new THREE.SphereGeometry(0.25, 16, 16),
+          new THREE.MeshStandardMaterial({ 
+            color: color,
+            metalness: 0.3,
+            roughness: 0.7
+          })
+        )
+        head.position.y = 2.3
+        agentGroup.add(head)
+        
+        // Глаза агента
+        const eye1 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.04, 8, 8),
+          new THREE.MeshBasicMaterial({ color: eyeColor })
+        )
+        eye1.position.set(-0.08, 2.4, 0.22)
+        agentGroup.add(eye1)
+        
+        const eye2 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.04, 8, 8),
+          new THREE.MeshBasicMaterial({ color: eyeColor })
+        )
+        eye2.position.set(0.08, 2.4, 0.22)
+        agentGroup.add(eye2)
+        
+        // Позиция и анимация
+        agentGroup.position.set(position.x, position.y, position.z)
+        agentGroup.userData = {
+          name: name,
+          originalY: position.y,
+          time: Math.random() * Math.PI * 2
+        }
+        
+        this.scene.add(agentGroup)
+        
+        const agentData = {
+          name,
+          object: agentGroup,
+          type: 'TEST',
+          position
+        }
+        
+        this.agents.push(agentData)
+        
+        return agentData
+      }
+      
+      createGLBAgent(name, position) {
+        console.log('🔧 Создаем GLB агента из загруженной модели...')
+        
+        // Клонируем загруженную модель
+        const agentObject = this.loadedGLBModel.clone()
+        
+        // Применяем позицию и нормальный масштаб
+        agentObject.position.set(position.x, position.y, position.z)
+        agentObject.scale.set(.00001, .00001, .00001)  // Оригинальный размер
+        
+        // Обрабатываем материалы для правильной работы
+        agentObject.traverse((child) => {
+          if (child.isMesh && child.material) {
+            const isSkinnedMesh = child.isSkinnedMesh || child.type === 'SkinnedMesh'
+            
+            // Сохраняем оригинальный материал, только настраиваем skinning
+            if (isSkinnedMesh && child.material.skinning !== true) {
+              child.material.skinning = true
+              console.log('🔧 Включен skinning для клонированного SkinnedMesh:', child.name)
+            }
+            
+            child.visible = true
+            child.frustumCulled = false
+            
+            if (!isSkinnedMesh) {
+              child.castShadow = true
+              child.receiveShadow = true
+            }
+            
+            console.log('✨ Оригинальный материал сохранен для агента:', child.name)
+          }
+        })
+        
+        // Анимация покачивания
+        agentObject.userData = {
+          name: name,
+          originalY: position.y,
+          time: Math.random() * Math.PI * 2,
+          mixer: mixer
+        }
+        
+        this.scene.add(agentObject)
+        
+        // Создаем миксер для анимаций нового GLB агента
+        let mixer = null
+        if (this.loadedGLBAnimations.length > 0) {
+          mixer = new THREE.AnimationMixer(agentObject)
+          this.animationMixers.push(mixer)
+          
+          // Запускаем все анимации танца для нового агента
+          this.loadedGLBAnimations.forEach((animation, index) => {
+            const action = mixer.clipAction(animation)
+            
+            // Настройка для танцевальных анимаций
+            action.setLoop(THREE.LoopRepeat)  // Зацикливаем
+            action.clampWhenFinished = false  // Не останавливаемся в конце
+            action.reset()                    // Сбрасываем состояние
+            action.play()                     // Запускаем
+            
+            console.log(`💃 Запущена танцевальная анимация для ${name}: "${animation.name}"`)
+          })
+          
+          console.log(`🎬 Все танцевальные анимации запущены для: ${name}`)
+        }
+        
+        const agentData = {
+          name,
+          object: agentObject,
+          type: 'GLB',
+          position,
+          mixer: mixer
+        }
+        
+        this.agents.push(agentData)
+        console.log('🎉 GLB агент создан и добавлен в сцену!')
+        
+        return agentData
+      }
+      
+      toggleTheme() {
+        this.isDarkTheme = !this.isDarkTheme
+        
+        if (this.isDarkTheme) {
+          this.renderer.setClearColor(0x1b2634, 1) // surface-900
+          document.getElementById('theme').textContent = 'Темная'
+        } else {
+          this.renderer.setClearColor(0xe1e4e9, 1) // surface-50
+          document.getElementById('theme').textContent = 'Светлая'
+        }
+        
+        console.log('🎨 Тема переключена:', this.isDarkTheme ? 'Темная' : 'Светлая')
+      }
+      
+      updateStats() {
+        document.getElementById('agents').textContent = this.agents.length
+      }
+      
+      resetCamera() {
+        this.camera.position.set(3, 2, 4)
+        this.camera.lookAt(0, 0, 0)
+        this.controls.target.set(0, 0, 0)
+        this.controls.update()
+        
+        console.log('📷 Камера сброшена в максимально близкое положение (3, 2, 4)')
+      }
+      
+      toggleWireframe() {
+        this.scene.traverse((child) => {
+          if (child.isMesh && child.material) {
+            child.material.wireframe = !child.material.wireframe
+            child.material.needsUpdate = true
+          }
+        })
+        console.log('🔍 Wireframe режим переключен')
+      }
+      
+      resetSkeletons() {
+        this.scene.traverse((child) => {
+          if (child.isSkinnedMesh && child.skeleton) {
+            child.skeleton.pose()
+            console.log(`🦴 Поза скелета сброшена для: ${child.name}`)
+          }
+        })
+        console.log('🦴 Все скелеты сброшены в базовую позу')
+      }
+      
+      pauseAnimations() {
+        this.animationMixers.forEach((mixer, index) => {
+          if (mixer) {
+            mixer.timeScale = 0
+            console.log(`⏸️ Анимация ${index + 1} приостановлена`)
+          }
+        })
+        console.log('⏸️ Все GLB анимации приостановлены')
+      }
+      
+      playAnimations() {
+        this.animationMixers.forEach((mixer, index) => {
+          if (mixer) {
+            mixer.timeScale = 1
+            console.log(`▶️ Анимация ${index + 1} запущена`)
+          }
+        })
+        console.log('▶️ Все GLB анимации запущены')
+      }
+      
+      setAnimationSpeed(speed = 1) {
+        this.animationMixers.forEach((mixer, index) => {
+          if (mixer) {
+            mixer.timeScale = speed
+            console.log(`⚡ Скорость анимации ${index + 1} установлена: ${speed}x`)
+          }
+        })
+        console.log(`⚡ Скорость всех GLB анимаций: ${speed}x`)
+      }
+      
+      showAnimations() {
+        console.log('🎬 ДИАГНОСТИКА ТАНЦЕВАЛЬНЫХ АНИМАЦИЙ:')
+        console.log(`📊 Всего анимаций в GLB: ${this.loadedGLBAnimations.length}`)
+        console.log(`🎭 Активных миксеров: ${this.animationMixers.length}`)
+        
+        if (this.loadedGLBAnimations.length === 0) {
+          console.log('❌ Анимации не найдены в GLB файле!')
+          return { animations: 0, mixers: 0, list: [] }
+        }
+        
+        this.loadedGLBAnimations.forEach((animation, index) => {
+          console.log(`  💃 ${index + 1}. "${animation.name}" - ${animation.duration.toFixed(2)}s`)
+          console.log(`     Треки: ${animation.tracks.length}`)
+        })
+        
+        // Проверяем состояние миксеров
+        this.animationMixers.forEach((mixer, index) => {
+          if (mixer) {
+            console.log(`🎭 Миксер ${index + 1}: timeScale=${mixer.timeScale}, время=${mixer.time.toFixed(2)}s`)
+            mixer._actions.forEach((action, actionIndex) => {
+              console.log(`   🎬 Action ${actionIndex + 1}: ${action.isRunning() ? '▶️ ИГРАЕТ' : '⏹️ ОСТАНОВЛЕН'}, вес=${action.weight}`)
+            })
+          }
+        })
+        
+        return {
+          animations: this.loadedGLBAnimations.length,
+          mixers: this.animationMixers.length,
+          list: this.loadedGLBAnimations.map(a => ({ name: a.name, duration: a.duration }))
+        }
+      }
+      
+      restartAnimations() {
+        console.log('🔄 ПРИНУДИТЕЛЬНЫЙ ПЕРЕЗАПУСК ТАНЦЕВАЛЬНЫХ АНИМАЦИЙ...')
+        
+        if (this.loadedGLBAnimations.length === 0) {
+          console.log('❌ Нет анимаций для перезапуска!')
+          return
+        }
+        
+        this.animationMixers.forEach((mixer, mixerIndex) => {
+          if (mixer) {
+            console.log(`🎭 Перезапускаем миксер ${mixerIndex + 1}...`)
+            
+            // Останавливаем все действия
+            mixer.stopAllAction()
+            
+            // Перезапускаем с правильными настройками
+            this.loadedGLBAnimations.forEach((animation, animIndex) => {
+              const action = mixer.clipAction(animation)
+              
+              // Принудительные настройки танца
+              action.setLoop(THREE.LoopRepeat)
+              action.clampWhenFinished = false
+              action.reset()
+              action.setEffectiveWeight(1)     // Полный вес
+              action.setEffectiveTimeScale(1)  // Нормальная скорость
+              action.play()
+              
+              console.log(`💃 ПРИНУДИТЕЛЬНО запущена: "${animation.name}"`)
+            })
+          }
+        })
+        
+        console.log('✅ Все танцевальные анимации перезапущены!')
+      }
+    }
+    
+    // Инициализация
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (!window.THREE || !window.THREE.GLTFLoader) {
+          console.log('⏳ Ждем загрузки Three.js и GLTFLoader...')
+          setTimeout(() => space = new VirtualSpace(), 500)
+          return
+        }
+        
+        console.log('✅ Three.js загружен, запускаем пространство...')
+        space = new VirtualSpace()
+        
+        console.log(`
+        🌌 MetaFor Virtual Space запущен!
+        
+        ✅ Пространство с ориентирами создано
+        ✅ Минимальное освещение настроено
+        ✅ GLB модели с оригинальными материалами и размером
+        
+        👀 ЧТО ВЫ ДОЛЖНЫ ВИДЕТЬ:
+        🔴 Красный кубик в центре (0,0,0)
+        🎯 Цветные оси координат (X=красный, Y=зеленый, Z=синий)
+        📏 Серая сетка на полу 10x10
+        🤖 GLB модель гуманоида с оригинальными материалами
+        💃 ТАНЦУЮЩАЯ модель (если в GLB есть анимации танца)
+        📷 Камера находится максимально близко для детального обзора
+        
+        🚨 ЕСЛИ ТАНЕЦ НЕ ВИДЕН:
+        1. Вызовите showAnimations() для диагностики
+        2. Попробуйте restartAnimations() для принудительного перезапуска
+        
+        🎮 Доступные команды в консоли:
+        ✨ addAgent() - добавить GLB агента
+        🎨 toggleTheme() - переключить тему
+        📷 resetCamera() - сбросить камеру  
+        🤖 showAgents() - показать всех GLB агентов
+        🔍 debugScene() - отладка всех объектов в сцене
+        📐 toggleWireframe() - переключить wireframe режим
+        🦴 resetSkeletons() - сбросить позы всех скелетов
+        
+        🎬 УПРАВЛЕНИЕ GLB АНИМАЦИЯМИ ТАНЦА:
+        ▶️ playAnimations() - запустить все анимации
+        ⏸️ pauseAnimations() - приостановить все анимации
+        ⚡ setAnimationSpeed(speed) - установить скорость (например: 0.5, 2)
+        🎭 showAnimations() - диагностика состояния анимаций
+        🔄 restartAnimations() - принудительный перезапуск танцев
+        `)
+        
+        // Глобальные функции для удобства
+        window.addAgent = () => space.addAgent()
+        window.toggleTheme = () => space.toggleTheme()
+        window.resetCamera = () => space.resetCamera()
+        window.toggleWireframe = () => space.toggleWireframe()
+        window.resetSkeletons = () => space.resetSkeletons()
+        window.pauseAnimations = () => space.pauseAnimations()
+        window.playAnimations = () => space.playAnimations()
+        window.setAnimationSpeed = (speed) => space.setAnimationSpeed(speed)
+        window.showAnimations = () => space.showAnimations()
+        window.restartAnimations = () => space.restartAnimations()
+        window.showAgents = () => {
+          console.log('🤖 Все агенты:', space.agents.map(a => `${a.name} (${a.type})`))
+          return space.agents
+        }
+        window.debugScene = () => {
+          console.log('🔍 ОТЛАДКА СЦЕНЫ:')
+          console.log('📷 Камера:', space.camera.position)
+          console.log('🎯 Цель камеры:', space.controls.target)
+          let count = 0
+          let skinnedCount = 0
+          space.scene.traverse((obj) => {
+            if (obj.isMesh) {
+              count++
+              const pos = obj.position
+              console.log(`  ${count}. ${obj.name || 'unnamed'} в (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)})`)
+              if (obj.isSkinnedMesh) {
+                skinnedCount++
+                console.log(`    🦴 SkinnedMesh: скелет ${obj.skeleton ? 'есть' : 'НЕТ'}`)
+              }
+            }
+          })
+          console.log(`📊 Всего mesh объектов: ${count}`)
+          console.log(`🦴 SkinnedMesh объектов: ${skinnedCount}`)
+          console.log(`🤖 GLB агентов: ${space.agents.length}`)
+          return { camera: space.camera.position, meshes: count, skinned: skinnedCount, agents: space.agents.length }
+        }
+      }, 300)
+    })
+  </script>
+</body>
+</html> 

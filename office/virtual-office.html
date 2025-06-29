@@ -5,8 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MetaFor Virtual Office - Виртуальный офис</title>
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+      <script src="lib/three.min.js"></script>
+  <script src="lib/GLTFLoader.js"></script>
+  
+  <script>
+    // Встроенные OrbitControls (упрощенная версия)
+    THREE.OrbitControls = class OrbitControls {
+      constructor(camera, domElement) {
+        this.camera = camera
+        this.domElement = domElement || document
+        this.enabled = true
+        
+        this.target = new THREE.Vector3()
+        this.minDistance = 0
+        this.maxDistance = Infinity
+        this.enableDamping = true
+        this.dampingFactor = 0.05
+        this.enableZoom = true
+        this.zoomSpeed = 1.0
+        this.enableRotate = true
+        this.rotateSpeed = 1.0
+        
+        this.spherical = new THREE.Spherical()
+        this.sphericalDelta = new THREE.Spherical()
+        this.scale = 1
+        
+        this.state = { NONE: -1, ROTATE: 0, DOLLY: 1 }
+        this.currentState = this.state.NONE
+        
+        this.rotateStart = new THREE.Vector2()
+        this.rotateEnd = new THREE.Vector2()
+        this.rotateDelta = new THREE.Vector2()
+        
+        this.dollyStart = new THREE.Vector2()
+        this.dollyEnd = new THREE.Vector2()
+        this.dollyDelta = new THREE.Vector2()
+        
+        this.bindEvents()
+        this.update()
+      }
+      
+      bindEvents() {
+        this.domElement.addEventListener('contextmenu', (e) => e.preventDefault())
+        this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this))
+        this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this))
+      }
+      
+      onMouseDown(event) {
+        if (!this.enabled) return
+        event.preventDefault()
+        
+        if (event.button === 0) {
+          this.currentState = this.state.ROTATE
+          this.rotateStart.set(event.clientX, event.clientY)
+        }
+        
+        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this))
+        this.domElement.addEventListener('mouseup', this.onMouseUp.bind(this))
+      }
+      
+      onMouseMove(event) {
+        if (!this.enabled) return
+        event.preventDefault()
+        
+        if (this.currentState === this.state.ROTATE) {
+          this.rotateEnd.set(event.clientX, event.clientY)
+          this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed)
+          
+          this.sphericalDelta.theta -= 2 * Math.PI * this.rotateDelta.x / this.domElement.clientHeight
+          this.sphericalDelta.phi -= 2 * Math.PI * this.rotateDelta.y / this.domElement.clientHeight
+          
+          this.rotateStart.copy(this.rotateEnd)
+          this.update()
+        }
+      }
+      
+      onMouseUp() {
+        if (!this.enabled) return
+        this.domElement.removeEventListener('mousemove', this.onMouseMove.bind(this))
+        this.domElement.removeEventListener('mouseup', this.onMouseUp.bind(this))
+        this.currentState = this.state.NONE
+      }
+      
+      onMouseWheel(event) {
+        if (!this.enabled || !this.enableZoom) return
+        event.preventDefault()
+        
+        if (event.deltaY < 0) {
+          this.scale /= Math.pow(0.95, this.zoomSpeed)
+        } else if (event.deltaY > 0) {
+          this.scale *= Math.pow(0.95, this.zoomSpeed)
+        }
+        
+        this.update()
+      }
+      
+      update() {
+        const offset = new THREE.Vector3()
+        offset.copy(this.camera.position).sub(this.target)
+        
+        this.spherical.setFromVector3(offset)
+        
+        this.spherical.theta += this.sphericalDelta.theta
+        this.spherical.phi += this.sphericalDelta.phi
+        
+        this.spherical.phi = Math.max(0.000001, Math.min(Math.PI - 0.000001, this.spherical.phi))
+        this.spherical.radius *= this.scale
+        this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius))
+        
+        offset.setFromSpherical(this.spherical)
+        this.camera.position.copy(this.target).add(offset)
+        this.camera.lookAt(this.target)
+        
+        if (this.enableDamping) {
+          this.sphericalDelta.theta *= (1 - this.dampingFactor)
+          this.sphericalDelta.phi *= (1 - this.dampingFactor)
+        } else {
+          this.sphericalDelta.set(0, 0, 0)
+        }
+        
+        this.scale = 1
+      }
+    }
+    
+               // GLTFLoader теперь загружен локально
+  </script>
   
   <style>
     body {
@@ -102,27 +225,64 @@
     <button onclick="addWorkstation()">Добавить рабочее место</button>
     <button onclick="toggleLighting()">Освещение</button>
     <button onclick="addMetaScreen()">MetaFor экран</button>
+    <button onclick="addHumanoid()">Добавить сотрудника 🤖</button>
     <button onclick="toggleDay()">День/Ночь</button>
   </div>
   
   <div id="info">
     <div><strong>FPS:</strong> <span id="fps">60</span></div>
     <div><strong>Объекты:</strong> <span id="objects">0</span></div>
+    <div><strong>Сотрудники:</strong> <span id="humanoids">0</span></div>
     <div><strong>Освещение:</strong> <span id="lights">Дневное</span></div>
     <div><strong>Время:</strong> <span id="time">12:00</span></div>
   </div>
 
   <script>
+    // Ждем загрузки глобальных скриптов
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initOffice, 300) // Даем время для загрузки скриптов
+    })
+    
+    function initOffice() {
+              if (!window.THREE || !window.THREE.OrbitControls || !window.THREE.GLTFLoader) {
+        console.log('⏳ Ждем загрузки Three.js скриптов...')
+        setTimeout(initOffice, 100)
+        return
+      }
+      
+      console.log('✅ Three.js скрипты загружены, запускаем офис...')
+      window.office = new VirtualOffice()
+      
+      console.log(`
+      🏢 MetaFor Virtual Office запущен!
+      
+      ✅ Офис-студия 8м × 6м × 3м создан
+      ✅ Базовая мебель размещена
+      ✅ Освещение настроено
+      ✅ Анимированные сотрудники загружаются...
+      ✅ Интерактивность добавлена
+      
+      Управление:
+      - Мышь: вращение камеры
+      - Колесо: приближение/отдаление
+      - Кнопки: добавление объектов и сотрудников
+      `)
+    }
+    
     // Виртуальный офис-студия MetaFor
     class VirtualOffice {
       constructor() {
         this.scene = new THREE.Scene()
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100)
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000)
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         this.controls = null
         
         this.workstations = []
         this.metaScreens = []
+        this.humanoids = []
+        this.mixers = []
+        this.clock = new THREE.Clock()
+        this.gltfLoader = new THREE.GLTFLoader()
         this.isDayTime = true
         this.lightingEnabled = true
         
@@ -134,6 +294,7 @@
         this.createFurniture()
         this.setupLighting()
         this.setupControls()
+        this.loadInitialHumanoids()
         this.animate()
       }
       
@@ -148,8 +309,9 @@
          const container = document.getElementById('office-container')
          container.appendChild(this.renderer.domElement)
          
-         // Позиция камеры в центре комнаты
-         this.camera.position.set(0, 1.7, 2) // Рост человека ~1.7м
+         // Позиция камеры снаружи офиса для обзора всей сцены  
+         this.camera.position.set(6, 4, 6) // Камера высоко и снаружи офиса
+         this.camera.lookAt(0, 0, 0) // Смотрим в центр офиса
          
          window.addEventListener('resize', () => this.handleResize())
        }
@@ -332,34 +494,286 @@
        }
        
        setupControls() {
-         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
-         this.controls.enableDamping = true
-         this.controls.dampingFactor = 0.05
-         this.controls.maxPolarAngle = Math.PI / 2 - 0.1
-         this.controls.maxDistance = 8
-         this.controls.minDistance = 1
+                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
+        this.controls.target.set(0, 1, 0) // Смотрим в центр офиса на уровне стола
+        this.controls.enableDamping = true
+        this.controls.dampingFactor = 0.05
+        this.controls.minDistance = 2
+        this.controls.maxDistance = 20
+        this.controls.maxPolarAngle = Math.PI * 0.8 // Не даем камере уйти под пол
+        console.log('🎮 OrbitControls настроены:', {
+          target: this.controls.target,
+          minDistance: this.controls.minDistance,
+          maxDistance: this.controls.maxDistance
+        })
+         
+                 this.controls.update() // Обновляем контролы
+         
+         console.log('✅ OrbitControls настроены. Позиция камеры:', this.camera.position)
+         console.log('🎯 Target камеры:', this.controls.target)
+       }
+       
+             loadInitialHumanoids() {
+        console.log('🤖 Создаем красивых виртуальных сотрудников...')
+        
+        // Сначала пробуем GLB ботов, если не получится - используем placeholder
+        this.loadGLBEmployees()
+        
+        // Placeholder как fallback
+        setTimeout(() => {
+          if (this.humanoids.length === 0) {
+            console.log('⚠️ GLB не загрузился, используем placeholder')
+            this.createPlaceholderHumanoids()
+          }
+          this.updateStats()
+        }, 3000) // Даем 3 секунды на загрузку GLB
+        
+        console.log('✅ Виртуальные сотрудники создаются...')
+      }
+       
+       loadGLBEmployees() {
+        console.log('🤖 Загружаем GLB ботов...')
+        
+        this.gltfLoader.load('/assets/models/humanoids/bots.glb',
+          (gltf) => {
+            console.log('✅ GLB модель загружена!', gltf.scene.children.length, 'объектов')
+            
+            // Анализируем размеры модели
+            const box = new THREE.Box3().setFromObject(gltf.scene)
+            const size = box.getSize(new THREE.Vector3())
+            const center = box.getCenter(new THREE.Vector3())
+            
+            console.log('📏 Размеры GLB модели:', {
+              width: size.x.toFixed(2),
+              height: size.y.toFixed(2), 
+              depth: size.z.toFixed(2),
+              center: { x: center.x.toFixed(2), y: center.y.toFixed(2), z: center.z.toFixed(2) }
+            })
+            
+            // Определяем нужный масштаб (целевая высота ~1.8м)
+            const targetHeight = 1.8
+            const currentHeight = size.y
+            const optimalScale = currentHeight > 0 ? targetHeight / currentHeight : 1.0
+            
+            console.log('🎯 Оптимальный масштаб:', optimalScale.toFixed(2))
+            
+            // Проходим по всем найденным ботам в GLB файле
+            gltf.scene.traverse((child) => {
+              if (child.isMesh) {
+                console.log('Найден mesh:', child.name, child.material?.name)
+                child.castShadow = true
+                child.receiveShadow = true
+              }
+            })
+            
+            // Центрируем модель перед клонированием
+            gltf.scene.position.set(-center.x, -center.y, -center.z)
+            
+            // Клонируем модель для двух ботов с правильным масштабом
+            const bot1 = gltf.scene.clone()
+            bot1.scale.set(optimalScale, optimalScale, optimalScale)
+            bot1.position.set(2, 0, 1) // Позиция на полу офиса
+            
+            // Добавляем отладочный wireframe для первого бота
+            const bot1Box = new THREE.BoxHelper(bot1, 0xff0000)
+            this.scene.add(bot1Box)
+            console.log('🔴 Бот 1 - позиция:', bot1.position, 'масштаб:', bot1.scale)
+            
+            this.scene.add(bot1)
+            
+            const bot2 = gltf.scene.clone()  
+            bot2.scale.set(optimalScale, optimalScale, optimalScale)
+            bot2.position.set(-2, 0, -1) // Позиция на полу офиса
+            
+            // Добавляем отладочный wireframe для второго бота
+            const bot2Box = new THREE.BoxHelper(bot2, 0x00ff00)
+            this.scene.add(bot2Box)
+            console.log('🟢 Бот 2 - позиция:', bot2.position, 'масштаб:', bot2.scale)
+            
+            this.scene.add(bot2)
+            
+            // Добавляем большие маркеры для отладки позиций
+            const marker1 = new THREE.Mesh(
+              new THREE.SphereGeometry(0.2),
+              new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+            )
+            marker1.position.set(2, 2, 1) // Над первым ботом
+            this.scene.add(marker1)
+            
+            const marker2 = new THREE.Mesh(
+              new THREE.SphereGeometry(0.2),
+              new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
+            )
+            marker2.position.set(-2, 2, -1) // Над вторым ботом
+            this.scene.add(marker2)
+            
+            // Добавляем в массив
+            this.humanoids.push({
+              name: 'GLB Bot Alpha',
+              object: bot1,
+              mixer: null,
+              position: { x: 2, y: 0, z: 1 },
+              isPlaceholder: false
+            })
+            
+            this.humanoids.push({
+              name: 'GLB Bot Beta', 
+              object: bot2,
+              mixer: null,
+              position: { x: -2, y: 0, z: -1 },
+              isPlaceholder: false
+            })
+            
+            console.log('🎉 GLB боты успешно загружены!', this.humanoids.length)
+            this.updateStats()
+          },
+          (progress) => {
+            const percent = Math.round((progress.loaded / progress.total) * 100)
+            console.log('⏳ Загрузка GLB:', percent + '%')
+          },
+          (error) => {
+            console.warn('⚠️ Ошибка загрузки GLB ботов:', error)
+            console.log('🔄 Используем placeholder сотрудников...')
+            this.createPlaceholderHumanoids()
+            this.updateStats()
+          }
+        )
+      }
+       
+       createPlaceholderHumanoids() {
+         // Создаем простых геометрических гуманоидов
+         this.createPlaceholderHumanoid('Alpha', { x: 2, y: 0, z: 1 }, 0xff6b6b)
+         this.createPlaceholderHumanoid('Beta', { x: -2, y: 0, z: -1 }, 0x4ecdc4)
+         
+         console.log('✅ Placeholder сотрудники созданы!', this.humanoids.length)
+       }
+       
+       createPlaceholderHumanoid(name, position, color) {
+         const group = new THREE.Group()
+         
+         // Тело (цилиндр)
+         const bodyGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1.2)
+         const bodyMaterial = new THREE.MeshLambertMaterial({ color: color })
+         const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
+         body.position.y = 0.6
+         body.castShadow = true
+         group.add(body)
+         
+         // Голова (сфера)
+         const headGeometry = new THREE.SphereGeometry(0.2)
+         const headMaterial = new THREE.MeshLambertMaterial({ color: 0xffdbac })
+         const head = new THREE.Mesh(headGeometry, headMaterial)
+         head.position.y = 1.4
+         head.castShadow = true
+         group.add(head)
+         
+         // Руки
+         for (let i = 0; i < 2; i++) {
+           const armGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.6)
+           const armMaterial = new THREE.MeshLambertMaterial({ color: 0xffdbac })
+           const arm = new THREE.Mesh(armGeometry, armMaterial)
+           arm.position.set((i * 2 - 1) * 0.5, 0.9, 0)
+           arm.castShadow = true
+           group.add(arm)
+         }
+         
+         // Ноги
+         for (let i = 0; i < 2; i++) {
+           const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8)
+           const legMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 })
+           const leg = new THREE.Mesh(legGeometry, legMaterial)
+           leg.position.set((i * 2 - 1) * 0.2, 0.4, 0)
+           leg.castShadow = true
+           group.add(leg)
+         }
+         
+         // Позиционируем группу
+         group.position.set(position.x, position.y, position.z)
+         group.scale.setScalar(0.8)
+         
+         // Простая анимация покачивания
+         group.userData = {
+           name: name,
+           originalY: position.y,
+           time: Math.random() * Math.PI * 2
+         }
+         
+         this.scene.add(group)
+         
+         const humanoidData = {
+           name,
+           object: group,
+           mixer: null, // Простая анимация без миксера
+           position,
+           isPlaceholder: true
+         }
+         
+         this.humanoids.push(humanoidData)
+         return humanoidData
        }
        
        animate() {
-         requestAnimationFrame(() => this.animate())
-         
-         this.frameCount++
-         const deltaTime = (performance.now() - this.lastTime) / 1000
-         this.lastTime = performance.now()
-         
-         // Обновляем контролы
-         if (this.controls) {
-           this.controls.update()
-         }
-         
-         // Рендер
-         this.renderer.render(this.scene, this.camera)
-         
-         // Обновляем FPS
-         if (this.frameCount % 60 === 0) {
-           const fps = Math.round(1 / deltaTime) || 60
-           document.getElementById('fps').textContent = fps
-           document.getElementById('objects').textContent = this.scene.children.length
+         try {
+           // Проверяем что все компоненты инициализированы
+           if (!this.renderer || !this.scene || !this.camera) {
+             console.error('❌ Критические компоненты не инициализированы, останавливаем анимацию')
+             return
+           }
+           
+           requestAnimationFrame(() => this.animate())
+           
+           this.frameCount++
+           const now = performance.now()
+           const deltaTime = Math.min((now - this.lastTime) / 1000, 0.1) // Ограничиваем deltaTime
+           this.lastTime = now
+           
+           // Обновляем анимации гуманоидов с защитой
+           const animationDelta = this.clock ? this.clock.getDelta() : 0
+           
+           if (this.mixers && Array.isArray(this.mixers)) {
+             this.mixers.forEach(mixer => {
+               if (mixer && typeof mixer.update === 'function') {
+                 mixer.update(animationDelta)
+               }
+             })
+           }
+           
+           // Простая анимация для placeholder гуманоидов с защитой
+           if (this.humanoids && Array.isArray(this.humanoids)) {
+             this.humanoids.forEach(humanoid => {
+               if (humanoid && humanoid.isPlaceholder && humanoid.object && humanoid.object.userData) {
+                 humanoid.object.userData.time += animationDelta
+                 const bobOffset = Math.sin(humanoid.object.userData.time * 2) * 0.05
+                 humanoid.object.position.y = humanoid.object.userData.originalY + bobOffset
+               }
+             })
+           }
+           
+           // Обновляем контролы с защитой
+           if (this.controls && typeof this.controls.update === 'function') {
+             this.controls.update()
+           }
+           
+           // Рендер с защитой
+           this.renderer.render(this.scene, this.camera)
+           
+           // Обновляем FPS и статистику каждые 60 кадров
+           if (this.frameCount % 60 === 0) {
+             const fps = Math.round(1 / deltaTime) || 60
+             const fpsElement = document.getElementById('fps')
+             const objectsElement = document.getElementById('objects') 
+             const humanoidsElement = document.getElementById('humanoids')
+             
+             if (fpsElement) fpsElement.textContent = fps
+             if (objectsElement) objectsElement.textContent = this.scene.children.length
+             if (humanoidsElement) humanoidsElement.textContent = this.humanoids ? this.humanoids.length : 0
+           }
+           
+         } catch (error) {
+           console.error('❌ Критическая ошибка в цикле анимации:', error)
+           console.error('Стек ошибки:', error.stack)
+           // Останавливаем анимацию при критической ошибке
+           return
          }
        }
        
@@ -419,32 +833,43 @@
            document.getElementById('time').textContent = '22:00'
          }
        }
+       
+       addHumanoid() {
+         // Случайная позиция в офисе
+         const position = {
+           x: (Math.random() - 0.5) * 6,
+           y: 0,
+           z: (Math.random() - 0.5) * 4
+         }
+         
+         const name = `Employee_${Date.now()}`
+         const colors = [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0xf9ca24, 0xf0932b, 0xeb4d4b, 0x6c5ce7]
+         const randomColor = colors[Math.floor(Math.random() * colors.length)]
+         
+         const humanoid = this.createPlaceholderHumanoid(name, position, randomColor)
+         
+         console.log(`✅ Добавлен новый сотрудник: ${name}`)
+         this.updateStats()
+         
+         return humanoid
+       }
+       
+       updateStats() {
+         if (document.getElementById('humanoids')) {
+           document.getElementById('humanoids').textContent = this.humanoids.length
+         }
+         if (document.getElementById('objects')) {
+           document.getElementById('objects').textContent = this.scene.children.length
+         }
+       }
      }
      
      // Глобальные функции для кнопок
-     let office
-     
-     window.addWorkstation = () => office.addWorkstation()
-     window.toggleLighting = () => office.toggleLighting()
-     window.addMetaScreen = () => office.addMetaScreen()
-     window.toggleDay = () => office.toggleDay()
-     
-     // Инициализация офиса
-     office = new VirtualOffice()
-     
-     console.log(`
-     🏢 MetaFor Virtual Office запущен!
-     
-     ✅ Офис-студия 8м × 6м × 3м создан
-     ✅ Базовая мебель размещена
-     ✅ Освещение настроено
-     ✅ Интерактивность добавлена
-     
-     Управление:
-     - Мышь: вращение камеры
-     - Колесо: приближение/отдаление
-     - Кнопки: добавление объектов
-     `)
+     window.addWorkstation = () => window.office?.addWorkstation()
+     window.toggleLighting = () => window.office?.toggleLighting()
+     window.addMetaScreen = () => window.office?.addMetaScreen()
+     window.addHumanoid = () => window.office?.addHumanoid()
+     window.toggleDay = () => window.office?.toggleDay()
   </script>
 </body>
 </html> 
