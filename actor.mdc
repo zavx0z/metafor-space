@@ -5,27 +5,12 @@ alwaysApply: true
 ---
 # MetaFor Actor System
 
-## MetaFor - создание актора
+## Создание актора MetaFor
 
-**Функция MetaFor создает актор с типизированным контекстом и автоматической регистрацией веб-компонента.**
+MetaFor создает актор с типизированным контекстом и автоматической регистрацией веб-компонента через Shadow DOM closed.
 
 ```javascript
-MetaFor(tag, conf?)
-```
-
-### Параметры:
-
-- **`tag`** `string` - Имя актора для автоматической регистрации `<metafor-{tag}>` элемента и идентификации в сообщениях. Система создает custom elements через Shadow DOM closed для полной изоляции компонента
-- **`conf`** `object` (опционально) - Конфигурация актора:
-  - **`description`** `string` - Описание актора для отладки и документации
-  - **`development`** `boolean` - Режим разработки с валидацией и отладкой
-
-### Пример:
-```javascript
-export default MetaFor("my-actor", {
-  description: "Мой первый актор", 
-  development: true
-})
+export default MetaFor("actor-name", {development: true})
   .context(t => ({...}))        // 1. Определение контекста
   .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные  
   .states("state1", "state2")   // 3. Список состояний
@@ -34,54 +19,44 @@ export default MetaFor("my-actor", {
   .view({...})                  // 6. Представление UI
 ```
 
-**Результат:** Система создает веб-компонент `<metafor-my-actor>`, который можно использовать в HTML.
+**Параметры MetaFor:**
+- **`tag`** `string` - Имя актора для регистрации `<metafor-{tag}>` элемента и идентификации в сообщениях
+- **`conf`** `object` (опционально):
+  - **`description`** `string` - Описание актора
+  - **`development`** `boolean` - Режим разработки с валидацией
 
-## Обзор
+## Акторная модель
 
-MetaFor реализует акторную модель вычислений, где каждый Meta компонент является независимым актором. Акторы взаимодействуют исключительно через передачу сообщений, обеспечивая изоляцию состояния и масштабируемость системы.
+MetaFor реализует акторную модель, где каждый компонент является независимым актором. Акторы взаимодействуют исключительно через передачу сообщений.
 
-## Основные принципы акторной модели
+### Основные принципы
 
-### 1. Инкапсуляция состояния
-Каждый актор имеет собственное внутреннее состояние, недоступное извне:
-- **Контекст** - типизированные данные состояния при изменения которых происходят проверки для перехода в другое состояние
-- **Состояние автомата** - текущая фаза жизненного цикла
-- **Ядро (Core)** - переиспользуемые методы и временные структуры
+**1. Инкапсуляция состояния**
+- **Контекст** - типизированные данные с автоматическими проверками переходов
+- **Состояние автомата** - текущая фаза жизненного цикла  
+- **Ядро** - переиспользуемые методы и временные структуры
 
-### 2. Изоляция выполнения
-Акторы выполняются независимо:
-- **Собственный Shadow DOM closed** - полная изоляция UI, работает нативно в браузере и на сервере через Happy DOM. Используется преимущественно из-за удобства модели DOM дерева в декларативном исполнении для HTML и Three.js, а также для использования SSR - распределенного вычисления единой мета
-- **Независимые каналы коммуникации** - BroadcastChannel и CustomEvent
-- **Асинхронная обработка действий** - неблокирующее выполнение
+**2. Изоляция выполнения**
+- Shadow DOM closed для полной изоляции логики и UX/UI а так же стилей
+- Независимые каналы коммуникации
+- Асинхронная обработка действий
 
-### 3. Автоматическое взаимодействие
-Акторы автоматически уведомляют друг друга об изменениях:
-- **Состояния** передаются глобально всем акторам
-- **Контекст** передается только вверх по DOM-дереву (от ребенка к родителям) через кастомные события
-- Все изменения попадают в реакции для обработки
-
-### 4. Демократическая архитектура
-**Ключевое преимущество MetaFor** - отсутствие централизованного управления:
-- **Все слушают всех** - каждый актор может подписаться на изменения любого другого
-- **Никто не командует** - нет иерархии, только равноправное взаимодействие
-- **Старший слушает младшего** - даже "главные" компоненты реагируют на события от простых
-- **Общая осведомленность** - все акторы видят состояния друг друга через BroadcastChannel
+**3. Демократическая архитектура**
+Ключевое преимущество - отсутствие централизованного управления:
+- Все акторы равноправны - могут слушать изменения любого другого
+- Нет иерархии командования - только реактивное взаимодействие
+- Простые компоненты могут влиять на сложные системы
 
 ```javascript
-// Любой актор может слушать изменения других
-.reactions([
-  {
-    title: "Простой актор влияет на сложный",
-    filter: ({meta}) => meta.tag === "simple-button",
-    action: ({update}) => {
-      // Даже главный контроллер реагирует на простую кнопку
-      update({mode: "button-triggered"})
-    }
-  }
-])
+// Простая кнопка может управлять сложной системой
+.reactions([{
+  title: "Простая кнопка влияет на сложную систему",
+  filter: ({meta}) => meta.tag === "emergency-button",
+  action: ({update}) => update({mode: "emergency"})
+}])
 ```
 
-## Жизненный цикл актора с блокировкой
+## Жизненный цикл актора
 
 ```mermaid
 ---
@@ -227,262 +202,156 @@ flowchart TD
 ```
 
 ## Компоненты актора
-*Актор - контекстно-событийно ориентированная система*
 
-**Приоритет архитектуры:**
-1. **Контекст** - основа актора, типизированные данные. При изменении контекста происходит запуск проверки переходов состояний. В массивах только простые типы без вложенности
-2. **Состояния и переходы** - состояния глобальны (видны всем акторам), переходы связаны с условиями контекста. При выполнении actions блокируется проверка переходов
-3. **Реакции** - обрабатывают события и изменяют контекст. События → контекст → состояния. Фильтры определяют какие сообщения обрабатываются
-4. **Ядро** - переиспользуемые методы и временные структуры данных, доступные из любого состояния и реакции. Сложные данные (Map, массивы объектов, конфигурации) хранятся здесь, не в контексте
-5. **Представление** - отображает контекстные данные декларативно в HTML, Three.js и custom elements через Shadow DOM closed. Работает одинаково в браузере и на сервере (Happy DOM)
-6. **Тег** - имя актора для автоматической регистрации `<metafor-{tag}>` элемента и идентификации в сообщениях
+Актор - контекстно-событийная система:
 
-## Последовательность создания актора
+1. **MetaFor** - функция создания актора, возвращающая конструктор
+2. **Контекст** - типизированные данные, изменения запускают проверку переходов
+3. **Ядро** - переиспользуемые методы и временные структуры 
+4. **Состояния** - глобально видимые фазы жизненного цикла
+5. **Переходы** - правила смены состояний с условиями и действиями
+6. **Реакции** - обработчики событий от других акторов
+7. **Представление** - декларативное отображение через Shadow DOM
 
-**Обязательная последовательность вызовов конструктора MetaFor:**
+### Обязательная последовательность колбеков
 
 ```javascript
-export default MetaFor("actor-name", {development: true})
-  .context(t => ({...}))        // 1. Определение контекста
-  .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные  
-  .states("state1", "state2")   // 3. Список состояний
-  .transitions("state1", [...]) // 4. Переходы и actions
-  .reactions([...])             // 5. Реакции на события
-  .view({...})                  // 6. Представление UI
+export default MetaFor("actor-name", {development: true})  // 1. Создание актора
+  .context(t => ({...}))        // 2. Определение контекста
+  .core(({update, context}) => ({...}))  // 3. Ядро, методы и данные  
+  .states("state1", "state2")   // 4. Список состояний
+  .transitions("state1", [...]) // 5. Переходы и actions
+  .reactions([...])             // 6. Реакции на события
+  .view({...})                  // 7. Представление UI
 ```
 
-**Описание колбеков:**
+> **⚠️ ВАЖНО:** Все 7 колбеков обязательны и должны вызываться в строгой последовательности 1→2→3→4→5→6→7.
 
-1. **`MetaFor(tag, conf?)`** - Создание актора с регистрацией custom element через Shadow DOM closed
-2. **`.context(t => ({...}))`** - Типизированное определение данных состояния
-3. **`.core(({update, context, self}) => ({...}))`** - Переиспользуемые методы и временные данные
-4. **`.states(...states)`** - Перечисление всех возможных состояний актора
-5. **`.transitions(initialState, transitions)`** - Правила переходов между состояниями с actions
-6. **`.reactions([...])`** - Обработчики событий от других акторов (может быть пустой массив)
-7. **`.view({render, style, onMount, onDestroy})`** - Функции рендеринга и жизненного цикла UI
+## Идентификация актора
 
-> **⚠️ ВАЖНО:** Все 7 колбеков обязательны для исполнения и должны вызываться в строго указанном порядке 1→2→3→4→5→6→7. Пропуск любого колбека или нарушение последовательности приведет к ошибке TypeScript/runtime.
+Каждый актор имеет уникальный ID: `{tag}/{index}`
 
-**✅ Исправлены ошибки в документации:**
-- Добавлено недостающее ядро (core) в TaskWorker
-- Дополнены неполные примеры SystemController и UIController
-- Все примеры теперь следуют правильной последовательности колбеков
+**Формирование ID:**
+- **`tag`** - имя типа актора ("counter", "user-input")
+- **`index`** - порядковый номер экземпляра (глобальный счетчик)
 
-### 1. MetaFor(tag, conf?) - создание актора
-**Основа системы - регистрация custom element через Shadow DOM closed.**
+```javascript
+// Примеры ID
+"counter/1"      // первый экземпляр counter
+"counter/2"      // второй экземпляр counter  
+"user-input/1"   // первый экземпляр user-input
+```
+
+**Передача в сообщениях:**
+```javascript
+{
+  meta: {
+    tag: "counter",    // тип актора
+    index: 2,         // номер экземпляра
+    timestamp: 1234567890
+  },
+  patch: {
+    path: "/context",  // пути: /, /state, /context
+    op: "replace", 
+    value: {counter: 10, active: true}
+  }
+}
+```
+
+**Meta-chain архитектура:**
+- При создании - полный снимок состояния
+- Далее - минимальные патчи изменений
+- Валидация через ограничения контекста
+- Детерминированное восстановление через патчи
+
+## 1. MetaFor - функция создания актора
+
+Возвращает конструктор для последовательного определения компонентов актора.
 
 ```javascript
 MetaFor(tag, conf?)
 ```
 
 **Параметры:**
-- **`tag`** `string` - Имя актора для автоматической регистрации `<metafor-{tag}>` элемента и идентификации в сообщениях. Система создает custom elements через Shadow DOM closed для полной изоляции компонента
-- **`conf`** `object` (опционально) - Конфигурация актора:
-  - **`description`** `string` - Описание актора для ui пользователя
-  - **`development`** `boolean` - Режим разработки с валидацией и отладкой
+- **`tag`** - имя актора для регистрации `<metafor-{tag}>` элемента
+- **`conf`** - опциональная конфигурация:
+  - `description` - описание актора
+  - `development` - режим разработки с валидацией
 
-**Результат:**
+**Возвращает:** конструктор с методами `.context()`, `.core()`, `.states()`, `.transitions()`, `.reactions()`, `.view()`
+
+**Результат выполнения:**
 - Автоматическая регистрация веб-компонента `<metafor-{tag}>`
-- Изоляция через Shadow DOM closed
+- Изоляция через Shadow DOM closed  
 - Уникальная идентификация в системе сообщений
-- Интеграция с браузерными API и SSR через Happy DOM
+- Интеграция с браузерными API и SSR
 
-**Идентификация актора:**
-Каждый актор имеет уникальный идентификатор, состоящий из:
-- **`tag`** - имя типа актора (например: "counter", "user-input")
-- **`index`** - порядковый номер экземпляра актора данного типа
+## 2. Контекст - основа актора
 
-**Формирование индекса:**
-```javascript
-// Глобальный счетчик для каждого типа актора
-let idx = 0
+Типизированные данные состояния - основа реактивности.
 
-// При создании экземпляра компонента (connectedCallback)
-this.index = idx += 1
-
-// Итоговый ID актора
-get id() {
-  return `${tag}/${this.index}` // Например: "counter/1", "counter/2", "user-input/1"
-}
-```
-
-**Примеры идентификации:**
-- `counter/1` - первый экземпляр актора counter
-- `counter/2` - второй экземпляр актора counter  
-- `user-input/1` - первый экземпляр актора user-input
-- `data-processor/1` - первый экземпляр актора data-processor
-
-Эта система позволяет различать экземпляры одного типа актора в сообщениях и реакциях.
-
-**Применение ID в системе:**
-Идентификация актора используется для:
-- **Фильтрации сообщений** в реакциях по конкретному экземпляру
-- **Сопоставления данных** в реакциях при изменениях в контексте и состоянии
-- **Отладки и логирования** для отслеживания поведения конкретных акторов  
-- **Персистентного состояния** - система автоматически отслеживает изменения через патчи
-- **Межакторного взаимодействия** - точечная адресация сообщений
-
-**Передача идентификации в сообщениях:**
-`tag` и `index` передаются в каждом сообщении в объекте `meta`:
-```javascript
-// Структура сообщения
-{
-  meta: {
-    tag: "counter",      // тип актора
-    index: 2,           // номер экземпляра
-    timestamp: 1234567890
-  },
-  patch: {
-    path: "/context",   // путь может быть только: /, /state, /context
-    op: "replace", 
-    value: {counter: 10, active: true} // объект с изменениями контекста
-  }
-}
-```
-
-Это позволяет в реакциях точно определить источник изменения через `meta.tag` и `meta.index`.
-
-**✅ Механизм meta-chain через снимки и патчи:**
-Если в процессе работы были изменения структуры (добавление/удаление акторов), то снимки изменений (snapshots) компенсируют эти структурные изменения в хронологическом порядке. Тем самым индексы сохраняют свою консистентность:
-
-**Архитектура meta-chain:**
-- **При создании актора** - передается снимок (snapshot) состояния (единственны раз)
-- **Дальнейшие изменения** - приходят в виде патчей (patches) с минимальными данными
-- **Без механизма подтверждения** - надежность обеспечивается валидацией ограничениями данных контекста
-- **Валидация ограничениями** - типизированный контекст автоматически отклоняет некорректные изменения, так же проверки контекста не позволяют изменить на рандомные значения
-
-**Детерминированность событийной модели:**
-Событийная модель подразумевает детерминированность при восстановлении патчами, поэтому динамическая природа формирования ID ограничена средой нахождения в событийной модели:
-
-- **Восстановление через патчи** требует воспроизводимой последовательности событий
-- **ID должны формироваться детерминированно** в рамках одной среды событийной модели
-- **Среда определяет контекст** - браузерная вкладка, воркер, сервер имеют свои пространства ID
-- **Консистентность в среде** - одинаковая последовательность событий дает одинаковые ID
-
-**Преимущества подхода:**
-- Система отслеживает все структурные изменения через снимки и патчи с временными метками
-- При восстановлении применяется хронологическая последовательность структурных изменений  
-- Индексы остаются консистентными благодаря компенсации через snapshots и patch
-- Это обеспечивает надежность персистентного состояния даже при динамических изменениях структуры акторов
-- Минимальный трафик за счет передачи только изменений (patches) после инициализации
-
-```javascript
-// Пример фильтрации сообщений по ID в реакциях:
-.reactions([
-  {
-    title: "Слушаем конкретный экземпляр counter/2",
-    filter: ({meta}) => meta.tag === "counter" && meta.index === 2,
-    action: ({patch, update}) => {
-      // Реагируем только на изменения второго счетчика
-      console.log("Counter #2 изменился:", patch.value)
-    }
-  }
-])
-
-// ✅ Система автоматически управляет консистентностью через meta-chain патчи
-```
-
-### 2. Контекст (Actor Context) - основа актора
-**Типизированные данные состояния - основа реактивности актора.**
-
-**Механизм работы:**
-- **Изменения контекста запускают проверку condition состояния**
-- **При выполнении actions происходит блокировка проверки контекста** - предотвращает каскадные переходы
-- **Контекст для изменений не блокируется** - можно продолжать обновлять данные во время выполнения действий
-- **После завершения action автоматически происходит проверка переходов**
+**Механизм:**
+- Изменения контекста запускают проверку переходов состояний
+- Во время выполнения actions переходы блокируются
+- Контекст может обновляться во время блокировки
 
 ```javascript
 .context(t => ({
   name: t.string({default: "actor"}),
   counter: t.number({default: 0}),
   active: t.boolean({default: true}),
-  // В array контекста только простые типы без вложенности
-  selectedItems: t.array({title: "Выбранные элементы"}), // массив простых типов. Объекты в контексте не предусмотрены. Array не может быть nullable и всегда по умолчанию []. Параметр title необязательный (отображается в ui для пользователя)
+  selectedItems: t.array({title: "Выбранные элементы"}), // только простые типы
   status: t.string({default: "idle"}),
-  error: t.string({nullable: true}) // nullable позволяет null значения для проверки {isNull: true/false}
+  error: t.string({nullable: true}) // для проверки {isNull: true/false}
 }))
 ```
 
-**Важно:** В array контекста должны быть только простые типы без вложенности (строки, числа, булевы значения). Сложные данные хранятся в core с доступом по ключу или с поиском в списках.
+**Важно:** Массивы содержат только простые типы. Сложные данные хранятся в core.
 
-### 3. Ядро (Actor Core) - переиспользуемые методы и данные
-**Для многократно используемых методов и временных структур, доступных из любого состояния:**
+## 3. Ядро - переиспользуемые методы и данные
+
+Для методов, сервисов и временных структур, доступных из любого состояния.
 
 **Отличие от Actions:**
-- **Core** - переиспользуемые методы, доступные из любого состояния
-- **Actions** - функции для конкретных состояний, которые не переиспользуются
-
-**Core можно оставлять пустым:**
-```javascript
-// Если актор не использует переиспользуемые методы или данные
-.core(() => ({}))
-
-// Или если нужен доступ к параметрам, но методы не используются  
-.core(({update, context, self}) => ({}))
-```
+- **Core** - переиспользуемые методы для всех состояний
+- **Actions** - функции для конкретных состояний
 
 ```javascript
 .core(({update, context, self}) => ({
-  // Сложные данные хранятся в core, не в контексте
-  users: new Map(), // ключ-значение для быстрого доступа
-  products: [], // список для поиска и фильтрации
-  config: {}, // объекты для структурированного хранения настроек
-  cache: new Map(),
-  connectionPool: new Set(),
+  // Сложные данные
+  users: new Map(),
+  products: [],
+  config: {},
   
-  // Методы работы со сложными данными
+  // Переиспользуемые методы
   getUserById: (id) => self.users.get(id),
-  findProductsByCategory: (category) => 
-    self.products.filter(p => p.category === category),
-  getConfig: (key) => self.config[key],
-  setConfig: (key, value) => self.config[key] = value,
-  
-  // Переиспользуемые методы для всех состояний
-  processWithContext: (data) => {
-    // Использует текущий контекст
-    return data.filter(item => context.active ? item.enabled : true)
-  },
-  
   updateCounter: () => update({counter: context.counter + 1}),
   
-  // Связь контекста с данными core
+  // Связь контекста с core
   getSelectedUsers: () => 
-    context.selectedIds.map(id => self.getUserById(id)).filter(Boolean),
-  
-  selectUser: (userId) => {
-    if (self.users.has(userId)) {
-      update({selectedIds: [...context.selectedIds, userId]})
-    }
-  },
-  
-  // Работа с временными данными
-  cacheResult: (key, value) => {
-    self.cache.set(key, value)
-    return value
-  }
+    context.selectedIds.map(id => self.getUserById(id)).filter(Boolean)
 }))
+
+// Core может быть пустым
+.core(() => ({}))
 ```
 
-**Применение:**
-- Методы ядра доступны в actions, reactions, view
-- Временные данные не попадают в контекст
-- Переиспользуются во всех состояниях актора
+## 4. Состояния - автомат состояний
 
-### 4. Состояния (States) - автомат состояний
-**Состояния глобальны** - видны всем в main thread, worker, service worker, tabs, windows и могут передаваться между устройствами:
+Состояния глобально видимы всем акторам в системе.
 
 ```javascript
 .states("idle", "working", "done", "emergency")
 ```
 
-**Глобальность состояний:**
-- Все акторы видят изменения состояний в main thread, worker, service worker
-- Состояния синхронизируются между tabs и windows
-- Могут передаваться на сервер, другие устройства
-- BroadcastChannel для синхронизации между потоками, WebSocket/WebRTC для межустройственной синхронизации
+**Глобальность:**
+- Видны в main thread, worker, service worker, tabs, windows
+- Синхронизируются через BroadcastChannel
+- Могут передаваться между устройствами
 
-### 5. Переходы (Transitions) - логика изменений состояний
-**Правила переходов между состояниями с actions:**
+## 5. Переходы - логика изменений состояний
+
+Правила переходов между состояниями с actions.
 
 ```javascript
 .transitions("idle", [
@@ -492,91 +361,36 @@ get id() {
   },
   {
     in: "working",
-    action: ({update, context}) => {
-      // Обработка данных из контекста
-      const result = processData(context.data)
+    action: async ({update, context}) => {
+      // Автоматическая блокировка переходов во время выполнения
+      const result = await processData(context.data)
       update({result, active: false})
+      // Блокировка снимается автоматически
     },
     to: [
       {state: "done", when: {active: false}},
-      {state: "emergency", when: {error: true}} // Глобально для всех
+      {state: "emergency", when: {error: {isNull: false}}}
     ]
   }
 ])
 ```
 
-**Механизм блокировки при выполнении actions:**
-```javascript
-// ⚠️ Блокировка переходов во время выполнения action - это встроенный механизм MetaFor
-// Разработчику НЕ нужно создавать булевые флаги типа "processing" в контексте
-{
-  in: "processing",
-  action: async ({update, context}) => {
-    // Блокировка активна - переходы не проверяются
-    // Контекст в это время может быть обновлен.
-    
-    const step1Result = await processStep1()
-    const step2Result = await processStep2()
-    const finalData = await processFinal()
-    
-    // Обновление выполняется в конце - одним коллбеком
-    // Результат данных передается для обновления контекста и хранилищ
-    update({
-      status: "completed",
-      step1Data: step1Result,
-      step2Data: step2Result,
-      finalResult: finalData
-    })
-    
-    // ⚠️ ВАЖНО: async функция автоматически возвращает промис
-    // Это предотвратит проблемы с множественным накоплением обновлений
-    // и корректно снимет блокировку после завершения всех await
-    
-    // После завершения action - блокировка снимается автоматически (встроенный механизм)
-    // Автоматически проверяются условия переходов с возможно обновленным контекстом во время блокировки
-  },
-  to: [
-    {state: "idle", when: {status: "completed"}} // Проверится после action
-  ]
-}
+**Встроенная блокировка:**
+- Actions автоматически блокируют проверку переходов
+- Контекст может обновляться во время блокировки
+- Для async/await блокировка снимается после завершения
+- Для промисов нужно возвращать промис из action
 
-// Для обычных функций с промисами - ОБЯЗАТЕЛЬНО возвращать промис:
-{
-  in: "loading",
-  action: ({update, context}) => {
-    return fetch('/api/data')
-      .then(response => response.json())
-      .then(data => {
-        update({data, loading: false, error: null})
-        // Промис должен быть возвращен для корректной работы блокировки
-      })
-      .catch(error => {
-        // Рекомендация: в контексте добавить error: t.string({nullable: true})
-        update({loading: false, error: error.message})
-        // В будущем планируется добавить отдельные колбеки success и error
-      })
-  },
-  to: [
-    {state: "loaded", when: {loading: false, error: {isNull: true}}},
-    {state: "error", when: {loading: false, error: {isNull: false}}}
-  ]
-}
-```
+## 6. Реакции - события меняют контекст
 
-**Планируемые улучшения:**
-- Отдельный callback `update` для передачи результата данных
-- Обновление контекста и хранилищ в едином коллбеке
-- Накопление изменений во время выполнения action
+Обработка событий от других акторов.
 
-### 6. Реакции (Event Handlers) - события меняют контекст
-Обработка событий с учетом очередности коллбеков:
 ```javascript
 .reactions([
   {
     title: "События изменяют контекст",
     filter: ({meta, patch}) => meta.tag === "user-input",
     action: ({patch, update, context}) => {
-      // Событие меняет контекст актора
       update({
         userInput: patch.value,
         lastModified: Date.now(),
@@ -587,8 +401,7 @@ get id() {
   {
     title: "Реакция на глобальные состояния", 
     filter: ({meta, patch}) => patch.path === "/state",
-    action: ({patch, context, update}) => {
-      // Глобальные состояния видны всем в main thread, worker, service worker, tabs, windows
+    action: ({patch, update}) => {
       if (patch.value === "emergency") {
         update({mode: "emergency", active: false})
       }
@@ -597,9 +410,9 @@ get id() {
 ])
 ```
 
-### 7. Представление (View) - отображение контекста
+## 7. Представление - отображение контекста
 
-**Шаблонизация основана на lit-html** - эффективной библиотеке для создания HTML шаблонов.
+Декларативное отображение данных через Shadow DOM. Шаблонизация основана на lit-html.
 
 ```javascript
 .view({
@@ -607,241 +420,66 @@ get id() {
     <div class="actor-${state}">
       <h3>${context.name}</h3>
       <div>Счетчик: ${context.counter}</div>
-      <div>Активен: ${context.active ? 'Да' : 'Нет'}</div>
       
-      <!-- Создание дочерних акторов с передачей контекста -->
+      <!-- Создание дочерних акторов -->
       ${repeat(context.childTasks, (task) => task.id, (task) => html`
         <metafor-child-worker context=${{
           taskId: task.id,
-          parentName: context.name,
-          config: task.settings
+          parentName: context.name
         }}></metafor-child-worker>
       `)}
     </div>
-      `
-  })
-```
-
-**🔄 repeat vs map для списков:**
-- **repeat()** - для изменяющихся списков (добавление/удаление/переупорядочивание)
-  - Доступен в render: `({html, context, repeat}) => html`
-  - Оптимизирует производительность за счет переиспользования DOM элементов
-  - Требует уникальный ключ для отслеживания элементов: `repeat(items, keyFn, templateFn)`
-  - Рекомендуется для динамических списков акторов
-  ```javascript
-  ${repeat(context.tasks, (task) => task.id, (task) => html`
-    <metafor-worker context=${{taskId: task.id}}></metafor-worker>
-  `)}
-  ```
-
-- **map()** - для статических списков или когда производительность не критична
-  - Проще в использовании, не требует ключей
-  - Пересоздает все элементы при изменении списка
-  - Подходит для статических списков: `items.map(item => html`...`)`
-
-// HTML использование - акторы как соседние элементы
-const html = `
-<div class="app">
-  <header>
-    <h1>Демократическая система управления</h1>
-    <metafor-emergency-button></metafor-emergency-button>
-  </header>
+  `,
   
-  <main>
-    <metafor-system-controller></metafor-system-controller>
-  </main>
-  
-  <aside>
-    <!-- Другие акторы тоже могут слушать аварийную кнопку -->
-    <metafor-logger></metafor-logger>
-    <metafor-notification-system></metafor-notification-system>
-  </aside>
-</div>
-`
-
-// Результат: простая кнопка управляет всей сложной системой
-// через демократическое взаимодействие акторов
+  style: ({css}) => css`
+    .actor { padding: 20px; }
+  `
+})
 ```
 
-### 6. Тег и регистрация элемента
-```javascript
-// Создание актора с автоматической регистрацией
-export default MetaFor("emergency-button")
-// Система создает: <metafor-emergency-button></metafor-emergency-button>
-```
-
-**Передача контекста для инициализации:**
-Контекст можно передать в виде JS объекта при создании элемента:
-
-```javascript
-// В render функции другого актора
-render: ({html, context}) => html`
-  <!-- Передача начального контекста актору -->
-  <metafor-task-worker context=${{
-    taskId: "task-123",
-    priority: "high",
-    data: someData
-  }}></metafor-task-worker>
-  
-  <!-- Или с использованием переменных из контекста -->
-  ${repeat(context.tasks, (task) => task.id, (task) => html`
-    <metafor-worker context=${{
-      workerId: task.id,
-      taskType: task.type
-    }}></metafor-worker>
-  `)}
-`
-```
-
-**Использование переданного контекста:**
-```javascript
-export default MetaFor("task-worker")
-  .context(t => ({
-    taskId: t.string(), // Будет установлен из переданного объекта
-    priority: t.enum("low", "high")({default: "low"}),
-    data: t.string({nullable: true})
-  }))
-  .core(({update}) => ({}))
-  .states("idle")
-  .transitions("idle", [
-    {
-      in: "idle",
-      action: ({context, update}) => {
-        // Доступ к переданному контексту
-        console.log("Получен taskId:", context.taskId)
-        console.log("Приоритет:", context.priority)
-        
-        // Можно обновлять как обычно
-        update({status: "started"})
-      }
-    }
-  ])
-  .reactions([])
-  .view({})
-```
+**repeat vs map:**
+- **repeat()** - для динамических списков с оптимизацией DOM
+- **map()** - для статических списков
 
 ## Коммуникационная система
 
-Акторы взаимодействуют **автоматически** через реакции:
+### Три способа взаимодействия
 
-### Глобальные уведомления
-- Изменения **состояний** видят все акторы в main thread, worker, service worker, tabs, windows
-- Любой актор может реагировать на смену состояния любого другого
-
-### Локальные уведомления (DOM-иерархия)  
-- Изменения **контекста** передаются только вверх по DOM-дереву
-- Родительские акторы получают уведомления от дочерних
-- Односторонняя передача: ребенок → родитель → прародитель
-
-```javascript
-// 1. Простая кнопка передает глобальные состояния
-export default MetaFor("emergency-button")
-  .context(t => ({pressed: t.boolean({default: false})}))
-  .core(({update}) => ({
-    press: () => update({pressed: true})
-  }))
-  .states("ready", "pressed") // Состояния видны всем!
-  .transitions("ready", [
-    {in: "ready", to: [{state: "pressed", when: {pressed: true}}]}
-  ])
-  .reactions([])
-  .view({
-    render: ({html, core, state}) => html`
-      <button class="emergency ${state}" 
-              @click=${core.press}>
-        🚨 EMERGENCY
-      </button>
-    `
-  })
-
-// 2. Система автоматически создает кастомный элемент <metafor-emergency-button>
-// В HTML используем:
-<metafor-emergency-button></metafor-emergency-button>
-  
-// 3. Сложная система слушает состояния простой кнопки:
-export default MetaFor("system-controller")
-  .context(t => ({
-    mode: t.enum("normal", "emergency")({default: "normal"}),
-    services: t.array({default: ["api", "database", "cache"]})
-  }))
-  .core(({update}) => ({
-    shutdown: () => update({mode: "emergency", services: []})
-  }))
-  .states("running", "emergency")
-  .transitions("running", [
-    {in: "running", to: [{state: "emergency", when: {mode: "emergency"}}]}
-  ])
-  .reactions([{
-    title: "Простая кнопка управляет сложной системой",
-    filter: ({meta}) => meta.tag === "emergency-button" && meta.state === "pressed",
-    action: ({update, core}) => {
-      // meta - информация о кнопке
-      // patch - изменения состояния кнопки  
-      // context - собственный контекст системы
-      console.log("Аварийная кнопка нажата!")
-      update({mode: "emergency"})
-      core.shutdown()
-    }
-  }])
-  .view({
-    render: ({html, context, state}) => html`
-      <div class="system ${state}">
-        <h3>Система: ${context.mode}</h3>
-        <div>Сервисы: ${context.services.join(", ") || "остановлены"}</div>
-      </div>
-    `
-  })
-```
+| Направление | Механизм | Область | Использование |
+|-------------|----------|---------|---------------|
+| 🌐 **Все ↔ Все** | Глобальные состояния | Main thread, workers, tabs, устройства | Координация системы |
+| ⬆️ **Ребенок → Родитель** | DOM-события | DOM-дерево | События меняют контекст |
+| ⬇️ **Родитель → Ребенок** | SessionStorage + состояния | Tab/window | Передача данных |
 
 ### Передача данных через SessionStorage
-- **Родитель** сохраняет данные в `sessionStorage` и меняет состояние
-- **Ребенок** реагирует на изменение состояния родителя и читает данные из `sessionStorage`
-- Асинхронная передача данных: родитель → sessionStorage → ребенок
 
 ```javascript
-// Родительский актор сохраняет данные в action перехода
-.transitions("idle", [
-  {
-    in: "idle",
-    action: ({update, context}) => {
-      // Функция используется только в этом состоянии
-      const data = context.dataToSend
-      sessionStorage.setItem('child-data', JSON.stringify(data))
-      update({dataReady: true}) // Сигнал ребенку
-    },
-    to: [{state: "waiting", when: {dataReady: true}}]
-  }
-])
+// Родитель: сохраняет данные и меняет состояние
+.transitions("idle", [{
+  in: "idle",
+  action: ({update, context}) => {
+    sessionStorage.setItem('child-data', JSON.stringify(context.dataToSend))
+    update({dataReady: true})
+  },
+  to: [{state: "waiting", when: {dataReady: true}}]
+}])
 
-// Дочерний актор получает данные по сигналу
+// Ребенок: реагирует на состояние и читает данные
 .reactions([{
   title: "Получение данных от родителя",
-  filter: ({meta}) => 
-    meta.tag === "parent-actor" && meta.state === "dataReady",
+  filter: ({meta, patch}) => 
+    meta.tag === "parent-actor" && 
+    patch.path === "/state" && patch.value === "waiting",
   action: ({update}) => {
     const data = JSON.parse(sessionStorage.getItem('child-data') || '{}')
-         update({receivedData: data})
-   }
- }])
- ```
-
-### Итого: Три способа коммуникации
-
-| Направление | Механизм | Область видимости | Использование |
-|-------------|----------|------------------|---------------|
-| 🌐 **Все ↔ Все** | Глобальные состояния | Main thread, worker, service worker, tabs, windows → Устройства → Сервера | Координация системы, аварийные сигналы |
-| ⬆️ **Ребенок → Родитель** | DOM-события (контекст) | Локально в DOM-дереве | События меняют контекст родителя |
-| ⬇️ **Родитель → Ребенок** | SessionStorage + состояния | Tab/window (одна вкладка) | Передача данных через временное хранилище |
-
-**Ключевые принципы:**
-- **События → Контекст**: события изменяют локальный контекст актора
-- **Состояния → Глобально**: состояния видны всем (main thread, worker, service worker, tabs, windows, устройства, сервера)
-- **Контекст → Локально**: контекст доступен только родителям в DOM
+    update({receivedData: data})
+  }
+}])
+```
 
 ## Простой пример актора
 
 ```javascript
-// Счетчик как актор
 export default MetaFor("counter")
   .context(t => ({
     value: t.number({default: 0}),
@@ -854,12 +492,10 @@ export default MetaFor("counter")
       const newValue = context.value + context.step
       update({value: Math.min(newValue, context.max)})
     },
-    
     decrement: () => {
       const newValue = context.value - context.step
       update({value: Math.max(newValue, 0)})
     },
-    
     reset: () => update({value: 0})
   }))
   
@@ -886,21 +522,13 @@ export default MetaFor("counter")
   .reactions([
     {
       title: "Команды от UI",
-             filter: ({meta}) => meta.tag === "ui-controller",
-             action: ({context, core}) => {
-         const command = context.lastCommand
-         if (command === "increment") core.increment()
-         if (command === "decrement") core.decrement() 
-         if (command === "reset") core.reset()
-       }
-    },
-    
-    {
-      title: "Настройки шага",
-             filter: ({meta}) => meta.tag === "settings",
-       action: ({context, update}) => {
-         update({step: context.newStep})
-       }
+      filter: ({meta}) => meta.tag === "ui-controller",
+      action: ({patch, core}) => {
+        const command = patch.value.command
+        if (command === "increment") core.increment()
+        if (command === "decrement") core.decrement() 
+        if (command === "reset") core.reset()
+      }
     }
   ])
   
@@ -938,54 +566,57 @@ export default MetaFor("counter")
   })
 ```
 
-## Взаимодействие акторов
-
-### Пример: UI Controller + Counter
+## Пример демократического взаимодействия
 
 ```javascript
-// UI контроллер
-export default MetaFor("ui-controller")
+// Простая кнопка влияет на сложную систему
+export default MetaFor("emergency-button")
+  .context(t => ({pressed: t.boolean({default: false})}))
+  .core(({update}) => ({
+    press: () => update({pressed: true})
+  }))
+  .states("ready", "pressed")
+  .transitions("ready", [
+    {in: "ready", to: [{state: "pressed", when: {pressed: true}}]}
+  ])
+  .reactions([])
+  .view({
+    render: ({html, core, state}) => html`
+      <button class="emergency ${state}" @click=${core.press}>
+        🚨 EMERGENCY
+      </button>
+    `
+  })
+
+// Сложная система слушает простую кнопку
+export default MetaFor("system-controller")
   .context(t => ({
-    selectedCounter: t.string({nullable: true}),
-    counters: t.array({default: []}),
-    lastCommand: t.string({nullable: true}),
-    commandTime: t.number({nullable: true})
+    mode: t.enum("normal", "emergency")({default: "normal"}),
+    services: t.array({default: ["api", "database", "cache"]})
   }))
   .core(({update}) => ({
-    sendCommand: (command) => {
-      // Система автоматически передаст команду через реакции
-      update({lastCommand: command, commandTime: Date.now()})
-    }
+    shutdown: () => update({mode: "emergency", services: []})
   }))
-  .states("idle")
-  .transitions("idle", [])
-  .reactions([
-    {
-      title: "Регистрация новых счетчиков",
-      filter: ({meta}) => meta.tag === "counter",
-      action: ({meta, update, context}) => {
-        // Автоматически добавляем новый счетчик в список
-        update({
-          counters: [...context.counters, meta.tag + "/" + meta.index]
-        })
-      }
-    }
+  .states("running", "emergency")
+  .transitions("running", [
+    {in: "running", to: [{state: "emergency", when: {mode: "emergency"}}]}
   ])
+  .reactions([{
+    title: "Простая кнопка управляет сложной системой",
+    filter: ({meta, patch}) => 
+      meta.tag === "emergency-button" && 
+      patch.path === "/state" && patch.value === "pressed",
+    action: ({update, core}) => {
+      console.log("Аварийная кнопка нажата!")
+      update({mode: "emergency"})
+      core.shutdown()
+    }
+  }])
   .view({
-    render: ({html, context, core, repeat}) => html`
-      <div class="controller">
-        <h3>Управление счетчиками</h3>
-        <select @change=${(e) => update({selectedCounter: e.target.value})}>
-          <option value="">Выберите счетчик</option>
-          ${repeat(context.counters, (counter) => counter, (counter) => html`
-            <option value="${counter}">${counter}</option>
-          `)}
-        </select>
-        <div class="buttons">
-          <button @click=${() => core.sendCommand("increment")}>+</button>
-          <button @click=${() => core.sendCommand("decrement")}>-</button>
-          <button @click=${() => core.sendCommand("reset")}>Reset</button>
-        </div>
+    render: ({html, context, state}) => html`
+      <div class="system ${state}">
+        <h3>Система: ${context.mode}</h3>
+        <div>Сервисы: ${context.services.join(", ") || "остановлены"}</div>
       </div>
     `
   })
@@ -995,228 +626,79 @@ export default MetaFor("ui-controller")
 
 ### 1. Слушание состояний
 ```javascript
-// Актор реагирует на изменение состояния другого актора
 .reactions([{
   title: "Реакция на активацию кнопки",
-  filter: ({meta}) => meta.tag === "button" && meta.state === "active",
-  action: ({update}) => {
-    update({buttonPressed: true})
-  }
+  filter: ({meta, patch}) => 
+    meta.tag === "button" && patch.path === "/state" && patch.value === "active",
+  action: ({update}) => update({buttonPressed: true})
 }])
 ```
 
 ### 2. Слушание контекста
 ```javascript
-// Актор реагирует на изменение данных другого актора
 .reactions([{
   title: "Отслеживание счетчика",
-  filter: ({meta, context}) => 
-    meta.tag === "counter" && context.value > 10,
-  action: ({update}) => {
-    update({counterThresholdReached: true})
-  }
+  filter: ({meta, patch}) => 
+    meta.tag === "counter" && patch.path === "/context" && patch.value.counter > 10,
+  action: ({update}) => update({thresholdReached: true})
 }])
 ```
 
 ### 3. Множественное слушание
 ```javascript
-// Один актор слушает несколько других
 .reactions([
   {
     title: "Слушаем пользователя",
     filter: ({meta}) => meta.tag === "user-input",
-    action: ({context, update}) => {
-      update({lastInput: context.value})
-    }
+    action: ({patch, update}) => update({lastInput: patch.value})
   },
   {
     title: "Слушаем систему", 
     filter: ({meta}) => meta.tag === "system-status",
-    action: ({context, update}) => {
-      update({systemOnline: context.online})
-    }
+    action: ({patch, update}) => update({systemOnline: patch.value.online})
   }
 ])
 ```
 
-## Преимущества
-
-1. **Демократичность** - нет начальников и подчиненных, все равноправны
-2. **Отзывчивость** - любой актор может влиять на любой другой
-3. **Простота** - каждый актор решает одну задачу, но может слушать всех
-4. **Изоляция** - ошибки не распространяются между акторами  
-5. **Композиция** - легко комбинировать акторы без нарушения архитектуры
-6. **Тестирование** - каждый актор тестируется независимо, но с учетом реакций
-
-## Пример демократического взаимодействия
-
-```javascript
-// Простая кнопка - может влиять на всю систему
-export default MetaFor("emergency-button")
-  .context(t => ({
-    pressed: t.boolean({default: false})
-  }))
-  .core(({update}) => ({
-    press: () => update({pressed: true}),
-    release: () => update({pressed: false})
-  }))
-  .states("ready", "pressed")
-  .transitions("ready", [
-    {in: "ready", to: [{state: "pressed", when: {pressed: true}}]},
-    {in: "pressed", to: [{state: "ready", when: {pressed: false}}]}
-  ])
-  .reactions([])
-  .view({
-    render: ({html, core, state}) => html`
-      <button class="emergency ${state}" 
-              @click=${core.press}
-              @mouseup=${core.release}>
-        🚨 EMERGENCY
-      </button>
-    `
-  })
-
-// Сложная система - слушает простую кнопку
-export default MetaFor("system-controller")
-  .context(t => ({
-    mode: t.enum("normal", "emergency", "shutdown")({default: "normal"}),
-    services: t.array({default: ["api", "database", "cache"]}),
-    emergencyTime: t.number({nullable: true})
-  }))
-  .core(({update, context}) => ({
-    shutdown: () => {
-      update({
-        mode: "shutdown", 
-        services: [],
-        emergencyTime: Date.now()
-      })
-    },
-    restore: () => {
-      update({
-        mode: "normal",
-        services: ["api", "database", "cache"],
-        emergencyTime: null
-      })
-    }
-  }))
-  .states("running", "emergency", "stopped")
-  .transitions("running", [
-    {in: "running", to: [{state: "emergency", when: {mode: "emergency"}}]},
-    {in: "emergency", to: [{state: "stopped", when: {mode: "shutdown"}}]},
-    {in: "stopped", to: [{state: "running", when: {mode: "normal"}}]}
-  ])
-  .reactions([
-         {
-       title: "Простая кнопка останавливает сложную систему",
-       filter: ({meta}) => 
-         meta.tag === "emergency-button" && meta.state === "pressed",
-       action: ({update, core}) => {
-         // Главный контроллер слушается простой кнопки!
-         update({mode: "emergency"})
-         core.shutdown()
-       }
-     },
-         {
-       title: "Автовосстановление при отпускании кнопки",
-       filter: ({meta}) => 
-         meta.tag === "emergency-button" && meta.state === "ready",
-       action: ({core}) => {
-         setTimeout(() => {
-           core.restore()
-         }, 5000)
-       }
-     }
-  ])
-  .view({
-    render: ({html, context, state}) => html`
-      <div class="system-status ${state}">
-        <h3>Система: ${context.mode}</h3>
-        <div>Сервисы: ${context.services.join(", ") || "остановлены"}</div>
-        ${context.emergencyTime ? 
-          html`<div>Аварийная остановка: ${new Date(context.emergencyTime)}</div>` : 
-          ""
-        }
-      </div>
-    `
-  })
-```
-
-В этом примере видно ключевой принцип:
-- **Простая кнопка** управляет **сложной системой**
-- **SystemController** не командует кнопкой, а **слушает** её
-- Любой актор может повлиять на любой другой через реакции
-- Нет иерархии "главный-подчинённый"
-
-## Лучшие практики
-
-1. **Думайте горизонтально** - не создавайте иерархии, создавайте сети
-2. **Слушайте всех** - подписывайтесь на события, которые могут быть полезны
-3. **Держите акторы простыми** - одна ответственность, но открытость к влиянию
-4. **Используйте типизацию** - определяйте четкие контракты сообщений
-5. **Обрабатывайте ошибки** - любой может сломаться, все должны это учитывать
-6. **Логируйте сообщения** - включайте development режим для отладки взаимодействий
-
 ## Пример параллельной обработки
 
-**Координация через акторов-помощников с результатами через sessionStorage:**
-
 ```javascript
-// Основной актор - координатор. Взаимодействие через сообщения, не через переменные
+// Координатор задач
 export default MetaFor("data-processor")
   .context(t => ({
     tasks: t.array({default: []}),
     completed: t.number({default: 0}),
     results: t.array({default: []})
   }))
-  .core(({update, context}) => ({
-    addTask: (taskData) => {
-      // Создаем актора-помощника для каждой задачи
-      const taskId = Date.now()
-      update({tasks: [...context.tasks, taskId]})
-    }
-  }))
+  .core(({update, context}) => ({}))
   .states("idle", "processing")
   .transitions("idle", [
-    {
-      in: "idle", 
-      to: [{state: "processing", when: {tasks: {length: {min: 1}}}}]
-    },
-    {
-      in: "processing",
-      to: [{state: "idle", when: {tasks: {isEmpty: true}}}]
-    }
+    {in: "idle", to: [{state: "processing", when: {tasks: {length: {min: 1}}}}]},
+    {in: "processing", to: [{state: "idle", when: {tasks: {isEmpty: true}}}]}
   ])
-  .reactions([
-    {
-      title: "Получение результата от актора-помощника через sessionStorage",
-      filter: ({meta, patch}) => 
-        meta.tag === "task-worker" && 
-        patch.path === "/state" && 
-        patch.value === "completed",
-      action: ({meta, update, context}) => {
-        // Актор-помощник завершил работу, читаем результат из sessionStorage
-        const result = JSON.parse(sessionStorage.getItem(`${meta.index}-task-result`) || 'null')
-        if (result) {
-          update({
-            completed: context.completed + 1,
-            results: [...context.results, result.id]
-          })
-          sessionStorage.removeItem(`${meta.index}-task-result`) // Очищаем после использования
-        }
+  .reactions([{
+    title: "Получение результата через sessionStorage",
+    filter: ({meta, patch}) => 
+      meta.tag === "task-worker" && 
+      patch.path === "/state" && patch.value === "completed",
+    action: ({meta, update, context}) => {
+      const result = JSON.parse(sessionStorage.getItem(`task-${meta.index}`) || 'null')
+      if (result) {
+        update({
+          completed: context.completed + 1,
+          results: [...context.results, result.id]
+        })
+        sessionStorage.removeItem(`task-${meta.index}`)
       }
     }
-  ])
+  }])
   .view({
-    render: ({html, context, core, repeat}) => html`
+    render: ({html, context, repeat}) => html`
       <div class="data-processor">
         <h3>Обработчик данных</h3>
         <div>Задач: ${context.tasks.length}</div>
         <div>Завершено: ${context.completed}</div>
-        <button @click=${() => core.addTask({data: "example"})}>
-          Добавить задачу
-        </button>
         
-        <!-- Акторы-помощники создаются декларативно с передачей контекста -->
         ${repeat(context.tasks, (taskId) => taskId, (taskId) => html`
           <metafor-task-worker context=${{taskId}}></metafor-task-worker>
         `)}
@@ -1224,19 +706,17 @@ export default MetaFor("data-processor")
     `
   })
 
-// Актор-помощник для параллельной обработки. Взаимодействие только через сообщения
+// Актор-воркер
 export default MetaFor("task-worker")
   .context(t => ({
-    taskId: t.string(), // Передается при инициализации актора
-    status: t.string({default: "pending"}) // НЕ используем processing - блокировка встроена в MetaFor
+    taskId: t.string(),
+    status: t.string({default: "pending"})
   }))
   .core(({update, context}) => ({
     processTask: async (actorIndex) => {
-      // Имитация тяжелой обработки данных
-      const result = await heavyProcessing(context.taskId) // Promise-функция обработки
-      // Сохраняем результат в sessionStorage для родительского актора
-      sessionStorage.setItem(`${actorIndex}-task-result`, JSON.stringify(result))
-      update({status: "completed"}) // Меняем состояние для уведомления родителя
+      const result = await heavyProcessing(context.taskId)
+      sessionStorage.setItem(`task-${actorIndex}`, JSON.stringify(result))
+      update({status: "completed"})
     }
   }))
   .states("idle", "working", "completed")
@@ -1244,12 +724,8 @@ export default MetaFor("task-worker")
     {
       in: "idle",
       action: async ({update, core, element}) => {
-        // Встроенная блокировка активируется автоматически при входе в action
         update({status: "working"})
-        
-        // Параллельная обработка через core, передаем индекс актора
         await core.processTask(element.index)
-        // Блокировка снимается автоматически после завершения action
       },
       to: [{state: "working", when: {status: "working"}}]
     },
@@ -1262,9 +738,20 @@ export default MetaFor("task-worker")
   .view({})
 ```
 
-**Преимущества подхода с актором-помощником:**
-- Каждая задача выполняется в изолированном акторе
-- Параллельное выполнение без блокировки основного актора
-- Автоматическая коммуникация через реакции
-- Возможность независимого управления жизненным циклом задач
-- Результаты передаются через sessionStorage при изменении состояния
+## Преимущества
+
+1. **Демократичность** - все акторы равноправны
+2. **Отзывчивость** - любой актор может влиять на любой другой
+3. **Простота** - каждый актор решает одну задачу
+4. **Изоляция** - ошибки не распространяются между акторами
+5. **Композиция** - легко комбинировать акторы
+6. **Тестирование** - независимое тестирование с учетом реакций
+
+## Лучшие практики
+
+1. **Думайте горизонтально** - создавайте сети, не иерархии
+2. **Слушайте всех** - подписывайтесь на полезные события
+3. **Держите акторы простыми** - одна ответственность
+4. **Используйте типизацию** - четкие контракты сообщений
+5. **Обрабатывайте ошибки** - любой может сломаться
+6. **Логируйте сообщения** - включайте development режим для отладки
