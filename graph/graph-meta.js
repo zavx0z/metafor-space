@@ -101,7 +101,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           width: layout.width,
           height: layout.height
         })
-
+        console.log(layout)
 
       }
     }
@@ -126,121 +126,118 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         <slot></slot>
       </section>
     `,
-    style: ({css}) => {
-      const borderRadius = "7px"
-      return css`
-        :host([data-state="позиционирование"]) {
-          opacity: 1;
-        }
+    style: ({css}) => css`
+      :host([data-state="позиционирование"]) {
+        opacity: 1;
+      }
 
-        :host {
-          --font-color: rgb(var(--surface-50));
-          --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
+      :host {
+        --font-color: rgb(var(--surface-50));
+        --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
 
-          position: fixed;
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        user-select: none;
+        will-change: transform;
+        box-sizing: border-box;
+        border-radius: 7px;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+      }
+
+      header {
+        --background-color: rgba(var(--surface-500) / var(--background-alpha));
+
+        position: relative;
+        padding: 8px 6px;
+        z-index: 2;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--background-color);
+        box-sizing: border-box;
+        user-select: none;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+
+        & > div:first-child {
+          flex: 1;
           display: flex;
-          flex-direction: column;
-          user-select: none;
-          will-change: transform;
-          box-sizing: border-box;
-          border-radius: ${borderRadius};
-          opacity: 1;
-          transition: opacity 1s ease-in-out;
+          gap: 4px;
+          padding-left: 4px;
         }
 
-        header {
-          --background-color: rgba(var(--surface-500) / var(--background-alpha));
+        & > h2 {
+          flex: 1;
+          text-align: center;
+          margin: 0;
+          padding: 0;
+        }
 
-          position: relative;
-          padding: 8px 6px;
-          z-index: 2;
-          width: 100%;
+        & > div:last-child {
+          flex: 1;
           display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background-color: var(--background-color);
-          box-sizing: border-box;
-          user-select: none;
-          border-top-left-radius: inherit;
-          border-top-right-radius: inherit;
-
-          & > div:first-child {
-            flex: 1;
-            display: flex;
-            gap: 4px;
-            padding-left: 4px;
-          }
-
-          & > h2 {
-            flex: 1;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-          }
-
-          & > div:last-child {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            padding-right: 4px;
-            gap: 4px;
-          }
-
-          button {
-            background: none;
-            border: none;
-            padding: 4px;
-            cursor: pointer;
-            border-radius: 4px;
-            color: var(--font-color);
-
-            &:hover {
-              background-color: rgba(0, 0, 0, 0.05);
-            }
-
-            & svg {
-              display: block;
-            }
-          }
+          justify-content: flex-end;
+          padding-right: 4px;
+          gap: 4px;
         }
 
-        section {
-          display: flex;
-          position: relative;
-          background-color: var(--background-color);
-          border-bottom-right-radius: inherit;
-          border-bottom-left-radius: inherit;
-          width: 100%;
-          height: 100%;
-        }
+        button {
+          background: none;
+          border: none;
+          padding: 4px;
+          cursor: pointer;
+          border-radius: 4px;
+          color: var(--font-color);
 
-        svg.connections {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+          }
 
-          & path {
-            stroke: #888;
-            stroke-width: 2;
-            fill: none;
-            transition: stroke 0.3s ease;
-
-            &.next {
-              stroke: #9c27b0;
-            }
-
-            &.active {
-              stroke: #2196f3;
-            }
-
-            &.preview {
-              stroke: #4caf50;
-            }
+          & svg {
+            display: block;
           }
         }
-      `
-    }
+      }
+
+      section {
+        display: flex;
+        position: relative;
+        background-color: var(--background-color);
+        border-bottom-right-radius: inherit;
+        border-bottom-left-radius: inherit;
+        width: 100%;
+        height: 100%;
+      }
+
+      svg.connections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+
+        & path {
+          stroke: #888;
+          stroke-width: 2;
+          fill: none;
+          transition: stroke 0.3s ease;
+
+          &.next {
+            stroke: #9c27b0;
+          }
+
+          &.active {
+            stroke: #2196f3;
+          }
+
+          &.preview {
+            stroke: #4caf50;
+          }
+        }
+      }
+    `
   })
