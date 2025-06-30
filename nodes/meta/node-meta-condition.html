@@ -9,6 +9,9 @@
     import "./node-meta-condition.js"
     import {html, render} from "../../html/html.js"
 
+    document.body.addEventListener('channel', (e)=>{
+      console.log(e.detail.meta, e.detail.patch)
+    })
     render(html`
       <metafor-node-meta-condition
         class="noselect" data=${{"eq": {value: null}}}

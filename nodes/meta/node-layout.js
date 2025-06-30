@@ -82,10 +82,9 @@ export default MetaFor("node-layout", {development: true})
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
-        // @ts-ignore
         update({current: null})
       },
-      to: [{state: "вычисление", when: {current: null}}]
+      to: [{state: "вычисление", when: {current: {isNull: true}}}]
     },
     {
       in: "вычисление",

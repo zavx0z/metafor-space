@@ -1,4 +1,5 @@
 import {MetaFor} from "../../metafor.js"
+import "./node-meta-operator.js"
 import "./node-meta-socket.js"
 
 export default MetaFor("node-meta-condition", {development: true})
@@ -18,9 +19,6 @@ export default MetaFor("node-meta-condition", {development: true})
   .transitions('рендер', [
     {
       in: "рендер",
-      action({element}) {
-
-      },
       to: [{state: "измерение", when: {error: null}}]
     },
     {
