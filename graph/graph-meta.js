@@ -56,6 +56,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
       in: "позиционирование",
       action({element, context, core}) {
         element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        core.svg.value.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
         // Отрисовываем edges после установки размеров
         setTimeout(() => core.renderEdges(), 0)
       },
@@ -120,7 +121,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         </div>
       </header>
       <section class="content" data-drag-selector="graph-atom">
-        <svg ${ref(core.svg)} class="connections" viewBox="0 0 ${context.width || 100} ${context.height || 100}">
+        <svg ${ref(core.svg)} class="connections">
         </svg>
         <slot></slot>
       </section>
