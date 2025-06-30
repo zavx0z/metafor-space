@@ -1,3 +1,4 @@
+import { createRef } from "../../html/directives/ref.js"
 import {MetaFor} from "../../metafor.js"
 
 export default MetaFor('node-meta-context', {
@@ -18,7 +19,8 @@ export default MetaFor('node-meta-context', {
     params: new Map(),
     /**@type{import("./node-meta-context.t.js").Sockets}*/
     sockets: new Map(),
-    count: 0
+    count: 0,
+    header: createRef()
   }))
   .states("рендер", "измерение", "позиционирование")
   .transitions("рендер", [
@@ -28,14 +30,16 @@ export default MetaFor('node-meta-context', {
     },
     {
       in: "измерение",
-      action({element, update}) {
+      action({element, update, core}) {
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
+          const header = /**@type{HTMLElement} */ (core.header.value)
+          const bbHeader = header.getBoundingClientRect()
           update({
             width: Math.round(width),
-            height: Math.round(height),
+            height: Math.round(height + bbHeader.height),
             x: Math.round(x),
-            y: Math.round(y),
+            y: Math.round(y - bbHeader.height),
           })
         })
       },
@@ -77,8 +81,8 @@ export default MetaFor('node-meta-context', {
     }
   ])
   .view({
-    render: ({context, html}) => html`
-      <header>
+    render: ({context, html, ref, core}) => html`
+      <header ${ref(core.header)}>
         <h2 class="noselect">${context.state}</h2>
       </header>
       <section>
