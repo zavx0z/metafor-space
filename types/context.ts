@@ -35,19 +35,9 @@ export type TypeDefinition =
  @template C - Тип определения контекста
  */
  export type ContextData<C extends ContextDefinition> = {
-    [K in keyof C]: C[K] extends ArrayDefinition
-        ? any[]
-        : C[K] extends EnumDefinition<infer T>
-            ? C[K]["nullable"] extends true
-                ? T[number] | null
-                : T[number]
-            : C[K] extends TypeDefinition
-                ? "nullable" extends keyof C[K]
-                    ? C[K]["nullable"] extends true
-                        ? ExtractTypeValue<C[K]> | null
-                        : ExtractTypeValue<C[K]>
-                    : ExtractTypeValue<C[K]>
-                : ExtractTypeValue<C[K]>
+    [K in keyof C]: C[K] extends { nullable: true }
+        ? ExtractTypeValue<C[K]> | null
+        : ExtractTypeValue<C[K]>
 }
 
 /**
@@ -75,19 +65,23 @@ type ExtractTypeValue<T extends TypeDefinition> = T extends StringDefinition
  @template C - Тип определения контекста
  */
 export type OnUpdateContextData<C extends ContextDefinition> = {
-    [K in keyof C]: C[K] extends ArrayDefinition
-        ? Array<string|number>
-        : C[K] extends EnumDefinition<infer T>
-            ? C[K]["nullable"] extends true
-                ? T[number] | null
-                : T[number]
-            : C[K] extends TypeDefinition
-                ? "nullable" extends keyof C[K]
-                    ? C[K]["nullable"] extends true
-                        ? ExtractTypeValue<C[K]> | null
-                        : ExtractTypeValue<C[K]>
-                    : ExtractTypeValue<C[K]>
-                : ExtractTypeValue<C[K]>
+    [K in keyof C]: C[K] extends { nullable: true }
+        ? ExtractTypeValue<C[K]> | null
+        : ExtractTypeValue<C[K]>
+}
+
+/**
+ Nullable поля для обновления контекста
+ */
+type UpdateNullableFields<C extends ContextDefinition> = {
+    [K in keyof C as C[K] extends { nullable: true } ? K : never]?: ExtractTypeValue<C[K]> | null
+}
+
+/**
+ Обычные поля для обновления контекста  
+ */
+type UpdateRegularFields<C extends ContextDefinition> = {
+    [K in keyof C as C[K] extends { nullable: true } ? never : K]?: ExtractTypeValue<C[K]>
 }
 
 /**
@@ -95,30 +89,14 @@ export type OnUpdateContextData<C extends ContextDefinition> = {
 
  @template C - Тип определения контекста
  */
-export type UpdateParameters<C extends ContextDefinition> = Partial<{
-    [K in keyof C]: C[K] extends ArrayDefinition
-        ? any[]
-        : C[K] extends EnumDefinition<infer T>
-            ? C[K]["nullable"] extends true
-                ? T[number] | null
-                : T[number]
-            : C[K] extends TypeDefinition
-                ? "nullable" extends keyof C[K]
-                    ? C[K]["nullable"] extends true
-                        ? ExtractTypeValue<C[K]> | null
-                        : ExtractTypeValue<C[K]>
-                    : ExtractTypeValue<C[K]>
-                : ExtractTypeValue<C[K]>
-}>
+export type UpdateParameters<C extends ContextDefinition> = UpdateNullableFields<C> & UpdateRegularFields<C>
 
 /**
  Частичный тип контекста
 
  @template C - Тип определения контекста
  */
-export type PartialContextData<C extends ContextDefinition> = Partial<{
-    [K in keyof C]: C[K] extends EnumDefinition<infer T> ? T[number] | null : ExtractTypeValue<C[K]> | null
-}>
+export type PartialContextData<C extends ContextDefinition> = UpdateParameters<C>
 
 /**
  Функция обновления контекста
@@ -130,7 +108,7 @@ export type PartialContextData<C extends ContextDefinition> = Partial<{
  @template C - Тип контекста
  @property context - Новые данные контекста
  */
-export type Update<C extends ContextDefinition> = (context: UpdateParameters<C>) => void
+export type Update<C extends ContextDefinition> = (context: UpdateParameters<C> | Partial<Record<keyof C, any>>) => void
 
 /**
  Функция обновления контекста
