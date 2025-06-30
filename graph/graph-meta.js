@@ -1,7 +1,6 @@
 import {MetaFor} from "../metafor.js"
-import {collectEdges} from "../layout/collect.js"
-import {getSimpleRoundedPath} from "./edge/rounded.js"
-import { createRef } from "../html/directives/ref.js"
+import {getSimpleRoundedPath, collectEdges} from "./graph-meta.actions.js"
+import {createRef} from "../html/directives/ref.js"
 
 export default MetaFor("graph-meta", {development: true, description: "Node"})
   .context(t => ({
@@ -10,9 +9,10 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     height: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true})
   }))
-  .core(({update, context}) => ({
+  .core(() => ({
     svg: createRef(),
-    edges: [] // Сложные данные о связях хранятся в core
+    /**@type{import('./graph-meta.t').Edge[]} */
+    edges: []
   }))
   .states("рендер", "позиционирование")
   .transitions("рендер", [
@@ -26,37 +26,37 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
       in: "позиционирование",
       action({element, context, core}) {
         element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
-        core.svg.value.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
-        
+        const svg = /**@type{SVGElement}*/ (core.svg.value)
+        svg.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+
         // Отрисовываем edges после установки размеров
         requestAnimationFrame(() => {
-          const svgElement = core.svg.value
-          if (!svgElement || !core.edges.length) return
-          
+          if (!svg || !core.edges.length) return
+
           // Очищаем существующие пути
-          Array.from(svgElement.querySelectorAll('path')).forEach(path => path.remove())
-          
+          Array.from(svg.querySelectorAll('path')).forEach(path => path.remove())
+
           // Создаем новые пути
-          core.edges.forEach(/** @param {{id: string, points: Array<{x: number, y: number}>, type: string}} edge */ edge => {
+          core.edges.forEach(/** @param {import('./graph-meta.t').Edge} edge */edge => {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
             path.id = edge.id
             path.setAttribute('d', getSimpleRoundedPath(edge.points, 8))
             path.setAttribute('fill', 'none')
             path.setAttribute('stroke-width', '2')
-            
+
             // Устанавливаем класс и цвет в зависимости от типа
-            const className = edge.type === 'east-input' ? 'next' : 
-                             edge.type === 'west' ? 'active' : 'preview'
+            const className = edge.type === 'east-input' ? 'next' :
+              edge.type === 'west' ? 'active' : 'preview'
             path.setAttribute('class', className)
-            
-            const color = edge.type === 'east-input' ? '#9c27b0' : 
-                         edge.type === 'west' ? '#2196f3' : '#4caf50'
+
+            const color = edge.type === 'east-input' ? '#9c27b0' :
+              edge.type === 'west' ? '#2196f3' : '#4caf50'
             path.setAttribute('stroke', color)
-            
-            svgElement.appendChild(path)
+
+            svg.appendChild(path)
           })
-          
-          console.log(`Создано ${core.edges.length} SVG путей`)
+
+          // console.log(`Создано ${core.edges.length} SVG путей`)
         })
       },
       to: []
@@ -86,22 +86,22 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
 
         // Извлекаем edges из layout данных
         const edges = collectEdges(layout)
-        console.log("Извлеченные edges:", edges)
-        
+        // console.log("Извлеченные edges:", edges)
+
         // Проверяем что SVG пути создаются корректно
-        edges.forEach(/** @param {{id: string, points: Array<{x: number, y: number}>, type: string}} edge */ edge => {
+        edges.forEach(/** @param {import('./graph-meta.t').Edge} edge */edge => {
           const svgPath = getSimpleRoundedPath(edge.points, 8)
-          console.log(`Edge ${edge.id}: ${svgPath}`)
+          // console.log(`Edge ${edge.id}: ${svgPath}`)
         })
 
         // Устанавливаем edges в core
         core.edges = edges
-        
+
         update({
-          width: layout.width, 
+          width: layout.width,
           height: layout.height
         })
-        
+
 
       }
     }

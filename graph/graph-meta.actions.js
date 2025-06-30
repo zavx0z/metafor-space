@@ -1,6 +1,6 @@
 /**
  * Создает SVG путь с простыми скруглениями
- * @param {Point[]} points - Массив точек пути
+ * @param {import('./graph-meta.t').Point[]} points - Массив точек пути
  * @param {number} radius - Радиус скругления углов
  * @returns {string} SVG path data
  */
@@ -33,10 +33,11 @@ export function getSimpleRoundedPath(points, radius) {
 
   return path.join(" ")
 }
+
 /**
  * Собирает все рёбра из layout
  * @param {import('elkjs').ElkNode} layout - ELK layout
- * @returns {Array<{id: string, points: Array<{x: number, y: number}>, type: string}>}
+ * @returns {import('./graph-meta.t').Edge[]} Массив рёбер с типами
  */
 export const collectEdges = layout => {
   const rootEdges = /**@type {import('elkjs').ElkExtendedEdge[]} */ (layout.edges || [])
@@ -81,3 +82,14 @@ export const collectEdges = layout => {
     }
   })
 }
+
+/**
+ * Добавляет смещение состояния к точке
+ * @param {import('./graph-meta.t').Point} point
+ * @param {import('./graph-meta.t').Point} stateLayout
+ * @returns {import('./graph-meta.t').Point}
+ */
+const addOffset = (point, stateLayout) => ({
+  x: point.x + stateLayout.x,
+  y: point.y + stateLayout.y
+})
