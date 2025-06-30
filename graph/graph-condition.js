@@ -65,7 +65,6 @@ export default MetaFor("graph-condition", {development: true})
           update({error: `Условие ${id} не найдено в состоянии ${context.to}`})
           return
         }
-
         update({x: layoutCondition.x, y: layoutCondition.y})
       }
     }

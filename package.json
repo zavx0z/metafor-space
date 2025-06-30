@@ -149,9 +149,9 @@
     "test:directives:async-append": "bun test tests/directives/async-append.spec.ts",
     "test:directives:async-append[debug]": "bun test tests/directives/async-append.spec.ts --inspect-brk",
     "test:directives:async-append[watch]": "bun test tests/directives/async-append.spec.ts --watch",
-    "test:graph-transition": "bun test graph/graph-transition.spec.ts",
     "test:graph-layout": "bun test graph/graph-layout.spec.ts",
-    "test:graph-state": "bun test graph/graph-state.spec.ts"
+    "test:graph-state": "bun test graph/graph-state.spec.ts",
+    "test:graph-transition": "bun test graph/graph-transition.spec.ts"
   },
   "dependencies": {
     "@types/three": "^0.177.0",

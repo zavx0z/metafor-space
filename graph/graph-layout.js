@@ -24,18 +24,18 @@ export default MetaFor("graph-layout", {development: true})
         "elk.spacing.edgeEdge": "36",
         // "elk.spacing.edgeNode": "36",
         "hierarchyHandling": "INCLUDE_CHILDREN",
-        'elk.layered.layering.strategy': 'LONGEST_PATH_SOURCE',
-        "elk.padding": "[top=0.0, left=20.0, bottom=20.0, right=20.0]",
-        "considerModelOrder.strategy": 'PREFER_NODES'
+        "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
+        "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
+        "considerModelOrder.strategy": "PREFER_NODES",
       },
       meta: {
-        'elk.spacing.nodeNode': "0",
-        'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+        "elk.spacing.nodeNode": "0",
+        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
       },
       state: {
-        'elk.spacing.nodeNode': "0",
+        "elk.spacing.nodeNode": "0",
         "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
-        "portConstraints": "FIXED_POS"
+        "portConstraints": "FIXED_POS",
       },
       condition: {
         "elk.spacing.nodeNode": "0",
@@ -48,12 +48,12 @@ export default MetaFor("graph-layout", {development: true})
       },
       port: {
         west: {
-          "port.side": "WEST"
+          "port.side": "WEST",
         },
         east: {
-          "port.side": "EAST"
-        }
-      }
+          "port.side": "EAST",
+        },
+      },
     }
   }))
   .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
