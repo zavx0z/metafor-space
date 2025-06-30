@@ -54,14 +54,21 @@ export default MetaFor("node-meta-condition", {development: true})
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("elkjs").ElkNode}*/
+        /**@type{import("./node-layout.t").LayoutResult}*/
         const layout = JSON.parse(data)
         const layoutState = layout.children?.find(i => i.id === context.to)
-        const layoutCondition = layoutState?.children?.find(i => i.id === id)
+        if (!layoutState) {
+          update({error: `Состояние ${context.to} не найдено в layout`})
+          return
+        }
+        
+        const layoutCondition = layoutState.children?.find(i => i.id === id)
+        if (!layoutCondition) {
+          update({error: `Условие ${id} не найдено в состоянии ${context.to}`})
+          return
+        }
 
-        // @ts-ignore
-        update({x: layoutCondition?.x, y: layoutCondition?.y})
-        // console.log(layoutCondition)
+        update({x: layoutCondition.x, y: layoutCondition.y})
       }
     }
   ])

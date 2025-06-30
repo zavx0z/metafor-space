@@ -70,13 +70,22 @@ export default MetaFor('node-meta-context', {
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("elkjs").ElkNode}*/
+        /**@type{import("./node-layout.t").LayoutResult}*/
         const layout = JSON.parse(data)
         const layoutState = layout.children?.find(i => i.id === context.state)
-        const layoutContext = layoutState?.children?.find(i => i.id === id)
+        if (!layoutState) {
+          update({error: `Состояние ${context.state} не найдено в layout`})
+          return
+        }
+        
+        const layoutContext = layoutState.children?.find(i => i.id === id)
+        if (!layoutContext) {
+          update({error: `Контекст ${id} не найден в состоянии ${context.state}`})
+          return
+        }
+        
         console.log(layoutContext)
-        // @ts-ignore
-        update({x: layoutContext.x, y:  layoutState.y})
+        update({x: layoutContext.x, y: layoutState.y})
       }
     }
   ])

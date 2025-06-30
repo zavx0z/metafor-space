@@ -1,6 +1,7 @@
 import ELK from "elkjs"
 import {MetaFor} from "../../metafor.js"
 import "./nodes-meta.js"
+import {createElkData} from "./node-layout.actions.js"
 
 export default MetaFor("node-layout", {development: true})
   .context(t => ({
@@ -16,6 +17,7 @@ export default MetaFor("node-layout", {development: true})
     meta: new Map(),
     /**@type{import("elkjs").ElkNode|null}*/
     data: null,
+    /**@type{import("./node-layout.t").LayoutConfig}*/
     config: {
       base: {
         "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
@@ -23,7 +25,7 @@ export default MetaFor("node-layout", {development: true})
         // "elk.spacing.edgeNode": "36",
         "hierarchyHandling": "INCLUDE_CHILDREN",
         'elk.layered.layering.strategy': 'LONGEST_PATH_SOURCE',
-        "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
+        "elk.padding": "[top=0.0, left=20.0, bottom=20.0, right=20.0]",
         "considerModelOrder.strategy": 'PREFER_NODES'
       },
       meta: {
@@ -79,108 +81,7 @@ export default MetaFor("node-layout", {development: true})
       action({core, context, update}) {
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
-        core.data = {
-          id: context.current,
-          layoutOptions: core.config.base,
-          children: Object.entries(dataMeta.states).map(([keyState, valState]) => {
-            return {
-              layoutOptions: core.config.meta,
-              id: valState.state,
-              children: [
-
-                {
-                  layoutOptions: core.config.state,
-                  id: keyState,
-                  width: valState.width,
-                  height: valState.height,
-                  ports:
-
-                    Object.entries(dataMeta.sockets)
-                      .filter(([_, socket]) =>
-                        socket.state === valState.state && socket.parent === "state"
-                      )
-                      .map(([keySocket, socket]) => ({
-                        id: keySocket,
-                        x: /**@type{number}*/(socket.x) - /**@type{number}*/(valState.x),
-                        y: /**@type{number}*/(socket.y) - /**@type{number}*/(valState.y),
-                        width: socket.size,
-                        height: socket.size
-                      }))
-                },
-                ...Object.entries(dataMeta.conditions)
-                  .filter(([_, val]) => val.to === valState.state)
-                  .map(([key, val]) => {
-                    return {
-                      layoutOptions: core.config.condition,
-                      id: key,
-                      width: val.width,
-                      height: val.height,
-                      ports: Object.entries(dataMeta.sockets)
-                        .filter(([_, socket]) =>
-                          socket.state === valState.state && socket.parent === "condition"
-                        )
-                        .map(([keySocket, socket]) => ({
-                          id: keySocket,
-                          layoutOptions: socket.direction === 'west' ? core.config.port.west : core.config.port.east,
-                          width: socket.size,
-                          height: socket.size
-                        }))
-                    }
-                  })
-
-              ],
-              edges:/**@type{import("elkjs").ElkExtendedEdge[]}*/(/**@type{unknown}*/(
-
-                Object.entries(dataMeta.sockets)
-                  .filter(([_, socket]) =>
-                    socket.state === valState.state
-                    && socket.parent === "condition"
-                    && socket.direction === "east"
-                  )
-                  .map(([key, socketCond]) => {
-                    const target = Object.entries(dataMeta.sockets)
-                      .find(([_, socketState]) =>
-                        socketState.state === valState.state
-                        && socketState.param === socketCond.param
-                        && socketState.parent === "state"
-                        && socketState.direction === "west"
-                      )
-                    if (typeof target === 'undefined') return
-                    return {
-                      id: `${key}->${target[0]}`,
-                      sources: [key],
-                      targets: [target[0]]
-                    }
-                  })
-
-              ))
-            }
-          }),
-          edges:/**@type{import("elkjs").ElkExtendedEdge[]}*/(/**@type{unknown}*/(
-
-            Object.entries(dataMeta.sockets)
-              .filter(([_, socket]) =>
-                socket.parent === "state"
-                && socket.direction === "east"
-              )
-              .map(([key, socketCond]) => {
-                const target = Object.entries(dataMeta.sockets)
-                  .find(([_, socketState]) =>
-                    socketState.param === socketCond.param
-                    && socketState.state !== socketCond.state
-                    && socketState.parent === "condition"
-                    && socketState.direction === "west"
-                  )
-                if (typeof target === 'undefined') return
-                return {
-                  id: `${key}->${target[0]}`,
-                  sources: [key],
-                  targets: [target[0]]
-                }
-              })
-
-          ))
-        }
+        core.data = createElkData(context.current, dataMeta, core.config)
         // @ts-ignore
         update({current: null})
       },
@@ -334,3 +235,4 @@ export default MetaFor("node-layout", {development: true})
       }
     `
   })
+

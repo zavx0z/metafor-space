@@ -1,6 +1,6 @@
 import { test, describe, expect } from "bun:test"
 import type { DataMetaMap } from "./node-layout.t"
-import { config, data } from "./node-layout.spec"
+import { config, data } from "./node-layout.fixture"
 import ELK, { type ElkExtendedEdge, type ElkNode } from "elkjs"
 
 describe("elk layout для ноды состояния", () => {

@@ -37,11 +37,15 @@ export default MetaFor("node-meta", {development: true, description: "Node"})
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("elkjs").ElkNode}*/
+        /**@type{import("./node-layout.t").LayoutResult}*/
         const layout = JSON.parse(data)
         console.log(layout)
-        // const layoutState = layout.children?.find(i => i.id === context.state)
-        // @ts-ignore
+        
+        if (!layout.width || !layout.height) {
+          update({error: "Нет размеров в layout данных"})
+          return
+        }
+        
         update({width: layout.width, height: layout.height})
       }
     }
