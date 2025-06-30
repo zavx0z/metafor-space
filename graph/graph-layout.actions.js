@@ -1,9 +1,4 @@
-/**
- * @param {import("./graph-layout.t.js").Metrics["sockets"]} sockets
- * @param {string} stateName
- * @param {{x: number, y: number}} statePosition
- * @returns {import("elkjs").ElkPort[]}
- */
+/** @type {import("./graph-layout.t.js").createStatePorts} */
 export function createStatePorts(sockets, stateName, statePosition) {
   return Object.entries(sockets)
     .filter(([_, socket]) => socket.state === stateName && socket.parent === "state")
@@ -16,12 +11,7 @@ export function createStatePorts(sockets, stateName, statePosition) {
     }))
 }
 
-/**
- * @param {import("./graph-layout.t.js").Metrics["sockets"]} sockets
- * @param {string} stateName
- * @param {import("./graph-layout.t.js").LayoutConfig} config
- * @returns {import("elkjs").ElkPort[]}
- */
+/** @type {import("./graph-layout.t.js").createConditionPorts} */
 export function createConditionPorts(sockets, stateName, config) {
   return Object.entries(sockets)
     .filter(([_, socket]) => socket.state === stateName && socket.parent === "condition")
@@ -33,13 +23,7 @@ export function createConditionPorts(sockets, stateName, config) {
     }))
 }
 
-/**
- * @param {string} keyState
- * @param {import("./graph-layout.t.js").Metrics["states"][string]} valState
- * @param {import("./graph-layout.t.js").Metrics["sockets"]} sockets
- * @param {import("./graph-layout.t.js").LayoutConfig} config
- * @returns {import("elkjs").ElkNode}
- */
+/** @type {import("./graph-layout.t.js").createStateNode} */
 export function createStateNode(keyState, valState, sockets, config) {
   return {
     layoutOptions: config.state,
@@ -50,13 +34,7 @@ export function createStateNode(keyState, valState, sockets, config) {
   }
 }
 
-/**
- * @param {import("./graph-layout.t.js").Metrics["conditions"]} conditions
- * @param {string} stateName
- * @param {import("./graph-layout.t.js").Metrics["sockets"]} sockets
- * @param {import("./graph-layout.t.js").LayoutConfig} config
- * @returns {import("elkjs").ElkNode[]}
- */
+/** @type {import("./graph-layout.t.js").createConditionNodes} */
 export function createConditionNodes(conditions, stateName, sockets, config) {
   return Object.entries(conditions)
     .filter(([_, val]) => val.to === stateName)
@@ -69,11 +47,7 @@ export function createConditionNodes(conditions, stateName, sockets, config) {
     }))
 }
 
-/**
- * @param {import("./graph-layout.t.js").Metrics["sockets"]} sockets
- * @param {string} stateName
- * @returns {import("elkjs").ElkExtendedEdge[]}
- */
+/** @type {import("./graph-layout.t.js").createInternalEdges} */
 export function createInternalEdges(sockets, stateName) {
   return Object.entries(sockets)
     .filter(([_, socket]) =>
@@ -99,10 +73,7 @@ export function createInternalEdges(sockets, stateName) {
     .filter(edge => edge !== undefined)
 }
 
-/**
- * @param {import("./graph-layout.t.js").Metrics["sockets"]} sockets
- * @returns {import("elkjs").ElkExtendedEdge[]}
- */
+/** @type {import("./graph-layout.t.js").createExternalEdges} */
 export function createExternalEdges(sockets) {
   return Object.entries(sockets)
     .filter(([_, socket]) =>
@@ -127,13 +98,7 @@ export function createExternalEdges(sockets) {
     .filter(edge => edge !== undefined)
 }
 
-/**
- * @param {string} keyState
- * @param {import("./graph-layout.t.js").Metrics["states"][string]} valState
- * @param {import("./graph-layout.t.js").Metrics} metrics
- * @param {import("./graph-layout.t.js").LayoutConfig} config
- * @returns {import("elkjs").ElkNode}
- */
+/** @type {import("./graph-layout.t.js").createStateGroup} */
 export function createStateGroup(keyState, valState, metrics, config) {
   return /**@type{import("elkjs").ElkNode}*/({
     layoutOptions: config.meta,
@@ -146,12 +111,7 @@ export function createStateGroup(keyState, valState, metrics, config) {
   })
 }
 
-/**
- * @param {string} metaId
- * @param {import("./graph-layout.t.js").Metrics} metrics
- * @param {import("./graph-layout.t.js").LayoutConfig} config
- * @returns {import("elkjs").ElkNode}
- */
+/** @type {import("./graph-layout.t.js").createElkData} */
 export function createElkData(metaId, metrics, config) {
   return {
     id: metaId,
