@@ -1,0 +1,293 @@
+{
+  "$H": 13,
+  "children": [
+    {
+      "$H": 277,
+      "children": [
+        {
+          "$H": 279,
+          "height": 110,
+          "id": "node-meta-state/1",
+          "layoutOptions": {
+            "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+            "elk.spacing.nodeNode": "0",
+            "portConstraints": "FIXED_POS"
+          },
+          "ports": [
+            {
+              "height": 12,
+              "id": "node-meta-socket/1",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "1",
+                  "width": 0,
+                  "x": -1,
+                  "y": 13
+                }
+              ],
+              "width": 12,
+              "x": -6,
+              "y": 56
+            },
+            {
+              "height": 12,
+              "id": "node-meta-socket/2",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "2",
+                  "width": 0,
+                  "x": 13,
+                  "y": 13
+                }
+              ],
+              "width": 12,
+              "x": 192,
+              "y": 56
+            }
+          ],
+          "width": 198,
+          "x": 203,
+          "y": 12
+        },
+        {
+          "$H": 287,
+          "height": 32,
+          "id": "node-meta-condition/2",
+          "layoutOptions": {
+            "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+            "elk.spacing.nodeNode": "0",
+            "portConstraints": "FIXED_SIDE",
+            "portAlignment.west": "JUSTIFIED"
+          },
+          "ports": [
+            {
+              "height": 12,
+              "id": "node-meta-socket/7",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "7",
+                  "width": 0,
+                  "x": -1,
+                  "y": 13
+                }
+              ],
+              "layoutOptions": {
+                "port.side": "WEST"
+              },
+              "width": 12,
+              "x": -12,
+              "y": 10
+            },
+            {
+              "height": 12,
+              "id": "node-meta-socket/8",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "8",
+                  "width": 0,
+                  "x": 13,
+                  "y": 13
+                }
+              ],
+              "layoutOptions": {
+                "port.side": "EAST"
+              },
+              "width": 12,
+              "x": 138,
+              "y": 10
+            }
+          ],
+          "width": 138,
+          "x": 25,
+          "y": 58
+        }
+      ],
+      "edges": [
+        {
+          "container": "начало",
+          "id": "node-meta-socket/8->node-meta-socket/1",
+          "sources": [
+            "node-meta-socket/8"
+          ],
+          "targets": [
+            "node-meta-socket/1"
+          ]
+        }
+      ],
+      "height": 134,
+      "id": "начало",
+      "layoutOptions": {
+        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+        "elk.spacing.nodeNode": "0"
+      },
+      "width": 420,
+      "x": 480,
+      "y": 20
+    },
+    {
+      "$H": 293,
+      "children": [
+        {
+          "$H": 295,
+          "height": 110,
+          "id": "node-meta-state/2",
+          "layoutOptions": {
+            "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+            "elk.spacing.nodeNode": "0",
+            "portConstraints": "FIXED_POS"
+          },
+          "ports": [
+            {
+              "height": 12,
+              "id": "node-meta-socket/3",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "3",
+                  "width": 0,
+                  "x": -1,
+                  "y": 13
+                }
+              ],
+              "width": 12,
+              "x": -6,
+              "y": 56
+            },
+            {
+              "height": 12,
+              "id": "node-meta-socket/4",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "4",
+                  "width": 0,
+                  "x": 13,
+                  "y": 13
+                }
+              ],
+              "width": 12,
+              "x": 192,
+              "y": 56
+            }
+          ],
+          "width": 198,
+          "x": 198,
+          "y": 12
+        },
+        {
+          "$H": 301,
+          "height": 32,
+          "id": "node-meta-condition/1",
+          "layoutOptions": {
+            "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+            "elk.spacing.nodeNode": "0",
+            "portConstraints": "FIXED_SIDE"
+          },
+          "ports": [
+            {
+              "height": 12,
+              "id": "node-meta-socket/5",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "5",
+                  "width": 0,
+                  "x": -1,
+                  "y": 13
+                }
+              ],
+              "layoutOptions": {
+                "port.side": "WEST"
+              },
+              "width": 12,
+              "x": -12,
+              "y": 10
+            },
+            {
+              "height": 12,
+              "id": "node-meta-socket/6",
+              "labels": [
+                {
+                  "height": 0,
+                  "text": "6",
+                  "width": 0,
+                  "x": 13,
+                  "y": 13
+                }
+              ],
+              "layoutOptions": {
+                "port.side": "EAST"
+              },
+              "width": 12,
+              "x": 133,
+              "y": 10
+            }
+          ],
+          "width": 133,
+          "x": 25,
+          "y": 58
+        }
+      ],
+      "edges": [
+        {
+          "container": "конец",
+          "id": "node-meta-socket/6->node-meta-socket/3",
+          "sources": [
+            "node-meta-socket/6"
+          ],
+          "targets": [
+            "node-meta-socket/3"
+          ]
+        }
+      ],
+      "height": 134,
+      "id": "конец",
+      "layoutOptions": {
+        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+        "elk.spacing.nodeNode": "0"
+      },
+      "width": 415,
+      "x": 35,
+      "y": 20
+    }
+  ],
+  "edges": [
+    {
+      "container": "test/1",
+      "id": "node-meta-socket/2->node-meta-socket/5",
+      "sources": [
+        "node-meta-socket/2"
+      ],
+      "targets": [
+        "node-meta-socket/5"
+      ]
+    },
+    {
+      "container": "test/1",
+      "id": "node-meta-socket/4->node-meta-socket/7",
+      "sources": [
+        "node-meta-socket/4"
+      ],
+      "targets": [
+        "node-meta-socket/7"
+      ]
+    }
+  ],
+  "height": 184,
+  "id": "test/1",
+  "layoutOptions": {
+    "considerModelOrder.strategy": "PREFER_NODES",
+    "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
+    "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
+    "elk.padding": "[top=80.0, left=20.0, bottom=20.0, right=20.0]",
+    "elk.spacing.edgeEdge": "36",
+    "hierarchyHandling": "INCLUDE_CHILDREN"
+  },
+  "width": 935,
+  "x": 0,
+  "y": 0
+}
