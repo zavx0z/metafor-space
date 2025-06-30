@@ -104,8 +104,8 @@ export function createStateGroup(keyState, valState, metrics, config) {
     layoutOptions: config.meta,
     id: valState.state,
     children: [
-      createStateNode(keyState, valState, metrics.sockets, config),
-      ...createConditionNodes(metrics.conditions, valState.state, metrics.sockets, config)
+      ...createConditionNodes(metrics.conditions, valState.state, metrics.sockets, config),
+      createStateNode(keyState, valState, metrics.sockets, config)
     ],
     edges: createInternalEdges(metrics.sockets, valState.state)
   })

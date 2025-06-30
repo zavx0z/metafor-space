@@ -25,12 +25,12 @@ export default MetaFor("graph-layout", {development: true})
         // "elk.spacing.edgeNode": "36",
         "hierarchyHandling": "INCLUDE_CHILDREN",
         "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
-        "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
+        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
         "considerModelOrder.strategy": "PREFER_NODES",
       },
       meta: {
         "elk.spacing.nodeNode": "0",
-        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+        // "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
       },
       state: {
         "elk.spacing.nodeNode": "0",
@@ -45,6 +45,7 @@ export default MetaFor("graph-layout", {development: true})
       operator: {
         "portConstraints": "FIXED_SIDE",
         "portAlignment.west": "JUSTIFIED",
+        "portAlignment.east": "JUSTIFIED",
       },
       port: {
         west: {
@@ -82,6 +83,7 @@ export default MetaFor("graph-layout", {development: true})
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
+        console.log(core.data)
         update({current: null})
       },
       to: [{state: "вычисление", when: {current: {isNull: true}}}]

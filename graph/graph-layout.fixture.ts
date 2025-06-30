@@ -12,8 +12,9 @@ export const config: LayoutConfig = {
     "considerModelOrder.strategy": "PREFER_NODES",
   },
   meta: {
+    "elk.algorithm": "box",
+    "elk.direction": "RIGHT",
     "elk.spacing.nodeNode": "0",
-    "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
   },
   state: {
     "elk.spacing.nodeNode": "0",
@@ -28,6 +29,7 @@ export const config: LayoutConfig = {
   operator: {
     "portConstraints": "FIXED_SIDE",
     "portAlignment.west": "JUSTIFIED",
+    "portAlignment.east": "JUSTIFIED",
   },
   port: {
     west: {

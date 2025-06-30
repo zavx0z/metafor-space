@@ -168,10 +168,12 @@ export interface LayoutConfig {
    * Определяют размещение состояний внутри группы
    */
   meta: {
+    /** Алгоритм размещения: "box" - прямоугольная упаковка, "layered" - слоистый */
+    // "elk.algorithm": string
+    /** Направление размещения элементов: "RIGHT" - слева направо, "DOWN" - сверху вниз */
+    // "elk.direction": string
     /** Расстояние между соседними узлами: "0" - плотное размещение */
     "elk.spacing.nodeNode": string
-    /** Стратегия размещения узлов: "NETWORK_SIMPLEX" - оптимизация сетевого симплекса */
-    "elk.layered.nodePlacement.strategy": string
   }
   
   /** 
@@ -209,6 +211,8 @@ export interface LayoutConfig {
     "portConstraints": string
     /** Выравнивание западных портов: "JUSTIFIED" - равномерное распределение */
     "portAlignment.west": string
+    /** Выравнивание западных портов: "JUSTIFIED" - равномерное распределение */
+    "portAlignment.east": string
   }
   
   /** 
