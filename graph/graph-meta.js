@@ -8,41 +8,11 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     id: t.string({title: "ID meta"}),
     width: t.number({nullable: true}),
     height: t.number({nullable: true}),
-    error: t.string({title: "Ошибка", nullable: true}),
-    edges: t.array({title: "Связи между узлами", default: []})
+    error: t.string({title: "Ошибка", nullable: true})
   }))
   .core(({update, context}) => ({
     svg: createRef(),
-    
-    renderEdges() {
-      const svgElement = this.svg.value
-      if (!svgElement || !context.edges.length) return
-      
-      // Очищаем существующие пути
-      Array.from(svgElement.querySelectorAll('path')).forEach(path => path.remove())
-      
-      // Создаем новые пути
-      context.edges.forEach(edge => {
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-        path.id = edge.id
-        path.setAttribute('d', getSimpleRoundedPath(edge.points, 8))
-        path.setAttribute('fill', 'none')
-        path.setAttribute('stroke-width', '2')
-        
-        // Устанавливаем класс и цвет в зависимости от типа
-        const className = edge.type === 'east-input' ? 'next' : 
-                         edge.type === 'west' ? 'active' : 'preview'
-        path.setAttribute('class', className)
-        
-        const color = edge.type === 'east-input' ? '#9c27b0' : 
-                     edge.type === 'west' ? '#2196f3' : '#4caf50'
-        path.setAttribute('stroke', color)
-        
-        svgElement.appendChild(path)
-      })
-      
-      console.log(`Создано ${context.edges.length} SVG путей`)
-    }
+    edges: [] // Сложные данные о связях хранятся в core
   }))
   .states("рендер", "позиционирование")
   .transitions("рендер", [
@@ -57,8 +27,37 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
       action({element, context, core}) {
         element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
         core.svg.value.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        
         // Отрисовываем edges после установки размеров
-        setTimeout(() => core.renderEdges(), 0)
+        requestAnimationFrame(() => {
+          const svgElement = core.svg.value
+          if (!svgElement || !core.edges.length) return
+          
+          // Очищаем существующие пути
+          Array.from(svgElement.querySelectorAll('path')).forEach(path => path.remove())
+          
+          // Создаем новые пути
+          core.edges.forEach(/** @param {{id: string, points: Array<{x: number, y: number}>, type: string}} edge */ edge => {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+            path.id = edge.id
+            path.setAttribute('d', getSimpleRoundedPath(edge.points, 8))
+            path.setAttribute('fill', 'none')
+            path.setAttribute('stroke-width', '2')
+            
+            // Устанавливаем класс и цвет в зависимости от типа
+            const className = edge.type === 'east-input' ? 'next' : 
+                             edge.type === 'west' ? 'active' : 'preview'
+            path.setAttribute('class', className)
+            
+            const color = edge.type === 'east-input' ? '#9c27b0' : 
+                         edge.type === 'west' ? '#2196f3' : '#4caf50'
+            path.setAttribute('stroke', color)
+            
+            svgElement.appendChild(path)
+          })
+          
+          console.log(`Создано ${core.edges.length} SVG путей`)
+        })
       },
       to: []
     }
@@ -90,19 +89,20 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         console.log("Извлеченные edges:", edges)
         
         // Проверяем что SVG пути создаются корректно
-        edges.forEach(edge => {
+        edges.forEach(/** @param {{id: string, points: Array<{x: number, y: number}>, type: string}} edge */ edge => {
           const svgPath = getSimpleRoundedPath(edge.points, 8)
           console.log(`Edge ${edge.id}: ${svgPath}`)
         })
 
+        // Устанавливаем edges в core
+        core.edges = edges
+        
         update({
           width: layout.width, 
-          height: layout.height,
-          edges: edges
+          height: layout.height
         })
         
-        // Отрисовываем edges императивно после обновления контекста
-        setTimeout(() => core.renderEdges(), 0)
+
       }
     }
   ])
