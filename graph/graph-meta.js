@@ -1,4 +1,7 @@
 import {MetaFor} from "../metafor.js"
+import {collectEdges} from "../layout/collect.js"
+import {getSimpleRoundedPath} from "./edge/rounded.js"
+import { createRef } from "../html/directives/ref.js"
 
 export default MetaFor("graph-meta", {development: true, description: "Node"})
   .context(t => ({
@@ -6,8 +9,41 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     width: t.number({nullable: true}),
     height: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
+    edges: t.array({title: "Связи между узлами", default: []})
   }))
-  .core(() => ({}))
+  .core(({update, context}) => ({
+    svg: createRef(),
+    
+    renderEdges() {
+      const svgElement = this.svg.value
+      if (!svgElement || !context.edges.length) return
+      
+      // Очищаем существующие пути
+      Array.from(svgElement.querySelectorAll('path')).forEach(path => path.remove())
+      
+      // Создаем новые пути
+      context.edges.forEach(edge => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.id = edge.id
+        path.setAttribute('d', getSimpleRoundedPath(edge.points, 8))
+        path.setAttribute('fill', 'none')
+        path.setAttribute('stroke-width', '2')
+        
+        // Устанавливаем класс и цвет в зависимости от типа
+        const className = edge.type === 'east-input' ? 'next' : 
+                         edge.type === 'west' ? 'active' : 'preview'
+        path.setAttribute('class', className)
+        
+        const color = edge.type === 'east-input' ? '#9c27b0' : 
+                     edge.type === 'west' ? '#2196f3' : '#4caf50'
+        path.setAttribute('stroke', color)
+        
+        svgElement.appendChild(path)
+      })
+      
+      console.log(`Создано ${context.edges.length} SVG путей`)
+    }
+  }))
   .states("рендер", "позиционирование")
   .transitions("рендер", [
     {
@@ -18,8 +54,10 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     },
     {
       in: "позиционирование",
-      action({element, context, update}) {
+      action({element, context, core}) {
         element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        // Отрисовываем edges после установки размеров
+        setTimeout(() => core.renderEdges(), 0)
       },
       to: []
     }
@@ -31,7 +69,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         && patch.path === "/state"
         && patch.value === "ожидание"
       ,
-      action({context, update}) {
+      action({context, update, core}) {
         const data = sessionStorage.getItem(context.id)
         if (!data) {
           update({error: "Нет данных разметки"})
@@ -39,19 +77,36 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         }
         /**@type{import("./graph-layout.t").LayoutResult}*/
         const layout = JSON.parse(data)
-        console.log(layout)
+        // console.log(layout)
 
         if (!layout.width || !layout.height) {
           update({error: "Нет размеров в layout данных"})
           return
         }
 
-        update({width: layout.width, height: layout.height})
+        // Извлекаем edges из layout данных
+        const edges = collectEdges(layout)
+        console.log("Извлеченные edges:", edges)
+        
+        // Проверяем что SVG пути создаются корректно
+        edges.forEach(edge => {
+          const svgPath = getSimpleRoundedPath(edge.points, 8)
+          console.log(`Edge ${edge.id}: ${svgPath}`)
+        })
+
+        update({
+          width: layout.width, 
+          height: layout.height,
+          edges: edges
+        })
+        
+        // Отрисовываем edges императивно после обновления контекста
+        setTimeout(() => core.renderEdges(), 0)
       }
     }
   ])
   .view({
-    render: ({html, context}) => html`
+    render: ({html, context, core, ref}) => html`
       <header data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.id}</h2>
@@ -65,7 +120,8 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         </div>
       </header>
       <section class="content" data-drag-selector="graph-atom">
-        <atom-svg></atom-svg>
+        <svg ${ref(core.svg)} class="connections" viewBox="0 0 ${context.width || 100} ${context.height || 100}">
+        </svg>
         <slot></slot>
       </section>
     `,
@@ -157,17 +213,31 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           height: 100%;
         }
 
-        svg.connections path {
-          &.next {
-            stroke: rgb(var(--secondary-500));
-          }
+        svg.connections {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
 
-          &.active {
-            stroke: rgb(var(--secondary-500));
-          }
+          & path {
+            stroke: #888;
+            stroke-width: 2;
+            fill: none;
+            transition: stroke 0.3s ease;
 
-          &.preview {
-            stroke: rgb(var(--primary-500));
+            &.next {
+              stroke: #9c27b0;
+            }
+
+            &.active {
+              stroke: #2196f3;
+            }
+
+            &.preview {
+              stroke: #4caf50;
+            }
           }
         }
       `

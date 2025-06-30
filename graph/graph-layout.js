@@ -83,7 +83,7 @@ export default MetaFor("graph-layout", {development: true})
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
-        console.log(core.data)
+        // console.log(core.data)
         update({current: null})
       },
       to: [{state: "вычисление", when: {current: {isNull: true}}}]

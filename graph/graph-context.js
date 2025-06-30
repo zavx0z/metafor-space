@@ -83,7 +83,7 @@ export default MetaFor('graph-context', {
           update({error: `Контекст ${id} не найден в состоянии ${context.state}`})
           return
         }
-        console.log(layoutContext)
+        // console.log(layoutContext)
         update({x: layoutContext.x, y: layoutState.y})
       }
     }

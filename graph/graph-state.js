@@ -48,7 +48,7 @@ export default MetaFor("graph-state", {development: true})
           update({error: `Состояние ${context.state} не найдено в layout`})
           return
         }
-        console.log(layoutState)
+        // console.log(layoutState)
         update({x: layoutState.x, y: layoutState.y})
         // console.log(layoutCondition)
       }
