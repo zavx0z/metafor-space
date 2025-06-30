@@ -7,7 +7,7 @@
  * Структура формируется актором node-layout на основе данных от дочерних 
  * компонентов (node-meta-state, node-meta-condition, node-meta-socket, node-meta-param).
  */
-export interface DataMeta {
+export interface Metrics {
   /** 
    * Состояния мета элемента
    * Ключ: ID состояния (например, "node-meta-state/1")
@@ -102,7 +102,7 @@ export interface DataMeta {
  * ])
  * ```
  */
-export type DataMetaMap = Map<string, DataMeta>
+export type MetricsMap = Map<string, Metrics>
 
 
 
@@ -442,7 +442,7 @@ export interface InputEdge {
  * - Ребра между портами (внутри состояний и между состояниями)
  * 
  * @param metaId - Уникальный идентификатор мета элемента (например, "test/1")
- * @param dataMeta - Структурированные данные мета элемента, содержащие:
+ * @param metrics - Структурированные данные мета элемента, содержащие:
  *   - states: состояния с их размерами и позициями
  *   - conditions: условия переходов между состояниями  
  *   - sockets: точки подключения с направлением и привязкой
@@ -472,6 +472,304 @@ export interface InputEdge {
  */
 export declare function createElkData(
   metaId: string,
-  dataMeta: DataMeta,
+  metrics: Metrics,
+  config: LayoutConfig
+): import("elkjs").ElkNode
+
+// ==================================================================================
+// КОМПОЗИЦИОННЫЕ ФУНКЦИИ ДЛЯ ФОРМИРОВАНИЯ ELK СТРУКТУРЫ
+// ==================================================================================
+
+/**
+ * ## Архитектура формирования ELK структуры
+ * 
+ * Процесс создания layout структуры разделен на логические этапы:
+ * 
+ * ### 1️⃣ **Базовые компоненты (атомарные функции)**
+ * - `createStatePorts()` - порты для узлов состояний
+ * - `createConditionPorts()` - порты для узлов условий  
+ * - `createStateNode()` - узел состояния с портами
+ * - `createConditionNodes()` - узлы условий для состояния
+ * 
+ * ### 2️⃣ **Соединения (связующие функции)**
+ * - `createInternalEdges()` - ребра внутри состояния (условие → состояние)
+ * - `createExternalEdges()` - ребра между состояниями (состояние → условие)
+ * 
+ * ### 3️⃣ **Группировка (композитные функции)**
+ * - `createStateGroup()` - группа состояния со всеми дочерними элементами
+ * - `createElkData()` - корневая ELK структура со всеми группами
+ * 
+ * ### 🎯 **Иерархия ELK структуры:**
+ * ```
+ * ElkNode (корневой)
+ * ├── layoutOptions: config.base
+ * ├── children: StateGroup[]
+ * │   ├── layoutOptions: config.meta  
+ * │   ├── children: [StateNode, ...ConditionNodes]
+ * │   │   ├── StateNode
+ * │   │   │   ├── layoutOptions: config.state
+ * │   │   │   └── ports: StatePorts[]
+ * │   │   └── ConditionNode
+ * │   │       ├── layoutOptions: config.condition
+ * │   │       └── ports: ConditionPorts[]
+ * │   └── edges: InternalEdges[]
+ * └── edges: ExternalEdges[]
+ * ```
+ * 
+ * ### 🔄 **Поток данных:**
+ * 1. **Metrics** → `createStatePorts/createConditionPorts` → **ElkPort[]**
+ * 2. **ElkPort[]** → `createStateNode/createConditionNodes` → **ElkNode[]**
+ * 3. **Metrics.sockets** → `createInternalEdges/createExternalEdges` → **ElkExtendedEdge[]**
+ * 4. **ElkNode[] + ElkExtendedEdge[]** → `createStateGroup` → **StateGroup**
+ * 5. **StateGroup[]** → `createElkData` → **ElkNode (root)**
+ * 6. **ElkNode** → `ELK.layout()` → **LayoutResult**
+ * 
+ * ### 🧪 **Тестирование в ELK JSON Playground:**
+ * Каждая функция возвращает валидную ELK структуру, которую можно:
+ * - Тестировать независимо в https://rtsys.informatik.uni-kiel.de/elklive/
+ * - Визуализировать для отладки layout логики
+ * - Комбинировать для создания сложных графов
+ */
+
+/**
+ * Создает порты для узла состояния
+ * 
+ * Формирует массив портов ELK для узла состояния на основе сокетов.
+ * Порты располагаются относительно позиции состояния, координаты
+ * пересчитываются в локальную систему координат узла.
+ * 
+ * **Особенности:**
+ * - Фильтрует сокеты только для данного состояния и parent="state"
+ * - Конвертирует абсолютные координаты в относительные
+ * - Каждый сокет становится портом с размерами и позицией
+ * 
+ * @param sockets - Все сокеты из Metrics.sockets
+ * @param stateName - Имя состояния для фильтрации сокетов
+ * @param statePosition - Абсолютная позиция состояния {x, y}
+ * @returns Массив портов ELK для узла состояния
+ * 
+ * @example
+ * ```javascript
+ * const ports = createStatePorts(
+ *   {"socket/1": {state: "idle", parent: "state", x: 120, y: 80, size: 12}},
+ *   "idle", 
+ *   {x: 100, y: 50}
+ * )
+ * // Result: [{id: "socket/1", x: 20, y: 30, width: 12, height: 12}]
+ * ```
+ */
+export declare function createStatePorts(
+  sockets: Metrics["sockets"],
+  stateName: string,
+  statePosition: { x: number; y: number }
+): import("elkjs").ElkPort[]
+
+/**
+ * Создает порты для узла условия
+ * 
+ * Формирует массив портов ELK для узла условия на основе сокетов.
+ * Порты автоматически получают layoutOptions в зависимости от направления
+ * (west/east) для правильного размещения ELK алгоритмом.
+ * 
+ * **Особенности:**
+ * - Фильтрует сокеты только для данного состояния и parent="condition"
+ * - Назначает layoutOptions.port.west/east в зависимости от direction
+ * - Размеры берутся из socket.size
+ * 
+ * @param sockets - Все сокеты из Metrics.sockets
+ * @param stateName - Имя состояния для фильтрации сокетов
+ * @param config - Конфигурация layout с настройками портов
+ * @returns Массив портов ELK для узла условия
+ * 
+ * @example
+ * ```javascript
+ * const ports = createConditionPorts(
+ *   {"sock/1": {state: "idle", parent: "condition", direction: "west", size: 8}},
+ *   "idle",
+ *   {port: {west: {"port.side": "WEST"}, east: {"port.side": "EAST"}}}
+ * )
+ * // Result: [{id: "sock/1", layoutOptions: {"port.side": "WEST"}, width: 8, height: 8}]
+ * ```
+ */
+export declare function createConditionPorts(
+  sockets: Metrics["sockets"],
+  stateName: string,
+  config: LayoutConfig
+): import("elkjs").ElkPort[]
+
+/**
+ * Создает узел состояния с портами
+ * 
+ * Формирует ELK узел для состояния, включающий все его порты.
+ * Узел получает размеры из Metrics и порты через createStatePorts().
+ * 
+ * **Структура узла:**
+ * - layoutOptions: config.state (настройки для узлов состояний)
+ * - id: keyState (уникальный ID узла состояния)
+ * - width/height: из valState (размеры после рендеринга)
+ * - ports: результат createStatePorts() 
+ * 
+ * @param keyState - Уникальный ID узла состояния (например, "node-meta-state/1")
+ * @param valState - Данные состояния из Metrics.states
+ * @param sockets - Все сокеты для создания портов
+ * @param config - Конфигурация layout
+ * @returns ELK узел для состояния
+ * 
+ * @example
+ * ```javascript
+ * const stateNode = createStateNode(
+ *   "node-meta-state/1",
+ *   {state: "idle", width: 100, height: 50, x: 0, y: 0},
+ *   sockets,
+ *   config
+ * )
+ * // Result: ELK узел с портами и размерами
+ * ```
+ */
+export declare function createStateNode(
+  keyState: string,
+  valState: Metrics["states"][string],
+  sockets: Metrics["sockets"],
+  config: LayoutConfig
+): import("elkjs").ElkNode
+
+/**
+ * Создает узлы условий для состояния
+ * 
+ * Формирует массив ELK узлов для всех условий, связанных с данным состоянием.
+ * Фильтрует условия по полю `to` (целевое состояние) и создает узел для каждого.
+ * 
+ * **Логика фильтрации:**
+ * - Берутся только условия где `condition.to === stateName`
+ * - Каждое условие становится отдельным ELK узлом
+ * - Узлы получают порты через createConditionPorts()
+ * 
+ * @param conditions - Все условия из Metrics.conditions
+ * @param stateName - Имя состояния для фильтрации условий
+ * @param sockets - Все сокеты для создания портов условий
+ * @param config - Конфигурация layout
+ * @returns Массив ELK узлов для условий
+ * 
+ * @example
+ * ```javascript
+ * const conditionNodes = createConditionNodes(
+ *   {"cond/1": {from: "start", to: "idle", param: "trigger", width: 80, height: 30}},
+ *   "idle",
+ *   sockets,
+ *   config  
+ * )
+ * // Result: [ELK узел условия с портами]
+ * ```
+ */
+export declare function createConditionNodes(
+  conditions: Metrics["conditions"],
+  stateName: string,
+  sockets: Metrics["sockets"],
+  config: LayoutConfig
+): import("elkjs").ElkNode[]
+
+/**
+ * Создает внутренние ребра (условие → состояние)
+ * 
+ * Формирует ребра внутри группы состояния, соединяющие условия с состоянием.
+ * Ребра создаются между выходными портами условий (direction="east") 
+ * и входными портами состояния (direction="west") по совпадению параметра.
+ * 
+ * **Алгоритм соединения:**
+ * 1. Найти все выходные сокеты условий (parent="condition", direction="east")
+ * 2. Для каждого найти соответствующий входной сокет состояния
+ * 3. Соединить их ребром если param совпадает
+ * 
+ * **Условия соединения:**
+ * - socket.state === stateName (в рамках одного состояния)
+ * - socketCond.parent === "condition" && socketCond.direction === "east"
+ * - socketState.parent === "state" && socketState.direction === "west"  
+ * - socketCond.param === socketState.param (совпадение параметра)
+ * 
+ * @param sockets - Все сокеты из Metrics.sockets
+ * @param stateName - Имя состояния для фильтрации
+ * @returns Массив внутренних ребер ELK
+ * 
+ * @example
+ * ```javascript
+ * const edges = createInternalEdges(sockets, "idle")
+ * // Result: [{id: "condition-sock->state-sock", sources: [...], targets: [...]}]
+ * ```
+ */
+export declare function createInternalEdges(
+  sockets: Metrics["sockets"],
+  stateName: string
+): import("elkjs").ElkExtendedEdge[]
+
+/**
+ * Создает внешние ребра (состояние → условие другого состояния)
+ * 
+ * Формирует ребра между группами состояний на верхнем уровне графа.
+ * Соединяет выходные порты состояний с входными портами условий других состояний.
+ * 
+ * **Алгоритм соединения:**
+ * 1. Найти все выходные сокеты состояний (parent="state", direction="east")
+ * 2. Для каждого найти соответствующий входной сокет условия
+ * 3. Соединить их ребром если param совпадает и состояния разные
+ * 
+ * **Условия соединения:**
+ * - socketState.parent === "state" && socketState.direction === "east"
+ * - socketCond.parent === "condition" && socketCond.direction === "west"
+ * - socketState.param === socketCond.param (совпадение параметра)
+ * - socketState.state !== socketCond.state (разные состояния)
+ * 
+ * @param sockets - Все сокеты из Metrics.sockets
+ * @returns Массив внешних ребер ELK
+ * 
+ * @example
+ * ```javascript
+ * const edges = createExternalEdges(sockets)
+ * // Result: [{id: "state1-sock->state2-cond-sock", sources: [...], targets: [...]}]
+ * ```
+ */
+export declare function createExternalEdges(
+  sockets: Metrics["sockets"]
+): import("elkjs").ElkExtendedEdge[]
+
+/**
+ * Создает группу состояния со всеми дочерними элементами
+ * 
+ * Формирует ELK узел группы, содержащий узел состояния, узлы условий
+ * и внутренние ребра. Это ключевая композитная функция, объединяющая
+ * все элементы одного состояния в единую ELK структуру.
+ * 
+ * **Состав группы:**
+ * - layoutOptions: config.meta (настройки для группирующих узлов)
+ * - id: valState.state (имя состояния, например "idle")
+ * - children: [StateNode, ...ConditionNodes] (узел состояния + узлы условий)
+ * - edges: InternalEdges[] (соединения внутри группы)
+ * 
+ * **Порядок формирования:**
+ * 1. Создать узел состояния через createStateNode()
+ * 2. Создать узлы условий через createConditionNodes()
+ * 3. Создать внутренние ребра через createInternalEdges()
+ * 4. Объединить все в группу с настройками config.meta
+ * 
+ * @param keyState - ID узла состояния (например, "node-meta-state/1")
+ * @param valState - Данные состояния из Metrics.states
+ * @param metrics - Полные мета данные для создания дочерних элементов
+ * @param config - Конфигурация layout
+ * @returns ELK узел группы состояния
+ * 
+ * @example
+ * ```javascript
+ * const stateGroup = createStateGroup(
+ *   "node-meta-state/1",
+ *   {state: "idle", width: 100, height: 50},
+ *   metrics,
+ *   config
+ * )
+ * // Result: ELK группа с состоянием, условиями и рёбрами
+ * ```
+ */
+export declare function createStateGroup(
+  keyState: string,
+  valState: Metrics["states"][string],
+  metrics: Metrics,
   config: LayoutConfig
 ): import("elkjs").ElkNode

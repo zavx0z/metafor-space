@@ -1,4 +1,4 @@
-import type { DataMetaMap, LayoutConfig } from "./node-layout.t";
+import type { MetricsMap, LayoutConfig } from "./node-layout.t";
 
 
 export const config: LayoutConfig = {
@@ -38,7 +38,7 @@ export const config: LayoutConfig = {
     },
   },
 }
-export const data: DataMetaMap = new Map([
+export const data: MetricsMap = new Map([
   [
     "test/1",
     {

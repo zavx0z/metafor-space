@@ -13,7 +13,7 @@ export default MetaFor("node-layout", {development: true})
   }))
   .core(() => ({
     elk: new ELK(),
-    /**@type{import("./node-layout.t").DataMetaMap}*/
+    /**@type{import("./node-layout.t").MetricsMap}*/
     meta: new Map(),
     /**@type{import("elkjs").ElkNode|null}*/
     data: null,
