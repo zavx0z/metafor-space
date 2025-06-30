@@ -911,7 +911,14 @@ export class PropertyPart extends AttributePart {
     value = this._sanitizer(value)
     // console.log(this.element, this.name, value)
     // @ts-ignore
-    if (this.name === "context" && value) this.element._updateContext(value)
+    if (this.name === "context" && value) {
+      try {
+      this.element._updateContext(value)  
+      }           catch (e) { const tag = this.element.tagName.toLowerCase()
+            throw new Error(`meta-компонент ${tag} не создан`)
+                        }
+      
+    }
     else if (this.name === "data") {  // @ts-ignore
       this.element._updateCore({data: value})
     } else if (this.name === "core") {

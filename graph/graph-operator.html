@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <title>node-meta-operator</title>
+  <link rel="stylesheet" href="/theme/theme.css"/>
+  <link rel="stylesheet" href="index.css"/>
+  <script type="module">
+    import "./graph-operator.js"
+    import {html, render} from "/html/html.js"
+
+    render(html`
+      <metafor-node-meta-operator
+        class="noselect"
+        context=${{op: "eq", value: null}}
+      />
+    `, document.body)
+  </script>
+</head>
+<body>
+</body>
+</html>

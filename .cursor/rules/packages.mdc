@@ -275,10 +275,10 @@ document.body.innerHTML = `
 ### nodes/meta
 ```
 nodes/meta/
-├── node-meta.js               # Основной мета-компонент
+├── graph-meta.js               # Основной мета-компонент
 ├── node-meta.spec.ts
 ├── node-meta.t.ts
-├── node-layout.js             # Компоновка узлов
+├── graph-layout.js             # Компоновка узлов
 ├── node-layout.actions.js     # Алгоритмы компоновки
 ├── node-layout.spec.ts
 ├── node-layout.t.ts
@@ -286,8 +286,8 @@ nodes/meta/
 ├── node-meta-state.js         # Состояния узлов
 ├── node-meta-state.spec.ts
 ├── node-meta-state.t.ts
-├── node-meta-condition.js     # Условия переходов
-├── node-meta-condition.spec.ts
+├── graph-condition.js     # Условия переходов
+├── graph-condition.spec.ts
 ├── node-meta-condition.t.ts
 └── ...
 ```

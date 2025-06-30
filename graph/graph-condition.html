@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <title>node-meta-condition</title>
+  <link rel="stylesheet" href="/theme/theme.css"/>
+  <link rel="stylesheet" href="index.css"/>
+  <script type="module">
+    import "./node-meta-condition.js"
+    import {html, render} from "../html/html.js"
+
+    document.body.addEventListener('channel', (ev) =>{
+      const {meta, patch } = (/**@type {CustomEvent}*/(ev)).detail
+      console.log(meta, patch)
+    })
+    render(html`
+      <metafor-graph-condition
+        class="noselect" data=${{"eq": {value: null}}}
+      >
+        <metafor-graph-operator
+          class="noselect"
+          context=${{op: "eq", value: null}}
+        ></metafor-graph-operator>
+        <metafor-graph-operator
+          class="noselect"
+          context=${{op: "eq", value: null}}
+        ></metafor-graph-operator>
+      </metafor-graph-condition>
+    `, document.body)
+  </script>
+</head>
+<body>
+
+</body>
+</html>

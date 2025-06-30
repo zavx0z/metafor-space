@@ -17,7 +17,7 @@
 
     // Best practices
     "strict": true,
-//    "skipLibCheck": true,
+    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
 
     // Some stricter flags (disabled by default)
