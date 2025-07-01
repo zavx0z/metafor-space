@@ -87,23 +87,23 @@
       </section>
       <h2>array (массив строк)</h2>
       <section>
-        <metafor-graph-param context=${{
+        <metafor-graph-param context={{
           id: "id6",
           state: "i",
           param: "key6",
           title: "Массив",
-          value: '["a", "b", "c"]',
+          value: ["a", "b", "c"],
           type: "array"
         }}></metafor-graph-param>
       </section>
       <h2>array (пустой)</h2>
       <section>
-        <metafor-graph-param context=${{
+        <metafor-graph-param context={{
           id: "id7",
           state: "i",
           param: "key7",
           title: "Пустой массив",
-          value: "[]",
+          value: [],
           type: "array"
         }}></metafor-graph-param>
       </section>
@@ -127,6 +127,30 @@
           title: "Варианты",
           value: "red,green,blue",
           type: "enum"
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (options массив)</h2>
+      <section>
+        <metafor-graph-param context={{
+          id: "id11",
+          state: "i",
+          param: "key11",
+          title: "Варианты (options)",
+          value: "two",
+          type: "enum",
+          options: ["one", "two", "three"]
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (options пустой)</h2>
+      <section>
+        <metafor-graph-param context={{
+          id: "id12",
+          state: "i",
+          param: "key12",
+          title: "Варианты (options пустой)",
+          value: "",
+          type: "enum",
+          options: []
         }}></metafor-graph-param>
       </section>
       <h2>Ошибка</h2>
