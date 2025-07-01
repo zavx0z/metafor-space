@@ -4,10 +4,10 @@ export function createStatePorts(sockets, stateName, statePosition) {
     .filter(([_, socket]) => socket.state === stateName && socket.parent === "state")
     .map(([keySocket, socket]) => ({
       id: keySocket,
-      x: /**@type{number}*/(socket.x) - statePosition.x,
+                    x: /**@type{number}*/(socket.x) - statePosition.x,
       y: /**@type{number}*/(socket.y) - statePosition.y,
-      width: socket.size,
-      height: socket.size
+        width: socket.size ?? 12,
+        height: socket.size ?? 12
     }))
 }
 
@@ -18,8 +18,6 @@ export function createConditionPorts(sockets, stateName, config) {
     .map(([keySocket, socket]) => ({
       id: keySocket,
       layoutOptions: socket.direction === 'west' ? config.port.west : config.port.east,
-      width: socket.size,
-      height: socket.size
     }))
 }
 

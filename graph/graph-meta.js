@@ -1,5 +1,5 @@
 import {MetaFor} from "../metafor.js"
-import {getSimpleRoundedPath, collectEdges} from "./graph-meta.actions.js"
+import {collectEdges, getSimpleRoundedPath} from "./graph-meta.actions.js"
 import {createRef} from "../html/directives/ref.js"
 
 export default MetaFor("graph-meta", {development: true, description: "Node"})
@@ -10,6 +10,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     error: t.string({title: "Ошибка", nullable: true})
   }))
   .core(() => ({
+    header: createRef(),
     svg: createRef(),
     /**@type{import('./graph-meta.t').Edge[]} */
     edges: []
@@ -25,7 +26,8 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     {
       in: "позиционирование",
       action({element, context, core}) {
-        element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        const headerBB = core.header.value.getBoundingClientRect()
+        element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
         const svg = /**@type{SVGElement}*/ (core.svg.value)
         svg.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
 
@@ -85,18 +87,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         }
 
         // Извлекаем edges из layout данных
-        const edges = collectEdges(layout)
-        // console.log("Извлеченные edges:", edges)
-
-        // Проверяем что SVG пути создаются корректно
-        edges.forEach(/** @param {import('./graph-meta.t').Edge} edge */edge => {
-          const svgPath = getSimpleRoundedPath(edge.points, 8)
-          // console.log(`Edge ${edge.id}: ${svgPath}`)
-        })
-
-        // Устанавливаем edges в core
-        core.edges = edges
-
+        core.edges = collectEdges(layout)
         update({
           width: layout.width,
           height: layout.height
@@ -108,7 +99,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
   ])
   .view({
     render: ({html, context, core, ref}) => html`
-      <header data-drag-selector="graph-atom">
+      <header ${ref(core.header)} data-drag-selector="graph-atom">
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.id}</h2>
         <div><!--кнопки справа-->
@@ -121,8 +112,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         </div>
       </header>
       <section class="content" data-drag-selector="graph-atom">
-        <svg ${ref(core.svg)} class="connections">
-        </svg>
+        <svg ${ref(core.svg)} class="connections"></svg>
         <slot></slot>
       </section>
     `,

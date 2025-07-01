@@ -33,13 +33,14 @@ export default MetaFor('graph-context', {
       action({element, update, core}) {
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
+          console.log(element.getBoundingClientRect())
           const header = /**@type{HTMLElement} */ (core.header.value)
           const bbHeader = header.getBoundingClientRect()
           update({
             width: Math.round(width),
-            height: Math.round(height + bbHeader.height),
+            height: Math.round(height),
             x: Math.round(x),
-            y: Math.round(y - bbHeader.height),
+            y: Math.round(y),
           })
         })
       },
@@ -84,7 +85,7 @@ export default MetaFor('graph-context', {
           return
         }
         // console.log(layoutContext)
-        update({x: layoutContext.x, y: layoutState.y})
+        update({x: layoutContext.x, y: layoutContext.y})
       }
     }
   ])

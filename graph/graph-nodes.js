@@ -54,7 +54,7 @@ export default MetaFor("graph-nodes", {
                 state: i
               }}>
                 ${snapshot.transitions.map((transition) => transition.to
-                  .filter(c => c.state !== i)
+                  .filter(c => c.state === i)
                   .map(condition =>
                     Object.entries(condition.when).map(([key, value]) => {
                       let op

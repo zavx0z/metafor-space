@@ -477,7 +477,7 @@ export interface InputEdge {
 export declare function createElkData(
   metaId: string,
   metrics: Metrics,
-  config: LayoutConfig
+  config: any
 ): import("elkjs").ElkNode
 
 // ==================================================================================

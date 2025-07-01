@@ -23,6 +23,7 @@ export default MetaFor("graph-state", {development: true})
     {
       in: "перемещение",
       action({element, context}) {
+        // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
       to: []
@@ -49,7 +50,7 @@ export default MetaFor("graph-state", {development: true})
           return
         }
         // console.log(layoutState)
-        update({x: layoutState.x, y: layoutState.y})
+        update({x: layoutState.x, y: layoutState.y, width: layoutState.width, height: layoutState.height})
         // console.log(layoutCondition)
       }
     }
