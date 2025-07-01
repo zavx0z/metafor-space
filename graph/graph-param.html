@@ -2,7 +2,7 @@
 <html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
-  <title>node-meta-param</title>
+  <title>graph-param</title>
   <link rel="stylesheet" href="/theme/theme.css"/>
   <link rel="stylesheet" href="index.css"/>
   <style>
@@ -15,6 +15,7 @@
       padding: 8px;
       display: flex;
       position: relative;
+      border-radius: var(--node-border-radius);
       background-color: var(--background-color);
     }
   </style>
@@ -24,22 +25,22 @@
 
     render(html`
       <section>
-        <metafor-node-meta-param context=${{
+        <metafor-graph-param context=${{
           tag: "snapshot.id",
           state: "i",
           param: "key",
           title: "Очень длинное название параметра",
           value: 4444
-        }}></metafor-node-meta-param>
+        }}></metafor-graph-param>
       </section>
       <section>
-        <metafor-node-meta-param context=${{
+        <metafor-graph-param context=${{
           tag: "snapshot.id",
           state: "i",
           param: "key",
           title: "Короткое название",
           value: 4444
-        }}></metafor-node-meta-param>
+        }}></metafor-graph-param>
       </section>
     `, document.body)
   </script>

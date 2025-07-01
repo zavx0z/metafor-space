@@ -80,6 +80,7 @@ export default MetaFor("graph-param")
         margin: 2px 0;
         padding: 0 2px;
         display: flex;
+        border-radius: calc(var(--node-border-radius)/2);
         align-items: center;
 
         &:active {
