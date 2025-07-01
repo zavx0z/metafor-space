@@ -119,7 +119,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         will-change: transform;
         box-sizing: border-box;
         border-radius: 7px;
-        opacity: 1;
+        opacity: 0;
         transition: opacity 1s ease-in-out;
       }
 

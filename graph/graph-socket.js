@@ -17,6 +17,9 @@ export default MetaFor('graph-socket')
   .transitions("рендер", [
     {
       in: "рендер",
+      action({element, context}) {
+        element.dataset['direction'] = typeof context.direction !== "undefined" ? context.direction === 'west' ? 'input' : 'output' : ''
+      },
       to: [{state: "измерение", when: {error: null}}]
     },
     {
@@ -41,57 +44,63 @@ export default MetaFor('graph-socket')
       const size = 12
       return css`
         :host {
-          --socket-size: 12;
-          --background-color: rgb(var(--secondary-500));
-
           position: absolute;
-          opacity: 1;
           width: ${size}px;
           height: ${size}px;
           border-radius: 50%;
-          box-sizing: border-box;
-          border: 1px solid var(--background-color);
-          background-color: var(--background-color);
+          border: 2px solid rgb(var(--surface-400));
+          background: rgb(var(--surface-600));
           cursor: pointer;
-          box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
-          transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        :host::before {
-          content: "";
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          background-color: inherit;
-          transform: scale(1);
-          transition: transform 0.3s ease;
+          transition: all 0.2s ease;
+          box-sizing: border-box;
         }
 
         :host([data-direction="input"]) {
           left: ${position}px;
+          background: rgb(var(--primary-500));
+          border-color: rgb(var(--primary-300));
         }
 
         :host([data-direction="output"]) {
           right: ${position}px;
+          background: rgb(var(--secondary-500));
+          border-color: rgb(var(--secondary-300));
         }
 
         :host(.connected) {
-          transition: all 0.3s ease;
-
-          &::before {
-            transform: scale(0.5);
-          }
+          background: rgb(var(--success-400));
+          border-color: rgb(var(--success-200));
+          box-shadow: 0 0 8px rgb(var(--success-400));
         }
 
-        :host:not(.connected) {
-          filter: contrast(0.5) brightness(0.5);
-          transition: all 0.3s ease;
+        :host(.connected[data-direction="input"]) {
+          background: rgb(var(--success-500));
+          border-color: rgb(var(--success-300));
+        }
 
-          &::before {
-            filter: contrast(0.5) brightness(0.5);
-            transition: all 0.3s ease;
-          }
+        :host(.connected[data-direction="output"]) {
+          background: rgb(var(--success-600));
+          border-color: rgb(var(--success-400));
+        }
+
+        :host(:hover) {
+          transform: scale(1.3);
+          z-index: 10;
+        }
+
+                :host(:active) {
+          transform: scale(0.9);
+        }
+
+        :host([data-valid="false"]) {
+          background: rgb(var(--error-500));
+          border-color: rgb(var(--error-300));
+        }
+
+        :host([disabled]) {
+          opacity: 0.3;
+          cursor: not-allowed;
+          filter: grayscale(1);
         }
       `
     },
