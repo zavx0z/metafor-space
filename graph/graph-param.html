@@ -2,7 +2,7 @@
 <html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8">
-  <title>graph-param</title>
+  <title>graph-param storybook</title>
   <link rel="stylesheet" href="/theme/theme.css"/>
   <link rel="stylesheet" href="index.css"/>
   <style>
@@ -10,36 +10,135 @@
       flex-direction: column;
       gap: 12px;
     }
-
     section {
       padding: 8px;
       display: flex;
       position: relative;
       border-radius: var(--node-border-radius);
       background-color: var(--background-color);
+      margin-bottom: 8px;
+    }
+    h2 {
+      color: var(--font-color);
+      font-size: 1em;
+      margin: 0 0 4px 0;
+      font-weight: 400;
     }
   </style>
   <script type="module">
-    import "./graph-param.js"
+    await import("./graph-param.js")
     import {html, render} from "../html/html.js"
 
     render(html`
+      <h2>string (короткое)</h2>
       <section>
         <metafor-graph-param context=${{
-          id: "snapshot.id",
+          id: "id1",
           state: "i",
-          param: "key",
-          title: "Очень длинное название параметра",
-          value: 4444
+          param: "key1",
+          title: "Имя",
+          value: "Текстовое значение",
+          type: "string"
         }}></metafor-graph-param>
       </section>
+      <h2>string (длинное, пустое)</h2>
       <section>
         <metafor-graph-param context=${{
-          id: "snapshot.id",
+          id: "id2",
           state: "i",
-          param: "key",
-          title: "Короткое название",
-          value: 4444
+          param: "key2",
+          title: "Очень длинное название параметра для проверки переполнения",
+          value: "",
+          type: "string"
+        }}></metafor-graph-param>
+      </section>
+      <h2>number</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id3",
+          state: "i",
+          param: "key3",
+          title: "Число",
+          value: 12345,
+          type: "number"
+        }}></metafor-graph-param>
+      </section>
+      <h2>boolean (true)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id4",
+          state: "i",
+          param: "key4",
+          title: "Включено?",
+          value: "true",
+          type: "boolean"
+        }}></metafor-graph-param>
+      </section>
+      <h2>boolean (false)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id5",
+          state: "i",
+          param: "key5",
+          title: "Видно?",
+          value: "false",
+          type: "boolean"
+        }}></metafor-graph-param>
+      </section>
+      <h2>array (массив строк)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id6",
+          state: "i",
+          param: "key6",
+          title: "Массив",
+          value: '["a", "b", "c"]',
+          type: "array"
+        }}></metafor-graph-param>
+      </section>
+      <h2>array (пустой)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id7",
+          state: "i",
+          param: "key7",
+          title: "Пустой массив",
+          value: "[]",
+          type: "array"
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (строка)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id8",
+          state: "i",
+          param: "key8",
+          title: "Тип цвета",
+          value: "red",
+          type: "enum"
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (несколько вариантов через запятую)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id9",
+          state: "i",
+          param: "key9",
+          title: "Варианты",
+          value: "red,green,blue",
+          type: "enum"
+        }}></metafor-graph-param>
+      </section>
+      <h2>Ошибка</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id10",
+          state: "i",
+          param: "key10",
+          title: "Ошибка",
+          value: "ошибка",
+          type: "string",
+          error: "Некорректное значение"
         }}></metafor-graph-param>
       </section>
     `, document.body)

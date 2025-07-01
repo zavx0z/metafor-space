@@ -7,6 +7,7 @@ export default MetaFor('graph-socket')
     param: t.string({title: "Ключ параметра"}),
     direction: t.enum("west", "east")({title: "Вход/Выход"}),
     parent: t.enum("state", "condition")({title: "Принадлежность"}),
+    type: t.enum("string", "number", "boolean", "array", "enum")({title: "Тип параметра", default: "string"}),
     size: t.number({nullable: true}),
     x: t.number({nullable: true}),
     y: t.number({nullable: true}),
@@ -19,6 +20,7 @@ export default MetaFor('graph-socket')
       in: "рендер",
       action({element, context}) {
         element.dataset['direction'] = typeof context.direction !== "undefined" ? context.direction === 'west' ? 'input' : 'output' : ''
+        element.dataset['type'] = context.type || 'string'
       },
       to: [{state: "измерение", when: {error: null}}]
     },
@@ -101,6 +103,58 @@ export default MetaFor('graph-socket')
           opacity: 0.3;
           cursor: not-allowed;
           filter: grayscale(1);
+        }
+
+        /* Цвета по типам параметров */
+        :host([data-type="string"]) {
+          background: rgb(var(--primary-500));
+          border-color: rgb(var(--primary-300));
+        }
+
+        :host([data-type="number"]) {
+          background: rgb(var(--secondary-500));
+          border-color: rgb(var(--secondary-300));
+        }
+
+        :host([data-type="boolean"]) {
+          background: rgb(var(--warning-500));
+          border-color: rgb(var(--warning-300));
+        }
+
+        :host([data-type="array"]) {
+          background: rgb(var(--tertiary-500));
+          border-color: rgb(var(--tertiary-300));
+        }
+
+        :host([data-type="enum"]) {
+          background: rgb(var(--error-400));
+          border-color: rgb(var(--error-200));
+        }
+
+        /* Подключенные сокеты по типам */
+        :host(.connected[data-type="string"]) {
+          background: rgb(var(--primary-400));
+          box-shadow: 0 0 8px rgb(var(--primary-400));
+        }
+
+        :host(.connected[data-type="number"]) {
+          background: rgb(var(--secondary-400));
+          box-shadow: 0 0 8px rgb(var(--secondary-400));
+        }
+
+        :host(.connected[data-type="boolean"]) {
+          background: rgb(var(--warning-400));
+          box-shadow: 0 0 8px rgb(var(--warning-400));
+        }
+
+        :host(.connected[data-type="array"]) {
+          background: rgb(var(--tertiary-400));
+          box-shadow: 0 0 8px rgb(var(--tertiary-400));
+        }
+
+        :host(.connected[data-type="enum"]) {
+          background: rgb(var(--error-300));
+          box-shadow: 0 0 8px rgb(var(--error-300));
         }
       `
     },
