@@ -27,13 +27,21 @@ export default MetaFor("input-boolean")
       </label>
     `,
     style: ({css}) => css`
-      :host { display: flex; align-items: center; }
+      :host { 
+        display: flex; 
+        align-items: center; 
+        min-width: 222px;
+        justify-content: space-between;
+      }
       .param-title { color: var(--font-color); font-size: 13px; margin: 0 8px; }
       .switch-vision-pro {
+        --switch-width: 44px;
+        --switch-height: 20px;
+        --switch-knob: 14px;
         position: relative;
         display: inline-block;
-        width: 44px;
-        height: 26px;
+        width: var(--switch-width);
+        height: var(--switch-height);
         margin: 0 8px 0 0;
         vertical-align: middle;
       }
@@ -50,7 +58,7 @@ export default MetaFor("input-boolean")
         right: 0;
         bottom: 0;
         background: linear-gradient(90deg, rgba(var(--surface-200),0.9) 0%, rgba(var(--surface-100),0.9) 100%);
-        border-radius: 16px;
+        border-radius: calc(var(--switch-height) / 1.625);
         box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1.5px 3px rgba(0,0,0,0.08);
         transition: background 0.3s, box-shadow 0.3s;
       }
@@ -63,15 +71,15 @@ export default MetaFor("input-boolean")
         position: absolute;
         left: 3px;
         top: 3px;
-        width: 20px;
-        height: 20px;
+        width: var(--switch-knob);
+        height: var(--switch-knob);
         border-radius: 50%;
         background: white;
         box-shadow: 0 1.5px 4px 0 rgba(0,0,0,0.10);
         transition: transform 0.3s cubic-bezier(.4,2.2,.2,1), background 0.3s;
       }
       .switch-vision-pro input:checked + .slider:before {
-        transform: translateX(18px);
+        transform: translateX(calc(var(--switch-width) - var(--switch-knob) - 6px));
         background: #eaf1ff;
       }
       .switch-vision-pro input:focus + .slider {
