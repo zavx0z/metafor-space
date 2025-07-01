@@ -52,23 +52,21 @@ export default MetaFor("graph-condition", {development: true})
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("./graph-layout.t").LayoutResult}*/
+        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
         const layout = JSON.parse(data)
-        const layoutState = layout.children?.find(i => i.id === context.to)
-        if (!layoutState) {
+        const stateGroup = layout.children.find(group => group.id === context.to)
+        if (!stateGroup) {
           update({error: `Состояние ${context.to} не найдено в layout`})
           return
         }
 
-        const layoutCondition = /**@type{import("./graph-layout.t").LayoutNode}*/(
-          layout.children?.find(child => child.id === context.to)?.children?.find(child => child.id === id)
-        )
+        const layoutCondition = stateGroup.children.find(child => child.id === id)
         if (!layoutCondition) {
           update({error: `не найден элемент: ${id}`})
           console.error(`не найден элемент: ${id}`, layout)
           return
         }
-        update({x: /**@type{number}*/(layoutCondition.x), y: /**@type{number}*/(layoutCondition.y)})
+        update({x: layoutCondition.x, y: layoutCondition.y})
       }
     }
   ])

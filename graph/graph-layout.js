@@ -90,6 +90,7 @@ export default MetaFor("graph-layout", {development: true})
             return reject()
           }
           const layout = await core.elk.layout(core.data)
+          console.log(layout)
           sessionStorage.setItem(core.data.id, JSON.stringify(layout))
           update({ready: core.data.id, current: null})
           return resolve()

@@ -23,7 +23,7 @@ export default MetaFor('graph-socket')
       in: "измерение",
       action({element, update}) {
         requestAnimationFrame(() => {
-          const {width, height, x, y} = element.getBoundingClientRect()
+          const {width, x, y} = element.getBoundingClientRect()
           update({
             size: Math.round(width),
             x: Math.round(x),

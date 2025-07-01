@@ -360,25 +360,11 @@ export interface LayoutResult extends LayoutNode {
 }
 
 /**
- * Секция ребра с детальной информацией о пути
+ * Секция ребра с детальной информацией о пути (старая версия)
  * 
- * Представляет отдельный сегмент ребра между двумя портами.
- * Содержит начальную и конечную точки, а также промежуточные
- * точки изгиба для создания криволинейного пути.
- * 
- * @example
- * ```typescript
- * const section: EdgeSection = {
- *   startPoint: { x: 100, y: 50 },
- *   endPoint: { x: 200, y: 100 },
- *   bendPoints: [
- *     { x: 130, y: 60 },
- *     { x: 170, y: 80 }
- *   ]
- * }
- * ```
+ * @deprecated Используйте новую типизацию EdgeSection
  */
-export interface EdgeSection {
+export interface OldEdgeSection {
   /** Начальная точка секции ребра */
   startPoint: Point
   /** Конечная точка секции ребра */
@@ -388,33 +374,15 @@ export interface EdgeSection {
 }
 
 /**
- * Входное ребро с секциями и портами подключения
+ * Входное ребро с секциями и портами подключения (старая версия)
  * 
- * Представляет ребро в том виде, в котором оно поступает в ELK
- * или возвращается из ELK после обработки. Может содержать
- * несколько секций для сложных путей соединения.
- * 
- * @example
- * ```typescript
- * const inputEdge: InputEdge = {
- *   id: "node-meta-socket/1->node-meta-socket/3",
- *   sources: ["node-meta-socket/1"],
- *   targets: ["node-meta-socket/3"],
- *   sections: [
- *     {
- *       startPoint: { x: 192, y: 96 },
- *       endPoint: { x: -6, y: 96 },
- *       bendPoints: [{ x: 100, y: 120 }]
- *     }
- *   ]
- * }
- * ```
+ * @deprecated Используйте новую типизацию LayoutEdge
  */
 export interface InputEdge {
   /** Уникальный идентификатор ребра в формате "source->target" */
   id: string
   /** Массив секций ребра с детальными путями (опционально) */
-  sections?: EdgeSection[]
+  sections?: OldEdgeSection[]
   /** Массив идентификаторов исходных портов */
   sources: string[]
   /** Массив идентификаторов целевых портов */
@@ -768,3 +736,279 @@ export declare function createStateGroup(
   metrics: Metrics,
   config: LayoutConfig
 ): import("elkjs").ElkNode
+
+// ==================================================================================
+// КОНКРЕТНЫЕ ТИПЫ ДЛЯ НАШЕЙ ДОМЕННОЙ СТРУКТУРЫ
+// ==================================================================================
+
+
+
+// ==================================================================================
+// ТОЧНАЯ ТИПИЗАЦИЯ ПОД НАШУ ELK СТРУКТУРУ
+// ==================================================================================
+
+/**
+ * Порт (сокет) для подключений
+ */
+export interface GraphSocket {
+  /** ID сокета (например, "graph-socket/1") */
+  id: string
+  /** Настройки layout для порта */
+  layoutOptions?: {
+    /** Сторона размещения: "WEST" | "EAST" */
+    "port.side"?: string
+  }
+  /** Координата X порта относительно родителя */
+  x: number
+  /** Координата Y порта относительно родителя */
+  y: number
+  /** Ширина порта */
+  width: number
+  /** Высота порта */
+  height: number
+}
+
+/**
+ * Элемент условия (graph-condition)
+ */
+export interface GraphCondition {
+  /** ID условия (например, "graph-condition/1") */
+  id: string
+  /** Настройки layout для условия */
+  layoutOptions: {}
+  /** Ширина условия */
+  width: number
+  /** Высота условия */
+  height: number
+  /** Порты условия */
+  ports: GraphSocket[]
+  /** Служебное поле ELK */
+  $H?: number
+  /** Координата X относительно группы состояния */
+  x: number
+  /** Координата Y относительно группы состояния */
+  y: number
+}
+
+/**
+ * Элемент контекста (graph-context)
+ */
+export interface GraphContext {
+  /** ID контекста (например, "graph-context/1") */
+  id: string
+  /** Настройки layout для контекста */
+  layoutOptions: {
+    /** Ограничения портов */
+    "portConstraints": string
+  }
+  /** Ширина контекста */
+  width: number
+  /** Высота контекста */
+  height: number
+  /** Порты контекста */
+  ports: GraphSocket[]
+  /** Служебное поле ELK */
+  $H?: number
+  /** Координата X относительно группы состояния */
+  x: number
+  /** Координата Y относительно группы состояния */
+  y: number
+}
+
+/**
+ * Секция ребра с точками пути
+ */
+export interface EdgeSection {
+  /** ID секции */
+  id: string
+  /** Начальная точка */
+  startPoint: {
+    x: number
+    y: number
+  }
+  /** Конечная точка */
+  endPoint: {
+    x: number
+    y: number
+  }
+  /** Промежуточные точки изгиба */
+  bendPoints?: Array<{
+    x: number
+    y: number
+  }>
+  /** Входящая форма */
+  incomingShape: string
+  /** Исходящая форма */
+  outgoingShape: string
+}
+
+/**
+ * Ребро в ELK структуре
+ */
+export interface LayoutEdge {
+  /** ID ребра (например, "graph-socket/2->graph-socket/3") */
+  id: string
+  /** Исходные порты */
+  sources: string[]
+  /** Целевые порты */
+  targets: string[]
+  /** Секции ребра с путями */
+  sections: EdgeSection[]
+  /** Контейнер, в котором находится ребро */
+  container: string
+}
+
+/**
+ * Группа состояния (например, "начало", "конец")
+ */
+export interface StateGroup {
+  /** Имя состояния */
+  id: string
+  /** Настройки layout для группы */
+  layoutOptions: {
+    /** Стратегия размещения узлов */
+    "elk.layered.nodePlacement.strategy": string
+  }
+  /** Дочерние элементы: условия и контексты */
+  children: (GraphCondition | GraphContext)[]
+  /** Рёбра внутри группы состояния */
+  edges: LayoutEdge[]
+  /** Служебное поле ELK */
+  $H?: number
+  /** Координата X группы относительно мета элемента */
+  x: number
+  /** Координата Y группы относительно мета элемента */
+  y: number
+  /** Ширина группы состояния */
+  width: number
+  /** Высота группы состояния */
+  height: number
+}
+
+/**
+ * Корневые настройки layout для мета элемента
+ */
+export interface RootLayoutOptions {
+  /** Расстояние между рёбрами в разных слоях */
+  "elk.layered.spacing.edgeEdgeBetweenLayers": string
+  /** Расстояние между рёбрами */
+  "elk.spacing.edgeEdge": string
+  /** Расстояние между узлами */
+  "elk.spacing.nodeNode": string
+  /** Расстояние между ребром и узлом */
+  "elk.spacing.edgeNode": string
+  /** Обработка иерархии */
+  "hierarchyHandling": string
+  /** Стратегия разбиения на слои */
+  "elk.layered.layering.strategy": string
+  /** Отступы */
+  "elk.padding": string
+  /** Стратегия учета порядка модели */
+  "considerModelOrder.strategy": string
+  /** Размер портов */
+  "elk.port.size": number
+}
+
+/**
+ * Полный результат ELK layout - точная структура нашей системы
+ */
+export interface TypedLayoutResult {
+  /** ID мета элемента (например, "test/1") */
+  id: string
+  /** Настройки layout для корневого уровня */
+  layoutOptions: RootLayoutOptions
+  /** Группы состояний */
+  children: StateGroup[]
+  /** Рёбра между группами состояний */
+  edges: LayoutEdge[]
+  /** Служебное поле ELK */
+  $H?: number
+  /** Координата X корневого элемента */
+  x: number
+  /** Координата Y корневого элемента */
+  y: number
+  /** Ширина всего мета элемента */
+  width: number
+  /** Высота всего мета элемента */
+  height: number
+}
+
+// ==================================================================================
+// ФУНКЦИИ-ПОМОЩНИКИ ДЛЯ РАБОТЫ С ТИПИЗИРОВАННОЙ СТРУКТУРОЙ
+// ==================================================================================
+
+/**
+ * Находит группу состояния по имени
+ */
+export function findStateGroup(layout: TypedLayoutResult, stateName: string): StateGroup | undefined {
+  return layout.children.find(group => group.id === stateName)
+}
+
+/**
+ * Находит элемент в группе состояния по ID
+ */
+export function findElementInGroup(group: StateGroup, elementId: string): GraphCondition | GraphContext | undefined {
+  return group.children.find(child => child.id === elementId)
+}
+
+/**
+ * Находит условие в группе состояния
+ */
+export function findConditionInGroup(group: StateGroup, conditionId: string): GraphCondition | undefined {
+  const element = group.children.find(child => child.id === conditionId)
+  return isGraphCondition(element) ? element : undefined
+}
+
+/**
+ * Находит контекст в группе состояния
+ */
+export function findContextInGroup(group: StateGroup, contextId: string): GraphContext | undefined {
+  const element = group.children.find(child => child.id === contextId)
+  return isGraphContext(element) ? element : undefined
+}
+
+/**
+ * Находит порт в элементе по ID
+ */
+export function findPortInElement(element: GraphCondition | GraphContext, portId: string): GraphSocket | undefined {
+  return element.ports.find(port => port.id === portId)
+}
+
+/**
+ * Находит ребро в группе по ID
+ */
+export function findEdgeInGroup(group: StateGroup, edgeId: string): LayoutEdge | undefined {
+  return group.edges.find(edge => edge.id === edgeId)
+}
+
+/**
+ * Находит ребро на корневом уровне по ID
+ */
+export function findRootEdge(layout: TypedLayoutResult, edgeId: string): LayoutEdge | undefined {
+  return layout.edges.find(edge => edge.id === edgeId)
+}
+
+// ==================================================================================
+// ТИПЫ-ГАРДЫ ДЛЯ ПРОВЕРКИ ЭЛЕМЕНТОВ
+// ==================================================================================
+
+/**
+ * Проверяет, является ли элемент условием
+ */
+export function isGraphCondition(element: GraphCondition | GraphContext | undefined): element is GraphCondition {
+  return element ? element.id.includes('graph-condition/') : false
+}
+
+/**
+ * Проверяет, является ли элемент контекстом
+ */
+export function isGraphContext(element: GraphCondition | GraphContext | undefined): element is GraphContext {
+  return element ? element.id.includes('graph-context/') : false
+}
+
+/**
+ * Проверяет, является ли элемент сокетом
+ */
+export function isGraphSocket(id: string): boolean {
+  return id.includes('graph-socket/')
+}

@@ -26,7 +26,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     {
       in: "позиционирование",
       action({element, context, core}) {
-        const headerBB = core.header.value.getBoundingClientRect()
+        const headerBB = /**@type{DOMRect} */ (core.header?.value?.getBoundingClientRect())
         element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
         const svg = /**@type{SVGElement}*/ (core.svg.value)
         svg.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
@@ -77,23 +77,10 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("./graph-layout.t").LayoutResult}*/
+        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
         const layout = JSON.parse(data)
-        // console.log(layout)
-
-        if (!layout.width || !layout.height) {
-          update({error: "Нет размеров в layout данных"})
-          return
-        }
-
-        // Извлекаем edges из layout данных
         core.edges = collectEdges(layout)
-        update({
-          width: layout.width,
-          height: layout.height
-        })
-        // console.log(layout)
-
+        update({width: layout.width, height: layout.height})
       }
     }
   ])

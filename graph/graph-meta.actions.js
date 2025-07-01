@@ -36,7 +36,7 @@ export function getSimpleRoundedPath(points, radius) {
 
 /**
  * Собирает все рёбра из layout
- * @param {import("./graph-layout.t").LayoutResult} layout - ELK layout
+ * @param {import("./graph-layout.t").TypedLayoutResult} layout - ELK layout
  * @returns {import('./graph-meta.t').Edge[]} Массив рёбер с типами
  */
 export const collectEdges = layout => {

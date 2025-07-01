@@ -36,22 +36,20 @@ export default MetaFor("graph-state", {development: true})
         && patch.path === "/state"
         && patch.value === "ожидание"
       ,
-      action({id, context, update}) {
+      action({context, update}) {
         const data = sessionStorage.getItem(context.id)
         if (!data) {
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("./graph-layout.t").LayoutResult}*/
+        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
         const layout = JSON.parse(data)
-        const layoutState = layout.children?.find(i => i.id === context.state)
-        if (!layoutState) {
+        const stateGroup = layout.children.find(group => group.id === context.state)
+        if (!stateGroup) {
           update({error: `Состояние ${context.state} не найдено в layout`})
           return
         }
-        // console.log(layoutState)
-        update({x: layoutState.x, y: layoutState.y, width: layoutState.width, height: layoutState.height})
-        // console.log(layoutCondition)
+        update({x: stateGroup.x, y: stateGroup.y, width: stateGroup.width, height: stateGroup.height})
       }
     }
   ])

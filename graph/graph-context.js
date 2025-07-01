@@ -70,24 +70,22 @@ export default MetaFor('graph-context', {
           update({error: "Нет данных разметки"})
           return
         }
-        /**@type{import("./graph-layout.t").LayoutResult}*/
+        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
         const layout = JSON.parse(data)
-        const layoutState = layout.children?.find(i => i.id === context.state)
-        if (!layoutState) {
+        const stateGroup = layout.children.find(group => group.id === context.state)
+        if (!stateGroup) {
           update({error: `Состояние ${context.state} не найдено в layout`})
           return
         }
         
-        const layoutContext = /**@type{import("./graph-layout.t").LayoutNode}*/(
-          layout.children?.find(child => child.id === context.state)?.children?.find(child => child.id === id)
-        )
+        const layoutContext = stateGroup.children.find(child => child.id === id)
         if (!layoutContext) {
           update({error: `не найден элемент: ${id} для состояния ${context.state}`})
           console.error(`не найден элемент: ${id} для состояния ${context.state}`, layout)
           return
         }
         // console.log(layoutContext)
-        update({x: /**@type{number}*/(layoutContext.x), y: /**@type{number}*/(layoutContext.y)})
+        update({x: layoutContext.x, y: layoutContext.y})
       }
     }
   ])
