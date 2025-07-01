@@ -69,6 +69,7 @@ export default MetaFor("graph-param")
               @change=${/**@param {Event} e*/e => {
                 if (!e.target) return;
                 const v = /**@type{HTMLInputElement}*/(e.target).checked
+                update({value: v})
                 e.target.dispatchEvent(new CustomEvent('input', {detail: v ? "true" : "false", bubbles: true}))
               }}
             />
@@ -81,29 +82,33 @@ export default MetaFor("graph-param")
         ["array", () => html`
           <textarea name=${context.title}>${Array.isArray(context.value) ? context.value.join(", ") : (context.value ?? "")}</textarea>
         `],
-        ["enum", () => html`
-          <div class="custom-select">
-            <select name=${context.title}
-              .value=${context.value != null ? String(context.value) : ''}
-              @change=${/**@param {Event} e*/e => {
-                if (!e.target) return;
-                const v = /**@type{HTMLSelectElement}*/(e.target).value
-                update({value: v})
-                e.target.dispatchEvent(new CustomEvent('input', {detail: v, bubbles: true}))
-              }}>
-              <option value="" disabled hidden>Выберите...</option>
-              ${(
-                Array.isArray(context.options) && context.options.length > 0
-                  ? context.options
-                  : Array.isArray(context.value)
-                    ? context.value
-                    : (typeof context.value === "string" && context.value)
-                      ? context.value.split(',')
-                      : []
-              ).map(opt => html`<option value=${opt.trim()}>${opt.trim()}</option>`)}
-            </select>
-          </div>
-        `]
+        ["enum", () => {
+          /** @type {string[]} */
+          let opts = []
+          if (Array.isArray(context.options) && context.options.length > 0) {
+            opts = context.options.map(String)
+          } else if (Array.isArray(context.value)) {
+            opts = context.value.map(String)
+          } else if (typeof context.value === "string" && context.value.includes(",")) {
+            opts = context.value.split(",").map(s => s.trim()).filter(Boolean)
+          }
+          // Выбранное значение (если value не массив и не список вариантов)
+          const selected = (typeof context.value === "string" && !context.value.includes(",")) ? context.value : ''
+          return html`
+            <div class="custom-select">
+              <select name=${context.title}
+                @change=${/**@param {Event} e*/e => {
+                  if (!e.target) return;
+                  const v = /**@type{HTMLSelectElement}*/(e.target).value
+                  update({value: v})
+                  e.target.dispatchEvent(new CustomEvent('input', {detail: v, bubbles: true}))
+                }}>
+                <option value="" disabled ?selected=${!selected}>Выберите...</option>
+                ${opts.map(opt => html`<option value=${opt} ?selected=${selected === opt}>${opt}</option>`)}
+              </select>
+            </div>
+          `
+        }]
       ], () => html`
         <input type="text" name=${context.title} value=${context.value}/>
       `)}
