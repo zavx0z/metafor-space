@@ -1,6 +1,6 @@
 import {MetaFor} from "../metafor.js"
 
-export default MetaFor("graph-param-boolean")
+export default MetaFor("input-boolean")
   .context(t => ({
     name: t.string({}),
     title: t.string({}),

@@ -1,11 +1,11 @@
 import {MetaFor} from "../metafor.js"
-import './graph-socket.js'
 import {choose} from "../html/directives/choose.js"
-import './graph-param-string.js'
-import './graph-param-number.js'
-import './graph-param-boolean.js'
-import './graph-param-array.js'
-import './graph-param-enum.js'
+import './graph-socket.js'
+import '../inputs/input-string.js'
+import '../inputs/input-number.js'
+import '../inputs/input-boolean.js'
+import '../inputs/input-array.js'
+import '../inputs/input-enum.js'
 
 export default MetaFor("graph-param")
   .context(t => ({
@@ -54,37 +54,37 @@ export default MetaFor("graph-param")
     render: ({context, html}) => html`
       ${choose(context.type, [
         ["string", () => html`
-          <metafor-graph-param-string context=${{
+          <metafor-input-string context=${{
             name: context.param,
             title: context.title,
             value: context.value
           }}
-          ></metafor-graph-param-string>`],
+          ></metafor-input-string>`],
         ["number", () => html`
-          <metafor-graph-param-number context=${{
+          <metafor-input-number context=${{
             name: context.param,
             title: context.title,
             value: context.value
-          }}></metafor-graph-param-number>`],
+          }}></metafor-input-number>`],
         ["boolean", () => html`
-          <metafor-graph-param-boolean context=${{
+          <metafor-input-boolean context=${{
             name: context.param,
             title: context.title,
             value: context.value
-          }}></metafor-graph-param-boolean>`],
+          }}></metafor-input-boolean>`],
         ["array", () => html`
-          <metafor-graph-param-array context=${{
+          <metafor-input-array context=${{
             name: context.param,
             title: context.title,
             value: context.value
-          }}></metafor-graph-param-array>`],
+          }}></metafor-input-array>`],
         ["enum", () => html`
-          <metafor-graph-param-enum context=${{
+          <metafor-input-enum context=${{
             name: context.param,
             title: context.title,
             value: context.value,
             options: context.options
-          }}></metafor-graph-param-enum>`],
+          }}></metafor-input-enum>`],
       ], () => html`<span>Неизвестный тип</span>`)}
     `,
     style: ({css}) => css`
@@ -96,158 +96,6 @@ export default MetaFor("graph-param")
         display: flex;
         align-items: center;
         border-radius: calc(var(--node-border-radius) / 2);
-      }
-
-      .param-title {
-        color: var(--font-color);
-        font-size: 13px;
-        white-space: nowrap;
-        user-select: none;
-        margin-right: 8px;
-        min-width: 0;
-        flex-shrink: 0;
-        padding-left: 6px;
-        margin-left: 4px;
-      }
-
-      input, select, textarea {
-        color: var(--font-color);
-        background: none;
-        margin: 0;
-        flex: 1 1 0;
-        width: auto;
-        min-width: 40px;
-        height: 100%;
-        text-align: right;
-        border: none;
-        border-radius: 13px;
-        font-size: 13px;
-        box-sizing: border-box;
-        outline: none;
-        resize: none;
-      }
-
-      select {
-        cursor: pointer;
-      }
-
-      textarea {
-        min-height: 20px;
-        max-height: 60px;
-        text-align: left;
-        padding: 2px 6px;
-        font-family: monospace;
-        font-size: 11px;
-      }
-
-      input[type="number"]::-webkit-outer-spin-button,
-      input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-
-      input[type="number"] {
-        -moz-appearance: textfield;
-      }
-
-      .custom-select {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-      }
-
-      .custom-select select {
-        width: 100%;
-        padding: 8px 12px;
-        border-radius: 6px;
-        border: 1.5px solid rgba(var(--surface-400), 0.7);
-        background: rgba(var(--surface-100), 0.9);
-        color: rgb(var(--surface-900));
-        font-family: inherit;
-        font-size: 1em;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1.5px 4px 0 rgba(0, 0, 0, 0.04);
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        cursor: pointer;
-      }
-
-      .custom-select select:focus, .custom-select select:hover {
-        border-color: rgb(var(--surface-600));
-        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
-      }
-
-      .custom-select::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        right: 16px;
-        width: 0;
-        height: 0;
-        pointer-events: none;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 6px solid rgb(var(--surface-600));
-        transform: translateY(-50%);
-      }
-
-      /* Vision Pro Switch Styles */
-
-      .switch-vision-pro {
-        position: relative;
-        display: inline-block;
-        width: 44px;
-        height: 26px;
-        margin: 0 8px 0 0;
-        vertical-align: middle;
-      }
-
-      .switch-vision-pro input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .switch-vision-pro .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, rgba(var(--surface-200), 0.9) 0%, rgba(var(--surface-100), 0.9) 100%);
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10), 0 1.5px 3px rgba(0, 0, 0, 0.08);
-        transition: background 0.3s, box-shadow 0.3s;
-      }
-
-      .switch-vision-pro input:checked + .slider {
-        background: linear-gradient(90deg, #4f8cff 0%, #a6bfff 100%);
-        box-shadow: 0 2px 12px #4f8cff44, 0 1.5px 3px #4f8cff22;
-      }
-
-      .switch-vision-pro .slider:before {
-        content: "";
-        position: absolute;
-        left: 3px;
-        top: 3px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: white;
-        box-shadow: 0 1.5px 4px 0 rgba(0, 0, 0, 0.10);
-        transition: transform 0.3s cubic-bezier(.4, 2.2, .2, 1), background 0.3s;
-      }
-
-      .switch-vision-pro input:checked + .slider:before {
-        transform: translateX(18px);
-        background: #eaf1ff;
-      }
-
-      .switch-vision-pro input:focus + .slider {
-        box-shadow: 0 0 0 2px #4f8cff55;
       }
     `
   })

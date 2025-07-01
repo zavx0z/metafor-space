@@ -1,6 +1,6 @@
 import {MetaFor} from "../metafor.js"
 
-export default MetaFor("graph-param-string")
+export default MetaFor("input-string")
   .context(t => ({
     name: t.string({}),
     title: t.string({}),

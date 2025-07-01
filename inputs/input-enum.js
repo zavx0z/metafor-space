@@ -1,6 +1,6 @@
 import {MetaFor} from "../metafor.js"
 
-export default MetaFor("graph-param-enum")
+export default MetaFor("input-enum")
   .context(t => ({
     name: t.string({}),
     title: t.string({}),
@@ -14,34 +14,31 @@ export default MetaFor("graph-param-enum")
   .reactions([])
   .view({
     render: ({context, html, update}) => html`
-        <span class="param-title">${context.title}</span>
-        <div class="custom-select">
-          <select
-            name=${context.name}
-            @change=${/**@param {Event} e*/e => {
-              const v = (e.target instanceof HTMLSelectElement) ? e.target.value : ''
-              update({value: v})
-              if (e.target instanceof HTMLSelectElement) {
-                e.target.dispatchEvent(new CustomEvent('input', {detail: v, bubbles: true}))
-              }
-            }}>
+      <span class="param-title">${context.title}</span>
+      <div class="custom-select">
+        <select
+          name=${context.name}
+          @change=${/**@param {Event} e*/e => {
+            const v = (e.target instanceof HTMLSelectElement) ? e.target.value : ''
+            if (e.target instanceof HTMLSelectElement) update({value: v})
+          }}>
+          <option 
+            value=""
+            disabled 
+            ?selected=${!context.value || !context.options.includes(context.value)}
+          >
+          </option>
+          ${context.options.map(opt => html`
             <option
-              value=""
-              disabled
-              ?selected=${!context.value}>
-              Выберите...
+              value=${opt}
+              ?selected=${context.value === opt}
+            >
+              ${opt}
             </option>
-            ${context.options.map(opt => html`
-              <option
-                value=${opt}
-                ?selected=${context.value === opt}
-              >
-                ${opt}
-              </option>
-            `)}
-          </select>
-        </div>
-      `
+          `)}
+        </select>
+      </div>
+    `
     ,
     style: ({css}) => css`
       :host {
@@ -60,15 +57,16 @@ export default MetaFor("graph-param-enum")
         position: relative;
         display: inline-block;
         width: 100%;
+        min-width: 100px;
       }
 
       .custom-select select {
         width: 100%;
-        padding: 8px 12px;
+        padding: 8px 12px 8px 2px;
         border-radius: 6px;
         border: 1.5px solid rgba(var(--surface-400), 0.7);
         background: rgba(var(--surface-100), 0.9);
-        color: rgb(var(--surface-900));
+        color: rgb(var(--primary-50));
         font-family: inherit;
         font-size: 1em;
         outline: none;
