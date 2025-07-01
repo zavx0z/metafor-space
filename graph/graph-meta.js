@@ -207,6 +207,21 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         border-top-right-radius: inherit;
         font-family: "Russo One", 'Courier New', Courier, monospace;
 
+        &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: -2px;
+          height: 12px;
+          pointer-events: none;
+          z-index: 1;
+          border-bottom-left-radius: 12px;
+          border-bottom-right-radius: 12px;
+          box-shadow: 0 6px 12px 0 rgba(0,0,0,0.18), 0 1.5px 3px 0 rgba(0,0,0,0.12);
+          opacity: 0.7;
+        }
+
         & > div:first-child {
           flex: 1;
           display: flex;
