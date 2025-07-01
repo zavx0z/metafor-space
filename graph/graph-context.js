@@ -1,5 +1,6 @@
 import { createRef } from "../html/directives/ref.js"
 import {MetaFor} from "../metafor.js"
+import "./graph-param.js"
 
 export default MetaFor('graph-context', {
   description: "Контекст",
@@ -98,13 +99,49 @@ export default MetaFor('graph-context', {
         <slot></slot>
       </section>
       <section>
-        <button>
-          <span>${"change"}</span>
-        </button>
       </section>
     `,
     style: ({css}) => css`
+
+      :host:before {
+        content: "";
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        border: 1px solid rgba(var(--surface-400));
+        border-radius: inherit;
+        pointer-events: none;
+        z-index: -2;
+        transition: box-shadow 0.3s ease-in-out;
+        box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 -3px 0 inset;
+      }
+
+      :host:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='noise' x='0%' y='0%' width='100%' height='100%'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.15'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='white' filter='url(%23noise)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: contain;
+        opacity: 0.1;
+        border-radius: inherit;
+        z-index: -1;
+      }
+
       :host {
+        backdrop-filter: var(--backdrop-filter-blur);
+        -webkit-backdrop-filter: var(--backdrop-filter-blur);
+        -moz-backdrop-filter: var(--backdrop-filter-blur);
+        -o-backdrop-filter: var(--backdrop-filter-blur);
+        -ms-backdrop-filter: var(--backdrop-filter-blur);
+
+        --shadow-color: rgba(var(--surface-800) / 0.8);
         --background-color: rgba(var(--surface-600) / var(--background-alpha));
 
         position: fixed;
@@ -139,7 +176,7 @@ export default MetaFor('graph-context', {
       }
 
       :host:has(> :nth-child(2)) > section:last-child {
-        padding-bottom: 8px;
+        padding-bottom: 0;
         border-bottom-left-radius: var(--node-border-radius);
         border-bottom-right-radius: var(--node-border-radius);
       }
@@ -154,35 +191,6 @@ export default MetaFor('graph-context', {
 
         & h2 {
           margin: 0;
-        }
-      }
-
-      button {
-        /* height: 26px; */
-        border: 1px solid var(--button-border-color);
-        border-radius: 4px;
-        background-color: var(--background-color);
-        color: rgba(var(--surface-50));
-        cursor: pointer;
-        font-size: inherit;
-        transition: all 0.3s ease;
-
-
-        &:hover {
-          background-color: var(--button-hover-background);
-          border-color: var(--button-border-color);
-        }
-
-        &:active {
-          background-color: var(--button-active-background);
-          border-color: var(--button-border-color);
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          background-color: var(--button-disabled-background);
-          border-color: var(--button-border-color);
         }
       }
     `
