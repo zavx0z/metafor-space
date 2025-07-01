@@ -51,6 +51,7 @@ export default MetaFor("input-enum")
         color: var(--font-color);
         font-size: 13px;
         margin: 0 8px;
+        text-wrap: nowrap;
       }
 
       div {
