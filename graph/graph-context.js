@@ -102,7 +102,6 @@ export default MetaFor('graph-context', {
       </section>
     `,
     style: ({css}) => css`
-
       :host:before {
         content: "";
         top: 0;
@@ -141,7 +140,6 @@ export default MetaFor('graph-context', {
         -o-backdrop-filter: var(--backdrop-filter-blur);
         -ms-backdrop-filter: var(--backdrop-filter-blur);
 
-        --shadow-color: rgba(var(--surface-800) / 0.8);
         --background-color: rgba(var(--surface-600) / var(--background-alpha));
 
         position: fixed;

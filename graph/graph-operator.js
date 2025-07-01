@@ -198,6 +198,7 @@ export default MetaFor("graph-operator", {development: true})
         border-radius: var(--node-border-radius);
         background-color: rgb(var(--primary-900));
         display: flex;
+        height: 100%;
         gap: 8px;
         padding: 0 8px;
 

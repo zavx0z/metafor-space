@@ -97,7 +97,43 @@ export default MetaFor("graph-condition", {development: true})
       ></metafor-graph-socket>
     `,
     style: ({css}) => css`
+      :host:before {
+        content: "";
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        border-radius: inherit;
+        pointer-events: none;
+        z-index: -2;
+        transition: box-shadow 0.3s ease-in-out;
+        box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 0 0 inset;
+      }
+
+      :host:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='noise' x='0%' y='0%' width='100%' height='100%'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.15'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='white' filter='url(%23noise)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: contain;
+        opacity: 0.1;
+        border-radius: inherit;
+        z-index: -1;
+      }
       :host {
+
+        backdrop-filter: var(--backdrop-filter-blur);
+        -webkit-backdrop-filter: var(--backdrop-filter-blur);
+        -moz-backdrop-filter: var(--backdrop-filter-blur);
+        -o-backdrop-filter: var(--backdrop-filter-blur);
+        -ms-backdrop-filter: var(--backdrop-filter-blur);
+        
         background-color: rgba(var(--surface-400));
         padding: 4px 8px;
         position: fixed;
@@ -108,10 +144,6 @@ export default MetaFor("graph-condition", {development: true})
         gap: 2px;
         min-width: max-content;
         height: fit-content;
-      }
-
-      :host(:before) {
-        background-color: rgba(var(--surface-400));
       }
     `
   })
