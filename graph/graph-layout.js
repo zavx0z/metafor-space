@@ -130,7 +130,7 @@ export default MetaFor("graph-layout", {development: true})
         && meta.tag.includes('graph-')
         && patch.path === "/"
         && patch.op === "add"
-        && !["graph-nodes", "graph-meta", "graph-state", "graph-operator"].includes(meta.tag)
+        && !["graph-nodes", "graph-meta", "graph-state", "graph-operator", "graph-param-"].includes(meta.tag)
       ),
       action({meta, patch, core, update, context}) {
         const entity = core.meta.get(patch.value.context.id)
@@ -173,7 +173,7 @@ export default MetaFor("graph-layout", {development: true})
         && patch.op === "replace"
         // && Object.hasOwn(patch.value, "x")
         // && Object.hasOwn(patch.value, "y")
-        && !["graph-nodes", "graph-meta", "graph-state", "graph-operator"].includes(meta.tag)
+        && !["graph-nodes", "graph-meta", "graph-state", "graph-operator", "graph-param-"].includes(meta.tag)
       ),
       action({meta, patch, core, update, context}) {
         const entity = core.meta.get(context.current)

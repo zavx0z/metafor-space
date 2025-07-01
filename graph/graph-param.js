@@ -1,6 +1,11 @@
 import {MetaFor} from "../metafor.js"
 import './graph-socket.js'
 import {choose} from "../html/directives/choose.js"
+import './graph-param-string.js'
+import './graph-param-number.js'
+import './graph-param-boolean.js'
+import './graph-param-array.js'
+import './graph-param-enum.js'
 
 export default MetaFor("graph-param")
   .context(t => ({
@@ -46,83 +51,41 @@ export default MetaFor("graph-param")
   ])
   .reactions([])
   .view({
-    render: ({context, html, update}) => html`
-      <metafor-graph-socket
-        context=${{
-          id: context.id,
-          state: context.state,
-          param: context.param,
-          parent: "state",
-          direction: "west",
-          type: context.type
-        }}
-        data-type="${context.type}"
-      >
-      </metafor-graph-socket>
-      <span class="noselect param-title" data-type="${context.type}">${context.title}</span>
+    render: ({context, html}) => html`
       ${choose(context.type, [
-        ["boolean", () => html`
-          <label class="switch-vision-pro">
-            <input type="checkbox"
-              name=${context.title}
-              .checked=${String(context.value) === "true"}
-              @change=${/**@param {Event} e*/e => {
-                if (!e.target) return;
-                const v = /**@type{HTMLInputElement}*/(e.target).checked
-                update({value: v})
-                e.target.dispatchEvent(new CustomEvent('input', {detail: v ? "true" : "false", bubbles: true}))
-              }}
-            />
-            <span class="slider"></span>
-          </label>
-        `],
+        ["string", () => html`
+          <metafor-graph-param-string context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}
+          ></metafor-graph-param-string>`],
         ["number", () => html`
-          <input type="number" name=${context.title} value=${context.value}/>
-        `],
+          <metafor-graph-param-number context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}></metafor-graph-param-number>`],
+        ["boolean", () => html`
+          <metafor-graph-param-boolean context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}></metafor-graph-param-boolean>`],
         ["array", () => html`
-          <textarea name=${context.title}>${Array.isArray(context.value) ? context.value.join(", ") : (context.value ?? "")}</textarea>
-        `],
-        ["enum", () => {
-          /** @type {string[]} */
-          let opts = []
-          if (Array.isArray(context.options) && context.options.length > 0) {
-            opts = context.options.map(String)
-          } else if (Array.isArray(context.value)) {
-            opts = context.value.map(String)
-          } else if (typeof context.value === "string" && context.value.includes(",")) {
-            opts = context.value.split(",").map(s => s.trim()).filter(Boolean)
-          }
-          // Выбранное значение (если value не массив и не список вариантов)
-          const selected = (typeof context.value === "string" && !context.value.includes(",")) ? context.value : ''
-          return html`
-            <div class="custom-select">
-              <select name=${context.title}
-                @change=${/**@param {Event} e*/e => {
-                  if (!e.target) return;
-                  const v = /**@type{HTMLSelectElement}*/(e.target).value
-                  update({value: v})
-                  e.target.dispatchEvent(new CustomEvent('input', {detail: v, bubbles: true}))
-                }}>
-                <option value="" disabled ?selected=${!selected}>Выберите...</option>
-                ${opts.map(opt => html`<option value=${opt} ?selected=${selected === opt}>${opt}</option>`)}
-              </select>
-            </div>
-          `
-        }]
-      ], () => html`
-        <input type="text" name=${context.title} value=${context.value}/>
-      `)}
-      <metafor-graph-socket
-        context=${{
-          id: context.id,
-          state: context.state,
-          param: context.param,
-          parent: "state",
-          direction: "east",
-          type: context.type
-        }}
-        data-type="${context.type}"
-      />
+          <metafor-graph-param-array context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}></metafor-graph-param-array>`],
+        ["enum", () => html`
+          <metafor-graph-param-enum context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value,
+            options: context.options
+          }}></metafor-graph-param-enum>`],
+      ], () => html`<span>Неизвестный тип</span>`)}
     `,
     style: ({css}) => css`
       :host {
@@ -132,7 +95,7 @@ export default MetaFor("graph-param")
         padding: 0 2px;
         display: flex;
         align-items: center;
-        border-radius: calc(var(--node-border-radius)/2);
+        border-radius: calc(var(--node-border-radius) / 2);
       }
 
       .param-title {
@@ -192,6 +155,7 @@ export default MetaFor("graph-param")
         display: inline-block;
         width: 100%;
       }
+
       .custom-select select {
         width: 100%;
         padding: 8px 12px;
@@ -203,16 +167,18 @@ export default MetaFor("graph-param")
         font-size: 1em;
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1.5px 4px 0 rgba(0,0,0,0.04);
+        box-shadow: 0 1.5px 4px 0 rgba(0, 0, 0, 0.04);
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
         cursor: pointer;
       }
+
       .custom-select select:focus, .custom-select select:hover {
         border-color: rgb(var(--surface-600));
-        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
       }
+
       .custom-select::after {
         content: "";
         position: absolute;
@@ -228,6 +194,7 @@ export default MetaFor("graph-param")
       }
 
       /* Vision Pro Switch Styles */
+
       .switch-vision-pro {
         position: relative;
         display: inline-block;
@@ -236,11 +203,13 @@ export default MetaFor("graph-param")
         margin: 0 8px 0 0;
         vertical-align: middle;
       }
+
       .switch-vision-pro input {
         opacity: 0;
         width: 0;
         height: 0;
       }
+
       .switch-vision-pro .slider {
         position: absolute;
         cursor: pointer;
@@ -248,15 +217,17 @@ export default MetaFor("graph-param")
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(90deg, rgba(var(--surface-200),0.9) 0%, rgba(var(--surface-100),0.9) 100%);
+        background: linear-gradient(90deg, rgba(var(--surface-200), 0.9) 0%, rgba(var(--surface-100), 0.9) 100%);
         border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 1.5px 3px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10), 0 1.5px 3px rgba(0, 0, 0, 0.08);
         transition: background 0.3s, box-shadow 0.3s;
       }
+
       .switch-vision-pro input:checked + .slider {
         background: linear-gradient(90deg, #4f8cff 0%, #a6bfff 100%);
         box-shadow: 0 2px 12px #4f8cff44, 0 1.5px 3px #4f8cff22;
       }
+
       .switch-vision-pro .slider:before {
         content: "";
         position: absolute;
@@ -266,13 +237,15 @@ export default MetaFor("graph-param")
         height: 20px;
         border-radius: 50%;
         background: white;
-        box-shadow: 0 1.5px 4px 0 rgba(0,0,0,0.10);
-        transition: transform 0.3s cubic-bezier(.4,2.2,.2,1), background 0.3s;
+        box-shadow: 0 1.5px 4px 0 rgba(0, 0, 0, 0.10);
+        transition: transform 0.3s cubic-bezier(.4, 2.2, .2, 1), background 0.3s;
       }
+
       .switch-vision-pro input:checked + .slider:before {
         transform: translateX(18px);
         background: #eaf1ff;
       }
+
       .switch-vision-pro input:focus + .slider {
         box-shadow: 0 0 0 2px #4f8cff55;
       }
