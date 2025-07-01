@@ -68,8 +68,6 @@ export const collectEdges = layout => {
         .filter(Boolean)
     })
   )
-
-  // Внутренние/внешние рёбра теперь не имеют internal, все с тенью
   return [
     ...rootEdges.map(edge => {
       const [section] = edge.sections || []
