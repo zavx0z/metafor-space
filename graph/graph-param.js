@@ -89,8 +89,7 @@ export default MetaFor("graph-param")
     `,
     style: ({css}) => css`
       :host {
-        --background-color: rgba(var(--surface-900));
-        background-color: var(--background-color);
+        background-color: rgba(var(--surface-900));
         margin: 2px 0;
         padding: 0 2px;
         display: flex;

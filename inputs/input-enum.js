@@ -14,8 +14,8 @@ export default MetaFor("input-enum")
   .reactions([])
   .view({
     render: ({context, html, update}) => html`
-      <span class="param-title">${context.title}</span>
-      <div class="custom-select">
+      <span>${context.title}</span>
+      <div>
         <select
           name=${context.name}
           @change=${/**@param {Event} e*/e => {
@@ -47,43 +47,44 @@ export default MetaFor("input-enum")
         text-wrap-mode: nowrap;
       }
 
-      .param-title {
+      span {
         color: var(--font-color);
         font-size: 13px;
         margin: 0 8px;
       }
 
-      .custom-select {
+      div {
         position: relative;
         display: inline-block;
         width: 100%;
         min-width: 100px;
       }
 
-      .custom-select select {
+      select {
         width: 100%;
-        padding: 8px 12px 8px 2px;
+        padding: 8px 22px 8px 2px;
         border-radius: 6px;
-        border: 1.5px solid rgba(var(--surface-400), 0.7);
+        border: 1px solid rgba(var(--surface-400), 0.7);
         background: rgba(var(--surface-100), 0.9);
         color: rgb(var(--primary-50));
         font-family: inherit;
         font-size: 1em;
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: 0 1.5px 4px 0 rgba(0, 0, 0, 0.04);
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.04);
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
         cursor: pointer;
+        text-align: right;
       }
 
-      .custom-select select:focus, .custom-select select:hover {
+      select:focus, select:hover {
         border-color: rgb(var(--surface-600));
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
       }
 
-      .custom-select::after {
+      div::after {
         content: "";
         position: absolute;
         top: 50%;
