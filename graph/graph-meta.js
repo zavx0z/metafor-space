@@ -11,7 +11,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
   }))
   .core(() => ({
     header: createRef(),
-    svg: createRef(),
+    canvas: createRef(),
     /**@type{import('./graph-meta.t').Edge[]} */
     edges: []
   }))
@@ -28,37 +28,67 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
       action({element, context, core}) {
         const headerBB = /**@type{DOMRect} */ (core.header?.value?.getBoundingClientRect())
         element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
-        const svg = /**@type{SVGElement}*/ (core.svg.value)
-        svg.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        const canvas = /**@type{HTMLCanvasElement}*/ (core.canvas.value)
+        if (!canvas) return;
+        canvas.width = context.width
+        canvas.height = context.height
 
-        // Отрисовываем edges после установки размеров
+        // Функция для отрисовки скругленного пути на canvas
+        /**
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {import('./graph-meta.t').Point[]} points
+         * @param {number} [radius]
+         */
+        function drawRoundedPath(ctx, points, radius = 8) {
+          if (points.length < 2) return;
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          for (let i = 1; i < points.length - 1; i++) {
+            const prev = points[i - 1];
+            const curr = points[i];
+            const next = points[i + 1];
+            if (prev.y === curr.y) { // горизонтальный сегмент
+              ctx.lineTo(curr.x - Math.sign(curr.x - prev.x) * radius, curr.y);
+              ctx.quadraticCurveTo(curr.x, curr.y, curr.x, curr.y + Math.sign(next.y - curr.y) * radius);
+            } else { // вертикальный сегмент
+              ctx.lineTo(curr.x, curr.y - Math.sign(curr.y - prev.y) * radius);
+              ctx.quadraticCurveTo(curr.x, curr.y, curr.x + Math.sign(next.x - curr.x) * radius, curr.y);
+            }
+          }
+          // Последний сегмент
+          const last = points[points.length - 1];
+          ctx.lineTo(last.x, last.y);
+        }
+
+        // Рисуем edges на canvas
         requestAnimationFrame(() => {
-          if (!svg || !core.edges.length) return
+          if (!canvas || !core.edges.length) return
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-          // Очищаем существующие пути
-          Array.from(svg.querySelectorAll('path')).forEach(path => path.remove())
-
-          // Создаем новые пути
           core.edges.forEach(/** @param {import('./graph-meta.t').Edge} edge */edge => {
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-            path.id = edge.id
-            path.setAttribute('d', getSimpleRoundedPath(edge.points, 8))
-            path.setAttribute('fill', 'none')
-            path.setAttribute('stroke-width', '2')
-
-            // Устанавливаем класс и цвет в зависимости от типа
-            const className = edge.type === 'east-input' ? 'next' :
-              edge.type === 'west' ? 'active' : 'preview'
-            path.setAttribute('class', className)
-
+            // Цвет и стиль линии
             const color = edge.type === 'east-input' ? '#9c27b0' :
               edge.type === 'west' ? '#2196f3' : '#4caf50'
-            path.setAttribute('stroke', color)
+            ctx.strokeStyle = color
+            ctx.lineWidth = 2
 
-            svg.appendChild(path)
+            // Всегда применяем тень для всех рёбер
+            ctx.shadowColor = 'rgba(0,0,0,0.4)'
+            ctx.shadowBlur = 4
+            ctx.shadowOffsetY = 4
+
+            // Рисуем скругленный путь
+            drawRoundedPath(ctx, edge.points, 8)
+            ctx.stroke()
+            ctx.closePath()
           })
 
-          // console.log(`Создано ${core.edges.length} SVG путей`)
+          // Сбросить тень после отрисовки
+          ctx.shadowColor = 'transparent'
+          ctx.shadowBlur = 0
+          ctx.shadowOffsetY = 0
         })
       },
       to: []
@@ -99,7 +129,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         </div>
       </header>
       <section class="content" data-drag-selector="graph-atom">
-        <svg ${ref(core.svg)} class="connections"></svg>
+        <canvas ${ref(core.canvas)} class="connections"></canvas>
         <slot></slot>
       </section>
     `,
@@ -108,7 +138,44 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         opacity: 1;
       }
 
+      :host:before {
+        content: "";
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        border: 1px solid rgba(var(--surface-800));
+        border-radius: inherit;
+        pointer-events: none;
+        z-index: -2;
+        transition: box-shadow 0.3s ease-in-out;
+        box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 -3px 0 inset;
+      }
+
+      :host:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='noise' x='0%' y='0%' width='100%' height='100%'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.15'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='white' filter='url(%23noise)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: contain;
+        opacity: 0.1;
+        border-radius: inherit;
+        z-index: -1;
+      }
+
       :host {
+        backdrop-filter: var(--backdrop-filter-blur);
+        -webkit-backdrop-filter: var(--backdrop-filter-blur);
+        -moz-backdrop-filter: var(--backdrop-filter-blur);
+        -o-backdrop-filter: var(--backdrop-filter-blur);
+        -ms-backdrop-filter: var(--backdrop-filter-blur);
+
         --font-color: rgb(var(--surface-50));
         --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
 
@@ -189,32 +256,15 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         height: 100%;
       }
 
-      svg.connections {
+      canvas.connections {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         pointer-events: none;
-
-        & path {
-          stroke: #888;
-          stroke-width: 2;
-          fill: none;
-          transition: stroke 0.3s ease;
-
-          &.next {
-            stroke: #9c27b0;
-          }
-
-          &.active {
-            stroke: #2196f3;
-          }
-
-          &.preview {
-            stroke: #4caf50;
-          }
-        }
+        z-index: 1;
+        display: block;
       }
     `
   })

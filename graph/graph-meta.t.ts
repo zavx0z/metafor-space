@@ -27,6 +27,7 @@ export interface Edge {
   id: string
   points: Point[]
   type: "east-input" | "west" | "other"
+  internal?: boolean
 }
 
 /**

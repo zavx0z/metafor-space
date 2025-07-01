@@ -22,7 +22,7 @@ export default MetaFor("graph-layout", {development: true})
         "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
         "elk.spacing.edgeEdge": "36",
         "elk.spacing.nodeNode": "0",
-        "elk.spacing.edgeNode": "20",
+        "elk.spacing.edgeNode": "10",
         "hierarchyHandling": "INCLUDE_CHILDREN",
         "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
         "elk.padding": "[top=10.0, left=10.0, bottom=10.0, right=10.0]",
@@ -30,6 +30,7 @@ export default MetaFor("graph-layout", {development: true})
         "elk.port.size": 12,
       },
       meta: {
+        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
         "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
       },
       state: {

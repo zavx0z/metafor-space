@@ -69,21 +69,41 @@ export const collectEdges = layout => {
     })
   )
 
-  return [...rootEdges, ...stateEdges].map(edge => {
-    const [section] = edge.sections || []
-    const points = [section.startPoint, ...(section.bendPoints || []), section.endPoint]
-
-    const isEastToInput = edge.sources[0].includes("east") && edge.targets[0].includes("input")
-    const isWestConnection = edge.sources[0].includes("west")
-
-    const type = isEastToInput ? "east-input" : isWestConnection ? "west" : "other"
-
-    return {
-      id: edge.id,
-      points,
-      type
-    }
-  })
+  // Внутренние/внешние рёбра теперь не имеют internal, все с тенью
+  return [
+    ...rootEdges.map(edge => {
+      const [section] = edge.sections || []
+      const points = [section.startPoint, ...(section.bendPoints || []), section.endPoint]
+      /** @type {'east-input' | 'west' | 'other'} */
+      let type
+      if (edge.sources[0].includes("east") && edge.targets[0].includes("input")) type = "east-input"
+      else if (edge.sources[0].includes("west")) type = "west"
+      else type = "other"
+      return {
+        id: edge.id,
+        points,
+        type,
+        sources: edge.sources,
+        targets: edge.targets
+      }
+    }),
+    ...stateEdges.map(edge => {
+      const [section] = edge.sections || []
+      const points = [section.startPoint, ...(section.bendPoints || []), section.endPoint]
+      /** @type {'east-input' | 'west' | 'other'} */
+      let type
+      if (edge.sources[0].includes("east") && edge.targets[0].includes("input")) type = "east-input"
+      else if (edge.sources[0].includes("west")) type = "west"
+      else type = "other"
+      return {
+        id: edge.id,
+        points,
+        type,
+        sources: edge.sources,
+        targets: edge.targets
+      }
+    })
+  ].flat()
 }
 
 /**
