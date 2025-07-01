@@ -205,6 +205,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         user-select: none;
         border-top-left-radius: inherit;
         border-top-right-radius: inherit;
+        font-family: "Russo One", 'Courier New', Courier, monospace;
 
         & > div:first-child {
           flex: 1;
@@ -214,6 +215,11 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         }
 
         & > h2 {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
           flex: 1;
           text-align: center;
           margin: 0;

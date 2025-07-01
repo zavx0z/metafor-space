@@ -241,6 +241,10 @@ body {
   text-shadow: 2px 2px 4px rgb(var(--surface-900));
 }
 
+h2 {
+  font-family: "Russo One", sans-serif, "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana;
+}
+
 h1,
 h2,
 h3,

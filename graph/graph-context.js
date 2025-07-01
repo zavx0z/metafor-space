@@ -186,8 +186,14 @@ export default MetaFor('graph-context', {
         position: relative;
         font-weight: 800;
         letter-spacing: 0.02em;
+        font-family: "Russo One", 'Courier New', Courier, monospace;
 
         & h2 {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
           margin: 0;
         }
       }
