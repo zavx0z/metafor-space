@@ -2,50 +2,52 @@
 <html lang="en" class="theme-dark">
 <head>
   <meta charset="UTF-8"/>
-  <title>graph-socket</title>
+  <title>graph-socket storybook</title>
   <link rel="stylesheet" href="/theme/theme.css"/>
   <link rel="stylesheet" href="index.css"/>
   <style>
-    div {
-      background-color: rgba(var(--surface-400));
+    body {
+      flex-direction: column;
+    }
+    .row {
       position: relative;
       display: flex;
-      border-radius: 8px;
+      gap: 16px;
       align-items: center;
-      width: 100px;
-      height: 24px;
+      margin-bottom: 16px;
+      width: 222px;
+    }
+    .label {
+      color: var(--font-color);
+      width: 100%;
+      font-size: 13px;
+      text-align: center;
+      opacity: 0.7;
     }
   </style>
   <script type="module">
     import "./graph-socket.js"
     import {html, render} from "../html/html.js"
 
-    document.body.addEventListener("channel", (ev) => {
-      const {meta, patch} = ( /**@type {CustomEvent}*/ (ev)).detail
-      console.log(meta, patch)
-    })
-    const context = {
+    const base = {
       id: "id meta",
       state: "state meta",
       param: "context parameter",
-      direction: "west",
       parent: "condition"
-    }
-    render(
-      html`
-        <div>
-          <metafor-graph-socket
-          disabled
-            context=${{...context, direction: "west"}}
-          ></metafor-graph-socket>
-          <metafor-graph-socket
-            class="connected"
-            context=${{...context, direction: "east"}}
-          ></metafor-graph-socket>
+    };
+
+    const types = ["string", "number", "boolean", "array", "enum"];
+
+    render(html`
+      ${types.map(type => html`
+        <div class="row">
+          <span class="label">${type}</span>
+          <metafor-graph-socket context=${{...base, direction: "west", type}} data-type="${type}"></metafor-graph-socket>
+          <metafor-graph-socket class="connected" context=${{...base, direction: "east", type}} data-type="${type}"></metafor-graph-socket>
+          <metafor-graph-socket disabled context=${{...base, direction: "west", type}} data-type="${type}"></metafor-graph-socket>
         </div>
-      `,
-      document.body
-    )
+      `)}
+    `, document.body)
   </script>
 </head>
 <body></body>

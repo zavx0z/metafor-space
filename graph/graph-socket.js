@@ -50,11 +50,12 @@ export default MetaFor('graph-socket')
           width: ${size}px;
           height: ${size}px;
           border-radius: 50%;
-          border: 2px solid rgb(var(--surface-400));
+          border: 1px solid rgb(var(--surface-400));
           background: rgb(var(--surface-600));
           cursor: pointer;
           transition: all 0.2s ease;
           box-sizing: border-box;
+          --socket-border-color: rgb(var(--surface-900) / 77%);
         }
 
         :host([data-direction="input"]) {
@@ -90,7 +91,7 @@ export default MetaFor('graph-socket')
           z-index: 10;
         }
 
-                :host(:active) {
+        :host(:active) {
           transform: scale(0.9);
         }
 
@@ -100,61 +101,72 @@ export default MetaFor('graph-socket')
         }
 
         :host([disabled]) {
-          opacity: 0.3;
-          cursor: not-allowed;
-          filter: grayscale(1);
+          opacity: 0.4;
+          filter: grayscale(0.3);
         }
 
         /* Цвета по типам параметров */
+
         :host([data-type="string"]) {
-          background: rgb(var(--primary-500));
-          border-color: rgb(var(--primary-300));
+          background: #6082B6;
+          border: 2px solid var(--socket-border-color);
+          box-shadow: none;
         }
 
         :host([data-type="number"]) {
-          background: rgb(var(--secondary-500));
-          border-color: rgb(var(--secondary-300));
+          background: #B6A160;
+          border: 2px solid var(--socket-border-color);
+          box-shadow: none;
         }
 
         :host([data-type="boolean"]) {
-          background: rgb(var(--warning-500));
-          border-color: rgb(var(--warning-300));
+          background: #60B67A;
+          border: 2px solid var(--socket-border-color);
+          box-shadow: none;
         }
 
         :host([data-type="array"]) {
-          background: rgb(var(--tertiary-500));
-          border-color: rgb(var(--tertiary-300));
+          background: #B660A1;
+          border: 2px solid var(--socket-border-color);
+          box-shadow: none;
         }
 
         :host([data-type="enum"]) {
-          background: rgb(var(--error-400));
-          border-color: rgb(var(--error-200));
+          background: #B66060;
+          border: 2px solid var(--socket-border-color);
+          box-shadow: none;
         }
 
         /* Подключенные сокеты по типам */
+
         :host(.connected[data-type="string"]) {
-          background: rgb(var(--primary-400));
-          box-shadow: 0 0 8px rgb(var(--primary-400));
+          background: rgb(var(--primary-500));
+          border-color: #fff;
+          box-shadow: none;
         }
 
         :host(.connected[data-type="number"]) {
-          background: rgb(var(--secondary-400));
-          box-shadow: 0 0 8px rgb(var(--secondary-400));
+          background: rgb(var(--secondary-500));
+          border-color: #fff;
+          box-shadow: none;
         }
 
         :host(.connected[data-type="boolean"]) {
-          background: rgb(var(--warning-400));
-          box-shadow: 0 0 8px rgb(var(--warning-400));
+          background: rgb(var(--warning-500));
+          border-color: #fff;
+          box-shadow: none;
         }
 
         :host(.connected[data-type="array"]) {
-          background: rgb(var(--tertiary-400));
-          box-shadow: 0 0 8px rgb(var(--tertiary-400));
+          background: rgb(var(--tertiary-500));
+          border-color: #fff;
+          box-shadow: none;
         }
 
         :host(.connected[data-type="enum"]) {
-          background: rgb(var(--error-300));
-          box-shadow: 0 0 8px rgb(var(--error-300));
+          background: rgb(var(--error-500));
+          border-color: #fff;
+          box-shadow: none;
         }
       `
     },
