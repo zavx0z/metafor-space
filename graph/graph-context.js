@@ -33,7 +33,6 @@ export default MetaFor('graph-context', {
       action({element, update, core}) {
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
-          console.log(element.getBoundingClientRect())
           const header = /**@type{HTMLElement} */ (core.header.value)
           const bbHeader = header.getBoundingClientRect()
           update({
@@ -79,13 +78,16 @@ export default MetaFor('graph-context', {
           return
         }
         
-        const layoutContext = layoutState.children?.find(i => i.id === id)
+        const layoutContext = /**@type{import("./graph-layout.t").LayoutNode}*/(
+          layout.children?.find(child => child.id === context.state)?.children?.find(child => child.id === id)
+        )
         if (!layoutContext) {
-          update({error: `Контекст ${id} не найден в состоянии ${context.state}`})
+          update({error: `не найден элемент: ${id} для состояния ${context.state}`})
+          console.error(`не найден элемент: ${id} для состояния ${context.state}`, layout)
           return
         }
         // console.log(layoutContext)
-        update({x: layoutContext.x, y: layoutContext.y})
+        update({x: /**@type{number}*/(layoutContext.x), y: /**@type{number}*/(layoutContext.y)})
       }
     }
   ])

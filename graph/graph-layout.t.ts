@@ -151,6 +151,8 @@ export interface LayoutConfig {
     "elk.layered.spacing.edgeEdgeBetweenLayers": string
     /** Минимальное расстояние между ребрами */
     "elk.spacing.edgeEdge"?: string
+    /** Минимальное расстояние между узлами */
+    "elk.spacing.nodeNode"?: string
     /** Минимальное расстояние между ребром и узлом */
     "elk.spacing.edgeNode"?: string
     /** Способ обработки иерархии: "INCLUDE_CHILDREN" - включить дочерние элементы */
@@ -161,6 +163,8 @@ export interface LayoutConfig {
     "elk.padding": string
     /** Стратегия учета порядка модели: "PREFER_NODES" - предпочитать порядок узлов */
     "considerModelOrder.strategy": string
+    /** Размер портов по умолчанию */
+    "elk.port.size"?: number
   }
   
   /** 
@@ -168,12 +172,8 @@ export interface LayoutConfig {
    * Определяют размещение состояний внутри группы
    */
   meta: {
-    /** Алгоритм размещения: "box" - прямоугольная упаковка, "layered" - слоистый */
-    // "elk.algorithm": string
-    /** Направление размещения элементов: "RIGHT" - слева направо, "DOWN" - сверху вниз */
-    // "elk.direction": string
-    /** Расстояние между соседними узлами: "0" - плотное размещение */
-    "elk.spacing.nodeNode": string
+    /** Стратегия размещения узлов: "NETWORK_SIMPLEX" - симплекс-алгоритм */
+    "elk.layered.nodePlacement.strategy"?: string
   }
   
   /** 
@@ -181,10 +181,6 @@ export interface LayoutConfig {
    * Определяют размещение элементов внутри состояния
    */
   state: {
-    /** Расстояние между узлами состояния: "0" - плотная упаковка */
-    "elk.spacing.nodeNode": string
-    /** Отступы внутри состояния: без отступов для плотной упаковки */
-    "elk.padding": string
     /** Ограничения портов: "FIXED_POS" - фиксированные позиции портов */
     "portConstraints": string
   }
@@ -194,12 +190,7 @@ export interface LayoutConfig {
    * Определяют размещение элементов условий
    */
   condition: {
-    /** Расстояние между узлами условий: "0" - плотная упаковка */
-    "elk.spacing.nodeNode": string
-    /** Отступы внутри условий: без отступов */
-    "elk.padding": string
-    /** Ограничения портов: "FIXED_SIDE" - порты привязаны к сторонам */
-    "portConstraints": string
+    // Пустой объект - используются настройки по умолчанию
   }
   
   /** 
@@ -592,7 +583,7 @@ export declare function createStatePorts(
  *   "idle",
  *   {port: {west: {"port.side": "WEST"}, east: {"port.side": "EAST"}}}
  * )
- * // Result: [{id: "sock/1", layoutOptions: {"port.side": "WEST"}, width: 8, height: 8}]
+ * // Result: [{id: "sock/1", layoutOptions: {"port.side": "WEST"}}]
  * ```
  */
 export declare function createConditionPorts(

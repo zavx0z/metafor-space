@@ -40,7 +40,7 @@ export function getSimpleRoundedPath(points, radius) {
  * @returns {import('./graph-meta.t').Edge[]} Массив рёбер с типами
  */
 export const collectEdges = layout => {
-  const rootEdges = /**@type {import('elkjs').ElkExtendedEdge[]} */ (layout.edges || []).map(edge=>{
+  const rootEdges = /**@type {import('elkjs').ElkExtendedEdge[]} */ (layout.edges || []).map(/**@type{import('elkjs').ElkExtendedEdge}*/edge=>{
     // console.log(edge)
     return edge
   })

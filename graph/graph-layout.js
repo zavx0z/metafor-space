@@ -19,32 +19,20 @@ export default MetaFor("graph-layout", {development: true})
     data: null,
     config: {
       base: {
-        // "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
-        // "elk.spacing.edgeEdge": "36",
+        "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
+        "elk.spacing.edgeEdge": "36",
         "elk.spacing.nodeNode": "0",
-        "elk.spacing.componentComponent": "0",
         "elk.spacing.edgeNode": "20",
         "hierarchyHandling": "INCLUDE_CHILDREN",
         "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
         "elk.padding": "[top=10.0, left=10.0, bottom=10.0, right=10.0]",
-        // "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
         "considerModelOrder.strategy": "PREFER_NODES",
-        "elk.port.size": 12
-        // "org.eclipse.elk.json.shapeCoords": "ROOT",
-        // "org.eclipse.elk.json.edgeCoords": "ROOT",
+        "elk.port.size": 12,
       },
       meta: {
-        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
-        // "elk.spacing.nodeNode": "0",
-        // "elk.spacing.componentComponent": "0",
-        // "elk.layered.spacing.nodeNodeBetweenLayers": "0",
-        // "elk.spacing.edgeNode": "0",
-        // "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
       },
       state: {
-        "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
-        // "elk.spacing.componentComponent": "0",
-        // "elk.spacing.edgeNode": "0",
         "portConstraints": "FIXED_POS",
       },
       condition: {
@@ -89,7 +77,7 @@ export default MetaFor("graph-layout", {development: true})
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
-        console.log(core.data)
+        // console.log(core.data)
         update({current: null})
       },
       to: [{state: "вычисление", when: {current: {isNull: true}}}]
@@ -194,7 +182,6 @@ export default MetaFor("graph-layout", {development: true})
         }
         const id = `${meta.tag}/${meta.index}`
         if (meta.tag === "graph-context") {
-          console.log("graph-context",patch.value)
           entity.states[id]["width"] = patch.value.width
           entity.states[id]["height"] = patch.value.height
           entity.states[id]["x"] = patch.value.x

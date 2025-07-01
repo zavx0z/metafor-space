@@ -92,7 +92,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           width: layout.width,
           height: layout.height
         })
-        console.log(layout)
+        // console.log(layout)
 
       }
     }

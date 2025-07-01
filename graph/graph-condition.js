@@ -59,13 +59,16 @@ export default MetaFor("graph-condition", {development: true})
           update({error: `Состояние ${context.to} не найдено в layout`})
           return
         }
-        
-        const layoutCondition = layoutState.children?.find(i => i.id === id)
+
+        const layoutCondition = /**@type{import("./graph-layout.t").LayoutNode}*/(
+          layout.children?.find(child => child.id === context.to)?.children?.find(child => child.id === id)
+        )
         if (!layoutCondition) {
-          update({error: `Условие ${id} не найдено в состоянии ${context.to}`})
+          update({error: `не найден элемент: ${id}`})
+          console.error(`не найден элемент: ${id}`, layout)
           return
         }
-        update({x: layoutCondition.x, y: layoutCondition.y})
+        update({x: /**@type{number}*/(layoutCondition.x), y: /**@type{number}*/(layoutCondition.y)})
       }
     }
   ])
