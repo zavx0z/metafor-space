@@ -24,8 +24,7 @@ export default MetaFor("graph-param")
     },
     {
       in: "измерение",
-      action({element,context, update}) {
-console.log(context)
+      action({element, update}) {
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
           update({
@@ -55,7 +54,6 @@ console.log(context)
           direction: "west",
           type: context.type
         }}
-        data-direction="input"
         data-type="${context.type}"
       >
       </metafor-graph-socket>
@@ -84,8 +82,6 @@ console.log(context)
           direction: "east",
           type: context.type
         }}
-        class="connected"
-        data-direction="output"
         data-type="${context.type}"
       />
     `,
