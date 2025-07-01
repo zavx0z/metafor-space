@@ -14,14 +14,28 @@ export default MetaFor("input-number")
   .reactions([])
   .view({
     render: ({context, html, update}) => html`
-      <span class="param-title">${context.title}</span>
-      <input type="number" name=${context.name} value=${context.value ?? ''}
+      <span>
+        ${context.title}
+      </span>
+      <input 
+        type="number" 
+        name=${context.name} 
+        value=${context.value ?? ''}
         @input=${/**@param {InputEvent} e*/e => update({value: ((e.target instanceof HTMLInputElement) ? e.target.value : '')})}
       />
     `,
     style: ({css}) => css`
-      :host { display: flex; align-items: center; }
-      .param-title { color: var(--font-color); font-size: 13px; margin: 0 8px; }
+      :host {
+        display: flex;
+        align-items: center;
+      }
+
+      span {
+        color: var(--font-color);
+        font-size: 13px;
+        margin: 0 8px;
+      }
+
       input[type="number"] {
         color: var(--font-color);
         background: none;
@@ -31,6 +45,19 @@ export default MetaFor("input-number")
         padding: 4px 8px;
         outline: none;
         min-width: 40px;
+        text-align: right;
+      }
+
+      /* Убираем стрелочки для Chrome, Safari, Edge */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      /* Убираем стрелочки для Firefox */
+      input[type="number"] {
+        -moz-appearance: textfield;
       }
     `
   }) 
