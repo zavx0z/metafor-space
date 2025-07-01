@@ -22,12 +22,6 @@ export default MetaFor("input-enum")
             const v = (e.target instanceof HTMLSelectElement) ? e.target.value : ''
             if (e.target instanceof HTMLSelectElement) update({value: v})
           }}>
-          <option 
-            value=""
-            disabled 
-            ?selected=${!context.value || !context.options.includes(context.value)}
-          >
-          </option>
           ${context.options.map(opt => html`
             <option
               value=${opt}

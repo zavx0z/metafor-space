@@ -60,16 +60,23 @@ export default MetaFor("graph-nodes", {
                       let op
                       let val
                       if (typeof value === "object" && value !== null) {
-                        return html`${Object.entries(/**@param{[string, string]} param*/([key, value]) => html`
-                          <metafor-graph-operator context=${{
+                        return html`
+                          <metafor-graph-condition context=${{
                             id: snapshot.id,
                             from: transition.in,
                             to: condition.state,
-                            op: key,
-                            value: value
-                          }}>
-                          </metafor-graph-operator>
-                        `)}`
+                            param: key,
+                            type: snapshot.types[key].type
+                          }}> ${html`${Object.entries(/**@param{[string, string]} param*/([key, value]) => html`
+                            <metafor-graph-operator context=${{
+                              id: snapshot.id,
+                              from: transition.in,
+                              to: condition.state,
+                              op: key,
+                              value: value
+                            }}>
+                            </metafor-graph-operator>`)}
+                          </metafor-graph-condition>`}`
                       } else if (value === null) {
                         op = "isNull"
                         value = true
@@ -82,7 +89,8 @@ export default MetaFor("graph-nodes", {
                           id: snapshot.id,
                           from: transition.in,
                           to: condition.state,
-                          param: key
+                          param: key,
+                          type: snapshot.types[key].type
                         }}>
                           <metafor-graph-operator context=${{
                             id: snapshot.id,
@@ -105,7 +113,9 @@ export default MetaFor("graph-nodes", {
                       state: i,
                       param: key,
                       title: snapshot.types[key].title,
-                      value: snapshot.context[key]
+                      value: snapshot.context[key],
+                      options: snapshot.types[key].type === 'enum' ? snapshot.types[key].values : [],
+                      type: snapshot.types[key].type
                     }}></metafor-graph-param>
                   `)}
                 </metafor-graph-context>

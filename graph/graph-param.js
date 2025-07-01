@@ -13,7 +13,7 @@ export default MetaFor("graph-param")
     state: t.string({title: "Название состояния"}),
     param: t.string({title: "Ключ параметра"}),
     title: t.string({title: "Название параметра"}),
-    type: t.enum("string", "number", "boolean", "array", "enum")({title: "Тип параметра", default: "string"}),
+    type: t.enum("string", "number", "boolean", "array", "enum")({title: "Тип параметра"}),
     value: t.string({title: "Значение параметра", nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
     width: t.number({nullable: true}),
@@ -52,6 +52,17 @@ export default MetaFor("graph-param")
   .reactions([])
   .view({
     render: ({context, html}) => html`
+      <metafor-graph-socket
+        context=${{
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "west",
+          type: context.type
+        }}
+      >
+      </metafor-graph-socket>
       ${choose(context.type, [
         ["string", () => html`
           <metafor-input-string context=${{
@@ -83,9 +94,19 @@ export default MetaFor("graph-param")
             name: context.param,
             title: context.title,
             value: context.value,
-            options: context.options
+            options: context.options,
           }}></metafor-input-enum>`],
       ], () => html`<span>Неизвестный тип</span>`)}
+      <metafor-graph-socket
+        context=${{
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "east",
+          type: context.type
+        }}>
+      </metafor-graph-socket>
     `,
     style: ({css}) => css`
       :host {

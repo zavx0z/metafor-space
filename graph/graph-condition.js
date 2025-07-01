@@ -8,6 +8,7 @@ export default MetaFor("graph-condition", {development: true})
     from: t.string({title: "Исходное состояние"}),
     to: t.string({title: "Текущее состояние"}),
     param: t.string({title: "Ключ параметра"}),
+    type: t.enum("string", "number", "boolean", "array", "enum")({title: "Тип параметра"}),
     error: t.string({nullable: true}),
     width: t.number({nullable: true}),
     height: t.number({nullable: true}),
@@ -77,11 +78,10 @@ export default MetaFor("graph-condition", {development: true})
           id: context.id,
           state: context.to,
           param: context.param,
+          type: context.type,
           parent: "condition",
           direction: "west"
         }}
-        data-direction="input"
-        data-active=${false}
       ></metafor-graph-socket>
       <slot></slot>
       <metafor-graph-socket
@@ -89,11 +89,10 @@ export default MetaFor("graph-condition", {development: true})
           id: context.id,
           state: context.to,
           param: context.param,
+          type: context.type,
           parent: "condition",
           direction: "east"
         }}
-        data-direction="output"
-        data-active=${false}
       ></metafor-graph-socket>
     `,
     style: ({css}) => css`
