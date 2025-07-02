@@ -82,8 +82,8 @@ export default MetaFor("input-enum")
       div::after {
         content: "";
         position: absolute;
-        top: 50%;
-        right: 6px;
+        top: 54%;
+        right: 4px;
         width: 0;
         height: 0;
         pointer-events: none;
