@@ -116,12 +116,10 @@ export type ContextData<T extends ContextDefinition> = {
 }
 
 /**
- Типизированные параметры обновления (разрешает null для nullable полей)
+ Типизированные параметры обновления (разрешает null для всех полей)
  */
 export type UpdateParameters<T extends ContextDefinition> = {
-  [K in keyof T]: T[K] extends { nullable: true }
-    ? ExtractType<T[K]> | null | undefined
-    : ExtractType<T[K]> | undefined
+  [K in keyof T]?: ExtractType<T[K]> | null
 }
 
 /**
