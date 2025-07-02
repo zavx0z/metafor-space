@@ -2,10 +2,10 @@ import {MetaFor} from "../metafor.js"
 
 export default MetaFor("test", {description: "Nodes", development: false})
   .context((t) => ({
-    status: t.enum("start", "end")({title: "Status", default: "end"}),
+    status: t.enum("start", "end")({title: "Статус", default: "end"}),
   }))
   .core()
-  .states("начало", "конец")
+  .states("конец", "начало" )
   .transitions("начало", [
     {
       in: "начало",

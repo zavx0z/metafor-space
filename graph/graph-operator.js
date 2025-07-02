@@ -191,7 +191,7 @@ export default MetaFor("graph-operator", {development: true})
   .view({
     render: ({context, html, state}) => state !== "ready" ? nothing : html`
       <span>${context.symbol}</span>
-      <span>${context.title} - ${String(context.value)}</span>
+      <span>${String(context.value)}</span>
     `,
     style: ({css}) => css`
       :host {
