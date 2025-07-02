@@ -19,6 +19,25 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
+/** @type {import("./types/context").StrictContextTypes} */
+const contextTypes = {
+  string: (params = {}) => ({type: "string", ...params}),
+  number: (params = {}) => ({type: "number", ...params}),
+  boolean: (params = {}) => ({type: "boolean", ...params}),
+  array: (params = {}) => ({
+    type: "array", 
+    default: params.default ?? [], 
+    elementType: params.default && params.default.length > 0 
+      ? typeof params.default[0] === "string" ? "string"
+      : typeof params.default[0] === "number" ? "number"
+      : typeof params.default[0] === "boolean" ? "boolean"
+      : "string"
+      : "string",
+    ...params
+  }),
+  enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
+}
+
 /** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
   const {development, description} = conf
@@ -29,23 +48,7 @@ export const MetaFor = (tag, conf = {}) => {
   }
   return {
     context(context) {
-      const contextDefinition = context({
-        string: (params) => ({type: "string", ...params}),
-        number: (params) => ({type: "number", ...params}),
-        boolean: (params) => ({type: "boolean", ...params}),
-        array: (params) => ({
-          type: "array", 
-          default: params.default ?? [], 
-          elementType: params.default && params.default.length > 0 
-            ? typeof params.default[0] === "string" ? "string"
-            : typeof params.default[0] === "number" ? "number"
-            : typeof params.default[0] === "boolean" ? "boolean"
-            : "string"
-            : "string",
-          ...params
-        }),
-        enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
-      })
+      const contextDefinition = context(contextTypes)
       development && import("./core/validator/index.js").then((module) =>
         module.validateContextDefinition({tag, context: contextDefinition}))
       return {

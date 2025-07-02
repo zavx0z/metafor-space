@@ -1,262 +1,193 @@
 /**
- # Определение контекста
+ # Строгая система типов для MetaFor
 
- Используется при создании частицы для определения структуры и типов данных контекста.
- Каждое поле контекста должно иметь явное определение типа через утилиты t.string(), t.number() и т.д.
+ Обеспечивает полную типизацию на этапе компиляции для всех компонентов системы.
  */
-export type ContextDefinition = Record<string, TypeDefinition>
+
+// ============================================================================
+// БАЗОВЫЕ ТИПЫ ОПРЕДЕЛЕНИЙ
+// ============================================================================
 
 /**
- Определение типов контекста
-
- Объединяет все возможные типы определений для полей контекста частицы.
- Используется для валидации и типизации данных контекста.
-
- @property type - Тип данных
- @property title - Описание поля для документации
- @property nullable - Флаг, может ли значение быть null
- @property default - Значение по умолчанию
+ Базовое определение типа с метаданными
  */
-export type TypeDefinition =
-    | StringDefinition
-    | BooleanDefinition
-    | NumberDefinition
-    | StringEnumDefinition<string[]>
-    | NumberEnumDefinition<number[]>
-    | ArrayDefinition<any>
-
-/**
- Данные контекста
-
- Представляет собой реальные значения контекста во время выполнения.
- В отличие от ContextDefinition содержит конкретные JavaScript значения.
- Все поля являются опциональными (Partial) для поддержки частичных обновлений.
-
- @template C - Тип определения контекста
- */
- export type ContextData<C extends ContextDefinition> = {
-    [K in keyof C]: C[K] extends { nullable: true }
-        ? ExtractTypeValue<C[K]> | null
-        : ExtractTypeValue<C[K]>
+type BaseTypeDefinition = {
+  title?: string
+  nullable?: boolean
 }
 
 /**
- Извлекает тип значения из определения типа
-
- @template T - Определение типа
+ Определение строкового типа
  */
-type ExtractTypeValue<T extends TypeDefinition> = T extends StringDefinition
-    ? string
-    : T extends NumberDefinition
-        ? number
-        : T extends BooleanDefinition
-            ? boolean
-            : T extends NumberEnumDefinition<infer V>
-                ? V[number]
-                : T extends StringEnumDefinition<infer V>
-                    ? V[number]
-                    : T extends ArrayDefinition<infer E>
-                        ? E[]
-                        : never
-
-/**
- Тип контекста для уведомлений об изменении значений контекста
-
- @template C - Тип определения контекста
- */
-export type OnUpdateContextData<C extends ContextDefinition> = {
-    [K in keyof C]: C[K] extends { nullable: true }
-        ? ExtractTypeValue<C[K]> | null
-        : ExtractTypeValue<C[K]>
+export type StringDefinition = BaseTypeDefinition & {
+  type: "string"
+  default?: string
 }
 
 /**
- Nullable поля для обновления контекста
+ Определение числового типа
  */
-type UpdateNullableFields<C extends ContextDefinition> = {
-    [K in keyof C as C[K] extends { nullable: true } ? K : never]?: ExtractTypeValue<C[K]> | null
+export type NumberDefinition = BaseTypeDefinition & {
+  type: "number"
+  default?: number
 }
 
 /**
- Обычные поля для обновления контекста  
+ Определение булевого типа
  */
-type UpdateRegularFields<C extends ContextDefinition> = {
-    [K in keyof C as C[K] extends { nullable: true } ? never : K]?: ExtractTypeValue<C[K]>
-}
-
-/**
- Тип параметров для обновления контекста
- Упрощенная версия - принимает любые поля контекста
- */
-export type UpdateParameters<C extends ContextDefinition> = Partial<ContextData<C>>
-
-/**
- Частичный тип контекста - теперь просто алиас
- */
-export type PartialContextData<C extends ContextDefinition> = UpdateParameters<C>
-
-/**
- Функция обновления контекста
- @external
-
- Используется в действиях и методах ядра для обновления данных контекста.
- Принимает частичный объект с новыми значениями контекста.
-
- @template C - Тип контекста
- @property context - Новые данные контекста
- */
-export type Update<C extends ContextDefinition> = (context: UpdateParameters<C>) => void
-
-/**
- Функция обновления контекста
- @internal
-
- Используется в действиях и методах ядра для обновления данных контекста.
- Принимает частичный объект с новыми значениями контекста.
-
- @template C - Тип контекста
- @property ctx - Новые данные контекста
- */
-export type _Update<C extends ContextDefinition> = (ctx: UpdateParameters<C>) => PartialContextData<C>
-
-/**
- Утилиты для создания типов контекста
-
- Предоставляет методы для определения типов полей контекста частицы.
-
- @property string - Создает определение строкового типа
- @property number - Создает определение числового типа
- @property boolean - Создает определение булева типа
- @property array - Создает определение типа массива
- @property enum - Создает определение типа enum
- */
-export type ContextTypes = {
-    string: (params: { title?: string; nullable?: boolean; default?: string }) => StringDefinition
-    number: (params: { title?: string; nullable?: boolean; default?: number }) => NumberDefinition
-    boolean: (params: { title?: string; nullable?: boolean; default?: boolean }) => BooleanDefinition
-    array: <T = string>(params: { title?: string; default?: T[]; nullable?: boolean }) => ArrayDefinition<T>
-    enum: <T extends string | number>(
-        ...values: T[]
-    ) => (options?: { title?: string; nullable?: boolean; default?: T }) => EnumDefinition<T[]>
-}
-
-/**
- Определение типа булева
-
- Используется для создания полей с булевыми значениями в контексте частицы.
-
- @property type - Тип данных "boolean"
- @property title - Описание поля для документации
- @property default - Значение по умолчанию (true/false)
- @property nullable - Флаг, может ли значение быть null
- */
-export type BooleanDefinition = {
-    type: "boolean"
-    title?: string
-    default?: boolean
-    nullable?: boolean
-}
-
-/**
- Определение типа числа
-
- Используется для создания числовых полей в контексте частицы.
-
- @property type - Тип данных "number"
- @property title - Описание поля для документации
- @property default - Числовое значение по умолчанию
- @property nullable - Флаг, может ли значение быть null
- */
-export type NumberDefinition = {
-    type: "number"
-    title?: string
-    default?: number
-    nullable?: boolean
-}
-
-/**
- Определение типа строки
-
- Используется для создания строковых полей в контексте частицы.
-
- @property type - Тип данных "string"
- @property title - Описание поля для документации
- @property default - Строковое значение по умолчанию
- @property nullable - Флаг, может ли значение быть null
- */
-export type StringDefinition = {
-    type: "string"
-    title?: string
-    default?: string
-    nullable?: boolean
+export type BooleanDefinition = BaseTypeDefinition & {
+  type: "boolean"
+  default?: boolean
 }
 
 /**
  Определение типа массива
-
- Используется для создания полей-массивов в контексте частицы.
-
- @template T - Тип элементов массива
- @property type - Тип данных "array"
- @property title - Описание поля для документации
- @property default - Массив значений по умолчанию
- @property nullable - Флаг, может ли значение быть null
- @property elementType - Тип элементов массива
  */
-export type ArrayDefinition<T = any> = {
-    type: "array"
-    title?: string
-    default?: T[]
-    nullable?: boolean
-    elementType?: "string" | "number" | "boolean"
+export type ArrayDefinition<T = any> = BaseTypeDefinition & {
+  type: "array"
+  default?: T[]
+  elementType?: "string" | "number" | "boolean"
 }
 
 /**
- Определение типа enum
-
- @template T - Тип значений enum
+ Определение enum типа
  */
-export type EnumDefinition<T extends readonly (string | number)[]> = {
-    type: "enum"
-    values: T
-    title?: string
-    nullable?: boolean
-    default?: T[number] | null
+export type EnumDefinition<T extends readonly (string | number)[]> = BaseTypeDefinition & {
+  type: "enum"
+  values: T
+  default?: T[number]
 }
 
 /**
- Определение типа enum чисел
-
- @template T - Тип значений enum
- @property values - Значения enum
+ Определение числового enum
  */
-export type NumberEnumDefinition<T extends readonly number[]> = EnumDefinition<T> & {
-    type: "enum"
-    values: T
+export type NumberEnumDefinition<T extends readonly number[]> = EnumDefinition<T>
+
+/**
+ Определение строкового enum
+ */
+export type StringEnumDefinition<T extends readonly string[]> = EnumDefinition<T>
+
+/**
+ Объединение всех типов определений
+ */
+export type TypeDefinition =
+  | StringDefinition
+  | NumberDefinition
+  | BooleanDefinition
+  | ArrayDefinition<any>
+  | NumberEnumDefinition<readonly number[]>
+  | StringEnumDefinition<readonly string[]>
+
+// ============================================================================
+// СТРОГИЕ ТИПЫ КОНТЕКСТА
+// ============================================================================
+
+/**
+ Строгое определение контекста
+ */
+export type StrictContextDefinition = Record<string, TypeDefinition>
+
+/**
+ Извлечение типа значения из определения типа
+ */
+type ExtractStrictType<T extends TypeDefinition> = 
+  T extends StringDefinition
+    ? string
+    : T extends NumberDefinition
+      ? number
+      : T extends BooleanDefinition
+        ? boolean
+        : T extends NumberEnumDefinition<infer V>
+          ? V[number]
+          : T extends StringEnumDefinition<infer V>
+            ? V[number]
+            : T extends ArrayDefinition<infer E>
+              ? E[]
+              : never
+
+/**
+ Строго типизированные данные контекста
+ */
+export type StrictContextData<T extends StrictContextDefinition> = {
+  [K in keyof T]: T[K] extends { nullable: true }
+    ? ExtractStrictType<T[K]> | null
+    : ExtractStrictType<T[K]>
 }
 
 /**
- Определение типа enum строк
-
- @template T - Тип значений enum
- @property values - Значения enum
+ Строго типизированные параметры обновления
  */
-export type StringEnumDefinition<T extends readonly string[]> = EnumDefinition<T> & {
-    type: "enum"
-    values: T
-}
+export type StrictUpdateParameters<T extends StrictContextDefinition> = Partial<StrictContextData<T>>
+
+// ============================================================================
+// СТРОГИЕ УТИЛИТЫ ТИПОВ
+// ============================================================================
 
 /**
- Параметры обновления контекста
- @internal
-
- @template C - Тип контекста
- @property context - Данные контекста для обновления
- @property srcName - Имя источника изменения
- @property funcName - Имя функции вызвавшей изменение
+ Строго типизированные утилиты для создания контекста
  */
-export type UpdateContextParams<C extends ContextDefinition> = {
-    ctx: UpdateParameters<C>
-    srcName?: string
-    funcName?: string
+export type StrictContextTypes = {
+  string: <T extends string = string>(
+    params?: { title?: string; nullable?: boolean; default?: T }
+  ) => StringDefinition & { __inferredType: T }
+  
+  number: <T extends number = number>(
+    params?: { title?: string; nullable?: boolean; default?: T }
+  ) => NumberDefinition & { __inferredType: T }
+  
+  boolean: <T extends boolean = boolean>(
+    params?: { title?: string; nullable?: boolean; default?: T }
+  ) => BooleanDefinition & { __inferredType: T }
+  
+  array: <T = any>(
+    params?: { title?: string; default?: T[]; nullable?: boolean }
+  ) => ArrayDefinition<T> & { __inferredType: T[] }
+  
+  enum: <T extends readonly (string | number)[]>(
+    ...values: T
+  ) => (options?: { title?: string; nullable?: boolean; default?: T[number] }) => 
+    EnumDefinition<T> & { __inferredType: T[number] }
 }
+
+// ============================================================================
+// ФУНКЦИИ ОБНОВЛЕНИЯ
+// ============================================================================
+
+/**
+ Строго типизированная функция обновления контекста
+ */
+export type StrictUpdate<T extends StrictContextDefinition> = (
+  context: StrictUpdateParameters<T>
+) => void
+
+/**
+ Внутренняя строго типизированная функция обновления
+ */
+export type StrictInternalUpdate<T extends StrictContextDefinition> = (
+  ctx: StrictUpdateParameters<T>
+) => StrictUpdateParameters<T>
+
+/**
+ Параметры для внутреннего обновления
+ */
+export type StrictUpdateContextParams<T extends StrictContextDefinition> = {
+  ctx: StrictUpdateParameters<T>
+  srcName?: string
+  funcName?: string
+}
+
+// ============================================================================
+// ОБРАТНАЯ СОВМЕСТИМОСТЬ
+// ============================================================================
+
+/**
+ Совместимость со старой системой типов
+ */
+export type ContextDefinition = StrictContextDefinition
+export type ContextData<T> = StrictContextData<T>
+export type UpdateParameters<T> = StrictUpdateParameters<T>
+export type Update<T> = StrictUpdate<T>
+export type _Update<T> = StrictInternalUpdate<T>
+export type UpdateContextParams<T> = StrictUpdateContextParams<T>
+export type ContextTypes = StrictContextTypes
