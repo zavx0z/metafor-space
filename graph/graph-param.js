@@ -31,8 +31,8 @@ export default MetaFor("graph-param")
         && patch.path === "/context"
         && Object.hasOwn(patch.value, context.param)
       ) {
-        console.log(context.param, patch.value[context.param])
-        // console.log(patch.value[context.param])
+        // console.log(context.param, patch.value[context.param])
+        console.log(patch.value[context.param])
         update({value: patch.value[context.param]})
       }
     })
@@ -77,66 +77,63 @@ export default MetaFor("graph-param")
     }
   ])
   .view({
-    render: ({context, html}) => {
-      console.log("render", context.value)
-      return html`
-        <metafor-graph-socket
-          context=${{
-            id: context.id,
-            state: context.state,
-            param: context.param,
-            parent: "state",
-            direction: "west",
-            type: context.type
+    render: ({context, html}) => html`
+      <metafor-graph-socket
+        context=${{
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "west",
+          type: context.type
+        }}
+      >
+      </metafor-graph-socket>
+      ${choose(context.type, [
+        ["string", () => html`
+          <metafor-input-string context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
           }}
-        >
-        </metafor-graph-socket>
-        ${choose(context.type, [
-          ["string", () => html`
-            <metafor-input-string context=${{
-              name: context.param,
-              title: context.title,
-              value: context.value
-            }}
-            ></metafor-input-string>`],
-          ["number", () => html`
-            <metafor-input-number context=${{
-              name: context.param,
-              title: context.title,
-              value: context.value
-            }}></metafor-input-number>`],
-          ["boolean", () => html`
-            <metafor-input-boolean context=${{
-              name: context.param,
-              title: context.title,
-              value: context.value
-            }}></metafor-input-boolean>`],
-          ["array", () => html`
-            <metafor-input-array context=${{
-              name: context.param,
-              title: context.title,
-              value: context.value
-            }}></metafor-input-array>`],
-          ["enum", () => html`
-            <metafor-input-enum context=${{
-              name: context.param,
-              title: context.title,
-              value: context.value,
-              options: context.options,
+          ></metafor-input-string>`],
+        ["number", () => html`
+          <metafor-input-number context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}></metafor-input-number>`],
+        ["boolean", () => html`
+          <metafor-input-boolean context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}></metafor-input-boolean>`],
+        ["array", () => html`
+          <metafor-input-array context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value
+          }}></metafor-input-array>`],
+        ["enum", () => html`
+          <metafor-input-enum context=${{
+            name: context.param,
+            title: context.title,
+            value: context.value,
+            options: context.options,
           }}></metafor-input-enum>`],
-        ], () => html`<span>Неизвестный тип</span>`)}
-        <metafor-graph-socket
-          context=${{
-            id: context.id,
-            state: context.state,
-            param: context.param,
-            parent: "state",
-            direction: "east",
-            type: context.type
-          }}>
-        </metafor-graph-socket>
-      `
-    },
+      ], () => html`<span>Неизвестный тип</span>`)}
+      <metafor-graph-socket
+        context=${{
+          id: context.id,
+          state: context.state,
+          param: context.param,
+          parent: "state",
+          direction: "east",
+          type: context.type
+        }}>
+      </metafor-graph-socket>
+    `,
     style: ({css}) => css`
       :host {
         background-color: rgba(var(--surface-900));

@@ -13,8 +13,8 @@ export default MetaFor("input-enum")
   .transitions("рендер", [])
   .reactions([])
   .view({
-    render: ({context, html, update}) => {
-      console.log(context.value)
+    render: ({context, html, update, repeat}) => {
+      // console.log(context.value)
       return html`
         <span>${context.title}</span>
         <div>
@@ -24,14 +24,14 @@ export default MetaFor("input-enum")
               const v = (e.target instanceof HTMLSelectElement) ? e.target.value : ''
               if (e.target instanceof HTMLSelectElement) update({value: v})
             }}>
-            ${context.options.map(opt => html`
+            ${repeat(context.options, i => i, (opt => html`
               <option
                 value=${opt}
                 ?selected=${context.value === opt}
               >
                 ${opt}
               </option>
-            `)}
+            `))}
           </select>
         </div>
       `

@@ -7,7 +7,7 @@ const config = {
     // "graph-state",
     // "graph-context",
     // "graph-layout"
-    // "test",
+    "test",
     "input-enum"
   ],
   index: 1,
