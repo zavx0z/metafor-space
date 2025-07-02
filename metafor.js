@@ -13,6 +13,7 @@ let devChannel = null
  * @param {BroadcastChannel} channel - Канал для разработки
  */
 const setDevChannel = (channel) => {
+  if (devChannel) return
   devChannel = channel
   devChannel.onmessage = ({data}) => console.warn(`${data.id}: ${data.message}`)
   console.debug("Режим разработки активирован")
@@ -353,6 +354,7 @@ function createMeta(
         const result = action({
           context: this.context,
           element: this,
+          shadow: this.#shadow,
           update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
           core: this.#core,
         })
@@ -433,6 +435,7 @@ function createMeta(
           cancelable: false,
           composed: true
         }))
+        // console.log(patches.value)
         if (debug) log(message, this.#core)
       }
       /**@param{Event} ev*/

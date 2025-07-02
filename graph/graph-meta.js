@@ -123,7 +123,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         box-sizing: border-box;
         border-radius: 7px;
         opacity: 0;
-        transition: opacity .4s ease-in-out;
+        transition: opacity 222ms ease-in-out;
       }
 
       :host([data-state="позиционирование"]) {
@@ -169,7 +169,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background-color: rgba(var(--surface-500) / var(--background-alpha));;
+        background-color: rgba(var(--surface-500) / var(--background-alpha));
         box-sizing: border-box;
         user-select: none;
         border-top-left-radius: inherit;

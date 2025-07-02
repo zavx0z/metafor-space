@@ -7,8 +7,8 @@ const config = {
     // "graph-state",
     // "graph-context",
     // "graph-layout"
-    "test",
-    "input-enum"
+    // "test",
+    // "input-enum"
   ],
   index: 1,
   patch: [

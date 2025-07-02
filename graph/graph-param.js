@@ -32,7 +32,7 @@ export default MetaFor("graph-param")
         && Object.hasOwn(patch.value, context.param)
       ) {
         // console.log(context.param, patch.value[context.param])
-        console.log(patch.value[context.param])
+        // console.log(patch.value[context.param])
         update({value: patch.value[context.param]})
       }
     })

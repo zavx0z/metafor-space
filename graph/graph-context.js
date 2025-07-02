@@ -29,12 +29,14 @@ export default MetaFor("graph-context", {
   .transitions("рендер", [
     {
       in: "рендер",
+      action({element}){
+      },
       to: [{state: "измерение", when: {error: null}}],
     },
     {
       in: "измерение",
       action({element, update}) {
-        requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
           update({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
         })
@@ -107,9 +109,8 @@ export default MetaFor("graph-context", {
         <h2 class="noselect">${context.state}</h2>
       </header>
       <section>
-        <slot></slot>
+        <slot>empty</slot>
       </section>
-      <section></section>
     `,
     style: ({css}) => css`
       :host:before {
@@ -125,6 +126,34 @@ export default MetaFor("graph-context", {
         z-index: -2;
         transition: box-shadow 0.3s ease-in-out;
         box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 -3px 0 inset;
+      }
+
+      :host {
+        backdrop-filter: var(--backdrop-filter-blur);
+        -webkit-backdrop-filter: var(--backdrop-filter-blur);
+        -moz-backdrop-filter: var(--backdrop-filter-blur);
+        -o-backdrop-filter: var(--backdrop-filter-blur);
+        -ms-backdrop-filter: var(--backdrop-filter-blur);
+
+        --background-color: rgba(var(--surface-700) / var(--background-alpha));
+
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        min-width: max-content;
+        border-radius: var(--node-border-radius);
+        transition: box-shadow 0.3s ease-in-out;
+        box-sizing: border-box;
+
+
+        & > section {
+          background: var(--background-color);
+          padding: 8px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          background-color: var(--background-color);
+        }
       }
 
       :host:after {
@@ -143,60 +172,17 @@ export default MetaFor("graph-context", {
         z-index: -1;
       }
 
-      :host {
-        backdrop-filter: var(--backdrop-filter-blur);
-        -webkit-backdrop-filter: var(--backdrop-filter-blur);
-        -moz-backdrop-filter: var(--backdrop-filter-blur);
-        -o-backdrop-filter: var(--backdrop-filter-blur);
-        -ms-backdrop-filter: var(--backdrop-filter-blur);
-
-        --background-color: rgba(var(--surface-600) / var(--background-alpha));
-
-        position: fixed;
-        display: flex;
-        flex-direction: column;
-        min-width: max-content;
-        border-radius: var(--node-border-radius);
-        transition: box-shadow 0.3s ease-in-out;
-        box-sizing: border-box;
-
-        & > section {
-          background: var(--background-color);
-        }
-      }
-
-      :host:has(> :nth-child(2)) > header {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-      }
-
-      :host:has(> :nth-child(2)) > header::before {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-      }
-
-      :host:has(> :nth-child(2)) > section {
-        padding: 8px 8px 0 8px;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        background-color: var(--background-color);
-      }
-
-      :host:has(> :nth-child(2)) > section:last-child {
-        padding-bottom: 0;
-        border-bottom-left-radius: var(--node-border-radius);
-        border-bottom-right-radius: var(--node-border-radius);
-      }
-
       header {
         padding: 8px 24px;
-        background-color: rgba(var(--surface-400) / var(--background-alpha));
+        background-color: rgba(var(--surface-500) / var(--background-alpha));
         border-radius: var(--node-border-radius);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
         position: relative;
         font-weight: 800;
         letter-spacing: 0.02em;
         font-family: "Russo One", "Courier New", Courier, monospace;
+        transition: background-color 0.4s;
 
         & h2 {
           -webkit-touch-callout: none;
@@ -216,22 +202,46 @@ export default MetaFor("graph-context", {
           height: 12px;
           pointer-events: none;
           z-index: 1;
-          border-bottom-left-radius: 12px;
-          border-bottom-right-radius: 12px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
           box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.18), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
           opacity: 0.7;
         }
       }
 
-      :host([data-state="активно"]) {
-        & header {
-          background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
-          box-shadow: 0 0 0 2px rgb(var(--primary-500)), 0 2px 8px 0 rgba(59, 130, 246, 0.1);
-          border: 2px solid rgb(var(--primary-500));
-          color: rgb(var(--primary-900));
-          box-sizing: border-box;
-        }
+      :host(:hover) > header {
+        background-color: rgba(var(--surface-600) / 1);
       }
 
+      :host([data-state="активно"]) header {
+        background-color: rgba(var(--surface-500) / 1);
+        color: rgb(var(--primary-50));
+
+      }
     `,
   })
+//:host:has(::slotted(*:nth-child(1))) > header  { background-color: green }
+
+// :host:has(> :nth-child(2)) > header {
+
+// }
+//
+// :host:has(> :nth-child(2)) > header::before {
+//   border-bottom-left-radius: 0;
+//   border-bottom-right-radius: 0;
+// }
+//
+// :host:has(> :nth-child(2)) > section {
+//   padding: 8px;
+//   display: flex;
+//   flex-direction: column;
+//   position: relative;
+//   background-color: var(--background-color);
+// }
+
+
+//:host:has(> :nth-child(1)) > section:last-child {
+//  padding-bottom: 0;
+//  border-bottom-left-radius: var(--node-border-radius);
+//  border-bottom-right-radius: var(--node-border-radius);
+//}

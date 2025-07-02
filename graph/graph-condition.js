@@ -142,7 +142,7 @@ export default MetaFor("graph-condition", {development: true})
         align-items: center;
         gap: 2px;
         min-width: max-content;
-        height: fit-content;
+        height: auto;
       }
     `
   })

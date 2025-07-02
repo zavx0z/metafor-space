@@ -40,7 +40,7 @@ export default MetaFor("input-enum")
       :host {
         display: flex;
         align-items: center;
-        text-wrap-mode: nowrap;
+        text-wrap: nowrap;
       }
 
       span {
@@ -73,8 +73,16 @@ export default MetaFor("input-enum")
         -webkit-appearance: none;
         -moz-appearance: none;
         cursor: pointer;
+        direction: rtl;
         text-align: right;
+
+        /* Safari через webkit-specific свойство */
+
+        &::-webkit-select-placeholder {
+          text-align: left;
+        }
       }
+
 
       select:focus, select:hover {
         border-color: rgb(var(--surface-600));

@@ -12,7 +12,7 @@ export default MetaFor("test", {description: "Nodes", development: false})
       action: ({update}) => new Promise((resolve) => {
         setTimeout(() => {
           update({status: "end"})
-          return resolve('')
+          return resolve()
         }, 4000)
       }),
       to: [{state: "конец", when: {status: "end"}}],
@@ -32,6 +32,4 @@ export default MetaFor("test", {description: "Nodes", development: false})
   ])
   .reactions([])
   .view({
-    render: ({html, context}) => html`
-    `
   })
