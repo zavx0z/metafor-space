@@ -129,19 +129,3 @@ export type OnTransitionCallBack<S extends string> = (
   preview: S | undefined,
   current: S | undefined
 ) => void
-
-/**
- Коллбек обрабатывающий переходы между состояниями с доступом к снимку
-
- @template S - Тип состояний
- @template C - Тип контекста
- @template I - Тип ядра
- @param preview - Предыдущее состояние
- @param current - Текущее состояние
- @param snapshot - Снимок состояния актора
- */
-export type CreateOnTransitionCallBack<S extends string, C extends ContextDefinition, I extends Record<string, any>> = (
-  preview: S | undefined,
-  current: S | undefined,
-  snapshot: Snapshot<S, C, I>
-) => void

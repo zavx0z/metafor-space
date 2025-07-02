@@ -1,5 +1,5 @@
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
-import type {Core, CoreData, CoreObj} from "./core.ts"
+import type {Core, CoreObj} from "./core.ts"
 import type {MetaDataMessage, PatchMetaFor} from "./meta.ts"
 
 /**

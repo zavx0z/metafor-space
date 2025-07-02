@@ -92,7 +92,7 @@ export const MetaFor = (tag, conf = {}) => {
  @template {import('./types/context').ContextDefinition} C - контекст
  @template {CoreObj} I - ядро
 
- @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
+ @param {import("./metafor.t").FabricCallbackCreateFuncHelper<S, C, I>} parameters
  @return {Meta<S, C>}
  */
 function createMeta(
@@ -347,7 +347,7 @@ function createMeta(
 
       /**
        * Выполнение действия с последующим отключением блокировки переходов
-       * @param {import('./types/actions').Action<C, I>} action
+       * @param {import('./metafor.t').Action<C, I>} action
        */
       #runAction = (action) => {
         const result = action({

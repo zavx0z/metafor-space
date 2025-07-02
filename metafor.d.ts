@@ -3,7 +3,6 @@ import type {Transitions} from "./types/transitions.ts"
 import type {CoreDefinition, CoreObj} from "./types/core.ts"
 import type {Reactions} from "./types/reaction.ts"
 import type {ViewDefinition} from "./types/view.ts"
-import type {CreateParams} from "./types/create.ts"
 import type {Snapshot, OnUpdate, OnTransition} from "./types/meta.ts"
 
 export {BroadcastMessage, PatchMetaFor} from "./types/meta.ts"

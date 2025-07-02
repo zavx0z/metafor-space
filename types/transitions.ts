@@ -1,4 +1,3 @@
-import type {Action} from "./actions.ts"
 import type {
   ArrayDefinition,
   BooleanDefinition,
@@ -9,6 +8,7 @@ import type {
   StringEnumDefinition
 } from "./context.ts";
 import type {CoreObj} from "./core.ts";
+import type {Action} from "../metafor.t.ts"
 
 /** # Переходы
 

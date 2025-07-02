@@ -44,7 +44,7 @@ export function createWebSocketConnection(options) {
  @template {import("../types/context").ContextDefinition} C
  @template {Record<string, any>} I
  @param {Meta<S, C>} particle
- @param {import("../types/create").CreateParams<I, S, C>['debug']} options
+ @param {*} options
  */
 export default function (particle, options) {
   let ws
