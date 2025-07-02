@@ -2,10 +2,10 @@ const config = {
   collapseAll: true,
   /**@type{Array<string>}*/
   tag: [
-    // "graph-meta"
-    "graph-param"
+    "graph-meta",
+    // "graph-param"
     // "graph-state",
-    // "graph-layout"
+    "graph-layout"
   ],
   patch: [
     "add",
