@@ -33,7 +33,17 @@ export const MetaFor = (tag, conf = {}) => {
         string: (params) => ({type: "string", ...params}),
         number: (params) => ({type: "number", ...params}),
         boolean: (params) => ({type: "boolean", ...params}),
-        array: (params) => ({type: "array", default: params.default ?? [], ...params}),
+        array: (params) => ({
+          type: "array", 
+          default: params.default ?? [], 
+          elementType: params.default && params.default.length > 0 
+            ? typeof params.default[0] === "string" ? "string"
+            : typeof params.default[0] === "number" ? "number"
+            : typeof params.default[0] === "boolean" ? "boolean"
+            : "string"
+            : "string",
+          ...params
+        }),
         enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
       })
       development && import("./core/validator/index.js").then((module) =>

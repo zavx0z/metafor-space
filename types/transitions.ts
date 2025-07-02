@@ -115,8 +115,8 @@ export type When<C extends ContextDefinition> = Partial<{
           ? CondNumber
           : C[K] extends BooleanDefinition
             ? CondBoolean
-            : C[K] extends ArrayDefinition
-              ? CondArray
+            : C[K] extends ArrayDefinition<infer T>
+              ? CondArray<T>
               : never
 }>
 

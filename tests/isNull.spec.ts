@@ -192,11 +192,11 @@ describe("isNull триггер", () => {
     const tag = Bun.randomUUIDv7()
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
       .core()
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",

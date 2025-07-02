@@ -23,7 +23,7 @@ export type TypeDefinition =
     | NumberDefinition
     | StringEnumDefinition<string[]>
     | NumberEnumDefinition<number[]>
-    | ArrayDefinition
+    | ArrayDefinition<any>
 
 /**
  Данные контекста
@@ -55,8 +55,8 @@ type ExtractTypeValue<T extends TypeDefinition> = T extends StringDefinition
                 ? V[number]
                 : T extends StringEnumDefinition<infer V>
                     ? V[number]
-                    : T extends ArrayDefinition
-                        ? any[]
+                    : T extends ArrayDefinition<infer E>
+                        ? E[]
                         : never
 
 /**
@@ -86,15 +86,12 @@ type UpdateRegularFields<C extends ContextDefinition> = {
 
 /**
  Тип параметров для обновления контекста
-
- @template C - Тип определения контекста
+ Упрощенная версия - принимает любые поля контекста
  */
-export type UpdateParameters<C extends ContextDefinition> = UpdateNullableFields<C> & UpdateRegularFields<C>
+export type UpdateParameters<C extends ContextDefinition> = Partial<ContextData<C>>
 
 /**
- Частичный тип контекста
-
- @template C - Тип определения контекста
+ Частичный тип контекста - теперь просто алиас
  */
 export type PartialContextData<C extends ContextDefinition> = UpdateParameters<C>
 
@@ -108,7 +105,7 @@ export type PartialContextData<C extends ContextDefinition> = UpdateParameters<C
  @template C - Тип контекста
  @property context - Новые данные контекста
  */
-export type Update<C extends ContextDefinition> = (context: UpdateParameters<C> | Partial<Record<keyof C, any>>) => void
+export type Update<C extends ContextDefinition> = (context: UpdateParameters<C>) => void
 
 /**
  Функция обновления контекста
@@ -137,7 +134,7 @@ export type ContextTypes = {
     string: (params: { title?: string; nullable?: boolean; default?: string }) => StringDefinition
     number: (params: { title?: string; nullable?: boolean; default?: number }) => NumberDefinition
     boolean: (params: { title?: string; nullable?: boolean; default?: boolean }) => BooleanDefinition
-    array: (params: { title?: string; default?: any[]; nullable?: boolean }) => ArrayDefinition
+    array: <T = string>(params: { title?: string; default?: T[]; nullable?: boolean }) => ArrayDefinition<T>
     enum: <T extends string | number>(
         ...values: T[]
     ) => (options?: { title?: string; nullable?: boolean; default?: T }) => EnumDefinition<T[]>
@@ -199,16 +196,19 @@ export type StringDefinition = {
 
  Используется для создания полей-массивов в контексте частицы.
 
+ @template T - Тип элементов массива
  @property type - Тип данных "array"
  @property title - Описание поля для документации
  @property default - Массив значений по умолчанию
  @property nullable - Флаг, может ли значение быть null
+ @property elementType - Тип элементов массива
  */
-export type ArrayDefinition = {
+export type ArrayDefinition<T = any> = {
     type: "array"
     title?: string
-    default?: string[] | number[]
+    default?: T[]
     nullable?: boolean
+    elementType?: "string" | "number" | "boolean"
 }
 
 /**
@@ -255,7 +255,7 @@ export type StringEnumDefinition<T extends readonly string[]> = EnumDefinition<T
  @property srcName - Имя источника изменения
  @property funcName - Имя функции вызвавшей изменение
  */
-export type UpdateContextParams<C extends Record<string, any>> = {
+export type UpdateContextParams<C extends ContextDefinition> = {
     ctx: UpdateParameters<C>
     srcName?: string
     funcName?: string

@@ -5,7 +5,7 @@ import {createRef} from "../html/directives/ref.js"
 export default MetaFor("graph-meta", {development: true, description: "Node"})
   .context(t => ({
     id: t.string({title: "ID meta"}),
-    width: t.number({nullable: true}),
+    width: t.number({default: 0}),
     height: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true})
   }))

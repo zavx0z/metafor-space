@@ -4,7 +4,7 @@ export default MetaFor("input-boolean")
   .context(t => ({
     name: t.string({}),
     title: t.string({}),
-    value: t.string({nullable: true}),
+    value: t.boolean({nullable: true}),
     error: t.string({nullable: true}),
   }))
   .core()
@@ -17,10 +17,10 @@ export default MetaFor("input-boolean")
       <label class="switch-vision-pro">
         <input type="checkbox"
           name=${context.name}
-          .checked=${String(context.value) === "true"}
+          .checked=${Boolean(context.value)}
           @change=${/**@param {Event} e*/e => {
             const v = (e.target instanceof HTMLInputElement) ? e.target.checked : false
-            update({value: v ? "true" : "false"})
+            update({value: v})
           }}
         />
         <span class="slider"></span>
