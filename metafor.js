@@ -439,20 +439,12 @@ function createMeta(
       #reactionCustomEventCb = (ev) => {
         const {meta, patch} = /**@type {import("./metafor").BroadcastMessage}*/(/**@type{CustomEvent}*/(ev).detail)
         if (meta.tag === tag && meta.index === this.index) return
-        this.#reactionCb({meta, patch})
+
         reactions.forEach((reaction) => {
-          if (reaction.filter({meta, patch, context: this.context})) {
-            reaction.action({
-              id: this.id,
-              patch, meta,
-              context: this.context,
-              core: this.#core,
-              update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
-            })
-            if (reaction.block) {
-              ev.preventDefault()
-              ev.stopPropagation()
-            }
+          this.#reactionCb({meta, patch})
+          if (reaction.block) {
+            ev.preventDefault()
+            ev.stopPropagation()
           }
         })
       }
@@ -462,17 +454,15 @@ function createMeta(
       }
 
       /**@param {import("./metafor").BroadcastMessage} message */
-      #reactionCb = ({meta, patch}) => reactions.forEach((reaction) => {
-        if (reaction.filter({meta, patch, context: this.context})) {
-          reaction.action({
-            id: this.id,
-            patch, meta,
-            context: this.context,
-            core: this.#core,
-            update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
-          })
-        }
-      })
+      #reactionCb = ({meta, patch}) => reactions.forEach((reaction) =>
+        (reaction.filter({meta, patch, context: this.context}))
+        && reaction.action({
+          id: this.id,
+          patch, meta,
+          context: this.context,
+          core: this.#core,
+          update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
+        }))
     }
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
