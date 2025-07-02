@@ -3,10 +3,23 @@ import type {Transitions} from "./transitions.ts"
 import type {CoreObj} from "./core.ts"
 
 /**
+ Патч для применения к актору
+
+ @property path - Путь к актору
+ @property op - Операция
+ @property value - Значение
+ */
+export type PatchMetaFor = {
+  path: string
+  op: "add" | "remove" | "replace" | "move" | "copy" | "test"
+  value: any
+}
+
+/**
  Снимок состояния актора
 
  @template S - Тип состояния
- @template C - Тип контекста  
+ @template C - Тип контекста
  @template I - Тип ядра
 
  @property id - Идентификатор актора
@@ -34,7 +47,7 @@ export type Snapshot<S extends string, C extends ContextDefinition, I extends Co
  Сообщение для обмена данными между акторами
 
  @property meta - Метаданные сообщения
- @property meta.tag - Имя типа актора  
+ @property meta.tag - Имя типа актора
  @property meta.index - Индекс экземпляра актора
  @property meta.func - Имя функции, инициировавшей сообщение
  @property meta.target - Цель сообщения

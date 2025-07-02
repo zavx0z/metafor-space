@@ -41,20 +41,19 @@ export default MetaFor("graph-nodes", {
           update({error: `Отсутствует снимок meta - ${context.nodes[context.nodes.length]}`})
           return
         }
-        /**@type{SnapshotMetaForAny}*/
+        /**@type{import("../types/meta.ts").Snapshot<any, any, any>}*/
         const snapshot = core.snapshot
         render(html`
           <metafor-graph-meta context=${{
             id: snapshot.id
-          }} class="backdrop"
-          >
+          }}>
             ${snapshot.states.map(i => html`
               <metafor-graph-state context=${{
                 id: snapshot.id,
                 state: i
               }}>
                 ${snapshot.transitions.map((transition) => transition.to
-                  .filter(c => c.state === i)
+                  .filter(t => t.state === i)
                   .map(condition =>
                     Object.entries(condition.when).map(([key, value]) => {
                       let op

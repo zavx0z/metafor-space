@@ -1,6 +1,6 @@
 import type {ContextData, ContextDefinition, Update} from "./context.ts"
-import type {Core, CoreData} from "./core.ts"
-import type {MetaDataMessage} from "./meta.ts"
+import type {Core, CoreData, CoreObj} from "./core.ts"
+import type {MetaDataMessage, PatchMetaFor} from "./meta.ts"
 
 /**
  Параметры действия реакции
@@ -8,7 +8,7 @@ import type {MetaDataMessage} from "./meta.ts"
  @template C - Тип контекста актора
  @template I - Тип ядра актора
  */
-type ReactionActionParam<C extends ContextDefinition, I extends Record<string, unknown>> = {
+type ReactionActionParam<C extends ContextDefinition, I extends CoreObj> = {
   id: string
   patch: PatchMetaFor
   context: ContextData<C>
@@ -41,7 +41,7 @@ type ReactionFilterParam<C extends ContextDefinition> = {
  @property filter - Функция фильтрации сообщений
  @property action - Функция, выполняемая при срабатывании фильтра
  */
-export type Reaction<C extends ContextDefinition, I extends Record<string, unknown>> = {
+export type Reaction<C extends ContextDefinition, I extends CoreObj> = {
   title: string
   block?: boolean
   // path?: string
@@ -69,4 +69,4 @@ export type Reaction<C extends ContextDefinition, I extends Record<string, unkno
  @template C - Тип контекста актора
  @template I - Тип ядра актора
  */
-export type Reactions<C extends ContextDefinition, I extends Record<string, unknown>> = Array<Reaction<C, I>>
+export type Reactions<C extends ContextDefinition, I extends CoreObj> = Array<Reaction<C, I>>

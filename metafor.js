@@ -1,5 +1,4 @@
-/** @typedef {import("./types/context").ContextDefinition} ContextDefinition
- * @typedef {import("./types/core").CoreObj} CoreObj */
+/** @typedef {import("./types/core").CoreObj} CoreObj */
 import {html, render} from "./html/html.js"
 import {ref} from "./html/directives/ref.js"
 import {repeat} from "./html/directives/repeat.js"
@@ -19,25 +18,6 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/** @type {import("./types/context").StrictContextTypes} */
-const contextTypes = {
-  string: (params = {}) => ({type: "string", ...params}),
-  number: (params = {}) => ({type: "number", ...params}),
-  boolean: (params = {}) => ({type: "boolean", ...params}),
-  array: (params = {}) => ({
-    type: "array", 
-    default: params.default ?? [], 
-    elementType: params.default && params.default.length > 0 
-      ? typeof params.default[0] === "string" ? "string"
-      : typeof params.default[0] === "number" ? "number"
-      : typeof params.default[0] === "boolean" ? "boolean"
-      : "string"
-      : "string",
-    ...params
-  }),
-  enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
-}
-
 /** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
   const {development, description} = conf
@@ -48,7 +28,23 @@ export const MetaFor = (tag, conf = {}) => {
   }
   return {
     context(context) {
-      const contextDefinition = context(contextTypes)
+      const contextDefinition = context({
+        string: (params = {}) => ({type: "string", ...params}),
+        number: (params = {}) => ({type: "number", ...params}),
+        boolean: (params = {}) => ({type: "boolean", ...params}),
+        array: (params = {}) => ({
+          type: "array",
+          default: params.default ?? [],
+          elementType: params.default && params.default.length > 0
+            ? typeof params.default[0] === "string" ? "string"
+              : typeof params.default[0] === "number" ? "number"
+                : typeof params.default[0] === "boolean" ? "boolean"
+                  : "string"
+            : "string",
+          ...params
+        }),
+        enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
+      })
       development && import("./core/validator/index.js").then((module) =>
         module.validateContextDefinition({tag, context: contextDefinition}))
       return {
@@ -93,7 +89,7 @@ export const MetaFor = (tag, conf = {}) => {
 
 /**
  @template {string} S - состояние
- @template {ContextDefinition} C - контекст
+ @template {import('./types/context').ContextDefinition} C - контекст
  @template {CoreObj} I - ядро
 
  @param {import("./types/create").FabricCallbackCreateFuncHelper<S, C, I>} parameters
@@ -309,7 +305,7 @@ function createMeta(
           this.#updateListeners.forEach((listener) => listener(updCtx, srcName, funcName))
           this.#sendPatches({path: `/context`, op: "replace", value: updCtx})
         }
-        return updCtx
+        return /** @type {Partial<import("./types/context").ContextData<C>>} */ (updCtx)
       }
 
       /** @param {import("./types/context").PartialContextData<C>} upd */
@@ -427,7 +423,7 @@ function createMeta(
         this.#channel.postMessage(message)
         if (debug) log(message, this.#core)
       }
-      /**@param {PatchMetaFor} patches*/
+      /**@param {import("./types/meta.ts").PatchMetaFor} patches*/
       #sendPatches = (patches) => {
         /**@type {import("./metafor").BroadcastMessage}*/
         const message = {meta: this.#meta, patch: patches}
@@ -483,10 +479,11 @@ function createMeta(
 }
 
 /**
- @template {ContextDefinition} C
+ @template {import('./types/context').ContextDefinition} C
+
  @param {import('./types/transitions').When<C>} when
  @param {import('./types/context').ContextData<C>} context
- @param {ContextDefinition} types
+ @param {import('./types/context').ContextDefinition} types
  */
 export function conditions(when, context, types) {
   for (const key in when) {

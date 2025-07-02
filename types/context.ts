@@ -80,18 +80,18 @@ export type TypeDefinition =
   | StringEnumDefinition<readonly string[]>
 
 // ============================================================================
-// СТРОГИЕ ТИПЫ КОНТЕКСТА
+// ТИПЫ КОНТЕКСТА
 // ============================================================================
 
 /**
- Строгое определение контекста
+ Определение контекста
  */
-export type StrictContextDefinition = Record<string, TypeDefinition>
+export type ContextDefinition = Record<string, TypeDefinition>
 
 /**
  Извлечение типа значения из определения типа
  */
-type ExtractStrictType<T extends TypeDefinition> = 
+type ExtractType<T extends TypeDefinition> = 
   T extends StringDefinition
     ? string
     : T extends NumberDefinition
@@ -107,47 +107,56 @@ type ExtractStrictType<T extends TypeDefinition> =
               : never
 
 /**
- Строго типизированные данные контекста
+ Типизированные данные контекста
  */
-export type StrictContextData<T extends StrictContextDefinition> = {
+export type ContextData<T extends ContextDefinition> = {
   [K in keyof T]: T[K] extends { nullable: true }
-    ? ExtractStrictType<T[K]> | null
-    : ExtractStrictType<T[K]>
+    ? ExtractType<T[K]> | null
+    : ExtractType<T[K]>
 }
 
 /**
- Строго типизированные параметры обновления
+ Типизированные параметры обновления (разрешает null для nullable полей)
  */
-export type StrictUpdateParameters<T extends StrictContextDefinition> = Partial<StrictContextData<T>>
+export type UpdateParameters<T extends ContextDefinition> = {
+  [K in keyof T]: T[K] extends { nullable: true }
+    ? ExtractType<T[K]> | null | undefined
+    : ExtractType<T[K]> | undefined
+}
+
+/**
+ Частичные данные контекста (алиас для обратной совместимости)
+ */
+export type PartialContextData<T extends ContextDefinition> = Partial<ContextData<T>>
 
 // ============================================================================
-// СТРОГИЕ УТИЛИТЫ ТИПОВ
+// УТИЛИТЫ ТИПОВ
 // ============================================================================
 
 /**
- Строго типизированные утилиты для создания контекста
+ Типизированные утилиты для создания контекста
  */
-export type StrictContextTypes = {
+export type ContextTypes = {
   string: <T extends string = string>(
     params?: { title?: string; nullable?: boolean; default?: T }
-  ) => StringDefinition & { __inferredType: T }
+  ) => StringDefinition
   
   number: <T extends number = number>(
     params?: { title?: string; nullable?: boolean; default?: T }
-  ) => NumberDefinition & { __inferredType: T }
+  ) => NumberDefinition
   
   boolean: <T extends boolean = boolean>(
     params?: { title?: string; nullable?: boolean; default?: T }
-  ) => BooleanDefinition & { __inferredType: T }
+  ) => BooleanDefinition
   
   array: <T = any>(
     params?: { title?: string; default?: T[]; nullable?: boolean }
-  ) => ArrayDefinition<T> & { __inferredType: T[] }
+  ) => ArrayDefinition<T>
   
   enum: <T extends readonly (string | number)[]>(
     ...values: T
   ) => (options?: { title?: string; nullable?: boolean; default?: T[number] }) => 
-    EnumDefinition<T> & { __inferredType: T[number] }
+    EnumDefinition<T>
 }
 
 // ============================================================================
@@ -155,39 +164,24 @@ export type StrictContextTypes = {
 // ============================================================================
 
 /**
- Строго типизированная функция обновления контекста
+ Типизированная функция обновления контекста
  */
-export type StrictUpdate<T extends StrictContextDefinition> = (
-  context: StrictUpdateParameters<T>
+export type Update<T extends ContextDefinition> = (
+  context: Partial<UpdateParameters<T>>
 ) => void
 
 /**
- Внутренняя строго типизированная функция обновления
+ Внутренняя типизированная функция обновления
  */
-export type StrictInternalUpdate<T extends StrictContextDefinition> = (
-  ctx: StrictUpdateParameters<T>
-) => StrictUpdateParameters<T>
+export type _Update<T extends ContextDefinition> = (
+  ctx: Partial<UpdateParameters<T>>
+) => Partial<UpdateParameters<T>>
 
 /**
  Параметры для внутреннего обновления
  */
-export type StrictUpdateContextParams<T extends StrictContextDefinition> = {
-  ctx: StrictUpdateParameters<T>
+export type UpdateContextParams<T extends ContextDefinition> = {
+  ctx: Partial<UpdateParameters<T>>
   srcName?: string
   funcName?: string
 }
-
-// ============================================================================
-// ОБРАТНАЯ СОВМЕСТИМОСТЬ
-// ============================================================================
-
-/**
- Совместимость со старой системой типов
- */
-export type ContextDefinition = StrictContextDefinition
-export type ContextData<T> = StrictContextData<T>
-export type UpdateParameters<T> = StrictUpdateParameters<T>
-export type Update<T> = StrictUpdate<T>
-export type _Update<T> = StrictInternalUpdate<T>
-export type UpdateContextParams<T> = StrictUpdateContextParams<T>
-export type ContextTypes = StrictContextTypes

@@ -1,5 +1,5 @@
 import {MetaFor} from "../metafor.js"
-import {collectEdges} from "./graph-meta.actions.js"
+import {collectEdges, drawRoundedPath} from "./graph-meta.actions.js"
 import {createRef} from "../html/directives/ref.js"
 
 export default MetaFor("graph-meta", {development: true, description: "Node"})
@@ -32,33 +32,6 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         if (!canvas) return
         canvas.width = context.width
         canvas.height = context.height
-
-        // Функция для отрисовки скругленного пути на canvas
-        /**
-         * @param {CanvasRenderingContext2D} ctx
-         * @param {import('./graph-meta.t').Point[]} points
-         * @param {number} [radius]
-         */
-        function drawRoundedPath(ctx, points, radius = 8) {
-          if (points.length < 2) return;
-          ctx.beginPath();
-          ctx.moveTo(points[0].x, points[0].y);
-          for (let i = 1; i < points.length - 1; i++) {
-            const prev = points[i - 1];
-            const curr = points[i];
-            const next = points[i + 1];
-            if (prev.y === curr.y) { // горизонтальный сегмент
-              ctx.lineTo(curr.x - Math.sign(curr.x - prev.x) * radius, curr.y);
-              ctx.quadraticCurveTo(curr.x, curr.y, curr.x, curr.y + Math.sign(next.y - curr.y) * radius);
-            } else { // вертикальный сегмент
-              ctx.lineTo(curr.x, curr.y - Math.sign(curr.y - prev.y) * radius);
-              ctx.quadraticCurveTo(curr.x, curr.y, curr.x + Math.sign(next.x - curr.x) * radius, curr.y);
-            }
-          }
-          // Последний сегмент
-          const last = points[points.length - 1];
-          ctx.lineTo(last.x, last.y);
-        }
 
         // Рисуем edges на canvas
         requestAnimationFrame(() => {
@@ -119,7 +92,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         <h2 class="noselect">${context.id}</h2>
         <div><!--кнопки справа-->
           <button aria-label="Редактировать">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor">
+            <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor">
               <path
                 d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/>
             </svg>

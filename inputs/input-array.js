@@ -4,7 +4,7 @@ export default MetaFor("input-array")
   .context(t => ({
     name: t.string({}),
     title: t.string({}),
-    value: t.array({default: []}),
+    value: t.array({default: [""]}),
     error: t.string({nullable: true}),
     input: t.string({default: ""}),
   }))
@@ -14,19 +14,18 @@ export default MetaFor("input-array")
   .reactions([])
   .view({
     render: ({context, html, update}) => html`
-      <div class="param-array-wrapper">
-        <span class="param-title">
+      <div>
+        <span>
           ${context.title}
         </span>
-        <div class="chips">
+        <div>
           ${context.value.map((chip, i) => html`
             <span class="chip">
               ${chip}
               <button
-                class="chip-remove"
                 title="Удалить"
                 @click=${() => {
-                  const arr = /**@type{Array<any>}*/ context.value.slice()
+                  const arr = /**@type{Array<any>}*/ (context.value.slice())
                   arr.splice(i, 1)
                   update({value: arr})
                 }}
@@ -36,7 +35,6 @@ export default MetaFor("input-array")
             </span>
           `)}
           <input
-            class="chip-input"
             name=${context.name}
             type="text"
             placeholder="Добавить..."
@@ -54,7 +52,6 @@ export default MetaFor("input-array")
             }}
           />
           <button
-            class="chip-add"
             title="Добавить"
             @click=${() => {
               const val = context.input.trim()
@@ -71,46 +68,47 @@ export default MetaFor("input-array")
       :host {
         display: flex;
         align-items: center;
+
+        & > div {
+          display: flex;
+          align-items: center;
+
+          & > span {
+            color: var(--font-color);
+            font-size: 13px;
+            margin: 0 8px;
+          }
+
+          & > div {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-width: 80px;
+            background: none;
+            border-radius: 8px;
+            padding: 2px 4px;
+
+            & span {
+              display: inline-flex;
+              align-items: center;
+              background: rgba(var(--surface-200)/ 0.7);
+              color: var(--font-color);
+              border-radius: 14px;
+              padding: 2px 6px 2px 8px;
+              font-size: 13px;
+              alignment-baseline: center;
+              margin: 0 2px;
+              box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+              user-select: none;
+              transition: background 0.2s;
+            }
+          }
+        }
+
       }
 
-      .param-array-wrapper {
-        display: flex;
-        align-items: center;
-      }
-
-      .param-title {
-        color: var(--font-color);
-        font-size: 13px;
-        margin: 0 8px;
-      }
-
-      .chips {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 6px;
-        min-width: 80px;
-        background: none;
-        border-radius: 8px;
-        padding: 2px 4px;
-      }
-
-      .chip {
-        display: inline-flex;
-        align-items: center;
-        background: rgba(var(--surface-200)/ 0.7);
-        color: var(--font-color);
-        border-radius: 14px;
-        padding: 2px 6px 2px 8px;
-        font-size: 13px;
-        alignment-baseline: center;
-        margin: 0 2px;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-        user-select: none;
-        transition: background 0.2s;
-      }
-
-      .chip-remove {
+      button[title="Удалить"] {
         background: none;
         border: none;
         color: rgb(var(--error-900));
@@ -125,13 +123,13 @@ export default MetaFor("input-array")
         align-items: center;
         justify-content: center;
         transition: background 0.2s;
+
+        &:hover {
+          background: #ffd6d6;
+        }
       }
 
-      .chip-remove:hover {
-        background: #ffd6d6;
-      }
-
-      .chip-input {
+      input {
         min-width: 40px;
         font-size: 13px;
         border: none;
@@ -142,7 +140,7 @@ export default MetaFor("input-array")
         border-radius: 8px;
       }
 
-      .chip-add {
+      button[title="Добавить"] {
         background: #eaf1ff;
         border: none;
         color: #2962ff;
@@ -153,10 +151,10 @@ export default MetaFor("input-array")
         margin-left: 2px;
         cursor: pointer;
         transition: background 0.2s;
-      }
 
-      .chip-add:hover {
-        background: #d0e6ff;
+        &:hover {
+          background: #d0e6ff;
+        }
       }
     `
   }) 

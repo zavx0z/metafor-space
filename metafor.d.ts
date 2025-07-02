@@ -1,4 +1,4 @@
-import type {ContextData, ContextDefinition, ContextTypes, Update, UpdateParameters} from "./types/context.ts"
+import type {ContextData, ContextDefinition, ContextTypes, Update} from "./types/context.ts"
 import type {Transitions} from "./types/transitions.ts"
 import type {CoreDefinition, CoreObj} from "./types/core.ts"
 import type {Reactions} from "./types/reaction.ts"
@@ -6,7 +6,7 @@ import type {ViewDefinition} from "./types/view.ts"
 import type {CreateParams} from "./types/create.ts"
 import type {Snapshot, OnUpdate, OnTransition} from "./types/meta.ts"
 
-export {BroadcastMessage} from "./types/meta.ts"
+export {BroadcastMessage, PatchMetaFor} from "./types/meta.ts"
 
 /**
 
@@ -55,7 +55,7 @@ export declare function MetaFor(
          */
         transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
           reactions: (reactions: Reactions<C, I>) => {
-            view: (view: ViewDefinition<I, C, S>) => Meta<S, C>
+            view: (view: ViewDefinition<I, C, S>) => Meta<S, C, I>
           }
         }
       }
@@ -90,7 +90,7 @@ declare global {
    @property graph - Граф meta
    @property destroy - Уничтожение meta
    */
-  export interface Meta<S extends string, C extends ContextDefinition> extends HTMLElement {
+  export interface Meta<S extends string, C extends ContextDefinition, I extends CoreObj = CoreObj> extends HTMLElement {
     id: string
     title: string
     description: string
@@ -104,53 +104,9 @@ declare global {
     update: Update<C>
     onUpdate: OnUpdate<C>
     onTransition: OnTransition<S>
-    snapshot: () => Snapshot<S, C, any>
+    snapshot: () => Snapshot<S, C, I>
     destroy: () => void
   }
-
-  export type MetaAny = Meta<any, any>
-
-
-  /**
-   Снимок meta
-
-   @template C - Тип контекста
-   @template S - Тип состояния
-
-   @property id - Идентификатор снимка
-   @property title - Заголовок снимка
-   @property description - Описание снимка
-   @property state - Текущее состояние
-   @property states - Доступные состояния
-   @property context - Данные контекста
-   @property types - Определение типов контекста
-   @property transitions - Переходы
-   @property core - Ядро
-   */
-  export type SnapshotMetaFor<S extends string, C extends ContextDefinition, I extends CoreObj> = {
-    id: string
-    // title: string
-    description: string
-    state: S
-    states: readonly S[]
-    context: ContextData<C>
-    types: ContextDefinition
-    transitions: Transitions<S, C, I>
-    core: Record<string, { read: string[]; write: string[] }>
-  }
-  export type SnapshotMetaForAny = SnapshotMetaFor<any, any, any>
-
-  /**
-   Патч для применения к частице
-
-   @property path - Путь к частице
-   @property op - Операция
-   @property value - Значение
-   */
-  export type PatchMetaFor = {
-    path: string
-    op: "add" | "remove" | "replace" | "move" | "copy" | "test"
-    value: any
-  }
+  export type MetaAny = Meta<any, any, any>
 }
 

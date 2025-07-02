@@ -4,8 +4,7 @@
  * @returns {import('./graph-meta.t').Edge[]} Массив рёбер с типами
  */
 export const collectEdges = layout => {
-  const rootEdges = /**@type {import('elkjs').ElkExtendedEdge[]} */ (layout.edges || []).map(/**@type{import('elkjs').ElkExtendedEdge}*/edge=>{
-    // console.log(edge)
+  const rootEdges = /**@type {import('elkjs').ElkExtendedEdge[]} */ (layout.edges || []).map(/**@type{import('elkjs').ElkExtendedEdge}*/edge => {
     return edge
   })
   const stateEdges = /**@type {import('elkjs').ElkExtendedEdge[]} */ (
@@ -14,9 +13,11 @@ export const collectEdges = layout => {
         .map(edge => {
           const [section] = edge.sections || []
           if (!section) return
-          //@ts-ignore
-          const points = [addOffset(section.startPoint, stateLayout), ...(section.bendPoints || []).map(point => addOffset(point, stateLayout)), addOffset(section.endPoint, stateLayout)]
-
+          const points = [
+            addOffset(section.startPoint, stateLayout),
+            ...(section.bendPoints || []).map(point => addOffset(point, stateLayout)),
+            addOffset(section.endPoint, stateLayout)
+          ]
           return {
             ...edge,
             sections: [
@@ -28,8 +29,7 @@ export const collectEdges = layout => {
               }
             ]
           }
-        })
-        .filter(Boolean)
+        }).filter(Boolean)
     })
   )
   return [
@@ -78,3 +78,30 @@ const addOffset = (point, stateLayout) => ({
   x: point.x + stateLayout.x,
   y: point.y + stateLayout.y
 })
+
+/**
+ * Функция для отрисовки скругленного пути на canvas
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('./graph-meta.t').Point[]} points
+ * @param {number} [radius]
+ */
+export function drawRoundedPath(ctx, points, radius = 8) {
+  if (points.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length - 1; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const next = points[i + 1];
+    if (prev.y === curr.y) { // горизонтальный сегмент
+      ctx.lineTo(curr.x - Math.sign(curr.x - prev.x) * radius, curr.y);
+      ctx.quadraticCurveTo(curr.x, curr.y, curr.x, curr.y + Math.sign(next.y - curr.y) * radius);
+    } else { // вертикальный сегмент
+      ctx.lineTo(curr.x, curr.y - Math.sign(curr.y - prev.y) * radius);
+      ctx.quadraticCurveTo(curr.x, curr.y, curr.x + Math.sign(next.x - curr.x) * radius, curr.y);
+    }
+  }
+  // Последний сегмент
+  const last = points[points.length - 1];
+  ctx.lineTo(last.x, last.y);
+}
