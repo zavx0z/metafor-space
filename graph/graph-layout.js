@@ -1,7 +1,8 @@
 import ELK from "elkjs"
 import {MetaFor} from "../metafor.js"
-import "./graph-nodes.js"
 import {createElkData} from "./graph-layout.actions.js"
+import "./graph-nodes.js"
+import "./graph-listener.js"
 
 export default MetaFor("graph-layout", {development: true})
   .context(t => ({
@@ -111,7 +112,7 @@ export default MetaFor("graph-layout", {development: true})
     {
       title: "начало создания meta",
       filter: ({patch, meta}) => (
-        meta.tag === "graph-nodes"
+        meta.tag === "graph-listener"
         && patch.path === '/context'
         // && patch.op === 'add'
         && patch.op === 'replace'
@@ -208,7 +209,7 @@ export default MetaFor("graph-layout", {development: true})
       title: "конец создания meta",
       filter: ({patch, meta, context}) => (
         context.current
-        && meta.tag === "graph-nodes"
+        && meta.tag === "graph-listener"
         && patch.path === '/context'
         // && patch.op === 'remove'
         && patch.op === 'replace'
@@ -222,8 +223,9 @@ export default MetaFor("graph-layout", {development: true})
   ])
   .view({
     render: ({html}) => html`
-      <metafor-graph-nodes>
-      </metafor-graph-nodes>
+        <metafor-graph-nodes>
+          <metafor-graph-listener/>
+        </metafor-graph-nodes>
     `,
     style: ({css}) => css`
       :host {

@@ -70,7 +70,7 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
   }
 
   if (transitions.length === 0) {
-    sendWarning({ id: tag, message: "Переходы отсутствуют. Частица не будет менять состояние.", src: "transitions" })
+    sendWarning({ id: tag, message: "Переходы отсутствуют. Мета не будет менять состояние.", src: "transitions" })
     return
   }
 
