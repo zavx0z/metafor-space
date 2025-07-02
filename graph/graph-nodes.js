@@ -1,5 +1,6 @@
-import {html, render} from "../html/html.js"
 import {MetaFor} from "../metafor.js"
+import {render} from "../html/html.js"
+import {template} from "./graph-nodes.actions.js"
 import "./graph-meta.js"
 import "./graph-state.js"
 import "./graph-context.js"
@@ -43,85 +44,7 @@ export default MetaFor("graph-nodes", {
         }
         /**@type{import("../types/meta.ts").Snapshot<any, any, any>}*/
         const snapshot = core.snapshot
-        render(html`
-          <metafor-graph-meta context=${{
-            id: snapshot.id
-          }}>
-            ${snapshot.states.map(i => html`
-              <metafor-graph-state context=${{
-                id: snapshot.id,
-                state: i
-              }}>
-                ${snapshot.transitions.map((transition) => transition.to
-                  .filter(t => t.state === i)
-                  .map(condition =>
-                    Object.entries(condition.when).map(([key, value]) => {
-                      let op
-                      let val
-                      if (typeof value === "object" && value !== null) {
-                        return html`
-                          <metafor-graph-condition context=${{
-                            id: snapshot.id,
-                            from: transition.in,
-                            to: condition.state,
-                            param: key,
-                            type: snapshot.types[key].type
-                          }}> ${html`${Object.entries(/**@param{[string, string]} param*/([key, value]) => html`
-                            <metafor-graph-operator context=${{
-                              id: snapshot.id,
-                              from: transition.in,
-                              to: condition.state,
-                              op: key,
-                              value: value
-                            }}>
-                            </metafor-graph-operator>`)}
-                          </metafor-graph-condition>`}`
-                      } else if (value === null) {
-                        op = "isNull"
-                        value = true
-                      } else {
-                        op = "eq"
-                        val = value
-                      }
-                      return html`
-                        <metafor-graph-condition context=${{
-                          id: snapshot.id,
-                          from: transition.in,
-                          to: condition.state,
-                          param: key,
-                          type: snapshot.types[key].type
-                        }}>
-                          <metafor-graph-operator context=${{
-                            id: snapshot.id,
-                            from: transition.in,
-                            to: condition.state,
-                            op: op,
-                            value: val
-                          }}>
-                          </metafor-graph-operator>
-                        </metafor-graph-condition>
-                      `
-                    })))}
-                <metafor-graph-context context=${{
-                  id: snapshot.id,
-                  state: i
-                }}>
-                  ${Object.keys(snapshot.types).map(key => html`
-                    <metafor-graph-param context=${{
-                      id: snapshot.id,
-                      state: i,
-                      param: key,
-                      title: snapshot.types[key].title,
-                      value: snapshot.context[key],
-                      options: snapshot.types[key].type === 'enum' ? snapshot.types[key].values : [],
-                      type: snapshot.types[key].type
-                    }}></metafor-graph-param>
-                  `)}
-                </metafor-graph-context>
-              </metafor-graph-state>
-            `)}
-          </metafor-graph-meta>
-        `, element)
+        render(template(snapshot), element)
         update({nodes: context.nodes.slice(1)})
         core.snapshot = null
       },

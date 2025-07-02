@@ -6,6 +6,7 @@ import type {ViewDefinition} from "./types/view.ts"
 import type {Snapshot, OnUpdate, OnTransition} from "./types/meta.ts"
 
 export {BroadcastMessage, PatchMetaFor} from "./types/meta.ts"
+export type {Snapshot}
 
 /**
 
@@ -106,6 +107,7 @@ declare global {
     snapshot: () => Snapshot<S, C, I>
     destroy: () => void
   }
+
   export type MetaAny = Meta<any, any, any>
 }
 
