@@ -912,14 +912,15 @@ export class PropertyPart extends AttributePart {
     // console.log(this.element, this.name, value)
     // @ts-ignore
     if (this.name === "context" && value) {
-      try {
-      this.element._updateContext(value)  
-      }           catch (e) { const tag = this.element.tagName.toLowerCase()
-            throw new Error(`meta-компонент ${tag} не создан`)
-                        }
-      
-    }
-    else if (this.name === "data") {  // @ts-ignore
+      try { // FIXME: при первой отрисовки без оповещения изменения контекста
+        // @ts-ignore
+        this.element.isConnected ? this.element.update(value) : this.element._updateContext(value)
+      } catch (e) {
+        const tag = this.element.tagName.toLowerCase()
+        throw new Error(`meta-компонент ${tag} не создан`)
+      }
+
+    } else if (this.name === "data") {  // @ts-ignore
       this.element._updateCore({data: value})
     } else if (this.name === "core") {
       try { //@ts-ignore

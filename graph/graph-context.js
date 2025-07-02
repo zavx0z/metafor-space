@@ -1,12 +1,12 @@
-import { createRef } from "../html/directives/ref.js"
+import {createRef} from "../html/directives/ref.js"
 import {MetaFor} from "../metafor.js"
 import "./graph-param.js"
 
-export default MetaFor('graph-context', {
+export default MetaFor("graph-context", {
   description: "Контекст",
-  development: true
+  development: true,
 })
-  .context(t => ({
+  .context((t) => ({
     id: t.string({title: "ID meta"}),
     state: t.string({title: "Название состояния"}),
     error: t.string({title: "Ошибка", nullable: true}),
@@ -14,6 +14,8 @@ export default MetaFor('graph-context', {
     height: t.number({nullable: true}),
     x: t.number({nullable: true}),
     y: t.number({nullable: true}),
+    layout: t.boolean({default: false}),
+    active: t.boolean({default: false}),
   }))
   .core(() => ({
     /**@type{import("./graph-context.t.js").Params}*/
@@ -21,50 +23,51 @@ export default MetaFor('graph-context', {
     /**@type{import("./graph-context.t.js").Sockets}*/
     sockets: new Map(),
     count: 0,
-    header: createRef()
+    header: createRef(),
   }))
-  .states("рендер", "измерение", "позиционирование")
+  .states("рендер", "измерение", "позиционирование", "неактивно", "активно")
   .transitions("рендер", [
     {
       in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
+      to: [{state: "измерение", when: {error: null}}],
     },
     {
       in: "измерение",
-      action({element, update, core}) {
+      action({element, update}) {
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
-          const header = /**@type{HTMLElement} */ (core.header.value)
-          const bbHeader = header.getBoundingClientRect()
-          update({
-            width: Math.round(width),
-            height: Math.round(height),
-            x: Math.round(x),
-            y: Math.round(y),
-          })
+          update({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
         })
       },
-      to: [{
-        state: "позиционирование", when: {
-          x: {isNull: false}, y: {isNull: false}
-        }
-      }]
+      to: [{state: "позиционирование", when: {layout: true}}],
     },
     {
       in: "позиционирование",
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
-      to: []
+      to: [
+        {state: "неактивно", when: {error: null, active: false}},
+        {state: "активно", when: {error: null, active: true}},
+      ],
+    },
+    {
+      in: "активно",
+      to: [
+        {state: "неактивно", when: {error: null, active: false}},
+      ],
+    },
+    {
+      in: "неактивно",
+      to: [
+        {state: "активно", when: {error: null, active: true}},
+      ],
     },
   ])
   .reactions([
     {
       title: "вычисленное положение",
-      filter: ({meta, patch}) => meta.tag === "graph-layout"
-        && patch.path === "/state"
-        && patch.value === "ожидание"
-      ,
+      filter: ({meta, patch}) => meta.tag === "graph-layout" && patch.path === "/state" && patch.value === "ожидание",
       action({id, context, update}) {
         const data = sessionStorage.getItem(context.id)
         if (!data) {
@@ -73,22 +76,30 @@ export default MetaFor('graph-context', {
         }
         /**@type{import("./graph-layout.t").TypedLayoutResult}*/
         const layout = JSON.parse(data)
-        const stateGroup = layout.children.find(group => group.id === context.state)
+        const stateGroup = layout.children.find((group) => group.id === context.state)
         if (!stateGroup) {
           update({error: `Состояние ${context.state} не найдено в layout`})
           return
         }
-        
-        const layoutContext = stateGroup.children.find(child => child.id === id)
+
+        const layoutContext = stateGroup.children.find((child) => child.id === id)
         if (!layoutContext) {
           update({error: `не найден элемент: ${id} для состояния ${context.state}`})
           console.error(`не найден элемент: ${id} для состояния ${context.state}`, layout)
           return
         }
-        // console.log(layoutContext)
-        update({x: layoutContext.x, y: layoutContext.y})
+        update({x: layoutContext.x, y: layoutContext.y, layout: true})
+      },
+    },
+    {
+      title: "Подписка на активность состояния",
+      filter: ({meta, patch, context}) =>
+        context.id === `${meta.tag}/${meta.index}`
+        && patch.path === "/state",
+      action: ({update, patch, context}) => {
+        update({active: patch.value === context.state})
       }
-    }
+    },
   ])
   .view({
     render: ({context, html, ref, core}) => html`
@@ -98,8 +109,7 @@ export default MetaFor('graph-context', {
       <section>
         <slot></slot>
       </section>
-      <section>
-      </section>
+      <section></section>
     `,
     style: ({css}) => css`
       :host:before {
@@ -186,7 +196,7 @@ export default MetaFor('graph-context', {
         position: relative;
         font-weight: 800;
         letter-spacing: 0.02em;
-        font-family: "Russo One", 'Courier New', Courier, monospace;
+        font-family: "Russo One", "Courier New", Courier, monospace;
 
         & h2 {
           -webkit-touch-callout: none;
@@ -208,9 +218,20 @@ export default MetaFor('graph-context', {
           z-index: 1;
           border-bottom-left-radius: 12px;
           border-bottom-right-radius: 12px;
-          box-shadow: 0 6px 12px 0 rgba(0,0,0,0.18), 0 1px 3px 0 rgba(0,0,0,0.12);
+          box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.18), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
           opacity: 0.7;
         }
       }
-    `
+
+      :host([data-state="активно"]) {
+        & header {
+          background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+          box-shadow: 0 0 0 2px rgb(var(--primary-500)), 0 2px 8px 0 rgba(59, 130, 246, 0.1);
+          border: 2px solid rgb(var(--primary-500));
+          color: rgb(var(--primary-900));
+          box-sizing: border-box;
+        }
+      }
+
+    `,
   })

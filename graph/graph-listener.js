@@ -11,21 +11,21 @@ export default MetaFor("graph-listener", {
     nodes: t.array({title: "Коллекция meta"}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
-  .core(({self, context, update}) => {
+  .core(({self, context, update}) => { // TODO: update перенести в функции
     document.addEventListener("channel", (ev) => {
       const {detail} = /** @type {CustomEvent} */ (ev)
       const {meta, patch} =  /**@type {import("../metafor.js").BroadcastMessage}*/(detail)
-      if (patch.op === "add"
+      if (
+        patch.op === "add"
         && !meta.tag.includes("graph-")
         && !meta.tag.includes("input-")
       ) {
         self.snapshot = patch.value
-        console.log(meta.tag)
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
       }
     })
     return {
-      snapshot: null
+      snapshot: null,
     }
   })
   .states("ожидание патча", "добавление актора")
@@ -54,4 +54,7 @@ export default MetaFor("graph-listener", {
     }
   ])
   .reactions([])
-  .view({render: ({html}) => html`<slot></slot>`})
+  .view({
+    render: ({html}) => html`
+      <slot></slot>`
+  })

@@ -5,18 +5,16 @@ export default MetaFor("test", {description: "Nodes", development: false})
     status: t.enum("start", "end")({title: "Статус", default: "end"}),
   }))
   .core()
-  .states("конец", "начало" )
+  .states("конец", "начало")
   .transitions("начало", [
     {
       in: "начало",
-      action: async ({update}) => {
-        // await new Promise((resolve) => {
-        //   setTimeout(() => {
-        //     update({status: "end"})
-        //     return resolve('')
-        //   }, 1000)
-        // })
-      },
+      action: ({update}) => new Promise((resolve) => {
+        setTimeout(() => {
+          update({status: "end"})
+          return resolve('')
+        }, 1000)
+      }),
       to: [{state: "конец", when: {status: "end"}}],
     },
     {
@@ -26,7 +24,7 @@ export default MetaFor("test", {description: "Nodes", development: false})
           setTimeout(() => {
             update({status: "start"})
             return resolve('')
-          }, 1000)
+          }, 4000)
         })
       },
       to: [{state: "начало", when: {status: "start"}}],

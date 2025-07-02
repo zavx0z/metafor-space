@@ -13,27 +13,29 @@ export default MetaFor("input-enum")
   .transitions("рендер", [])
   .reactions([])
   .view({
-    render: ({context, html, update}) => html`
-      <span>${context.title}</span>
-      <div>
-        <select
-          name=${context.name}
-          @change=${/**@param {Event} e*/e => {
-            const v = (e.target instanceof HTMLSelectElement) ? e.target.value : ''
-            if (e.target instanceof HTMLSelectElement) update({value: v})
-          }}>
-          ${context.options.map(opt => html`
-            <option
-              value=${opt}
-              ?selected=${context.value === opt}
-            >
-              ${opt}
-            </option>
-          `)}
-        </select>
-      </div>
-    `
-    ,
+    render: ({context, html, update}) => {
+      console.log(context.value)
+      return html`
+        <span>${context.title}</span>
+        <div>
+          <select
+            name=${context.name}
+            @change=${/**@param {Event} e*/e => {
+              const v = (e.target instanceof HTMLSelectElement) ? e.target.value : ''
+              if (e.target instanceof HTMLSelectElement) update({value: v})
+            }}>
+            ${context.options.map(opt => html`
+              <option
+                value=${opt}
+                ?selected=${context.value === opt}
+              >
+                ${opt}
+              </option>
+            `)}
+          </select>
+        </div>
+      `
+    },
     style: ({css}) => css`
       :host {
         display: flex;

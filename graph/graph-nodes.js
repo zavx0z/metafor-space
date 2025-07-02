@@ -1,4 +1,6 @@
 import {MetaFor} from "../metafor.js"
+import "./graph-layout.js"
+import "./graph-listener.js"
 import "./graph-meta.js"
 import "./graph-state.js"
 import "./graph-context.js"
@@ -11,7 +13,6 @@ export default MetaFor("graph-nodes", {
 })
   .context(t => ({
     op: t.enum("add")({title: "Тип патча", nullable: true}),
-    metas: t.array({title: "Коллекция meta"}),
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
@@ -30,7 +31,9 @@ export default MetaFor("graph-nodes", {
   ])
   .view({
     render: ({html}) => html`
-      <slot></slot>
+      <metafor-graph-layout>
+        <metafor-graph-listener/>
+      </metafor-graph-layout>
     `,
     style: ({css}) => css`
       :host {

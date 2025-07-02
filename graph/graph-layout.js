@@ -1,8 +1,6 @@
 import ELK from "elkjs"
 import {MetaFor} from "../metafor.js"
 import {createElkData} from "./graph-layout.actions.js"
-import "./graph-nodes.js"
-import "./graph-listener.js"
 
 export default MetaFor("graph-layout", {development: true})
   .context(t => ({
@@ -223,9 +221,7 @@ export default MetaFor("graph-layout", {development: true})
   ])
   .view({
     render: ({html}) => html`
-        <metafor-graph-nodes>
-          <metafor-graph-listener/>
-        </metafor-graph-nodes>
+      <slot></slot>
     `,
     style: ({css}) => css`
       :host {
