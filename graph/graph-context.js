@@ -208,7 +208,7 @@ export default MetaFor('graph-context', {
           z-index: 1;
           border-bottom-left-radius: 12px;
           border-bottom-right-radius: 12px;
-          box-shadow: 0 6px 12px 0 rgba(0,0,0,0.18), 0 1.5px 3px 0 rgba(0,0,0,0.12);
+          box-shadow: 0 6px 12px 0 rgba(0,0,0,0.18), 0 1px 3px 0 rgba(0,0,0,0.12);
           opacity: 0.7;
         }
       }

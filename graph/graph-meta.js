@@ -1,5 +1,5 @@
 import {MetaFor} from "../metafor.js"
-import {collectEdges, getSimpleRoundedPath} from "./graph-meta.actions.js"
+import {collectEdges} from "./graph-meta.actions.js"
 import {createRef} from "../html/directives/ref.js"
 
 export default MetaFor("graph-meta", {development: true, description: "Node"})
@@ -29,7 +29,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         const headerBB = /**@type{DOMRect} */ (core.header?.value?.getBoundingClientRect())
         element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
         const canvas = /**@type{HTMLCanvasElement}*/ (core.canvas.value)
-        if (!canvas) return;
+        if (!canvas) return
         canvas.width = context.width
         canvas.height = context.height
 
@@ -69,9 +69,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
 
           core.edges.forEach(/** @param {import('./graph-meta.t').Edge} edge */edge => {
             // Цвет и стиль линии
-            const color = edge.type === 'east-input' ? '#9c27b0' :
-              edge.type === 'west' ? '#2196f3' : '#4caf50'
-            ctx.strokeStyle = color
+            ctx.strokeStyle = edge.type === 'east-input' ? '#9c27b0' : edge.type === 'west' ? '#2196f3' : '#4caf50'
             ctx.lineWidth = 2
 
             // Всегда применяем тень для всех рёбер
@@ -116,7 +114,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
   ])
   .view({
     render: ({html, context, core, ref}) => html`
-      <header ${ref(core.header)} data-drag-selector="graph-atom">
+      <header ${ref(core.header)}>
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.id}</h2>
         <div><!--кнопки справа-->
@@ -128,12 +126,33 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           </button>
         </div>
       </header>
-      <section class="content" data-drag-selector="graph-atom">
-        <canvas ${ref(core.canvas)} class="connections"></canvas>
+      <section>
+        <canvas ${ref(core.canvas)}></canvas>
         <slot></slot>
       </section>
     `,
     style: ({css}) => css`
+      :host {
+        backdrop-filter: var(--backdrop-filter-blur);
+        -webkit-backdrop-filter: var(--backdrop-filter-blur);
+        -moz-backdrop-filter: var(--backdrop-filter-blur);
+        -o-backdrop-filter: var(--backdrop-filter-blur);
+        -ms-backdrop-filter: var(--backdrop-filter-blur);
+
+        --font-color: rgb(var(--surface-50));
+        --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
+
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        user-select: none;
+        will-change: transform;
+        box-sizing: border-box;
+        border-radius: 7px;
+        opacity: 0;
+        transition: opacity .4s ease-in-out;
+      }
+
       :host([data-state="позиционирование"]) {
         opacity: 1;
       }
@@ -169,30 +188,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         z-index: -1;
       }
 
-      :host {
-        backdrop-filter: var(--backdrop-filter-blur);
-        -webkit-backdrop-filter: var(--backdrop-filter-blur);
-        -moz-backdrop-filter: var(--backdrop-filter-blur);
-        -o-backdrop-filter: var(--backdrop-filter-blur);
-        -ms-backdrop-filter: var(--backdrop-filter-blur);
-
-        --font-color: rgb(var(--surface-50));
-        --background-color: rgba(var(--surface-100) / calc(var(--background-alpha) * 0.1));
-
-        position: fixed;
-        display: flex;
-        flex-direction: column;
-        user-select: none;
-        will-change: transform;
-        box-sizing: border-box;
-        border-radius: 7px;
-        opacity: 0;
-        transition: opacity .4s ease-in-out;
-      }
-
       header {
-        --background-color: rgba(var(--surface-500) / var(--background-alpha));
-
         position: relative;
         padding: 8px 6px;
         z-index: 2;
@@ -200,7 +196,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background-color: var(--background-color);
+        background-color: rgba(var(--surface-500) / var(--background-alpha));;
         box-sizing: border-box;
         user-select: none;
         border-top-left-radius: inherit;
@@ -218,7 +214,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           z-index: 1;
           border-bottom-left-radius: 12px;
           border-bottom-right-radius: 12px;
-          box-shadow: 0 6px 12px 0 rgba(0,0,0,0.18), 0 1.5px 3px 0 rgba(0,0,0,0.12);
+          box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.18), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
           opacity: 0.7;
         }
 
@@ -275,17 +271,18 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         border-bottom-left-radius: inherit;
         width: 100%;
         height: 100%;
+
+        & canvas {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
+          display: block;
+        }
       }
 
-      canvas.connections {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        display: block;
-      }
     `
   })
