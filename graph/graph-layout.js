@@ -18,13 +18,12 @@ export default MetaFor("graph-layout", {development: true})
     data: null,
     config: {
       base: {
-        "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
-        "elk.spacing.edgeEdge": "36",
-        "elk.spacing.nodeNode": "0",
-        "elk.spacing.edgeNode": "10",
+        "elk.layered.spacing.edgeEdgeBetweenLayers": 20,
+        "elk.spacing.edgeEdge": 20,
+        "elk.spacing.edgeNode": 20,
         "hierarchyHandling": "INCLUDE_CHILDREN",
         "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
-        "elk.padding": "[top=10.0, left=10.0, bottom=10.0, right=10.0]",
+        "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
         "considerModelOrder.strategy": "PREFER_NODES",
         "elk.port.size": 12,
       },

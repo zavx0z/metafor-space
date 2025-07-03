@@ -244,16 +244,24 @@ export default MetaFor("graph-context", {
       }
 
       :host([state="в процессе"]) {
-        box-shadow: 0 0 12px 4px rgb(var(--primary-700));
-        animation: process-blink 1.1s steps(1, end) infinite;
+        &:before {
+          box-shadow: 0 0 12px 4px rgb(var(--primary-700));
+          animation: process-blink 1.1s ease-in-out infinite;
+          border-color: rgb(var(--primary-800));
+          border-width: 1px;
+        }
       }
 
       @keyframes process-blink {
         0%, 100% {
           box-shadow: 0 0 12px 4px rgb(var(--primary-700));
+          border-color: rgb(var(--primary-400));
+          border-width: 2px;
         }
         50% {
-          box-shadow: 0 0 0 0 transparent;
+          box-shadow: 0 0 12px 0 rgb(var(--primary-700) / .8);
+          border-color: rgb(var(--primary-800));
+          border-width: 1px;
         }
       }
     `,

@@ -11,9 +11,9 @@ export default MetaFor("test", {description: "Nodes", development: false})
       in: "начало",
       action: ({update}) => new Promise((resolve) => {
         setTimeout(() => {
-          // update({status: "end"})
+          update({status: "end"})
           return resolve()
-        }, 4000)
+        }, 6000)
       }),
       to: [{state: "конец", when: {status: "end"}}],
     },
