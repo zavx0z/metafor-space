@@ -21,7 +21,7 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
       in: "конец",
       action: ({update}) => new Promise((resolve) => setTimeout(() => {
         update({status: "start"})
-        return resolve('')
+        return resolve()
       }, 4000)),
       to: [{state: "начало", when: {status: "start"}}],
     },

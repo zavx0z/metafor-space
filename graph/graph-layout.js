@@ -6,8 +6,8 @@ export default MetaFor("graph-layout", {development: true})
   .context(t => ({
     current: t.string({title: "ID ноды meta передающий данные", nullable: true}),
     ready: t.string({title: "ID готовой ноды meta", nullable: true}),
-    count: t.number({title: "Счетчик обрабатываемых элементов ноды meta", default: 0}),
-    dataReceived: t.boolean({title: "Статус получения данных элементов от nodes-meta", default: false}),
+    data: t.boolean({title: "Статус получения данных элементов от nodes-meta", default: false}),
+    metrics: t.boolean({title: "Статус получения размеров и позиций от нодовых эл-ов", default: false}),
     error: t.string({nullable: true})
   }))
   .core(() => ({
@@ -16,6 +16,9 @@ export default MetaFor("graph-layout", {development: true})
     meta: new Map(),
     /**@type{import("elkjs").ElkNode|null}*/
     data: null,
+    /**@type{number}*/
+    count: 0,
+    /** @type{import("./graph-layout.t").LayoutConfig} */
     config: {
       base: {
         "elk.layered.spacing.edgeEdgeBetweenLayers": 20,
@@ -39,6 +42,7 @@ export default MetaFor("graph-layout", {development: true})
       operator: {
         "portConstraints": "FIXED_SIDE",
         "portAlignment.west": "JUSTIFIED",
+        "portAlignment.east": "JUSTIFIED",
       },
       port: {
         west: {
@@ -68,7 +72,7 @@ export default MetaFor("graph-layout", {development: true})
           states: {}, conditions: {}, sockets: {}, params: {}
         })
       },
-      to: [{state: "форматирование данных", when: {dataReceived: true, count: 0}}]
+      to: [{state: "форматирование данных", when: {data: true, metrics: true}}]
     },
     {
       in: "форматирование данных",
@@ -130,7 +134,7 @@ export default MetaFor("graph-layout", {development: true})
         && patch.op === "add"
         && ["graph-context", "graph-condition", "graph-socket", "graph-param"].includes(meta.tag)
       ),
-      action({meta, patch, core, update, context}) {
+      action({meta, patch, update, core}) {
         const entity = core.meta.get(patch.value.context.id)
         if (!entity) {
           update({error: `При получении элементов, в карте данных, отсутствует мета: ${patch.value.context.id}`})
@@ -160,7 +164,7 @@ export default MetaFor("graph-layout", {development: true})
             param: patch.value.context.param,
           }
         else return
-        update({count: context.count + 1})
+        core.count = core.count + 1
       }
     },
     {
@@ -203,7 +207,8 @@ export default MetaFor("graph-layout", {development: true})
           entity.params[id]["x"] = patch.value.x
           entity.params[id]["y"] = patch.value.y
         }
-        update({count: context.count - 1})
+        core.count = core.count - 1
+        if (!core.count) update({metrics: true})
       }
     },
     {
@@ -218,7 +223,7 @@ export default MetaFor("graph-layout", {development: true})
         && !patch.value.nodes.length
       ),
       action({update}) {
-        update({dataReceived: true})
+        update({data: true})
       }
     }
   ])

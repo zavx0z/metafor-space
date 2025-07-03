@@ -12,12 +12,21 @@ export default MetaFor("graph-nodes", {
   development: true
 })
   .context(t => ({
-    op: t.enum("add")({title: "Тип патча", nullable: true}),
     error: t.string({title: "Ошибка", nullable: true}),
+    queue: t.array({title: "Очередь акторов для добавления"})
   }))
   .core()
-  .states("render")
-  .transitions("render", [])
+  .states("render", "центрирование")
+  .transitions("render", [
+    {
+      in: "render",
+      to: [{state: "центрирование", when: {error: null}}]
+    },
+    {
+      in: "центрирование",
+      to: [{state: "render", when: {error: {isNull: false}}}]
+    },
+  ])
   .reactions([
     {
       title: "",

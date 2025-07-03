@@ -109,5 +109,6 @@ declare global {
   }
 
   export type MetaAny = Meta<any, any, any>
+  export type SnapshotAny = Snapshot<any, any, any>
 }
 

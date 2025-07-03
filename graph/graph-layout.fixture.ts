@@ -1,31 +1,25 @@
-import type { MetricsMap, LayoutConfig } from "./graph-layout.t";
-
+import type {MetricsMap, LayoutConfig} from "./graph-layout.t";
 
 export const config: LayoutConfig = {
   base: {
-    "elk.layered.spacing.edgeEdgeBetweenLayers": "36",
-    "elk.spacing.edgeEdge": "36",
-    // "elk.spacing.edgeNode": "36",
+    "elk.layered.spacing.edgeEdgeBetweenLayers": 20,
+    "elk.spacing.edgeEdge": 20,
+    "elk.spacing.edgeNode": 20,
     "hierarchyHandling": "INCLUDE_CHILDREN",
     "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
     "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
     "considerModelOrder.strategy": "PREFER_NODES",
+    "elk.port.size": 12,
+    // "elk.direction": "DOWN"
   },
   meta: {
-    "elk.algorithm": "box",
-    "elk.direction": "RIGHT",
-    "elk.spacing.nodeNode": "0",
+    "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
+    "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
   },
   state: {
-    "elk.spacing.nodeNode": "0",
-    "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
     "portConstraints": "FIXED_POS",
   },
-  condition: {
-    "elk.spacing.nodeNode": "0",
-    "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",
-    "portConstraints": "FIXED_SIDE",
-  },
+  condition: {},
   operator: {
     "portConstraints": "FIXED_SIDE",
     "portAlignment.west": "JUSTIFIED",
@@ -40,6 +34,7 @@ export const config: LayoutConfig = {
     },
   },
 }
+
 export const data: MetricsMap = new Map([
   [
     "test/1",

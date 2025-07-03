@@ -26,8 +26,9 @@ export default MetaFor("graph-listener", {
       }
     })
     return {
+      /**@type{SnapshotAny|null}*/
       snapshot: null,
-      /**@type{MetaAny}*/
+      /**@type{MetaAny|null}*/
       instance: null
     }
   })

@@ -148,21 +148,21 @@ export interface LayoutConfig {
    */
   base: {
     /** Расстояние между ребрами в разных слоях (по умолчанию: "36") */
-    "elk.layered.spacing.edgeEdgeBetweenLayers": string
+    "elk.layered.spacing.edgeEdgeBetweenLayers"?: number
     /** Минимальное расстояние между ребрами */
-    "elk.spacing.edgeEdge"?: string
+    "elk.spacing.edgeEdge"?: number
     /** Минимальное расстояние между узлами */
-    "elk.spacing.nodeNode"?: string
+    "elk.spacing.nodeNode"?: number
     /** Минимальное расстояние между ребром и узлом */
-    "elk.spacing.edgeNode"?: string
+    "elk.spacing.edgeNode"?: number
     /** Способ обработки иерархии: "INCLUDE_CHILDREN" - включить дочерние элементы */
-    "hierarchyHandling": string
+    "hierarchyHandling": "INCLUDE_CHILDREN"
     /** Стратегия разбиения на слои: "LONGEST_PATH_SOURCE" - от источника по длинному пути */
-    "elk.layered.layering.strategy": string
+    "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE"
     /** Отступы вокруг содержимого в формате "[top=20.0, left=20.0, bottom=20.0, right=20.0]" */
     "elk.padding": string
     /** Стратегия учета порядка модели: "PREFER_NODES" - предпочитать порядок узлов */
-    "considerModelOrder.strategy": string
+    "considerModelOrder.strategy": "PREFER_NODES"
     /** Размер портов по умолчанию */
     "elk.port.size"?: number
   }
@@ -172,21 +172,23 @@ export interface LayoutConfig {
    * Определяют размещение состояний внутри группы
    */
   meta: {
+    /** Отступы вокруг содержимого в формате "[top=20.0, left=20.0, bottom=20.0, right=20.0]" */
+    "elk.padding": string
     /** Стратегия размещения узлов: "NETWORK_SIMPLEX" - симплекс-алгоритм */
     "elk.layered.nodePlacement.strategy"?: string
   }
   
   /** 
-   * Настройки для узлов состояний
+   * Настройки для узлов состояний.
    * Определяют размещение элементов внутри состояния
    */
   state: {
     /** Ограничения портов: "FIXED_POS" - фиксированные позиции портов */
-    "portConstraints": string
+    "portConstraints": "FIXED_POS"
   }
   
   /** 
-   * Настройки для узлов условий переходов
+   * Настройки для узлов условий переходов.
    * Определяют размещение элементов условий
    */
   condition: {
@@ -194,20 +196,20 @@ export interface LayoutConfig {
   }
   
   /** 
-   * Настройки для операторов
+   * Настройки для операторов.
    * Определяют размещение элементов операторов
    */
   operator: {
     /** Ограничения портов: "FIXED_SIDE" - порты привязаны к сторонам */
-    "portConstraints": string
+    "portConstraints": "FIXED_SIDE"
     /** Выравнивание западных портов: "JUSTIFIED" - равномерное распределение */
-    "portAlignment.west": string
+    "portAlignment.west": "JUSTIFIED"
     /** Выравнивание западных портов: "JUSTIFIED" - равномерное распределение */
-    "portAlignment.east": string
+    "portAlignment.east": "JUSTIFIED"
   }
-  
+
   /** 
-   * Настройки для портов подключения
+   * Настройки для портов подключения.
    * Определяют расположение портов на сторонах узлов
    */
   port: {
@@ -738,12 +740,6 @@ export declare function createStateGroup(
 ): import("elkjs").ElkNode
 
 // ==================================================================================
-// КОНКРЕТНЫЕ ТИПЫ ДЛЯ НАШЕЙ ДОМЕННОЙ СТРУКТУРЫ
-// ==================================================================================
-
-
-
-// ==================================================================================
 // ТОЧНАЯ ТИПИЗАЦИЯ ПОД НАШУ ELK СТРУКТУРУ
 // ==================================================================================
 
@@ -886,7 +882,7 @@ export interface StateGroup {
 }
 
 /**
- * Корневые настройки layout для мета элемента
+ * Корневые настройки layout для меты
  */
 export interface RootLayoutOptions {
   /** Расстояние между рёбрами в разных слоях */
