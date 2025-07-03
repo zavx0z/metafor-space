@@ -35,8 +35,7 @@ export default MetaFor("graph-layout", {development: true})
       state: {
         "portConstraints": "FIXED_POS",
       },
-      condition: {
-      },
+      condition: {},
       operator: {
         "portConstraints": "FIXED_SIDE",
         "portAlignment.west": "JUSTIFIED",
@@ -160,6 +159,7 @@ export default MetaFor("graph-layout", {development: true})
             state: patch.value.context.state,
             param: patch.value.context.param,
           }
+        else return
         update({count: context.count + 1})
       }
     },
@@ -170,8 +170,11 @@ export default MetaFor("graph-layout", {development: true})
         && meta.tag.includes('graph-')
         && patch.path === "/context"
         && patch.op === "replace"
-        // && Object.hasOwn(patch.value, "x")
-        // && Object.hasOwn(patch.value, "y")
+        && (Object.hasOwn(patch.value, "x")
+          || Object.hasOwn(patch.value, "y")
+          || Object.hasOwn(patch.value, "width")
+          || Object.hasOwn(patch.value, "height")
+        )
         && ["graph-context", "graph-condition", "graph-socket", "graph-param"].includes(meta.tag)
       ),
       action({meta, patch, core, update, context}) {

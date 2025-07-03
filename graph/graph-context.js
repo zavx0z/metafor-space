@@ -121,7 +121,7 @@ export default MetaFor("graph-context", {
     onMount({component, core, update, context}) {
       update({active: context.state === core.meta.state})
       core.meta.onUpdate(i => {
-        console.log(i)
+        // console.log(i)
       })
       console.log(core.meta.state)
       core.meta.onTransition((prev, next) => {
@@ -236,117 +236,25 @@ export default MetaFor("graph-context", {
         }
       }
 
-      :host([state="в процессе"]) {
-      }
-
       :host([state="активно"]) {
         &:before {
-          border-color: rgba(var(--surface-200) / 1);
-        }
-
-        & header {
-          color: rgb(var(--success-50));
+          box-shadow: 0 0 12px 2px rgb(var(--primary-500)/.7);
+          border-color: rgb(var(--primary-400));
         }
       }
 
-      :host(:hover) > header {
-        color: rgb(var(--success-100));
+      :host([state="в процессе"]) {
+        box-shadow: 0 0 12px 4px rgb(var(--primary-700));
+        animation: process-blink 1.1s steps(1, end) infinite;
       }
 
-      :host([state="в процессе"])::before {
-        content: "";
-        position: absolute;
-        z-index: 1;
-        inset: -10px;
-        border-radius: inherit;
-        pointer-events: none;
-        background:
-          linear-gradient(120deg,
-            rgb(var(--primary-500)),
-            rgb(var(--secondary-500)),
-            rgb(var(--warning-500)),
-            rgb(var(--error-500)),
-            rgb(var(--success-500)),
-            rgb(var(--primary-500))
-          ),
-          linear-gradient(240deg,
-            rgb(var(--success-500)),
-            rgb(var(--primary-500)),
-            rgb(var(--secondary-500)),
-            rgb(var(--warning-500)),
-            rgb(var(--error-500)),
-            rgb(var(--success-500))
-          );
-        background-size: 300% 300%, 400% 400%;
-        background-blend-mode: lighten;
-        filter: blur(16px);
-        opacity: 0.5;
-        animation:
-          rainbow-chaos-1 2.2s linear infinite,
-          rainbow-chaos-2 3.1s linear infinite;
-      }
-
-      :host([state="в процессе"])::after {
-        content: "";
-        position: absolute;
-        z-index: 2;
-        inset: -3px;
-        border-radius: inherit;
-        pointer-events: none;
-        background:
-          linear-gradient(120deg,
-            rgb(var(--primary-500)),
-            rgb(var(--secondary-500)),
-            rgb(var(--warning-500)),
-            rgb(var(--error-500)),
-            rgb(var(--success-500)),
-            rgb(var(--primary-500))
-          ),
-          linear-gradient(240deg,
-            rgb(var(--success-500)),
-            rgb(var(--primary-500)),
-            rgb(var(--secondary-500)),
-            rgb(var(--warning-500)),
-            rgb(var(--error-500)),
-            rgb(var(--success-500))
-          );
-        background-size: 300% 300%, 400% 400%;
-        background-blend-mode: lighten;
-        -webkit-mask:
-          linear-gradient(#fff 0 0) content-box, 
-          linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        box-shadow: 0 0 16px 2px rgb(var(--primary-500)), 0 0 32px 4px rgb(var(--secondary-500));
-        opacity: 1;
-        animation:
-          rainbow-chaos-1 2.2s linear infinite,
-          rainbow-chaos-2 3.1s linear infinite;
-      }
-
-      @keyframes rainbow-move {
-        0% {
-          background-position: 0% 50%;
+      @keyframes process-blink {
+        0%, 100% {
+          box-shadow: 0 0 12px 4px rgb(var(--primary-700));
         }
-        100% {
-          background-position: 100% 50%;
+        50% {
+          box-shadow: 0 0 0 0 transparent;
         }
-      }
-
-      @keyframes rainbow-chaos-1 {
-        0%   { background-position: 0% 50%; }
-        25%  { background-position: 50% 100%; }
-        50%  { background-position: 100% 50%; }
-        75%  { background-position: 50% 0%; }
-        100% { background-position: 0% 50%; }
-      }
-      @keyframes rainbow-chaos-2 {
-        0%   { background-position: 100% 0%; }
-        20%  { background-position: 0% 100%; }
-        40%  { background-position: 100% 100%; }
-        60%  { background-position: 0% 0%; }
-        80%  { background-position: 100% 50%; }
-        100% { background-position: 100% 0%; }
       }
     `,
   })

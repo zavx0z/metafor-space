@@ -10,7 +10,10 @@ export default MetaFor("graph-state", {development: true})
     x: t.number({nullable: true}),
     y: t.number({nullable: true}),
   }))
-  .core(() => ({}))
+  .core(() => ({
+    /**@type{MetaAny}*/
+    meta: undefined
+  }))
   .states("рендер", "изменение размера", "перемещение")
   .transitions('рендер', [
     {

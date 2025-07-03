@@ -1,13 +1,14 @@
 import {html} from "../html/html.js"
 
 /** @param {import("../metafor").Snapshot<any, any, any>} snapshot */
-export const template = (snapshot) =>
-  html`
+export const template = (snapshot, instance) => {
+  // const cb = (e) => console.log(e)
+  return html`
     <metafor-graph-meta context=${{
       id: snapshot.id
     }}>
       ${snapshot.states.map(i => html`
-        <metafor-graph-state context=${{
+        <metafor-graph-state core=${{meta: instance}} context=${{
           id: snapshot.id,
           state: i
         }}>
@@ -49,7 +50,8 @@ export const template = (snapshot) =>
                     to: condition.state,
                     param: key,
                     type: snapshot.types[key].type
-                  }}>
+                  }}
+                  >
                     <metafor-graph-operator context=${{
                       id: snapshot.id,
                       from: transition.in,
@@ -61,23 +63,27 @@ export const template = (snapshot) =>
                   </metafor-graph-condition>
                 `
               })))}
-          <metafor-graph-context context=${{
+          <metafor-graph-context .core=${{meta: instance}} context=${{
             id: snapshot.id,
             state: i
           }}>
             ${Object.keys(snapshot.types).map(key => html`
-              <metafor-graph-param context=${{
-                id: snapshot.id,
-                state: i,
-                param: key,
-                title: snapshot.types[key].title,
-                value: snapshot.context[key],
-                options: snapshot.types[key].type === 'enum' ? snapshot.types[key].values : [],
-                type: snapshot.types[key].type
-              }}></metafor-graph-param>
+              <metafor-graph-param
+                .core=${{meta: instance}}
+                context=${{
+                  id: snapshot.id,
+                  state: i,
+                  param: key,
+                  title: snapshot.types[key].title,
+                  value: snapshot.context[key],
+                  options: snapshot.types[key].type === 'enum' ? snapshot.types[key].values : [],
+                  type: snapshot.types[key].type
+                }}
+              ></metafor-graph-param>
             `)}
           </metafor-graph-context>
         </metafor-graph-state>
       `)}
     </metafor-graph-meta>
   `
+}

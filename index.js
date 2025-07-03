@@ -11,7 +11,7 @@ export default MetaFor("test", {description: "Nodes", development: false})
       in: "начало",
       action: ({update}) => new Promise((resolve) => {
         setTimeout(() => {
-          update({status: "end"})
+          // update({status: "end"})
           return resolve()
         }, 4000)
       }),
@@ -19,17 +19,14 @@ export default MetaFor("test", {description: "Nodes", development: false})
     },
     {
       in: "конец",
-      action: async ({update}) => {
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            update({status: "start"})
-            return resolve('')
-          }, 4000)
-        })
-      },
+      action: ({update}) => new Promise((resolve) => setTimeout(() => {
+          update({status: "start"})
+          return resolve('')
+        }, 4000)),
       to: [{state: "начало", when: {status: "start"}}],
     },
   ])
   .reactions([])
   .view({
+    // render: ({html, context}) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`
   })

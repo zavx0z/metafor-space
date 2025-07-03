@@ -179,6 +179,7 @@ function createMeta(
               const oldValue = state
               state = next
               listeners.forEach((listener) => listener(oldValue, next))
+              this.setAttribute('state', this.state)
               this.#broadcastState(next)
             }
           },
@@ -203,12 +204,16 @@ function createMeta(
 
       set process(value) {
         this.#process = value
-        if (!value) this.update(this.context)
+        this.setAttribute("process", value)
+        if (!value) {
+          this.#broadcastState(this.state)
+          this.update(this.context)
+        }
       }
 
       constructor() {
         super()
-        this.dataset.state = initialState
+        this.setAttribute('state', initialState)
         view?.style?.({
           css: (strings, ...values) => {
             const sheet = new CSSStyleSheet()
@@ -229,13 +234,16 @@ function createMeta(
           this.#shadow.addEventListener("channel", this.#reactionCustomEventCb)
         }
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
-        this.#broadcastState(initialState)
         const transition = transitions.find((i) => i.in === initialState)
         if (transition?.action) {
           this.process = true
+          this.#broadcastState(initialState)
           this.#runAction(transition.action) // FIXME: если в действии нет вызова update, то #updateView не происходит
           this.#transition()
-        } else this.#transition()
+        } else {
+          this.#broadcastState(initialState)
+          this.#transition()
+        }
         if (view) {
           // Обновляем представление только если нет переходов или они не сработали
           // if (!transition?.action) {
@@ -375,15 +383,14 @@ function createMeta(
             if (conditions(transition.when, this.context, contextDefinition)) {
               const actionDefinition = transitions.find((i) => i.in === transition.state && i.action)
               if (actionDefinition?.action) {
-                this.#process = true
+                this.process = true
                 this.#state.setValue(transition.state)
-                if (view) this.#updateView()
+                if (view.render) this.#updateView()
                 this.#runAction(actionDefinition.action)
               } else {
                 this.#state.setValue(transition.state)
-                if (view) this.#updateView()
+                if (view.render) this.#updateView()
               }
-              if (view) this.dataset.state = String(this.state)
             }
           }
         }
@@ -420,7 +427,7 @@ function createMeta(
       /**@param{S}state*/
       #broadcastState = (state) => {
         /**@type {import("./metafor").BroadcastMessage}*/
-        const message = {meta: this.#meta, patch: {path: "/state", op: "replace", value: state}}
+        const message = {meta: this.#meta, patch: {path: "/state", op: this.process ? "add" : "replace", value: state}}
         if (!this.#channel) {
           console.warn("Нет канала!", message)
           return

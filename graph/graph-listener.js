@@ -21,11 +21,14 @@ export default MetaFor("graph-listener", {
         && !meta.tag.includes("input-")
       ) {
         self.snapshot = patch.value
+        self.instance = ev.target
         update({op: "add", nodes: [...context.nodes, patch.value.id]})
       }
     })
     return {
       snapshot: null,
+      /**@type{MetaAny}*/
+      instance: null
     }
   })
   .states("ожидание патча", "добавление актора")
@@ -43,7 +46,7 @@ export default MetaFor("graph-listener", {
         }
         /**@type{import("../metafor").Snapshot<any, any, any>}*/
         const snapshot = core.snapshot
-        render(template(snapshot), element)
+        render(template(snapshot, core.instance), element)
         update({nodes: context.nodes.slice(1)})
         core.snapshot = null
       },

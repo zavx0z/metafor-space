@@ -100,8 +100,8 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         </div>
       </header>
       <section>
-        <canvas ${ref(core.canvas)}></canvas>
         <slot></slot>
+        <canvas ${ref(core.canvas)}></canvas>
       </section>
     `,
     style: ({css}) => css`
@@ -126,7 +126,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         transition: opacity 222ms ease-in-out;
       }
 
-      :host([data-state="позиционирование"]) {
+      :host([state="позиционирование"]) {
         opacity: 1;
       }
 
@@ -175,6 +175,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         border-top-left-radius: inherit;
         border-top-right-radius: inherit;
         font-family: "Russo One", 'Courier New', Courier, monospace;
+        cursor: move;
 
         &::after {
           content: "";

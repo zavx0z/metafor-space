@@ -36,7 +36,10 @@ export default MetaFor("graph-param")
         update({value: patch.value[context.param]})
       }
     })
-    return {}
+    return {
+      /** @type {MetaAny}*/
+      meta: null
+    }
   })
   .states("рендер", "измерение", "установка положения")
   .transitions('рендер', [
@@ -68,11 +71,12 @@ export default MetaFor("graph-param")
     {
       title: "изменение значений",
       filter: ({context, meta, patch}) =>
-        context.id === `${meta.tag}/${meta.index}`
+        meta.tag.includes("input-")
         && patch.path === "/context"
+        && Object.hasOwn(patch.value, "value")
       ,
-      action({context, meta, patch}) {
-        console.log(patch)
+      action({core, context, patch}) {
+        core.meta.update({[context.param]: patch.value.value})
       }
     }
   ])

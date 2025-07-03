@@ -40,14 +40,14 @@ export default MetaFor("input-enum")
       :host {
         display: flex;
         align-items: center;
-        text-wrap: nowrap;
+        white-space: nowrap;
       }
 
       span {
         color: var(--font-color);
         font-size: 13px;
         margin: 0 8px;
-        text-wrap: nowrap;
+        white-space: nowrap;
       }
 
       div {
@@ -77,6 +77,8 @@ export default MetaFor("input-enum")
         text-align: right;
 
         /* Safari через webkit-specific свойство */
+
+        /*noinspection ALL*/
 
         &::-webkit-select-placeholder {
           text-align: left;
