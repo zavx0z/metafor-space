@@ -7,6 +7,7 @@ const debug = localStorage.getItem('debug') === "true"
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
+/**@type{BroadcastChannel}*/
 let devChannel = null
 /**
  * Установка канала для разработки
@@ -233,6 +234,7 @@ function createMeta(
         if (transition?.action) {
           this.process = true
           this.#runAction(transition.action) // FIXME: если в действии нет вызова update, то #updateView не происходит
+          this.#transition()
         } else this.#transition()
         if (view) {
           // Обновляем представление только если нет переходов или они не сработали
@@ -243,7 +245,8 @@ function createMeta(
           view.onMount?.({
             update: (ctx) => this._update({ctx, srcName: "view", funcName: "onMount"}),
             component: this.#shadow.host,
-            core: this.#core
+            core: this.#core,
+            context: this.context
           })
         }
       }
@@ -354,7 +357,7 @@ function createMeta(
         const result = action({
           context: this.context,
           element: this,
-          shadow: this.#shadow,
+          // shadow: this.#shadow,
           update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
           core: this.#core,
         })
@@ -427,14 +430,16 @@ function createMeta(
       }
       /**@param {import("./types/meta.ts").PatchMetaFor} patches*/
       #sendPatches = (patches) => {
-        /**@type {import("./metafor").BroadcastMessage}*/
         const message = {meta: this.#meta, patch: patches}
-        this.#shadow.dispatchEvent(new CustomEvent('channel', {
-          detail: message,
-          bubbles: true,
-          cancelable: false,
-          composed: true
-        }))
+        queueMicrotask(() => {
+          /**@type {import("./metafor").BroadcastMessage}*/
+          this.#shadow.dispatchEvent(new CustomEvent('channel', {
+            detail: message,
+            bubbles: true,
+            cancelable: false,
+            composed: true
+          }))
+        })
         // console.log(patches.value)
         if (debug) log(message, this.#core)
       }
