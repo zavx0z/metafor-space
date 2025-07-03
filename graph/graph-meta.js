@@ -5,6 +5,7 @@ import {createRef} from "../html/directives/ref.js"
 export default MetaFor("graph-meta", {development: true, description: "Node"})
   .context(t => ({
     id: t.string({title: "ID meta"}),
+    description: t.string({title: "Описание", nullable: true}),
     width: t.number({default: 0}),
     height: t.number({nullable: true}),
     error: t.string({title: "Ошибка", nullable: true})
@@ -89,7 +90,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     render: ({html, context, core, ref}) => html`
       <header ${ref(core.header)}>
         <div><!--кнопки слева--></div>
-        <h2 class="noselect">${context.id}</h2>
+        <h2 class="noselect">${context.description||context.id.split("/")[0]}</h2>
         <div><!--кнопки справа-->
           <button aria-label="Редактировать">
             <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor">
@@ -122,7 +123,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         will-change: transform;
         box-sizing: border-box;
         border-radius: 7px;
-        opacity: 0;
+        opacity: 1;
         transition: opacity 222ms ease-in-out;
       }
 
@@ -209,6 +210,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           text-align: center;
           margin: 0;
           padding: 0;
+          text-wrap: nowrap;
         }
 
         & > div:last-child {

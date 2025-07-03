@@ -123,7 +123,7 @@ export default MetaFor("graph-context", {
       core.meta.onUpdate(i => {
         // console.log(i)
       })
-      console.log(core.meta.state)
+
       core.meta.onTransition((prev, next) => {
         // console.log(prev, next)
         // update({active: context.state === next})

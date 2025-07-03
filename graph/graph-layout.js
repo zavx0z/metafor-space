@@ -26,6 +26,7 @@ export default MetaFor("graph-layout", {development: true})
         "elk.padding": "[top=20.0, left=20.0, bottom=20.0, right=20.0]",
         "considerModelOrder.strategy": "PREFER_NODES",
         "elk.port.size": 12,
+        // "elk.direction": "DOWN"
       },
       meta: {
         "elk.padding": "[top=0.0, left=0.0, bottom=0.0, right=0.0]",

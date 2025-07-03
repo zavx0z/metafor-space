@@ -1,6 +1,6 @@
 import {MetaFor} from "../metafor.js"
 import {render} from "../html/html.js"
-import {template} from "./graph-nodes.actions.js"
+import {template} from "./graph-listener.actions.js"
 
 export default MetaFor("graph-listener", {
   description: "Отслеживает добавление и удаление акторов",

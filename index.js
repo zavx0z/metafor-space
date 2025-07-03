@@ -1,6 +1,6 @@
 import {MetaFor} from "./metafor.js"
 
-export default MetaFor("test", {description: "Nodes", development: false})
+export default MetaFor("roadmap", {description: "MetaFor roadmap", development: false})
   .context((t) => ({
     status: t.enum("start", "end")({title: "Статус", default: "end"}),
   }))
@@ -20,9 +20,9 @@ export default MetaFor("test", {description: "Nodes", development: false})
     {
       in: "конец",
       action: ({update}) => new Promise((resolve) => setTimeout(() => {
-          update({status: "start"})
-          return resolve('')
-        }, 4000)),
+        update({status: "start"})
+        return resolve('')
+      }, 4000)),
       to: [{state: "начало", when: {status: "start"}}],
     },
   ])

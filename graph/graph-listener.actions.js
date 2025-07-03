@@ -1,11 +1,14 @@
 import {html} from "../html/html.js"
 
-/** @param {import("../metafor").Snapshot<any, any, any>} snapshot */
+/**
+ * @param {import("../metafor").Snapshot<any, any, any>} snapshot
+ * @param {MetaAny} instance
+ */
 export const template = (snapshot, instance) => {
-  // const cb = (e) => console.log(e)
   return html`
     <metafor-graph-meta context=${{
-      id: snapshot.id
+      id: snapshot.id,
+      description: snapshot.description
     }}>
       ${snapshot.states.map(i => html`
         <metafor-graph-state core=${{meta: instance}} context=${{
