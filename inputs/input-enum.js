@@ -41,6 +41,7 @@ export default MetaFor("input-enum")
         display: flex;
         align-items: center;
         white-space: nowrap;
+        width: 100%;
       }
 
       span {

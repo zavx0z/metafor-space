@@ -7,7 +7,7 @@ const debug = localStorage.getItem('debug') === "true"
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
-let devChannel = /**@type{BroadcastChannel}*/(null)
+let devChannel = /**@type{BroadcastChannel}*/(/**@type{unknown}*/(undefined))
 /**
  * Установка канала для разработки
  * @param {BroadcastChannel} channel - Канал для разработки
@@ -109,8 +109,7 @@ function createMeta(
     reactions = [],
     view
   }) {
-  development && import("./core/validator/index.js").then(
-    (module) => module.validateCreateOptions({tag, states}))
+  development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
   let idx = 0
 
   customElements.define("metafor-" + tag,
@@ -237,17 +236,13 @@ function createMeta(
         if (transition?.action) {
           this.process = true
           this.#broadcastState(initialState)
-          this.#runAction(transition.action) // FIXME: если в действии нет вызова update, то #updateView не происходит
+          this.#runTransitionAction(transition)
           this.#transition()
         } else {
           this.#broadcastState(initialState)
           this.#transition()
         }
         if (view) {
-          // Обновляем представление только если нет переходов или они не сработали
-          // if (!transition?.action) {
-          //   this.#updateView()
-          // }
           this.#updateView() //FIXME: временное решение
           view.onMount?.({
             update: (ctx) => this._update({ctx, srcName: "view", funcName: "onMount"}),
@@ -357,20 +352,55 @@ function createMeta(
       }
 
       /**
-       * Выполнение действия с последующим отключением блокировки переходов
-       * @param {import('./metafor.t').Action<C, I>} action
+       * Выполнение действия с поддержкой success/error
+       * @param {import('./types/transitions').Transition<any, any, any>} transitionObj
        */
-      #runAction = (action) => {
-        const result = action({
+      #runTransitionAction = (transitionObj) => {
+        const {action, success, error} = transitionObj
+        if (!action) return;
+        let result;
+        const params = {
           context: this.context,
           element: this,
-          // shadow: this.#shadow,
-          update: (ctx) => this.#updateContext({ctx, srcName: "action"}),
           core: this.#core,
-        })
-        const finallyFn = () => (this.process = false)
-        if (result?.then) result.finally(finallyFn)
-        else finallyFn()
+        };
+        try {
+          result = action(params);
+          if (result && typeof result.then === "function") {
+            // async
+            result
+              .then((data) => {
+                if (typeof success === "function") {
+                  success({ ...params, data,
+                    update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
+                  })
+                }
+              })
+              .catch((err) => {
+                if (typeof error === "function") {
+                  error({ ...params, data: err,
+                    update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
+                  })
+                }
+              })
+              .finally(() => (this.process = false));
+          } else {
+            // sync
+            if (typeof success === "function") {
+              success({ ...params, data: result,
+                update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
+              })
+            }
+            this.process = false
+          }
+        } catch (err) {
+          if (typeof error === "function") {
+            error({ ...params, data: err,
+              update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
+            })
+          }
+          this.process = false
+        }
       }
 
       /** Проверка условий перехода и выполнение действия */
@@ -385,7 +415,7 @@ function createMeta(
                 this.process = true
                 this.#state.setValue(transition.state)
                 if (view.render) this.#updateView()
-                this.#runAction(actionDefinition.action)
+                this.#runTransitionAction(actionDefinition)
               } else {
                 this.#state.setValue(transition.state)
                 if (view.render) this.#updateView()

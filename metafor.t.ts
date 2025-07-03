@@ -37,7 +37,7 @@ export type FabricCallbackCreateFuncHelper<
   transitions: Transitions<S, C, I>
   coreDefinition: CoreDefinition<I, C>
   reactions?: Reactions<C, I>
-  view?: ViewDefinition<I, C, S>
+  view: ViewDefinition<I, C, S>
 }
 /**
  Действие объявленное в transitions
@@ -57,6 +57,6 @@ export type Action<C extends ContextDefinition, I extends Record<string, unknown
   {context, element, update, core}: {
     context: ContextData<C>
     element: HTMLElement
-    update: Update<C>
+    // update: Update<C>
     core: Core<I>
   }) => void | Promise<void>

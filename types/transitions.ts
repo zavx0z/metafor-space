@@ -5,7 +5,9 @@ import type {
   NumberDefinition,
   NumberEnumDefinition,
   StringDefinition,
-  StringEnumDefinition
+  StringEnumDefinition,
+  ContextData,
+  Update
 } from "./context.ts";
 import type {CoreObj} from "./core.ts";
 import type {Action} from "../metafor.t.ts"
@@ -68,6 +70,26 @@ export type Transition<S extends string, C extends ContextDefinition, I extends 
    @default undefined
    */
   action?: Action<C, I>
+  /** # Success callback (опционально)
+   * Вызывается при успешном завершении action (resolve/return)
+   */
+  success?: ({update, data, context, element, core}: {
+    update: Update<C>
+    data: any
+    context: ContextData<C>
+    element: HTMLElement
+    core: CoreObj
+  }) => void | Promise<void>
+  /** # Error callback (опционально)
+   * Вызывается при ошибке в action (reject/throw)
+   */
+  error?: ({update, data, context, element, core}: {
+    update: Update<C>
+    data: any
+    context: ContextData<C>
+    element: HTMLElement
+    core: CoreObj
+  }) => void | Promise<void>
   /** # Целевые состояния
 
    Набор целевых состояний, в которые возможен переход из состояния, указанного в `from`.
