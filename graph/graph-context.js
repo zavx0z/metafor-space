@@ -25,7 +25,7 @@ export default MetaFor("graph-context", {
     sockets: new Map(),
     count: 0,
     header: createRef(),
-    /**@type{MetaAny}*/
+    /**@type{MetaAny|null}*/
     meta: null,
   }))
   .states("рендер", "измерение", "позиционирование", "неактивно", "активно", "в процессе")

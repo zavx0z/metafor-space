@@ -33,7 +33,7 @@ export default MetaFor("graph-nodes", {
       filter: ({meta, patch}) => meta.tag === "graph-listener"
         && patch.path === "/context"
       ,
-      action({meta, patch}) {
+      action({patch}) {
         console.log(patch)
       }
     }

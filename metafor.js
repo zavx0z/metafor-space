@@ -7,8 +7,7 @@ const debug = localStorage.getItem('debug') === "true"
 let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
 if (debug) log = (await import('./core/console.js')).log
 
-/**@type{BroadcastChannel}*/
-let devChannel = null
+let devChannel = /**@type{BroadcastChannel}*/(null)
 /**
  * Установка канала для разработки
  * @param {BroadcastChannel} channel - Канал для разработки
@@ -204,17 +203,17 @@ function createMeta(
 
       set process(value) {
         this.#process = value
-        this.setAttribute("process", value)
         if (!value) {
+          this.removeAttribute("process")
           this.#broadcastState(this.state)
           this.update(this.context)
-        }
+        } else this.setAttribute("process", "")
       }
 
       constructor() {
         super()
         this.setAttribute('state', initialState)
-        view?.style?.({
+        view.style?.({
           css: (strings, ...values) => {
             const sheet = new CSSStyleSheet()
             const result = strings.reduce((acc, str, i) => acc + str + (values[i] || ""), "")

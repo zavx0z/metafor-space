@@ -43,6 +43,7 @@ type MountParams<C extends ContextDefinition, I extends Record<string, any>> = (
   component: Element
   core: Core<I>
   update: Update<C>
+  context: ContextData<C>
 }) => void
 
 /**
