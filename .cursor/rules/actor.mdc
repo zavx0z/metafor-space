@@ -1,7 +1,3 @@
----
-alwaysApply: true
----
-
 # MetaFor Actor System
 
 ## Создание актора MetaFor
@@ -22,12 +18,13 @@ export default MetaFor("actor-name", {development: true})
 
 - **`tag`** `string` - Имя актора для регистрации `<metafor-{tag}>` элемента и идентификации в сообщениях
 - **`conf`** `object` (опционально):
-  - **`description`** `string` - Описание актора
-  - **`development`** `boolean` - Режим разработки с валидацией
+    - **`description`** `string` - Описание актора
+    - **`development`** `boolean` - Режим разработки с валидацией
 
 ## Акторная модель
 
-MetaFor реализует акторную модель, где каждый компонент является независимым актором. Акторы взаимодействуют исключительно через передачу сообщений.
+MetaFor реализует акторную модель, где каждый компонент является независимым актором. Акторы взаимодействуют
+исключительно через передачу сообщений.
 
 ### Основные принципы
 
@@ -52,7 +49,8 @@ MetaFor реализует акторную модель, где каждый к
 
 ```javascript
 // Простая кнопка может управлять сложной системой
-.reactions([{
+.
+reactions([{
   title: "Простая кнопка влияет на сложную систему",
   filter: ({meta}) => meta.tag === "emergency-button",
   action: ({update}) => update({mode: "emergency"})
@@ -62,18 +60,14 @@ MetaFor реализует акторную модель, где каждый к
 ## Жизненный цикл актора
 
 ```mermaid
----
-config:
-  theme: dark
----
 flowchart TD
     subgraph s2["Инициализация актора"]
         A["Создание актора"]
         B{"Есть действие при инициализации?"}
         C["Присвоение начального состояния и контекста"]
         C2["Присвоение начального состояния и контекста"]
-        D["sendPatch: op=add path=/"]
-        D2["sendPatch: op=add path=/"]
+        D["sendPatch: op=add path=/\n(CustomEvent, snapshot)"]
+        D2["sendPatch: op=add path=/\n(CustomEvent, snapshot)"]
         n10["🔒 Блокировка триггеров: process=true"]
         n17(("Ожидание"))
     end
@@ -85,14 +79,14 @@ flowchart TD
         n8(("Ожидание"))
         n27["Обновление контекста"]
         n28["onUpdate сигнал"]
-        n29["sendPatch path: /context"]
+        n29["sendPatch: op=replace path=/context\n(CustomEvent)"]
     end
 
     subgraph s4["Внешние обновления (Реакции)"]
         HD{"Триггеры разблокированы?"}
         n24["Обновление контекста"]
         n25["onUpdate сигнал"]
-        n26["sendPatch path: /context"]
+        n26["sendPatch: op=replace path=/context\n(CustomEvent)"]
         n31["Есть обновленные параметры?"]
         n32(("Ожидание"))
         n33(("Ожидание"))
@@ -102,7 +96,7 @@ flowchart TD
         HE{"Переходы существуют?"}
         HG{"Условие перехода выполнено?"}
         K["Смена состояния"]
-        HL["sendPatch path: /state"]
+        HL["sendPatch: op=replace path=/state\n(BroadcastChannel)"]
         HM{"Есть действие в новом состоянии?"}
         n11["🔒 Блокировка триггеров: process=true"]
         n15["🔓 Разблокировка триггеров"]
@@ -110,7 +104,7 @@ flowchart TD
         n20["onTransition сигнал"]
         n21["onUpdate сигнал"]
         n22["Обновление контекста"]
-        n23["sendPatch path: /context"]
+        n23["sendPatch: op=replace path=/context\n(CustomEvent)"]
     end
 
     subgraph s1["Core функции"]
@@ -122,45 +116,43 @@ flowchart TD
         n13{"Контекст обновляет?"}
     end
 
+%% Патчи состояния (BroadcastChannel)
+    D --> D_state["sendPatch: op=add path=/state\n(BroadcastChannel, блокировка если есть action)"]
+    D2 --> D2_state["sendPatch: op=add path=/state\n(BroadcastChannel, блокировка если есть action)"]
+%% Обычные связи
     A --> B
-    B -- "Нет" --> C2
-    B -- "Да" --> n10
+    B -- " Нет " --> C2
+    B -- " Да " --> n10
     n10 --> C
     C --> D
     C2 --> D2
-    D --> n1
-    D2 --> n17
-
-    n1 -- "Да" --> n2
+    D_state --> n1
+    D2_state --> n17
+    n1 -- " Да " --> n2
     n1 --> n4
-    n4 -- "Да" --> n27
-    n4 -- "Нет" --> n14
+    n4 -- " Да " --> n27
+    n4 -- " Нет " --> n14
     n27 --> n28
     n28 --> n29
     n29 --> HE
     n14 --> n8
-
     n2 --> n24
-    n12 -- "Да" --> n2
+    n12 -- " Да " --> n2
     n12 --> n13
     n13 --> n24
-
     n24 --> n31
-    n31 -- "Да" --> n25
-    n31 -- "Нет" --> n32
+    n31 -- " Да " --> n25
+    n31 -- " Нет " --> n32
     n25 --> n26
     n26 --> HD
-
-    HD -- "Да" --> HE
-    HD -- "Нет" --> n33
-
-    HE -- "Да" --> HG
-    HE -- "Нет" --> n15
-    HG -- "Да" --> HM
-    HG -- "Нет" --> n15
-
-    HM -- "Да" --> n11
-    HM -- "Нет" --> n15
+    HD -- " Да " --> HE
+    HD -- " Нет " --> n33
+    HE -- " Да " --> HG
+    HE -- " Нет " --> n15
+    HG -- " Да " --> HM
+    HG -- " Нет " --> n15
+    HM -- " Да " --> n11
+    HM -- " Нет " --> n15
     n11 --> n22
     n22 --> n21
     n21 --> n23
@@ -168,40 +160,18 @@ flowchart TD
     K --> n20
     n20 --> HL
     HL --> n1
-
     n15 --> n16
     n16 --> n17
-
-    style A stroke:none
-    style B stroke:none
-    style C stroke:none
-    style C2 stroke:none
-    style D stroke:none,fill:#FFD600,color:#000000
-    style D2 stroke:none,fill:#FFD600,color:#000000
-    style n10 color:#000000,fill:#FF5757
-    style n17 fill:#FFFFFF,color:#000000
-    style n14 fill:#00C853,color:#000000
-    style n8 fill:#FFFFFF,color:#000000
-    style n27 fill:#FF6D00,color:#000000
-    style n28 color:#000000,fill:#FF6D00,stroke:none
-    style n29 fill:#FFD600,color:#000000,stroke:#FF6D00
-    style n24 fill:#FF6D00,color:#000000
-    style n25 color:#000000,fill:#FF6D00,stroke:none
-    style n26 fill:#FFD600,color:#000000,stroke:#FF6D00
-    style n32 fill:#FFFFFF,color:#000000
-    style n33 fill:#FFFFFF,color:#000000
-    style K fill:#2962FF,color:#FFFFFF
-    style HL fill:#FFD600,color:#000000,stroke:#2962FF
-    style n11 color:#000000,fill:#FF5757
-    style n15 fill:#00C853,color:#000000
-    style n16 fill:#FFFFFF,color:#000000
-    style n20 color:#FFFFFF,fill:#2962FF
-    style n21 color:#000000,fill:#FF6D00,stroke:none
-    style n22 fill:#FF6D00,color:#000000
-    style n23 fill:#FFD600,color:#000000,stroke:#FF6D00
-    style ActionExecution stroke-width:2px,stroke:#38B6FF
-    style s1 stroke:#5271FF,stroke-width:2px,stroke-dasharray:5 5,color:#FFFFFF,fill:transparent
-    style s6 stroke:#5271FF,stroke-width:2px,stroke-dasharray:5 5,color:#FFFFFF,fill:transparent
+%% Стилизация патчей
+    style D_state fill: #FFD600, stroke: #2962FF, color: #000
+    style D2_state fill: #FFD600, stroke: #2962FF, color: #000
+    style HL fill: #FFD600, stroke: #2962FF, color: #000
+    style n29 fill: #FFD600, stroke: #FF6D00, color: #000
+    style n26 fill: #FFD600, stroke: #FF6D00, color: #000
+    style n23 fill: #FFD600, stroke: #FF6D00, color: #000
+%% Описание каналов
+%% - CustomEvent: жёлтый фон, оранжевая рамка
+%% - BroadcastChannel: жёлтый фон, синяя рамка
 ```
 
 ## Компоненты актора
@@ -252,13 +222,26 @@ export default MetaFor("actor-name", {development: true})  // 1. Создани�
 {
   meta: {
     tag: "counter",    // тип актора
-    index: 2,         // номер экземпляра
-    timestamp: 1234567890
-  },
+      index
+  :
+    2,         // номер экземпляра
+      timestamp
+  :
+    1234567890
+  }
+,
   patch: {
     path: "/context",  // пути: /, /state, /context
-    op: "replace",
-    value: {counter: 10, active: true}
+      op
+  :
+    "replace",
+      value
+  :
+    {
+      counter: 10, active
+    :
+      true
+    }
   }
 }
 ```
@@ -275,15 +258,15 @@ export default MetaFor("actor-name", {development: true})  // 1. Создани�
 Возвращает конструктор для последовательного определения компонентов актора.
 
 ```javascript
-MetaFor(tag, conf?)
+MetaFor(tag, conf ?)
 ```
 
 **Параметры:**
 
 - **`tag`** - имя актора для регистрации `<metafor-{tag}>` элемента
 - **`conf`** - опциональная конфигурация:
-  - `description` - описание актора
-  - `development` - режим разработки с валидацией
+    - `description` - описание актора
+    - `development` - режим разработки с валидацией
 
 **Возвращает:** конструктор с методами `.context()`, `.core()`, `.states()`, `.transitions()`, `.reactions()`, `.view()`
 
@@ -305,7 +288,8 @@ MetaFor(tag, conf?)
 - Контекст может обновляться во время блокировки
 
 ```javascript
-.context(t => ({
+.
+context(t => ({
   name: t.string({default: "actor"}),
   counter: t.number({default: 0}),
   active: t.boolean({default: true}),
@@ -327,7 +311,8 @@ MetaFor(tag, conf?)
 - **Actions** - функции для конкретных состояний
 
 ```javascript
-.core(({update, context, self}) => ({
+.
+core(({update, context, self}) => ({
   // Сложные данные
   users: new Map(),
   products: [],
@@ -361,8 +346,8 @@ MetaFor(tag, conf?)
     context.selectedIds.map(id => self.getUserById(id)).filter(Boolean)
 }))
 
-// Core может быть пустым
-.core(() => ({}))
+  // Core может быть пустым
+  .core(() => ({}))
 ```
 
 ## 4. Состояния - автомат состояний
@@ -370,7 +355,8 @@ MetaFor(tag, conf?)
 Состояния глобально видимы всем акторам в системе.
 
 ```javascript
-.states("idle", "working", "done", "emergency")
+.
+states("idle", "working", "done", "emergency")
 ```
 
 **Глобальность:**
@@ -385,14 +371,15 @@ MetaFor(tag, conf?)
 
 ### Автоматическая обработка результата
 
-**Новая система автоматически обрабатывает результат action:**
+**Система автоматически обрабатывает результат action:**
 
 1. **Автоматический success**: если action возвращает объект для обновления контекста
 2. **Автоматический error**: если action выбрасывает Error
 3. **Ручные success/error**: только для форматирования результата сторонних функций
 
 ```javascript
-.transitions("idle", [
+.
+transitions("idle", [
   {
     in: "idle",
     to: [{state: "working", when: {data: {isEmpty: false}}}]
@@ -449,13 +436,18 @@ MetaFor(tag, conf?)
 
 ```javascript
 {
-  in: "начало",
-  action: () => new Promise((resolve) => {
+in:
+  "начало",
+    action
+:
+  () => new Promise((resolve) => {
     setTimeout(() => {
       resolve({status: "end"}) // Автоматически обновит контекст
     }, 6000)
   }),
-  to: [{state: "конец", when: {status: "end"}}],
+    to
+:
+  [{state: "конец", when: {status: "end"}}],
 }
 ```
 
@@ -463,8 +455,11 @@ MetaFor(tag, conf?)
 
 ```javascript
 {
-  in: "начало",
-  action: () => new Promise((resolve, reject) => {
+in:
+  "начало",
+    action
+:
+  () => new Promise((resolve, reject) => {
     try {
       // какая-то логика
       resolve({status: "success"})
@@ -472,7 +467,9 @@ MetaFor(tag, conf?)
       reject(new Error("Что-то пошло не так")) // Автоматически обновит error
     }
   }),
-  to: [
+    to
+:
+  [
     {state: "конец", when: {status: "success"}},
     {state: "ошибка", when: {error: {isNull: false}}}
   ],
@@ -483,9 +480,14 @@ MetaFor(tag, conf?)
 
 ```javascript
 {
-  in: "загрузка",
-  action: () => fetch('/api/users'),
-  success: ({update, data}) => {
+in:
+  "загрузка",
+    action
+:
+  () => fetch('/api/users'),
+    success
+:
+  ({update, data}) => {
     // Форматируем ответ API
     update({
       users: data.users,
@@ -493,14 +495,18 @@ MetaFor(tag, conf?)
       loaded: true
     })
   },
-  error: ({update, data}) => {
+    error
+:
+  ({update, data}) => {
     // Обрабатываем ошибку API
     update({
       error: `Ошибка загрузки: ${data.message}`,
       loaded: false
     })
   },
-  to: [
+    to
+:
+  [
     {state: "готово", when: {loaded: true}},
     {state: "ошибка", when: {error: {isNull: false}}}
   ]
@@ -519,7 +525,8 @@ MetaFor(tag, conf?)
 Обработка событий от других акторов.
 
 ```javascript
-.reactions([
+.
+reactions([
   {
     title: "События изменяют контекст",
     filter: ({meta, patch}) => meta.tag === "user-input",
@@ -548,7 +555,8 @@ MetaFor(tag, conf?)
 Декларативное отображение данных через Shadow DOM. Шаблонизация основана на lit-html.
 
 ```javascript
-.view({
+.
+view({
   render: ({html, context, state, repeat}) => html`
     <div class="actor-${state}">
       <h3>${context.name}</h3>
@@ -557,9 +565,9 @@ MetaFor(tag, conf?)
       <!-- Создание дочерних акторов -->
       ${repeat(context.childTasks, (task) => task.id, (task) => html`
         <metafor-child-worker context=${{
-          taskId: task.id,
-          parentName: context.name
-        }}></metafor-child-worker>
+    taskId: task.id,
+    parentName: context.name
+  }}></metafor-child-worker>
       `)}
     </div>
   `,
@@ -580,7 +588,7 @@ MetaFor(tag, conf?)
 ### Три способа взаимодействия
 
 | Направление               | Механизм                   | Область                                | Использование           |
-| ------------------------- | -------------------------- | -------------------------------------- | ----------------------- |
+|---------------------------|----------------------------|----------------------------------------|-------------------------|
 | 🌐 **Все ↔ Все**          | Глобальные состояния       | Main thread, workers, tabs, устройства | Координация системы     |
 | ⬆️ **Ребенок → Родитель** | DOM-события                | DOM-дерево                             | События меняют контекст |
 | ⬇️ **Родитель → Ребенок** | SessionStorage + состояния | Tab/window                             | Передача данных         |
@@ -589,7 +597,8 @@ MetaFor(tag, conf?)
 
 ```javascript
 // Родитель: сохраняет данные и меняет состояние
-.transitions("idle", [{
+.
+transitions("idle", [{
   in: "idle",
   action: ({update, context}) => {
     sessionStorage.setItem('child-data', JSON.stringify(context.dataToSend))
@@ -598,17 +607,17 @@ MetaFor(tag, conf?)
   to: [{state: "waiting", when: {dataReady: true}}]
 }])
 
-// Ребенок: реагирует на состояние и читает данные
-.reactions([{
-  title: "Получение данных от родителя",
-  filter: ({meta, patch}) =>
-    meta.tag === "parent-actor" &&
-    patch.path === "/state" && patch.value === "waiting",
-  action: ({update}) => {
-    const data = JSON.parse(sessionStorage.getItem('child-data') || '{}')
-    update({receivedData: data})
-  }
-}])
+  // Ребенок: реагирует на состояние и читает данные
+  .reactions([{
+    title: "Получение данных от родителя",
+    filter: ({meta, patch}) =>
+      meta.tag === "parent-actor" &&
+      patch.path === "/state" && patch.value === "waiting",
+    action: ({update}) => {
+      const data = JSON.parse(sessionStorage.getItem('child-data') || '{}')
+      update({receivedData: data})
+    }
+  }])
 ```
 
 ## Простой пример актора
@@ -616,21 +625,21 @@ MetaFor(tag, conf?)
 ```javascript
 export default MetaFor("counter")
   .context((t) => ({
-    value: t.number({ default: 0 }),
-    step: t.number({ default: 1 }),
-    max: t.number({ default: 10 }),
+    value: t.number({default: 0}),
+    step: t.number({default: 1}),
+    max: t.number({default: 10}),
   }))
 
-  .core(({ update, context }) => ({
+  .core(({update, context}) => ({
     increment: () => {
       const newValue = context.value + context.step
-      update({ value: Math.min(newValue, context.max) })
+      update({value: Math.min(newValue, context.max)})
     },
     decrement: () => {
       const newValue = context.value - context.step
-      update({ value: Math.max(newValue, 0) })
+      update({value: Math.max(newValue, 0)})
     },
-    reset: () => update({ value: 0 }),
+    reset: () => update({value: 0}),
   }))
 
   .states("active", "max", "min")
@@ -639,25 +648,25 @@ export default MetaFor("counter")
     {
       in: "active",
       to: [
-        { state: "max", when: { value: { gte: 10 } } },
-        { state: "min", when: { value: { lte: 0 } } },
+        {state: "max", when: {value: {gte: 10}}},
+        {state: "min", when: {value: {lte: 0}}},
       ],
     },
     {
       in: "max",
-      to: [{ state: "active", when: { value: { lt: 10 } } }],
+      to: [{state: "active", when: {value: {lt: 10}}}],
     },
     {
       in: "min",
-      to: [{ state: "active", when: { value: { gt: 0 } } }],
+      to: [{state: "active", when: {value: {gt: 0}}}],
     },
   ])
 
   .reactions([
     {
       title: "Команды от UI",
-      filter: ({ meta }) => meta.tag === "ui-controller",
-      action: ({ patch, core }) => {
+      filter: ({meta}) => meta.tag === "ui-controller",
+      action: ({patch, core}) => {
         const command = patch.value.command
         if (command === "increment") core.increment()
         if (command === "decrement") core.decrement()
@@ -667,7 +676,7 @@ export default MetaFor("counter")
   ])
 
   .view({
-    render: ({ html, context, state, core }) => html`
+    render: ({html, context, state, core}) => html`
       <div class="counter ${state}">
         <div class="value">${context.value}</div>
         <button @click=${core.increment}>+</button>
@@ -677,7 +686,7 @@ export default MetaFor("counter")
       </div>
     `,
 
-    style: ({ css }) => css`
+    style: ({css}) => css`
       .counter {
         padding: 20px;
         border: 2px solid #ccc;
@@ -765,7 +774,8 @@ export default MetaFor("system-controller")
 ### 1. Слушание состояний
 
 ```javascript
-.reactions([{
+.
+reactions([{
   title: "Реакция на активацию кнопки",
   filter: ({meta, patch}) =>
     meta.tag === "button" && patch.path === "/state" && patch.value === "active",
@@ -776,7 +786,8 @@ export default MetaFor("system-controller")
 ### 2. Слушание контекста
 
 ```javascript
-.reactions([{
+.
+reactions([{
   title: "Отслеживание счетчика",
   filter: ({meta, patch}) =>
     meta.tag === "counter" && patch.path === "/context" && patch.value.counter > 10,
@@ -787,7 +798,8 @@ export default MetaFor("system-controller")
 ### 3. Множественное слушание
 
 ```javascript
-.reactions([
+.
+reactions([
   {
     title: "Слушаем пользователя",
     filter: ({meta}) => meta.tag === "user-input",
@@ -891,7 +903,9 @@ export default MetaFor("task-worker")
 
 ## Лучшие практики
 
-1. **Используйте вложенность функционально** - создавайте иерархии для разделения ответственности, сети для взаимодействия. Родительские акторы координируют работу, дочерние решают конкретные задачи, при этом все могут слушать друг друга
+1. **Используйте вложенность функционально** - создавайте иерархии для разделения ответственности, сети для
+   взаимодействия. Родительские акторы координируют работу, дочерние решают конкретные задачи, при этом все могут
+   слушать друг друга
 2. **Слушайте всех** - подписывайтесь на полезные события
 3. **Держите акторы простыми** - одна ответственность
 4. **Используйте типизацию** - четкие контракты сообщений

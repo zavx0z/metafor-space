@@ -27,9 +27,9 @@ describe("Actions", () => {
         },
         {
           in: "АВТОРИЗАЦИЯ",
-          action: ({update}) => {
+          action: () => {
             const nickname = "zavx0z"
-            update({nickname})
+            return {nickname}
           },
           to: [
             {
@@ -71,9 +71,9 @@ describe("Actions", () => {
         },
         {
           in: "АВТОРИЗАЦИЯ",
-          action: async ({update}) => {
+          action: async () => {
             await new Promise((resolve) => setTimeout(resolve, 100))
-            update({nickname: "async_user"})
+            return {nickname: "async_user"}
           },
           to: [
             {
@@ -117,11 +117,11 @@ describe("Actions", () => {
         },
         {
           in: "АВТОРИЗАЦИЯ",
-          action: ({update}) => {
-            update({
+          action: () => {
+            return {
               nickname: "multi_update",
               email: "updated@email.com",
-            })
+            }
           },
           to: [
             {
@@ -163,9 +163,9 @@ describe("Actions", () => {
         },
         {
           in: "АВТОРИЗАЦИЯ",
-          action: ({update}) => {
+          action: () => {
             actionCalled = true
-            update({nickname: "should_not_update"})
+            return {nickname: "should_not_update"}
           },
           to: [
             {

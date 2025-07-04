@@ -15,19 +15,19 @@ test("Блокировка переходов перед входом в нов�
     .transitions("INIT", [
       {
         in: "INIT",
-        action: ({update}) => {
-          update({value: 11})
+        action: () => {
+          return {value: 11} // Автоматически обновит контекст
         },
         to: [{state: "PROCESS", when: {value: {gt: 10}}}],
       },
       {
         in: "PROCESS",
-        action: ({update}) => {
-          update({value: 15})
+        action: () => {
           const end = Date.now() + 500
           while (Date.now() < end) {
             // Блокируем поток
           }
+          return {value: 15} // Автоматически обновит контекст
         },
         to: [
           {state: "DONE", when: {value: {gt: 14}}},
@@ -65,9 +65,9 @@ test("Блокировка переходов для асинхронного д
     .transitions("INIT", [
       {
         in: "INIT",
-        action: async ({update}) => {
+        action: async () => {
           await new Promise((resolve) => setTimeout(resolve, 10))
-          update({value: 15}) // Это не должно вызвать переход
+          return {value: 15} // Автоматически обновит контекст
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
@@ -91,9 +91,9 @@ test("Снятие блокировки после действия", async () =
     .transitions("INIT", [
       {
         in: "INIT",
-        action: async ({update}) => {
+        action: async () => {
           await new Promise((resolve) => setTimeout(resolve, 50))
-          update({value: 15})
+          return {value: 15} // Автоматически обновит контекст
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },

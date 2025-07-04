@@ -25,7 +25,7 @@ describe("Конструктор MetaFor", () => {
       },
       {
         in: "АВТОРИЗАЦИЯ",
-        action: ({update}) => update({nickname}),
+        action: () => ({nickname}),
         to: [{state: "АВТОРИЗОВАН", when: {nickname: {isNull: false}}}],
       },
     ])

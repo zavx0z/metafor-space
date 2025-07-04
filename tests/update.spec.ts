@@ -26,12 +26,12 @@ describe("update", async () => {
     .transitions("INITIAL", [
       {
         in: "INITIAL",
-        action: ({update}) => update({state: "action"}),
+        action: () => ({state: "action"}),
         to: [{state: "action", when: {state: "action"}}],
       },
       {
         in: "action",
-        action: ({update}) => update({state: "core", field1: "action complex"}),
+        action: () => ({state: "core", field1: "action complex"}),
         to: [{state: "core", when: {state: "core"}}],
       },
       {

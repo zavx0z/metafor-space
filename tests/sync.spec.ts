@@ -33,8 +33,9 @@ describe("Синхронизация core и context", async () => {
       },
       {
         in: "push",
-        action: ({core}) =>
-          core.pushData(),
+        action: ({core}) => {
+          core.pushData()
+        },
         to: [
           {state: "IDLE", when: {process: null}},
           {state: "pop", when: {process: "pop"}}
@@ -58,7 +59,7 @@ describe("Синхронизация core и context", async () => {
 
   meta.onUpdate((values) => {
     // console.log("upd", values)
-    if (values.dataLength > 47) {
+    if (typeof values.dataLength === 'number' && values.dataLength > 47) {
       test("Данные ядра синхронизируются с контекстом", () => {
         // meta.core.popData()
         meta.update({process: "pop"})

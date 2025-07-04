@@ -31,17 +31,17 @@ describe("core", () => {
         },
         {
           in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
-          action: ({core, update}) => {
+          action: ({core}) => {
             core.handleKeyDown("Space")
-            update({actionUpdate: true})
+            return {actionUpdate: true}
           },
           to: [{state: "отпуск элемента", when: {isSpacePressed: false, actionUpdate: false}}]
         },
         {
           in: "отпуск элемента",
-          action: ({core, update}) => {
+          action: ({core}) => {
             core.handleKeyUp("Space")
-            update({actionUpdate: true})
+            return {actionUpdate: true}
           },
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false, actionUpdate: false}}],
         }

@@ -23,14 +23,26 @@ export const messagesFixture = (options?: {
       messages.push(detail)
     }
   })
+  // @ts-ignore
+  document.addEventListener('metafor-update', ({detail}: CustomEvent) => {
+    if (!options?.meta || detail.meta?.tag === options.meta) {
+      messages.push(detail)
+    }
+  })
   const onmessage = (cb: (message: BroadcastMessage) => void) => {
     channel.addEventListener("message", ({data}) => {
-      if (!options?.meta || data.meta?.particle === options.meta) {
+      if (!options?.meta || data.meta?.tag === options.meta) {
         cb(data)
       }
     })
     // @ts-ignore
     document.addEventListener('channel', ({detail}: CustomEvent) => {
+      if (!options?.meta || detail.meta?.tag === options.meta) {
+        cb(detail)
+      }
+    })
+    // @ts-ignore
+    document.addEventListener('metafor-update', ({detail}: CustomEvent) => {
       if (!options?.meta || detail.meta?.tag === options.meta) {
         cb(detail)
       }
@@ -47,15 +59,29 @@ export const messagesFixture = (options?: {
           resolve(messages)
           return
         }
-        setTimeout(checkMessages, 100)
+        setTimeout(checkMessages, 50)
+      }
+
+      const updateLastMessageTime = () => {
+        lastMessageTime = Date.now()
       }
 
       channel.addEventListener("message", ({data}: MessageEvent) => {
-        if (!options?.meta || data.meta?.particle === options.meta) lastMessageTime = Date.now()
+        if (!options?.meta || data.meta?.tag === options.meta) {
+          updateLastMessageTime()
+        }
       })
       // @ts-ignore
       document.addEventListener('channel', ({detail}: CustomEvent) => {
-        if (!options?.meta || detail.meta?.particle === options.meta) lastMessageTime = Date.now()
+        if (!options?.meta || detail.meta?.tag === options.meta) {
+          updateLastMessageTime()
+        }
+      })
+      // @ts-ignore
+      document.addEventListener('metafor-update', ({detail}: CustomEvent) => {
+        if (!options?.meta || detail.meta?.tag === options.meta) {
+          updateLastMessageTime()
+        }
       })
       checkMessages()
     })

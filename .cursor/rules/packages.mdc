@@ -1,8 +1,9 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 Все скрипты проекта MetaFor запускаются из корневой директории с помощью bun run, при этом код написан на VanillaJS без сборщиков и может выполняться стандартными средствами любой IDE через встроенные возможности запуска статического сервера в браузере.
 
 # Структура модулей MetaFor
@@ -27,13 +28,15 @@ module-name/
 ## Именование тегов акторов
 
 Для модуля с именем `graph` теги акторов формируются по шаблону:
+
 ```
 {module-name}-{feature}
 ```
 
 **Примеры:**
+
 - `graph-layout` - управление компоновкой графа
-- `graph-nodes` - управление узлами графа  
+- `graph-nodes` - управление узлами графа
 - `graph-meta` - нода-актор графа
 - `graph-edges` - управление рёбрами графа
 - `graph-viewport` - управление областью просмотра
@@ -41,19 +44,22 @@ module-name/
 ## Обязательные файлы актора
 
 ### 1. `{tag-name}.js` - основной файл актора
-```javascript
-import {MetaFor} from "../metafor.js"
-import "./{related-actors}.js"  // Импорт связанных акторов
 
-export default MetaFor("graph-layout", {development: true})
-  .context(t => ({
-    nodes: t.array({default: []}),
-    width: t.number({nullable: true}),
-    height: t.number({nullable: true})
+```javascript
+import { MetaFor } from "../metafor.js"
+import "./{related-actors}.js" // Импорт связанных акторов
+
+export default MetaFor("graph-layout", { development: true })
+  .context((t) => ({
+    nodes: t.array({ default: [] }),
+    width: t.number({ nullable: true }),
+    height: t.number({ nullable: true }),
   }))
-  .core(({update, context}) => ({
+  .core(({ update, context }) => ({
     // Переиспользуемые методы
-    updateLayout: () => { /* логика */ }
+    updateLayout: () => {
+      /* логика */
+    },
   }))
   .states("idle", "calculating", "ready")
   .transitions("idle", [
@@ -63,16 +69,15 @@ export default MetaFor("graph-layout", {development: true})
     // Реакции на другие акторы
   ])
   .view({
-    render: ({html, context}) => html`
-      <!-- UI представление -->
-    `,
-    style: ({css}) => css`
+    render: ({ html, context }) => html` <!-- UI представление --> `,
+    style: ({ css }) => css`
       /* стили */
-    `
+    `,
   })
 ```
 
 ### 2. `{tag-name}.t.ts` - определения TypeScript типов
+
 ```typescript
 /**
  * Типы для актора graph-layout
@@ -100,22 +105,23 @@ export type LayoutResult = {
 ```
 
 ### 3. `{tag-name}.spec.ts` - тесты актора
+
 ```typescript
-import {describe, expect, test} from "bun:test"
-import {MetaFor} from "../metafor.js"
+import { describe, expect, test } from "bun:test"
+import { MetaFor } from "../metafor.js"
 
 describe("graph-layout актор", () => {
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
-  
+
   test("создание актора", () => {
     // Тесты инициализации
   })
-  
+
   test("переходы состояний", () => {
     // Тесты логики
   })
-  
+
   test("реакции на события", () => {
     // Тесты взаимодействия
   })
@@ -125,6 +131,7 @@ describe("graph-layout актор", () => {
 ## Опциональные файлы актора
 
 ### 4. `{tag-name}.actions.js` - выделенные действия
+
 ```javascript
 /**
  * Сложные действия для актора graph-layout
@@ -145,22 +152,24 @@ export function optimizePositions(layout) {
 ```
 
 ### 5. `{tag-name}.fixture.ts` - тестовые данные
+
 ```typescript
-import type {LayoutConfig, NodeMetrics} from "./graph-layout.t"
+import type { LayoutConfig, NodeMetrics } from "./graph-layout.t"
 
 export const mockNodes: NodeMetrics[] = [
-  {id: "node1", width: 100, height: 50},
-  {id: "node2", width: 120, height: 60}
+  { id: "node1", width: 100, height: 50 },
+  { id: "node2", width: 120, height: 60 },
 ]
 
 export const defaultConfig: LayoutConfig = {
   algorithm: "elk",
   spacing: 20,
-  direction: "TB"
+  direction: "TB",
 }
 ```
 
 ### 6. `{tag-name}.layout.json` - конфигурация макета
+
 ```json
 {
   "elk": {
@@ -177,6 +186,7 @@ export const defaultConfig: LayoutConfig = {
 ```
 
 ### 7. `{tag-name}.html` - HTML для примера использования
+
 ```html
 <!-- Шаблоны для сложных UI компонентов -->
 <template id="graph-node-template">
@@ -204,7 +214,7 @@ graph/
 ├── graph-nodes.js              # Управление узлами
 ├── graph-nodes.spec.ts
 ├── graph-nodes.t.ts
-├── graph-edges.js              # Управление рёбрами  
+├── graph-edges.js              # Управление рёбрами
 ├── graph-edges.spec.ts
 ├── graph-edges.t.ts
 ├── graph-meta.js               # Мета-информация
@@ -220,6 +230,7 @@ graph/
 IDE автоматически сворачивает связанные файлы под основной `.js` файл через настройки группировки:
 
 ### VSCode настройки
+
 ```json
 {
   "explorer.fileNesting.patterns": {
@@ -229,11 +240,13 @@ IDE автоматически сворачивает связанные фай�
 ```
 
 ### IntelliJ IDEA настройки
+
 ```
 -compiled.js; -compiled.js.map; .actions.js; .d.ts; .dev.js; .fixture.ts; .html; .js.map; .layout.json; .map; .min.js; .min.js.map; .spec.ts; .t.ts; layout.json
 ```
 
 ### Результат группировки
+
 ```
 📁 graph/
 ├── 📄 graph-layout.js          (основной файл)
@@ -255,7 +268,7 @@ IDE автоматически сворачивает связанные фай�
 ```javascript
 // Импорт всех акторов модуля
 import "./graph/graph-layout.js"
-import "./graph/graph-nodes.js" 
+import "./graph/graph-nodes.js"
 import "./graph/graph-edges.js"
 
 // Или импорт конкретного актора
@@ -273,6 +286,7 @@ document.body.innerHTML = `
 ## Существующие модули
 
 ### nodes/meta
+
 ```
 nodes/meta/
 ├── graph-meta.js               # Основной мета-компонент
@@ -307,11 +321,13 @@ nodes/meta/
 **Основной принцип:** Функции должны выделяться в `{tag-name}.actions.js`, а не храниться в `core`.
 
 **Core предназначен для:**
+
 - Временных данных и структур
 - Ссылок на DOM элементы (refs)
 - Сервисов подписки (websockets, events)
 
 **.actions.js предназначен для:**
+
 - Сложной бизнес-логики
 - Функций из `transitions` и `reactions`
 - Алгоритмов обработки данных
@@ -341,4 +357,3 @@ bun test graph/graph-layout.spec.ts --inspect-brk
 # Тест в watch режиме
 bun test graph/graph-layout.spec.ts --watch
 ```
-

@@ -15,12 +15,12 @@ describe("Пайплайн", () => {
     .transitions("IDLE", [
       {
         in: "IDLE",
-        action: ({update}) => update({username: "user123", progress: 20}),
+        action: () => ({username: "user123", progress: 20}),
         to: [{state: "ACTIVE", when: {username: {include: "user"}, progress: {gt: 0, lt: 50}}}],
       },
       {
         in: "ACTIVE",
-        action: ({update}) => update({progress: 101}),
+        action: () => ({progress: 101}),
         to: [{state: "COMPLETE", when: {progress: {gt: 100}}}],
       },
     ]).reactions([])

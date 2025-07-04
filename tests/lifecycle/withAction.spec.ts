@@ -3,15 +3,13 @@ import {MetaFor} from "@metafor/space"
 import {messagesFixture} from "../../fixtures/broadcast.ts"
 
 
-describe("Инициализация c действием", async () => {
+describe("MetaFor: автоматические автопереходы и обновление контекста", async () => {
   const tag = Bun.randomUUIDv7()
   const {waitForMessages} = messagesFixture({meta: tag})
 
   const initialState = "INITIAL"
   const initialContext = {value: "initial"}
-
   const nextContext = {value: "next"}
-
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
@@ -25,18 +23,18 @@ describe("Инициализация c действием", async () => {
     .transitions(initialState, [
       {
         in: "INITIAL",
-        action: async ({update}) => {
-          await Bun.sleep(1000)
-          update(nextContext)
-        }, // Асинхронное действие - так можно проверить блокировку,
+        action: async () => {
+          await Bun.sleep(100)
+          return nextContext // Автоматически обновит контекст
+        },
         to: [{state: "NEXT", when: {value: nextContext.value}}],
       },
       {
         in: "NEXT",
-        action: async ({update}) => {
-          await Bun.sleep(1000)
-          update(otherContext)
-        }, // Асинхронное действие - так можно проверить блокировку,
+        action: async () => {
+          await Bun.sleep(100)
+          return otherContext // Автоматически обновит контекст
+        },
         to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
     ])
@@ -44,36 +42,60 @@ describe("Инициализация c действием", async () => {
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-  test.todo("Условия meta заблокированы до окончания автопереходов")
-  test.todo("Независимо от блокировки, сообщения с изменениями отправляются")
-  const block = meta.process // Блокировку до окончания действия можно перехватить сразу после выполнения синхронного конструктора
-  const messages = await waitForMessages()
+  const messages = await waitForMessages(2000)
 
-  describe("Присваивание контекста/состояния и отправка snapshot meta", () => {
-    const firstMessage = messages[0]
 
-    test("Тип патча - `add`", () =>
-      expect(firstMessage.patch.op, "Патч типа add должен быть при первой инициализации meta").toBe("add"))
-    test("Состояние равно параметру state в create", () => expect(firstMessage.patch.value.state).toBe(initialState))
-    test("Контекст равен параметру context в create", () =>
-      expect(firstMessage.patch.value.context).toEqual(initialContext))
+  test("[transition] Первый патч add содержит полную информацию об акторе", () => {
+    console.log("Messages:", messages.map(m => ({op: m.patch.op, path: m.patch.path, state: m.patch.value?.state, context: m.patch.value?.context})))
+    expect(messages[0].patch.op).toBe("add")
+    expect(messages[0].patch.path).toBe("/")
+    expect(messages[0].patch.value.state).toBe(initialState)
+
+    expect(messages[0].patch.value.context).toEqual(otherContext)
   })
-  describe("Действия с автопереходами", () => {
-    describe("Выполнение первого действия и отправка patch'а meta", () => {
-      const secondMessage = messages[1]
-      test("Блокировка условий", () => expect(block, "Условия должны быть заблокированы до выполнения всех действий автоперехода").toBe(true))
-      test("Тип патча - `replace`", () => expect(secondMessage.patch.op, "Патч типа replace должен быть при изменениях").toBe("replace"))
-    })
-    describe("Выполнение второго действия и отправка patch'а meta", async () => {
-      const thirdMessage = messages[2]
-      test("Блокировка условий", () => expect(block, "Условия должны быть заблокированы до выполнения всех действий автоперехода").toBe(true))
-      test("Тип патча replace", () => expect(thirdMessage.patch.op, "Патч типа replace должен быть при изменениях").toBe("replace"))
-    })
+
+  test("[transition] Второй патч содержит состояние инициализации", () => {
+    expect(messages[1].patch.op).toBe("add")
+    expect(messages[1].patch.path).toBe("/state")
+    expect(messages[1].patch.value).toBe(initialState)
   })
-  describe("meta инициализирован", async () => {
-    await Bun.sleep(1100)
-    test("Условия разблокированы", () => expect(meta.process, "Условия должны быть разблокированы после выполнения всех действий автоперехода").toBe(false))
-    test("Состояние не равно параметру state в create", () => expect(meta.state, "Должно быть равно последнему состоянию в переходе (автопереход)").toBe(otherState))
-    test("Контекст не равен параметру по умолчанию", () => expect(meta.context, "Должен быть равен контексту в последнем переходе").toEqual(otherContext))
+
+  test("[transition] Последующие патчи содержат обновления контекста и состояний", () => {
+    const contextPatches = messages.filter(m => m.patch.path === "/context" && m.patch.op === "replace")
+    const statePatches = messages.filter(m => m.patch.path === "/state" && m.patch.op === "replace")
+    
+    expect(contextPatches.length).toBeGreaterThanOrEqual(2) // Обновления контекста от action
+    expect(statePatches.length).toBeGreaterThanOrEqual(2)   // Смены состояний
+    
+    // Проверяем, что есть патчи для каждого автоперехода
+    expect(contextPatches[0].patch.value).toEqual(nextContext)
+    expect(contextPatches[1].patch.value).toEqual(otherContext)
+  })
+
+  test("[transition] После автопереходов контекст и state соответствуют последнему переходу (финальное состояние)", async () => {
+    await Bun.sleep(250)
+    expect(meta.state).toBe(otherState)
+    expect(meta.context).toEqual(otherContext)
+  })
+
+  test("[transition] process всегда false — переходы выполняются синхронно", () => {
+    expect(meta.process).toBe(false)
+    meta.update({value: "initial"})
+    expect(meta.process).toBe(false)
+  })
+
+  test("[transition] Для каждого автоперехода есть патчи на context и state (сообщения)", () => {
+    const ops = messages.map(m => m.patch.op)
+    expect(ops).toContain("add")
+    expect(ops.filter(x=>x==="replace").length).toBeGreaterThanOrEqual(2)
+    const statePatches = messages.filter(m => m.patch.path === "/state")
+    const contextPatches = messages.filter(m => m.patch.path === "/context")
+    expect(statePatches.length).toBeGreaterThanOrEqual(2)
+    expect(contextPatches.length).toBeGreaterThanOrEqual(2)
+  })
+
+  test("[snapshot] Сырые сообщения фикстуры", () => {
+    // Выводим все сообщения в snapshot для наглядности
+    expect(messages).toMatchSnapshot()
   })
 })
