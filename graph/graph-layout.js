@@ -62,11 +62,8 @@ export default MetaFor("graph-layout", {development: true})
     },
     {
       in: "получение данных",
-      action({context, update, core}) {
-        if (!context.current) {
-          update({error: "Нет ID мета для обработки данных"})
-          return
-        }
+      action({context, core}) {
+        if (!context.current) throw new Error("Нет ID мета для обработки данных")
         let meta = core.meta.get(context.current)
         if (!meta) core.meta.set(context.current, {
           states: {}, conditions: {}, sockets: {}, params: {}
@@ -76,29 +73,23 @@ export default MetaFor("graph-layout", {development: true})
     },
     {
       in: "форматирование данных",
-      action({core, context, update}) {
+      action({core, context}) {
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
-        // console.log(core.data)
-        update({current: null})
+        return {current: null}
       },
       to: [{state: "вычисление", when: {current: {isNull: true}}}]
     },
     {
       in: "вычисление",
-      async action({core, update}) {
-        return new Promise(async (resolve, reject) => {
-          if (!core.data) {
-            return reject()
-          }
-          const layout = await core.elk.layout(core.data)
-          // console.log(layout)
-          sessionStorage.setItem(core.data.id, JSON.stringify(layout))
-          update({ready: core.data.id, current: null})
-          return resolve()
-        })
-      },
+      action: ({core}) => new Promise(async (resolve, reject) => {
+        if (!core.data) return reject("ошибка вычисления")
+        const layout = await core.elk.layout(core.data)
+        // console.log(layout)
+        sessionStorage.setItem(core.data.id, JSON.stringify(layout))
+        return resolve({ready: core.data.id, current: null})
+      }),
       to: [{state: "ожидание", when: {current: null}}]
     }
   ])

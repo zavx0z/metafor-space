@@ -173,10 +173,10 @@ export default MetaFor("graph-operator", {development: true})
   .transitions('init', [
     {
       in: "init",
-      action({context, core, update}) {
-        if (!context.op) return
+      action({context, core}) {
+        if (!context.op) throw new Error("Не установлен в контекст значение параметра op")
         const operator = core.operators[context.op]
-        update({title: operator.title, symbol: operator.symbol})
+        return {title: operator.title, symbol: operator.symbol}
       },
       to: [{
         state: "ready", when: {

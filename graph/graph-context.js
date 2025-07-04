@@ -16,7 +16,7 @@ export default MetaFor("graph-context", {
     y: t.number({nullable: true}),
     layout: t.boolean({default: false}),
     active: t.boolean({default: false}),
-    process: t.boolean({default: false})
+    process: t.boolean({default: false}),
   }))
   .core(() => ({
     /**@type{import("./graph-context.t.js").Params}*/
@@ -38,12 +38,13 @@ export default MetaFor("graph-context", {
     },
     {
       in: "измерение",
-      action({element, update}) {
-        requestAnimationFrame(() => {
-          const {width, height, x, y} = element.getBoundingClientRect()
-          update({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
-        })
-      },
+      action: ({element}) =>
+        new Promise((resolve) => {
+          requestAnimationFrame(() => {
+            const {width, height, x, y} = element.getBoundingClientRect()
+            resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
+          })
+        }),
       to: [{state: "позиционирование", when: {layout: true}}],
     },
     {
@@ -65,9 +66,7 @@ export default MetaFor("graph-context", {
     },
     {
       in: "активно",
-      to: [
-        {state: "неактивно", when: {error: null, active: false}},
-      ],
+      to: [{state: "неактивно", when: {error: null, active: false}}],
     },
     {
       in: "неактивно",
@@ -106,28 +105,26 @@ export default MetaFor("graph-context", {
     },
     {
       title: "активность состояния",
-      filter: ({meta, patch, context}) =>
-        context.id === `${meta.tag}/${meta.index}`
-        && patch.path === "/state",
+      filter: ({meta, patch, context}) => context.id === `${meta.tag}/${meta.index}` && patch.path === "/state",
       action: ({update, patch, context}) => {
-        if (patch.value === context.state)
-          update({process: patch.op === "add", active: true})
-        else
-          update({process: false, active: false})
-      }
+        if (patch.value === context.state) update({process: patch.op === "add", active: true})
+        else update({process: false, active: false})
+      },
     },
   ])
   .view({
     onMount({component, core, update, context}) {
-      update({active: context.state === core.meta.state})
-      core.meta.onUpdate(i => {
-        // console.log(i)
-      })
+      if (core.meta) {
+        update({active: context.state === core.meta.state})
+        core.meta.onUpdate((i) => {
+          // console.log(i)
+        })
 
-      core.meta.onTransition((prev, next) => {
-        // console.log(prev, next)
-        // update({active: context.state === next})
-      })
+        core.meta.onTransition((prev, next) => {
+          // console.log(prev, next)
+          // update({active: context.state === next})
+        })
+      }
     },
     render: ({context, html, ref, core}) => html`
       <header ${ref(core.header)}>
@@ -167,7 +164,8 @@ export default MetaFor("graph-context", {
           pointer-events: none;
           z-index: -2;
           transition: box-shadow 0.3s ease-in-out;
-          box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 -3px 0 inset;
+          box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px,
+          rgba(0, 0, 0, 0.2) 0 -3px 0 inset;
         }
 
         &:after {
@@ -238,7 +236,7 @@ export default MetaFor("graph-context", {
 
       :host([state="активно"]) {
         &:before {
-          box-shadow: 0 0 12px 2px rgb(var(--primary-500)/.7);
+          box-shadow: 0 0 12px 2px rgb(var(--primary-500) / 0.7);
           border-color: rgb(var(--primary-400));
         }
       }
@@ -253,13 +251,14 @@ export default MetaFor("graph-context", {
       }
 
       @keyframes process-blink {
-        0%, 100% {
+        0%,
+        100% {
           box-shadow: 0 0 12px 4px rgb(var(--primary-700));
           border-color: rgb(var(--primary-400));
           border-width: 2px;
         }
         50% {
-          box-shadow: 0 0 12px 0 rgb(var(--primary-700) / .8);
+          box-shadow: 0 0 12px 0 rgb(var(--primary-700) / 0.8);
           border-color: rgb(var(--primary-800));
           border-width: 1px;
         }
@@ -284,7 +283,6 @@ export default MetaFor("graph-context", {
 //   position: relative;
 //   background-color: var(--background-color);
 // }
-
 
 //:host:has(> :nth-child(1)) > section:last-child {
 //  padding-bottom: 0;

@@ -50,13 +50,11 @@ export type FabricCallbackCreateFuncHelper<
 
  @property context - Данные контекста
  @property element - HTML элемент актора
- @property update - Функция обновления контекста
  @property core - Внутренние данные и сервисы
  */
 export type Action<C extends ContextDefinition, I extends Record<string, unknown>> = (
-  {context, element, update, core}: {
+  {context, element, core}: {
     context: ContextData<C>
     element: HTMLElement
-    // update: Update<C>
     core: Core<I>
-  }) => void | Promise<void>
+  }) => unknown | Promise<unknown>

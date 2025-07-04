@@ -351,54 +351,48 @@ function createMeta(
         }
       }
 
-      /**
-       * Выполнение действия с поддержкой success/error
-       * @param {import('./types/transitions').Transition<any, any, any>} transitionObj
-       */
+      /** @param {import('./types/transitions').Transition<S, C, I>} transitionObj */
       #runTransitionAction = (transitionObj) => {
         const {action, success, error} = transitionObj
-        if (!action) return;
-        let result;
-        const params = {
-          context: this.context,
-          element: this,
-          core: this.#core,
-        };
+        if (!action) return
+
+        let result
+        const params = {context: this.context, element: this, core: this.#core}
+
+        /** @type {import('./types/context').Update<C>} */
+        const updateFn = (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"})
+
         try {
-          result = action(params);
+          result = /**@type{any}*/(action(params))
           if (result && typeof result.then === "function") {
             // async
             result
-              .then((data) => {
-                if (typeof success === "function") {
-                  success({ ...params, data,
-                    update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
-                  })
-                }
+              .then(
+                /** @param {Record<string, any>} data */
+                (data) => {
+                  if (typeof success === "function") success({...params, data, update: updateFn})
+                  else if (data && typeof data === "object" && !(data instanceof Error)) updateFn(data)
+                })
+              .catch(
+              /** @param {Error} err*/
+                (err) => {
+                if (typeof error === "function") error({...params, data: err, update: updateFn})
+                else if (err instanceof Error)
+                  // @ts-ignore
+                   updateFn({error: err.message})
               })
-              .catch((err) => {
-                if (typeof error === "function") {
-                  error({ ...params, data: err,
-                    update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
-                  })
-                }
-              })
-              .finally(() => (this.process = false));
+              .finally(() => (this.process = false))
           } else {
             // sync
-            if (typeof success === "function") {
-              success({ ...params, data: result,
-                update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
-              })
-            }
+            if (typeof success === "function") success({...params, data: result, update: updateFn})
+            else if (result && typeof result === "object" && !(result instanceof Error)) updateFn(result)
             this.process = false
           }
-        } catch (err) {
-          if (typeof error === "function") {
-            error({ ...params, data: err,
-              update: (ctx) => this._update({ctx, srcName: "action", funcName: "unknown"}) 
-            })
-          }
+        } catch (/** @type {any} */ err) {
+          if (typeof error === "function") error({...params, data: err, update: updateFn}) //@ts-ignore
+          else if (err instanceof Error)
+            // @ts-ignore
+            updateFn({error: err.message})
           this.process = false
         }
       }

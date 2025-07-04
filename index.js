@@ -13,22 +13,19 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
       action: () => new Promise((resolve, reject) => {
         try {
           setTimeout(() => {
-            return resolve("end")
+            resolve({status: "end"})
           }, 6000)  
         } catch (error) {
-          return reject(error instanceof Error ? error.message : String(error))
+          reject(new Error(error instanceof Error ? error.message : String(error)))
         }
       }),
-      success: ({update, data}) => update({status: data}),
-      error: ({update, data}) => update({error: data}),
       to: [{state: "конец", when: {status: "end"}}],
     },
     {
       in: "конец",
       action: () => new Promise((resolve) => setTimeout(() => {
-        return resolve("start")
+        resolve({status: "start"})
       }, 4000)),
-      success: ({update, data}) => update({status: data}),
       to: [{state: "начало", when: {status: "start"}}],
     },
   ])

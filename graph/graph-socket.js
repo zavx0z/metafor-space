@@ -26,16 +26,12 @@ export default MetaFor('graph-socket')
     },
     {
       in: "измерение",
-      action({element, update}) {
+      action: ({element}) => new Promise((res) => {
         requestAnimationFrame(() => {
           const {width, x, y} = element.getBoundingClientRect()
-          update({
-            size: Math.round(width),
-            x: Math.round(x),
-            y: Math.round(y),
-          })
+          return res({size: Math.round(width), x: Math.round(x), y: Math.round(y)})
         })
-      },
+      }),
       to: []
     },
   ])
@@ -44,6 +40,7 @@ export default MetaFor('graph-socket')
     style: ({css}) => {
       const position = -6
       const size = 12
+      // noinspection CssUnresolvedCustomProperty
       return css`
         :host {
           position: absolute;

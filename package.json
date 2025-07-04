@@ -42,11 +42,13 @@
     "./core/web/component": "./core/web/component.js"
   },
   "devDependencies": {
-    "@happy-dom/global-registrator": "17.3.0",
+    "@happy-dom/global-registrator": "18.0.1",
     "@types/bun": "latest",
-    "happy-dom": "^17.6.3",
-    "puppeteer": "^24.11.1",
-    "elkjs": "^0.10.0"
+    "happy-dom": "18.0.1",
+    "puppeteer": "^24.11.2",
+    "elkjs": "0.10.1",
+    "@types/three": "0.178.0",
+    "three": "0.178.0"
   },
   "peerDependencies": {
     "typescript": "^5.8.2"
@@ -152,9 +154,5 @@
     "test:graph-layout": "bun test graph/graph-layout.spec.ts",
     "test:graph-state": "bun test graph/graph-state.spec.ts",
     "test:graph-transition": "bun test graph/graph-transition.spec.ts"
-  },
-  "dependencies": {
-    "@types/three": "^0.177.0",
-    "three": "^0.177.0"
   }
 }

@@ -37,7 +37,7 @@ export default MetaFor("graph-param")
       }
     })
     return {
-      /** @type {MetaAny}*/
+      /** @type {MetaAny|null}*/
       meta: null
     }
   })
@@ -49,17 +49,12 @@ export default MetaFor("graph-param")
     },
     {
       in: "измерение",
-      action({element, update}) {
+      action: ({element}) => new Promise((resolve) => {
         requestAnimationFrame(() => {
           const {width, height, x, y} = element.getBoundingClientRect()
-          update({
-            width: Math.round(width),
-            height: Math.round(height),
-            x: Math.round(x),
-            y: Math.round(y),
-          })
+          resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
         })
-      },
+      }),
       to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
     },
     {

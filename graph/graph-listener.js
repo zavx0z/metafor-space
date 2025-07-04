@@ -40,16 +40,13 @@ export default MetaFor("graph-listener", {
     },
     {
       in: "добавление актора",
-      action: ({update, element, core, context}) => {
-        if (!core.snapshot) {
-          update({error: `Отсутствует снимок meta - ${context.nodes[context.nodes.length]}`})
-          return
-        }
+      action: ({element, core, context}) => {
+        if (!core.snapshot) throw new Error(`Отсутствует снимок meta - ${context.nodes[context.nodes.length]}`)
         /**@type{import("../metafor").Snapshot<any, any, any>}*/
         const snapshot = core.snapshot
         render(template(snapshot, core.instance), element)
-        update({nodes: context.nodes.slice(1)})
         core.snapshot = null
+        return {nodes: context.nodes.slice(1)}
       },
       to: [
         {state: "ожидание патча", when: {nodes: {isEmpty: true}}},

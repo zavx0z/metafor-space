@@ -24,12 +24,12 @@ export default MetaFor("graph-condition", {development: true})
     },
     {
       in: "измерение",
-      action({element, update}) {
+      action: ({element}) => new Promise((resolve) => {
         requestAnimationFrame(() => {
           const {width, height} = element.getBoundingClientRect()
-          update({width: Math.round(width), height: Math.round(height)})
+          resolve({width: Math.round(width), height: Math.round(height)})
         })
-      },
+      }),
       to: [{state: "позиционирование", when: {x: {isNull: false}, y: {isNull: false}}}]
     },
     {
@@ -125,6 +125,7 @@ export default MetaFor("graph-condition", {development: true})
         border-radius: inherit;
         z-index: -1;
       }
+
       :host {
 
         backdrop-filter: var(--backdrop-filter-blur);
@@ -132,7 +133,7 @@ export default MetaFor("graph-condition", {development: true})
         -moz-backdrop-filter: var(--backdrop-filter-blur);
         -o-backdrop-filter: var(--backdrop-filter-blur);
         -ms-backdrop-filter: var(--backdrop-filter-blur);
-        
+
         background-color: rgba(var(--surface-400));
         padding: 4px 8px;
         position: fixed;

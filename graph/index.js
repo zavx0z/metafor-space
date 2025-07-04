@@ -9,29 +9,16 @@ export default MetaFor("test", {description: "Nodes", development: false})
   .transitions("начало", [
     {
       in: "начало",
-      action: ({update}) => new Promise((resolve) => {
-        setTimeout(() => {
-          update({status: "end"})
-          return resolve('')
-        }, 1000)
-      }),
-      to: [{state: "конец", when: {status: "end"}}],
+      action: () => new Promise((resolve) =>
+        setTimeout(() => resolve({status: "end"}), 4000)),
+      to: [{state: "конец", when: {status: "end"}}]
     },
     {
       in: "конец",
-      action: async ({update}) => {
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            update({status: "start"})
-            return resolve('')
-          }, 4000)
-        })
-      },
-      to: [{state: "начало", when: {status: "start"}}],
+      action: () => new Promise((resolve) =>
+        setTimeout(() => resolve({status: "start"}), 4000)),
+      to: [{state: "начало", when: {status: "start"}}]
     },
   ])
   .reactions([])
-  .view({
-    render: ({html, context}) => html`
-    `
-  })
+  .view({})

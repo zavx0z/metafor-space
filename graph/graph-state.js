@@ -11,16 +11,13 @@ export default MetaFor("graph-state", {development: true})
     y: t.number({nullable: true}),
   }))
   .core(() => ({
-    /**@type{MetaAny}*/
-    meta: undefined
+    /**@type{MetaAny|null}*/
+    meta: null
   }))
   .states("рендер", "изменение размера", "перемещение")
   .transitions('рендер', [
     {
       in: "рендер",
-      action({element}) {
-
-      },
       to: [{state: "перемещение", when: {x: {isNull: false}, y: {isNull: false}}}]
     },
     {
