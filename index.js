@@ -12,7 +12,7 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
       in: "начало",
       action: () => new Promise((resolve, reject) => {
           setTimeout(() => {
-            // resolve({status: "end"})
+            resolve(null)
           }, 6000)  
       }),
       to: [{state: "конец", when: {status: "end"}}],
@@ -20,7 +20,7 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
     {
       in: "конец",
       action: () => new Promise((resolve) => setTimeout(() => {
-        // resolve({status: "start"})
+        resolve(null)
       }, 4000)),
       to: [{state: "начало", when: {status: "start"}}],
     },
