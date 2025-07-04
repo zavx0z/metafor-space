@@ -3,7 +3,7 @@ import {MetaFor} from "@metafor/space"
 import {messagesFixture} from "../../fixtures/broadcast.ts"
 
 
-describe("MetaFor: автоматические автопереходы и обновление контекста", async () => {
+describe("MetaFor: инициализация с действиями", async () => {
   const tag = Bun.randomUUIDv7()
   const {waitForMessages} = messagesFixture({meta: tag})
 
@@ -42,11 +42,10 @@ describe("MetaFor: автоматические автопереходы и об
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-  const messages = await waitForMessages(2000)
+  const messages = await waitForMessages(400)
 
 
   test("[transition] Первый патч add содержит полную информацию об акторе", () => {
-    console.log("Messages:", messages.map(m => ({op: m.patch.op, path: m.patch.path, state: m.patch.value?.state, context: m.patch.value?.context})))
     expect(messages[0].patch.op).toBe("add")
     expect(messages[0].patch.path).toBe("/")
     expect(messages[0].patch.value.state).toBe(initialState)
@@ -94,8 +93,123 @@ describe("MetaFor: автоматические автопереходы и об
     expect(contextPatches.length).toBeGreaterThanOrEqual(2)
   })
 
-  test("[snapshot] Сырые сообщения фикстуры", () => {
-    // Выводим все сообщения в snapshot для наглядности
-    expect(messages).toMatchSnapshot()
+  test("[messages] Сырые сообщения фикстуры", () => {
+    expect(messages).toEqual([
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "add",
+          path: "/",
+          value: expect.objectContaining({
+            context: { value: "initial" },
+            state: "INITIAL",
+            states: ["INITIAL", "OTHER", "NEXT"],
+            transitions: expect.any(Array),
+            types: expect.any(Object),
+            // ...другие поля, если нужно
+          }),
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "add",
+          path: "/state",
+          value: "INITIAL",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/context",
+          value: { value: "next" },
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/state",
+          value: "INITIAL",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "add",
+          path: "/state",
+          value: "NEXT",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/context",
+          value: { value: "other" },
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/state",
+          value: "NEXT",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/state",
+          value: "OTHER",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/context",
+          value: { value: "initial" },
+        },
+      },
+    ])
   })
 })

@@ -37,15 +37,15 @@ test("Блокировка переходов перед входом в нов�
     ])
     .reactions([])
     .view({})
-    // .create({
-    //   onTransition: async (_, newState, meta) => {
-    //     if (newState === "PROCESS") {
-    //       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
-    //       meta.update({value: 1}) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
-    //       value = meta.context.value
-    //     }
-    //   },
-    // })
+  // .create({
+  //   onTransition: async (_, newState, meta) => {
+  //     if (newState === "PROCESS") {
+  //       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+  //       meta.update({value: 1}) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
+  //       value = meta.context.value
+  //     }
+  //   },
+  // })
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   await Bun.sleep(1000)
@@ -71,8 +71,9 @@ test("Блокировка переходов для асинхронного д
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
-    ])      .reactions([])
-      .view({})
+    ])
+    .reactions([])
+    .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   meta.update({value: 1})
@@ -97,8 +98,9 @@ test("Снятие блокировки после действия", async () =
         },
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
-    ])      .reactions([])
-      .view({})
+    ])
+    .reactions([])
+    .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   expect(meta.state).toBe("INIT")
