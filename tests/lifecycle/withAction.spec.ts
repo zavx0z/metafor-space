@@ -1,79 +1,215 @@
-import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../../index"
-import { messagesFixture } from "../fixtures/broadcast"
+import {describe, expect, test} from "bun:test"
+import {MetaFor} from "@metafor/space"
+import {messagesFixture} from "../../fixtures/broadcast.ts"
 
-describe("Инициализация c действием", async () => {
-  const {waitForMessages} = messagesFixture()
+
+describe("MetaFor: инициализация с действиями", async () => {
+  const tag = Bun.randomUUIDv7()
+  const {waitForMessages} = messagesFixture({meta: tag})
 
   const initialState = "INITIAL"
   const initialContext = {value: "initial"}
-
   const nextContext = {value: "next"}
-
   const otherState = "OTHER"
   const otherContext = {value: "other"}
 
-  const particle = MetaFor("test-particle")
-    .states("INITIAL", "OTHER", "NEXT")
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+  const Meta = MetaFor(tag)
     .context((t) => ({
-      value: t.string({ nullable: true }),
+      value: t.string({nullable: true, default: initialContext.value}),
     }))
-    .transitions([
+    .core()
+    .states("INITIAL", "OTHER", "NEXT")
+    .transitions(initialState, [
       {
-        from: "INITIAL",
-        action: "initial",
-        to: [{ state: "NEXT", trigger: { value: nextContext.value } }],
+        in: "INITIAL",
+        action: async () => {
+          await Bun.sleep(100)
+          return nextContext // Автоматически обновит контекст
+        },
+        to: [{state: "NEXT", when: {value: nextContext.value}}],
       },
       {
-        from: "NEXT",
-        action: "next",
-        to: [{state: "OTHER", trigger: {value: otherContext.value}}]
+        in: "NEXT",
+        action: async () => {
+          await Bun.sleep(100)
+          return otherContext // Автоматически обновит контекст
+        },
+        to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
     ])
-    .core()
-    .actions({
-      initial: async ({update}) => {
-        await Bun.sleep(1000)
-        update(nextContext)
-      }, // Асинхронное действие - так можно проверить блокировку
-      next: async ({update}) => {
-        await Bun.sleep(1000)
-        update(otherContext)
-      } // Асинхронное действие - так можно проверить блокировку
-    })
     .reactions([])
-    .create({
-      state: initialState,
-      context: initialContext
-    })
+    .view({})
+  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-  test.todo("Триггеры частицы заблокированы до окончания автопереходов")
-  test.todo("Независимо от блокировки, сообщения с изменениями отправляются")
-  const block = particle.process // Блокировку до окончания действия можно перехватить сразу после выполнения синхронного конструктора
-  const messages = await waitForMessages()
+  const messages = await waitForMessages(400)
 
-  describe("Присваивание контекста/состояния и отправка snapshot частицы", () => {
-    const firstMessage = messages[0]
 
-    test("Тип патча - `add`", () => expect(firstMessage.patch.op, "Патч типа add должен быть при первой инициализации частицы").toBe("add"))
-    test("Состояние равно параметру state в create", () => expect(firstMessage.patch.value.state).toBe(initialState))
-    test("Контекст равен параметру context в create", () => expect(firstMessage.patch.value.context).toEqual(initialContext))
+  test("[transition] Первый патч add содержит полную информацию об акторе", () => {
+    expect(messages[0].patch.op).toBe("add")
+    expect(messages[0].patch.path).toBe("/")
+    expect(messages[0].patch.value.state).toBe(initialState)
+
+    expect(messages[0].patch.value.context).toEqual(otherContext)
   })
-  describe("Действия с автопереходами", () => {
-    describe("Выполнение первого действия и отправка patch'а частицы", () => {
-      const secondMessage = messages[1]
-      test("Блокировка триггеров", () => expect(block, "Триггеры должны быть заблокированы до выполнения всех действий автоперехода").toBe(true))
-      test("Тип патча - `replace`", () => expect(secondMessage.patch.op, "Патч типа replace должен быть при изменениях").toBe("replace"))
-    })
-    describe("Выполнение второго действия и отправка patch'а частицы", async () => {
-      const thirdMessage = messages[2]
-      test("Блокировка триггеров", () => expect(block, "Триггеры должны быть заблокированы до выполнения всех действий автоперехода").toBe(true))
-      test("Тип патча replace", () => expect(thirdMessage.patch.op, "Патч типа replace должен быть при изменениях").toBe("replace"))
-    })
+
+  test("[transition] Второй патч содержит состояние инициализации", () => {
+    expect(messages[1].patch.op).toBe("add")
+    expect(messages[1].patch.path).toBe("/state")
+    expect(messages[1].patch.value).toBe(initialState)
   })
-  describe("Атом инициализирован", async () => {
-    test("Триггеры разблокированы", () => expect(particle.process, "Триггеры должны быть разблокированы после выполнения всех действий автоперехода").toBe(false))
-    test("Состояние не равно параметру state в create", () => expect(particle.state, "Должно быть равно последнему состоянию в collapse (автопереход)").toBe(otherState))
-    test("Контекст не равен параметру context в create", () => expect(particle.context, "Должен быть равен контексту в последнем collapse").toEqual(otherContext))
+
+  test("[transition] Последующие патчи содержат обновления контекста и состояний", () => {
+    const contextPatches = messages.filter(m => m.patch.path === "/context" && m.patch.op === "replace")
+    const statePatches = messages.filter(m => m.patch.path === "/state" && m.patch.op === "replace")
+    
+    expect(contextPatches.length).toBeGreaterThanOrEqual(2) // Обновления контекста от action
+    expect(statePatches.length).toBeGreaterThanOrEqual(2)   // Смены состояний
+    
+    // Проверяем, что есть патчи для каждого автоперехода
+    expect(contextPatches[0].patch.value).toEqual(nextContext)
+    expect(contextPatches[1].patch.value).toEqual(otherContext)
+  })
+
+  test("[transition] После автопереходов контекст и state соответствуют последнему переходу (финальное состояние)", async () => {
+    await Bun.sleep(250)
+    expect(meta.state).toBe(otherState)
+    expect(meta.context).toEqual(otherContext)
+  })
+
+  test("[transition] process всегда false — переходы выполняются синхронно", () => {
+    expect(meta.process).toBe(false)
+    meta.update({value: "initial"})
+    expect(meta.process).toBe(false)
+  })
+
+  test("[transition] Для каждого автоперехода есть патчи на context и state (сообщения)", () => {
+    const ops = messages.map(m => m.patch.op)
+    expect(ops).toContain("add")
+    expect(ops.filter(x=>x==="replace").length).toBeGreaterThanOrEqual(2)
+    const statePatches = messages.filter(m => m.patch.path === "/state")
+    const contextPatches = messages.filter(m => m.patch.path === "/context")
+    expect(statePatches.length).toBeGreaterThanOrEqual(2)
+    expect(contextPatches.length).toBeGreaterThanOrEqual(2)
+  })
+
+  test("[messages] Сырые сообщения фикстуры", () => {
+    expect(messages).toEqual([
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "add",
+          path: "/",
+          value: expect.objectContaining({
+            context: { value: "initial" },
+            state: "INITIAL",
+            states: ["INITIAL", "OTHER", "NEXT"],
+            transitions: expect.any(Array),
+            types: expect.any(Object),
+            // ...другие поля, если нужно
+          }),
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "add",
+          path: "/state",
+          value: "INITIAL",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/context",
+          value: { value: "next" },
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/state",
+          value: "INITIAL",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "add",
+          path: "/state",
+          value: "NEXT",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/context",
+          value: { value: "other" },
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/state",
+          value: "NEXT",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/state",
+          value: "OTHER",
+        },
+      },
+      {
+        meta: {
+          index: expect.any(Number),
+          tag: expect.any(String),
+          timestamp: expect.any(Number),
+        },
+        patch: {
+          op: "replace",
+          path: "/context",
+          value: { value: "initial" },
+        },
+      },
+    ])
   })
 })

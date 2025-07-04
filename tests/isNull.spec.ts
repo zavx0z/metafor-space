@@ -1,260 +1,276 @@
-import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index.js"
+import {describe, expect, test} from "bun:test"
+import {MetaFor} from "@metafor/space"
 
-describe("null триггер", () => {
-  test("Должен выполнить переход когда число null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: null } }] }])
+
+describe("null условие перехода", () => {
+  test("Должен выполнить переход когда параметр меняется с числа на null и условие ожидает null", () => {
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({
+        size: t.number({nullable: true, default: 0})
+      }))
       .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ size: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: null}}]
+        }
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+    meta.update({size: null})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
-  test("Значение не nullable а триггер ожидает null (вывод предупреждения валидатора)", () => {
-    let particle
-    const template = MetaFor("NullTest").states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-
-    particle = template
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: null } }] }])
+  test("Значение не nullable а триггер ожидает null", () => { // TODO: (вывод предупреждения валидатора)
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({
+        size: t.number({nullable: false, default: 0}),
+        name: t.string({nullable: false, default: ""}),
+        active: t.boolean({nullable: false, default: false}),
+        status: t.enum("active", "inactive")({nullable: false, default: "active"}),
+      }))
       .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ size: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+      .states("ОЖИДАНИЕ", "число", "строка", "булево")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [
+            {state: "число", when: {size: null}},
+            {state: "строка", when: {name: null}},
+            {state: "булево", when: {active: null}},
+          ]
+        }
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    particle = template
-      .context((t) => ({ name: t.string({ nullable: false, default: "" }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { name: null } }] }])
-      .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ name: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    meta.update({size: null})
+    expect(meta.state, "не должен обновлять на null если не nullable").toBe("ОЖИДАНИЕ")
+    // expect(meta.context.size).toBe(0) // TODO: проверять контекстное значение на тип
 
-    particle = template
-      .context((t) => ({ active: t.boolean({ nullable: false, default: false }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { active: null } }] }])
-      .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ active: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    meta.update({name: null})
+    expect(meta.state, "не должен обновлять на null если не nullable").toBe("ОЖИДАНИЕ")
 
-    particle = template
-      .context((t) => ({ status: t.enum("active", "inactive")({ nullable: false, default: "active" }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { status: null } }] }])
-      .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ status: null })
-    // expect(particle.state).toBe("ОЖИДАНИЕ") FIXME: не должен обновлять на null если не nullable
+    meta.update({active: null})
+    expect(meta.state, "не должен обновлять на null если не nullable").toBe("ОЖИДАНИЕ")
+
+    meta.update({status: null})
+    expect(meta.state, "не должен обновлять на null если не nullable").toBe("ОЖИДАНИЕ")
   })
 
   test("Должен выполнить переход когда строка null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ name: t.string({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { name: null } }] }])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({name: t.string({nullable: true})}))
       .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ name: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ", to: [{state: "ДОБАВИТЬ", when: {name: null}}]
+        }
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({name: null})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Должен выполнить переход когда boolean null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ active: t.boolean({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { active: null } }] }])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({active: t.boolean({nullable: true})}))
       .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ active: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {active: null}}]
+        }
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({active: null})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Должен выполнить переход когда enum null и триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({
+        status: t.enum("active", "inactive")({nullable: true})
+      })).core()
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ status: t.enum("active", "inactive")({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { status: null } }] }])
-      .core()
-      .actions({})
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.update({ status: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {status: null}}]
+        }
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({status: null})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 })
 
 describe("isNull триггер", () => {
   test("Должен выполнить переход когда значение меняется с null на не-null и соответствует условиям", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([
-        {
-          from: "ОЖИДАНИЕ",
-          to: [
-            {
-              state: "ДОБАВИТЬ",
-              trigger: { size: { isNull: false, gt: 4 } },
-            },
-          ],
-        },
-      ])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({
+        size: t.number({nullable: true})
+      }))
       .core()
-      .actions({})
-      .reactions([])
-      .create({
-        state: "ОЖИДАНИЕ",
-        context: {
-          size: null,
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 4}}}],
         },
-        // debug: true
-      })
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    particle.update({ size: 10 })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+    meta.update({size: 10})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Не должен выполнять переход когда значение null, но триггер требует не-null", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([
-        {
-          from: "ОЖИДАНИЕ",
-          to: [
-            {
-              state: "ДОБАВИТЬ",
-              trigger: {
-                size: { isNull: false, gt: 4 },
-              },
-            },
-          ],
-        },
-      ])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({size: t.number({nullable: true})}))
       .core()
-      .actions({})
-      .reactions([])
-      .create({
-        state: "ОЖИДАНИЕ",
-        context: {
-          size: null,
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 4}}}],
         },
-      })
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    expect(particle.state).toBe("ОЖИДАНИЕ")
+    expect(meta.state).toBe("ОЖИДАНИЕ")
   })
 
   test("Должен выполнить переход когда значение null и триггер ожидает {isNull: true}", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: { isNull: true } } }] }])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({size: t.number({nullable: true})}))
       .core()
-      .actions({})
-      .reactions([])
-      .create({
-        state: "ОЖИДАНИЕ",
-        context: {},
-      })
-    particle.update({ size: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
+        }
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({size: null})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Не должен выполнять переход когда значение не-null, но триггер ожидает null", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([
-        {
-          from: "ОЖИДАНИЕ",
-          to: [
-            {
-              state: "ДОБАВИТЬ",
-              trigger: {
-                size: { isNull: true },
-              },
-            },
-          ],
-        },
-      ])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({
+        size: t.number({nullable: true, default: 0})
+      }))
       .core()
-      .actions({})
-      .reactions([])
-      .create({
-        state: "ОЖИДАНИЕ",
-        context: {
-          size: 10,
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}],
         },
-      })
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    expect(particle.state).toBe("ОЖИДАНИЕ")
+    expect(meta.state).toBe("ОЖИДАНИЕ")
   })
 
   test("Должен обрабатывать множественные условия с isNull false", () => {
-    const particle = MetaFor("NullTest")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({size: t.number({nullable: true})}))
+      .core()
       .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([
+      .transitions("ОЖИДАНИЕ", [
         {
-          from: "ОЖИДАНИЕ",
-          to: [
-            {
-              state: "ДОБАВИТЬ",
-              trigger: {
-                size: { isNull: false, gt: 5, lt: 15 },
-              },
-            },
-          ],
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5, lt: 15}}}],
         },
       ])
-      .core()
-      .actions({})
       .reactions([])
-      .create({
-        state: "ОЖИДАНИЕ",
-        context: {},
-      })
-    particle.update({ size: 10 })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({size: 10})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 
   test("Не должен выполнять переход когда одно из множественных условий не выполняется", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([
-        /* FIXME: валидатор не должен пропускать такой триггер */
-        { from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: { isNull: false, gt: 5, lt: 15 } } }] },
-      ])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({size: t.number({nullable: true})}))
       .core()
-      .actions({})
-      .reactions([])
-      .create({ state: "ОЖИДАНИЕ", context: { size: 20 } })
-    expect(particle.state).toBe("ОЖИДАНИЕ")
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        /* FIXME: валидатор не должен пропускать такой триггер */
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{
+            state: "ДОБАВИТЬ",
+            when: {size: {isNull: false, gt: 5, lt: 15}}
+          }]
+        },
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    expect(meta.state).toBe("ОЖИДАНИЕ")
   })
 
   test("Должен обрабатывать обновление значения с не-null на null", () => {
-    const particle = MetaFor("NullTest")
-      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
-      .context((t) => ({ size: t.number({ nullable: true }) }))
-      .transitions([{ from: "ОЖИДАНИЕ", to: [{ state: "ДОБАВИТЬ", trigger: { size: { isNull: true } } }] }])
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context((t) => ({
+        size: t.number({nullable: true, default: 1})
+      }))
       .core()
-      .actions({})
-      .reactions([])
-      .create({
-        state: "ОЖИДАНИЕ",
-        context: { size: 10 },
-      })
-    particle.update({ size: null })
-    expect(particle.state).toBe("ДОБАВИТЬ")
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
+        }
+      ]).reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({size: null})
+    expect(meta.state).toBe("ДОБАВИТЬ")
   })
 })

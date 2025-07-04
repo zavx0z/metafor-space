@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Map</title>
+    <style>
+        html, body {
+            background: black;
+            color: white;
+        }
+    </style>
+    <script type="module">
+        import {html, render} from "../html.js"
+
+        render(html`
+            <h1>Map</h1>
+            <ul>
+                ${["one", "two", "three"].map(i => html`
+                    <li>${i}</li>
+                `)}
+            </ul>
+        `, document.body)
+    </script>
+</head>
+<body>
+
+</body>
+</html>

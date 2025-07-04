@@ -1,126 +1,124 @@
-import {MetaFor} from "../index.js"
+import {MetaFor} from "@metafor/space"
 import {describe, expect, test} from "bun:test"
+
 
 describe("Enum тип", () => {
   test("создание enum типа", () => {
-    const particle = MetaFor("test-enum")
-      .states("INITIAL", "FINAL")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .context((t) => ({
-        status: t.enum("active", "inactive", "pending")({ title: "Статус", nullable: true, default: "inactive" }),
+        status: t.enum("active", "inactive", "pending")({title: "Статус", nullable: true, default: "inactive"}),
       }))
-      .transitions([
+      .core()
+      .states("INITIAL", "FINAL")
+      .transitions("INITIAL", [
         {
-          from: "INITIAL",
-          to: [{ state: "FINAL", trigger: { status: "active" } }],
+          in: "INITIAL",
+          to: [{state: "FINAL", when: {status: "active"}}],
         },
       ])
-      .core()
-      .actions({})
-      .create({ state: "INITIAL" })
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    expect(particle.context.status).toBe("inactive")
+    expect(meta.context.status).toBe("inactive")
   })
 
   test("проверка перехода по enum значению", async () => {
-    const particle = MetaFor("test-enum")
-      .states("INITIAL", "ACTIVE")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .context((t) => ({
-        status: t.enum("active", "inactive")({ default: "inactive" }),
+        status: t.enum("active", "inactive")({default: "inactive"}),
       }))
-      .transitions([
+      .core()
+      .states("INITIAL", "ACTIVE")
+      .transitions("INITIAL", [
         {
-          from: "INITIAL",
-          to: [{ state: "ACTIVE", trigger: { status: "active" } }],
+          in: "INITIAL",
+          to: [{state: "ACTIVE", when: {status: "active"}}],
         },
       ])
-      .core()
-      .actions({})
-      .create({ state: "INITIAL" })
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    particle.update({status: "active"})
-    expect(particle.state).toBe("ACTIVE")
+    meta.update({status: "active"})
+    expect(meta.state).toBe("ACTIVE")
   })
 
-  test("сложные условия enum триггера", async () => {
-    const particle = MetaFor("test-enum")
-      .states("INITIAL", "ACTIVE", "INACTIVE")
+  test("сложные условия enum", async () => {
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .context((t) => ({
-        status: t.enum("active", "inactive", "pending")({ default: "pending" }),
+        status: t.enum("active", "inactive", "pending")({default: "pending"}),
       }))
-      .transitions([
-        {
-          from: "INITIAL",
-          to: [{ state: "ACTIVE", trigger: { status: { oneOf: ["active", "pending"] } } }],
-        },
-        {
-          from: "ACTIVE",
-          to: [{state: "INACTIVE", trigger: {status: "inactive"}}]
-        }
-      ])
       .core(({update}) => ({
         example: async () => {
           update({status: "inactive"})
-        }
+        },
       }))
-      .actions({
-        example: ({update}) => {
-          update({status: "active"})
-        }
-      })
-      .reactions([]).create({state: "INITIAL"})
+      .states("INITIAL", "ACTIVE", "INACTIVE")
+      .transitions("INITIAL", [
+        {
+          in: "INITIAL",
+          to: [{state: "ACTIVE", when: {status: {oneOf: ["active", "pending"]}}}],
+        },
+        {
+          in: "ACTIVE",
+          to: [{state: "INACTIVE", when: {status: "inactive"}}],
+        },
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    particle.update({status: "active"})
-    expect(particle.state).toBe("ACTIVE")
+    meta.update({status: "active"})
+    expect(meta.state).toBe("ACTIVE")
 
-    particle.update({status: "inactive"})
-    expect(particle.state).toBe("INACTIVE")
+    meta.update({status: "inactive"})
+    expect(meta.state).toBe("INACTIVE")
   })
 
   test("числовой enum тип", () => {
-    const particle = MetaFor("test-enum")
-      .states("INITIAL", "FINAL")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .context((t) => ({
-        status: t.enum(1, 2, 3)({ title: "Статус", nullable: true, default: 1 }),
+        status: t.enum(1, 2, 3)({title: "Статус", nullable: true, default: 1}),
       }))
-      .transitions([])
       .core()
-      .actions({})
-      .create({ state: "INITIAL" })
+      .states("INITIAL", "FINAL")
+      .transitions("INITIAL", [])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    expect(particle.context.status).toBe(1)
+    expect(meta.context.status).toBe(1)
   })
 
   test("проверка перехода по числовому enum значению", async () => {
-    const particle = MetaFor("test-enum")
-      .states("INITIAL", "ACTIVE")
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
       .context((t) => ({
-        status: t.enum(1, 2)({ default: 1 }),
+        status: t.enum(1, 2)({default: 1}),
       }))
-      .transitions([
+      .core()
+      .states("INITIAL", "ACTIVE")
+      .transitions("INITIAL", [
         {
-          from: "INITIAL",
-          to: [{ state: "ACTIVE", trigger: { status: 2 } }],
+          in: "INITIAL",
+          to: [{state: "ACTIVE", when: {status: 2}}],
         },
       ])
-      .core()
-      .actions({})
-      .create({ state: "INITIAL" })
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-    particle.update({status: 2})
-    expect(particle.state).toBe("ACTIVE")
-  })
-
-  test("смешанный enum тип", () => {
-    const particle = MetaFor("test-enum")
-      .states("INITIAL", "FINAL")
-      .context((t) => ({
-        status: t.enum("active", "inactive")({ title: "Статус", default: "active" }),
-      }))
-      .transitions([])
-      .core()
-      .actions({})
-      .create({ state: "INITIAL" })
-
-    expect(particle.context.status).toBe("active")
+    meta.update({status: 2})
+    expect(meta.state).toBe("ACTIVE")
   })
 })

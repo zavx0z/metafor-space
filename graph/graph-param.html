@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <title>graph-param storybook</title>
+  <link rel="stylesheet" href="/theme/theme.css"/>
+  <link rel="stylesheet" href="index.css"/>
+  <style>
+    body {
+      flex-direction: column;
+      gap: 4px;
+    }
+    section:before {
+      content: "";
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      position: absolute;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: -2;
+      transition: box-shadow 0.3s ease-in-out;
+      box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 0 0 inset;
+    }
+
+    section:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='noise' x='0%' y='0%' width='100%' height='100%'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.15'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='white' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: contain;
+      opacity: 0.1;
+      border-radius: inherit;
+      z-index: -1;
+    }
+    section {
+
+      backdrop-filter: var(--backdrop-filter-blur);
+      -webkit-backdrop-filter: var(--backdrop-filter-blur);
+      -moz-backdrop-filter: var(--backdrop-filter-blur);
+      -o-backdrop-filter: var(--backdrop-filter-blur);
+      -ms-backdrop-filter: var(--backdrop-filter-blur);
+
+      background-color: rgba(var(--surface-400));
+      padding: 4px 8px;
+      display: flex;
+      border-radius: 8px;
+      flex-direction: row;
+      align-items: center;
+      min-width: max-content;
+      height: fit-content;
+    }
+    h2 {
+      color: var(--font-color);
+      font-size: 1em;
+      margin: 0 0 4px 0;
+      font-weight: 400;
+    }
+  </style>
+  <script type="module">
+    await import("./graph-param.js")
+    import {html, render} from "../html/html.js"
+
+    render(html`
+      <h2>string (короткое)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id1",
+          state: "i",
+          param: "key1",
+          title: "Имя",
+          value: "Текстовое значение",
+          type: "string"
+        }}></metafor-graph-param>
+      </section>
+      <h2>string (длинное, пустое)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id2",
+          state: "i",
+          param: "key2",
+          title: "Очень длинное название параметра для проверки переполнения",
+          value: "",
+          type: "string"
+        }}></metafor-graph-param>
+      </section>
+      <h2>number</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id3",
+          state: "i",
+          param: "key3",
+          title: "Число",
+          value: 12345,
+          type: "number"
+        }}></metafor-graph-param>
+      </section>
+      <h2>boolean (true)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id4",
+          state: "i",
+          param: "key4",
+          title: "Включено?",
+          value: "true",
+          type: "boolean"
+        }}></metafor-graph-param>
+      </section>
+      <h2>boolean (false)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id5",
+          state: "i",
+          param: "key5",
+          title: "Видно?",
+          value: "false",
+          type: "boolean"
+        }}></metafor-graph-param>
+      </section>
+      <h2>array (массив строк)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id6",
+          state: "i",
+          param: "key6",
+          title: "Массив",
+          value: ["a", "b", "c"],
+          type: "array"
+        }}></metafor-graph-param>
+      </section>
+      <h2>array (пустой)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id7",
+          state: "i",
+          param: "key7",
+          title: "Пустой массив",
+          value: [],
+          type: "array"
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (строка)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id8",
+          state: "i",
+          param: "key8",
+          title: "Тип цвета",
+          value: "red",
+          type: "enum"
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (несколько вариантов через запятую)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id9",
+          state: "i",
+          param: "key9",
+          title: "Варианты",
+          value: "red,green,blue",
+          type: "enum"
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (options массив)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id11",
+          state: "i",
+          param: "key11",
+          title: "Варианты (options)",
+          value: "two",
+          type: "enum",
+          options: ["one", "two", "three"]
+        }}></metafor-graph-param>
+      </section>
+      <h2>enum (options пустой)</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id12",
+          state: "i",
+          param: "key12",
+          title: "Варианты (options пустой)",
+          value: "",
+          type: "enum",
+          options: []
+        }}></metafor-graph-param>
+      </section>
+      <h2>Ошибка</h2>
+      <section>
+        <metafor-graph-param context=${{
+          id: "id10",
+          state: "i",
+          param: "key10",
+          title: "Ошибка",
+          value: "ошибка",
+          type: "string",
+          error: "Некорректное значение"
+        }}></metafor-graph-param>
+      </section>
+    `, document.body)
+  </script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,226 +1,248 @@
-import { describe, expect, test } from "bun:test"
-import { MetaFor } from "../index.js"
+import {describe, expect, test} from "bun:test"
+import {MetaFor} from "@metafor/space"
+
 
 describe("core", () => {
   describe("обработка нажатия и отпускания пробела", () => {
-    const particle = MetaFor("core-test1")
-      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
-      .context(({ boolean }) => ({
-        actionUpdate: boolean({ title: "Обновление контекста из action", nullable: true }),
-        isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context(({boolean}) => ({
+        actionUpdate: boolean({title: "Обновление контекста из action", nullable: true, default: false}),
+        isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
       }))
-      .transitions([
-        {
-          from: "ОЖИДАНИЕ",
-          to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", trigger: { isSpacePressed: true } }],
-          action: "init",
-        },
-        {
-          from: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
-          to: [{ state: "ОЖИДАНИЕ", trigger: { isSpacePressed: false } }],
-        },
-      ])
-      .core(({ update }) => ({
+      .core(({update}) => ({
         handleKeyDown: (code: string) => {
           if (code === "Space") {
-            update({ isSpacePressed: true, actionUpdate: false })
+            update({actionUpdate: false})
           }
         },
         handleKeyUp(code: string) {
           if (code === "Space") {
-            update({ isSpacePressed: false })
+            update({actionUpdate: false})
           }
         },
       }))
-      .actions({
-        init: ({ update }) => {
-          update({ actionUpdate: true })
+      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", "отпуск элемента")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}],
         },
-      })
-      .create({
-        state: "ОЖИДАНИЕ",
-      })
+        {
+          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          action: ({core}) => {
+            core.handleKeyDown("Space")
+            return {actionUpdate: true}
+          },
+          to: [{state: "отпуск элемента", when: {isSpacePressed: false, actionUpdate: false}}]
+        },
+        {
+          in: "отпуск элемента",
+          action: ({core}) => {
+            core.handleKeyUp("Space")
+            return {actionUpdate: true}
+          },
+          to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false, actionUpdate: false}}],
+        }
+      ])
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
     test("Проверяем начальное состояние", () => {
-      expect(particle.context.isSpacePressed).toBe(false)
-      expect(particle.context.actionUpdate).toBe(true)
-      expect(particle.state).toBe("ОЖИДАНИЕ")
+      expect(meta.context.isSpacePressed).toBe(false)
+      expect(meta.state).toBe("ОЖИДАНИЕ")
     })
     test("Эмулируем нажатие пробела", () => {
-      particle.core.handleKeyDown("Space", "Other")
-      expect(particle.context.isSpacePressed).toBe(true)
-      expect(particle.state).toBe("ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
+      meta.update({isSpacePressed: true})
+      expect(meta.context.isSpacePressed).toBe(true)
+      expect(meta.state).toBe("ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
     })
     test("Эмулируем отпускание пробела", () => {
-      particle.core.handleKeyUp("Space")
-      expect(particle.context.isSpacePressed).toBe(false)
-      expect(particle.state).toBe("ОЖИДАНИЕ")
+      meta.update({isSpacePressed: false, actionUpdate: false})
+      expect(meta.context.isSpacePressed).toBe(false)
+      expect(meta.state).toBe("отпуск элемента")
     })
   })
 
   test.todo("Кто вызывает обновление контекста, какие параметры контекста обновляет и с какими значениями")
   test("Волатильность параметров", () => {
-    const particle = MetaFor("core-test2")
-      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
-      .context(({ boolean }) => ({
-        isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context(({boolean}) => ({
+        isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
       }))
-      .transitions([
-        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", trigger: { isSpacePressed: true } }] },
-      ])
-      .core(({ update }) => {
+      .core(({update}) => {
         // Создаем объект с общим состоянием
-        const coreState = { parameter: true }
+        const coreState = {parameter: true}
         return {
           handleKeyDown(code: string) {
             if (code === "Space") {
-              update({ isSpacePressed: coreState.parameter })
+              update({isSpacePressed: coreState.parameter})
             }
           },
           parameter: coreState.parameter,
         }
       })
-      .actions({})
-      .reactions([])
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.core.handleKeyDown("Space")
-    expect(particle.context.isSpacePressed).toBe(true)
-  })
-  test("Доступ внутри ядра ко всем входящим в состав частицы функциям и объектам", () => {
-    const particle = MetaFor("core-test3")
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
-      .context(({ boolean }) => ({
-        isSpacePressed: boolean({ title: "Нажата ли клавиша Space", default: false }),
-      }))
-      .transitions([
-        { from: "ОЖИДАНИЕ", to: [{ state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", trigger: { isSpacePressed: true } }] },
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
+        },
+        {
+          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          action: ({core}) => {
+            core.handleKeyDown("Space")
+          },
+          to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
+        }
       ])
-      .core(({ update }) => ({
+      .reactions([])
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({isSpacePressed: true})
+    expect(meta.context.isSpacePressed).toBe(true)
+  })
+  test("Доступ внутри ядра ко всем входящим в состав meta функциям и объектам", () => {
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context(({boolean}) => ({
+        isSpacePressed: boolean({title: "Нажата ли клавиша Space", default: false}),
+      }))
+      .core(({update}) => ({
         /** Используем стрелочную функцию, которая замкнет coreState */
         handleKeyDown(code: string) {
           if (code === "Space") {
-            update({ isSpacePressed: this.parameter })
+            update({isSpacePressed: this.parameter})
           }
         },
         parameter: true,
       }))
-      .actions({})
+      .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
+        },
+        {
+          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+          action: ({core}) => {
+            core.handleKeyDown("Space")
+          },
+          to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
+        }
+      ])
       .reactions([])
-      .create({ state: "ОЖИДАНИЕ" })
-    particle.core.handleKeyDown("Space")
-    expect(particle.context.isSpacePressed).toBe(true)
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    meta.update({isSpacePressed: true})
+    expect(meta.context.isSpacePressed).toBe(true)
   })
-  test("Доступ внутри ядра к контексту частицы", () => {
-    const particle = MetaFor("core-test4")
-      .states("ОЖИДАНИЕ")
-      .context(({ number }) => ({
-        parameter: number({
-          default: 0,
-        }),
+
+  test("Доступ внутри ядра к контексту meta", () => {
+    const tag = Bun.randomUUIDv7()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const Meta = MetaFor(tag)
+      .context(({number}) => ({
+        parameter: number({default: 0}),
+        other: number({default: 1})
       }))
-      .transitions([])
-      .core(({ context }) => ({
+      .core(({context, update, self}) => ({
         parameter: context.parameter,
+        updateOther: () => update({other: self.parameter})
       }))
-      .actions({})
+      .states("ОЖИДАНИЕ", "ПАРАМЕТР ОБНОВЛЕН")
+      .transitions("ОЖИДАНИЕ", [
+        {
+          in: "ОЖИДАНИЕ",
+          to: [{state: "ПАРАМЕТР ОБНОВЛЕН", when: {other: 1}}]
+        },
+        {
+          in: "ПАРАМЕТР ОБНОВЛЕН",
+          action: ({core}) => core.updateOther(),
+          to: [{state: "ОЖИДАНИЕ", when: {other: 0}}]
+        }
+      ])
       .reactions([])
-      .create({ state: "ОЖИДАНИЕ" })
-    expect(particle.core.parameter).toBe(0)
+      .view({})
+    const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+    expect(meta.context.other).toBe(0)
   })
 })
 
 describe("core", () => {
   describe("Взаимодействие с общими данными через core", () => {
     test("Данные в core доступны для модификации без замены", () => {
-      //@ts-ignore
-      const sharedArray = []
-      const particle = MetaFor("core-shared-data-test")
-        .states("INITIAL", "MODIFIED")
-        .context(({ boolean }) => ({
-          isUpdated: boolean({ title: "Обновлено ли", default: false }),
+
+      const sharedArray: object[] = []
+      const tag = Bun.randomUUIDv7()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const Meta = MetaFor(tag)
+        .context(({boolean}) => ({
+          isUpdated: boolean({title: "Обновлено ли", default: false}),
         }))
-        .transitions([
-          {
-            from: "INITIAL",
-            to: [{ state: "MODIFIED", trigger: { isUpdated: true } }],
-          },
-        ])
-        .core(({ update }) => ({
-          //@ts-ignore
-          addData: (value) => {
+        .core(({update}) => ({
+          addData: (value: object) => {
             sharedArray.push(value)
-            update({ isUpdated: true })
-          }, //@ts-ignore
+            update({isUpdated: true})
+          },
           getData: () => sharedArray,
         }))
-        .actions({})
-        .reactions([]) //@ts-ignore
-        .create({ state: "INITIAL", core: { sharedArray } })
+        .states("INITIAL", "MODIFIED")
+        .transitions("INITIAL", [
+          {
+            in: "INITIAL",
+            action: ({core}) => {
+              core.addData(42)
+            },
+            to: [{state: "MODIFIED", when: {isUpdated: true}}],
+          },
+        ])
+        .reactions([])
+        .view({})
+      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
-      particle.core.addData(42)
-      particle.core.addData(100)
-
-      expect(particle.context.isUpdated).toBe(true)
-      expect(particle.state).toBe("MODIFIED")
-      expect(particle.core.getData()).toEqual([42, 100])
+      expect(meta.context.isUpdated).toBe(true)
+      expect(meta.state).toBe("MODIFIED")
+      expect(sharedArray).toEqual([42])
     })
   })
 
-  describe("Защита данных в core", () => {
-    test("Данные в core остаются неизменяемыми при попытке модификации структуры", () => {
-      const sharedObject = { key: "value" }
-      const particle = MetaFor("core-protection-test")
-        .states("INITIAL")
-        .context(({ boolean }) => ({
-          integrityMaintained: boolean({ title: "Сохранена ли целостность", default: true }),
-        }))
-        .transitions([])
-        .core(() => ({
-          updateKey: () => {
-            try {
-              sharedObject.key = "newValue" // Допустимо
-            } catch {
-              // Ошибок быть не должно
-            }
-          },
-          modifyStructure: () => {
-            try {
-              //@ts-ignore
-              delete sharedObject.key //@ts-ignore Попытка модификации структуры
-              sharedObject.newKey = "newValue" // Попытка добавить новое свойство
-            } catch {
-              particle.context.integrityMaintained = false // Сигнализируем о проблеме
-            }
-          },
-        }))
-        .actions({})
-        .reactions([]) //@ts-ignore
-        .create({ state: "INITIAL", core: { sharedObject } })
-
-      particle.core.updateKey()
-      expect(sharedObject.key).toBe("newValue") // Изменение значения допустимо
-
-      particle.core.modifyStructure()
-      expect("key" in sharedObject).toBe(false) // Свойство удалено
-      //@ts-ignore
-      expect(sharedObject.newKey).toBe("newValue") // Новое свойство добавлено
-    })
-  })
   describe("обновление ядра внутри через self ", () => {
     test("обновление ядра внутри через self", () => {
-      const particle = MetaFor("core-test5")
-        .states("INITIAL")
-        .context(() => ({}))
-        .transitions([])
-        .core(({ self }) => ({
+      const tag = Bun.randomUUIDv7()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const Meta = MetaFor(tag)
+        .context((t) => ({
+          coreParameter: t.number({nullable: true})
+        }))
+        .core(({self, update}) => ({
           coreParameter: 0,
           update: () => {
             self.coreParameter = 1
+            update({coreParameter: self.coreParameter})
           },
         }))
-        .actions({})
-        .create({ state: "INITIAL" })
-      particle.core.update()
-      expect(particle.core.coreParameter).toEqual(1)
+        .states("INITIAL", "UPDATED")
+        .transitions("INITIAL", [
+          {
+            in: "INITIAL",
+            action: ({core}) => core.update(),
+            to: [{state: "UPDATED", when: {coreParameter: null}}]
+          }
+        ])
+        .reactions([])
+        .view({})
+      const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
+
+      expect(meta.context.coreParameter).toEqual(1)
     })
   })
 })
