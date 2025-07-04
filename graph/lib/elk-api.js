@@ -69,7 +69,7 @@ export default class ELK {
     defaultLayoutOptions = {},
     algorithms = ["layered", "stress", "mrtree", "radial", "force", "disco", "sporeOverlap", "sporeCompaction", "rectpacking"],
     workerFactory,
-    workerUrl = "/graph/lib/elk-worker.js"
+    workerUrl = "/graph/lib/elk-worker.min.js"
   } = {}) {
     this.defaultLayoutOptions = defaultLayoutOptions
     this.initialized = false
