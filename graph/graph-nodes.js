@@ -16,14 +16,14 @@ export default MetaFor("graph-nodes", {
     queue: t.array({title: "Очередь акторов для добавления"})
   }))
   .core()
-  .states("render", "центрирование")
+  .states("render", "центрирование одной ноды")
   .transitions("render", [
     {
       in: "render",
-      to: [{state: "центрирование", when: {error: null}}]
+      to: [{state: "центрирование одной ноды", when: {error: null, queue: {length: 1}}}]
     },
     {
-      in: "центрирование",
+      in: "центрирование одной ноды",
       to: [{state: "render", when: {error: {isNull: false}}}]
     },
   ])

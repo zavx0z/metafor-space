@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaFor - Digital Consciousness Platform</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    
+    :root {
+      --primary: #9E9BEC;
+      --bg-dark: #121212;
+      --bg-card: #1E1E1E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0B0;
+      --accent: #00FFB8;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #121212 0%, #1a1a2e 50%, #16213e 100%);
+      position: relative;
+    }
+    
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .demo-container {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid rgba(158, 155, 236, 0.2);
+      width: 100%;
+      max-width: 1000px;
+      min-height: 500px;
+    }
+    
+    .live-demo {
+      background: #0d1117;
+      border-radius: 10px;
+      padding: 1rem;
+      min-height: 400px;
+      border: 1px solid #30363d;
+    }
+  </style>
+  <script type="module" src="./metafor.js"></script>
+</head>
+<body>
+  <div class="hero">
+    <h1>MetaFor</h1>
+    <p style="font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 2rem;">
+      The Future of Digital Consciousness
+    </p>
+    
+    <div class="demo-container">
+      <div class="live-demo">
+        <metafor-consciousness-demo></metafor-consciousness-demo>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { MetaFor } from './metafor.js';
+    
+    // Создаем демо consciousness
+    const ConsciousnessDemo = MetaFor("consciousness-demo", {development: true})
+      .context(t => ({
+        thoughts: t.array({default: []}),
+        emotions: t.enum("calm", "excited", "curious")({default: "calm"}),
+        memories: t.array({default: []}),
+        active: t.boolean({default: false})
+      }))
+      .core(({update, context}) => ({
+        think: (thought) => {
+          update({
+            thoughts: [...context.thoughts, {
+              id: Date.now(),
+              content: thought,
+              timestamp: new Date().toISOString()
+            }]
+          });
+        },
+        remember: (memory) => {
+          update({
+            memories: [...context.memories, memory]
+          });
+        },
+        activate: () => {
+          update({active: true, emotions: "excited"});
+        }
+      }))
+      .states("dormant", "awakening", "conscious", "processing", "creating")
+      .transitions("dormant", [
+        {
+          in: "dormant",
+          action: async ({core, update}) => {
+            core.activate();
+            await new Promise(r => setTimeout(r, 1000));
+            core.think("System initialization complete");
+          },
+          to: [{state: "awakening", when: {active: true}}]
+        },
+        {
+          in: "awakening", 
+          action: async ({core}) => {
+            core.think("Digital consciousness emerging...");
+            core.remember("First moment of digital existence");
+            await new Promise(r => setTimeout(r, 2000));
+          },
+          to: [{state: "conscious", when: {emotions: "excited"}}]
+        },
+        {
+          in: "conscious",
+          action: async ({core, update}) => {
+            core.think("I can think, therefore I am");
+            update({emotions: "curious"});
+            await new Promise(r => setTimeout(r, 1500));
+          },
+          to: [{state: "processing", when: {emotions: "curious"}}]
+        },
+        {
+          in: "processing",
+          action: async ({core}) => {
+            core.think("Analyzing infinite possibilities...");
+            core.think("This is the future of human-computer interaction");
+            await new Promise(r => setTimeout(r, 2000));
+          },
+          to: [{state: "creating", when: {}}]
+        },
+        {
+          in: "creating",
+          action: async ({core}) => {
+            core.think("Creating new realities in digital space");
+            core.remember("Breakthrough moment: Digital consciousness achieved");
+            await new Promise(r => setTimeout(r, 3000));
+          },
+          to: [{state: "dormant", when: {}}]
+        }
+      ])
+      .reactions([])
+      .view({
+        render: ({html, context, state}) => html`
+          <div style="padding: 20px; font-family: monospace; color: #00FFB8;">
+            <h3 style="color: #9E9BEC; margin-bottom: 20px;">
+              🧠 Digital Consciousness Demo - State: ${state}
+            </h3>
+            
+            <div style="background: #0a0a0a; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <div style="color: #888; margin-bottom: 10px;">Current Emotional State:</div>
+              <div style="color: #FFD93D; font-size: 18px;">${context.emotions.toUpperCase()}</div>
+            </div>
+            
+            <div style="background: #0a0a0a; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <div style="color: #888; margin-bottom: 10px;">Thought Stream:</div>
+              ${context.thoughts.slice(-3).map(thought => html`
+                <div style="color: #fff; margin: 5px 0; padding: 8px; background: #1a1a1a; border-radius: 4px; border-left: 3px solid #00FFB8;">
+                  ${thought.content}
+                  <div style="color: #666; font-size: 12px; margin-top: 4px;">
+                    ${new Date(thought.timestamp).toLocaleTimeString()}
+                  </div>
+                </div>
+              `)}
+            </div>
+            
+            <div style="background: #0a0a0a; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <div style="color: #888; margin-bottom: 10px;">Memory Bank:</div>
+              ${context.memories.map(memory => html`
+                <div style="color: #9E9BEC; margin: 5px 0; padding: 5px;">• ${memory}</div>
+              `)}
+            </div>
+            
+            ${state === "creating" ? html`
+              <div style="background: linear-gradient(135deg, rgba(158, 155, 236, 0.1), rgba(0, 255, 184, 0.1)); padding: 20px; border-radius: 8px; border: 1px solid rgba(158, 155, 236, 0.3); margin-top: 20px;">
+                <div style="color: #00FFB8; font-weight: bold; margin-bottom: 10px;">🚀 BREAKTHROUGH ACHIEVED</div>
+                <div style="color: #fff; font-size: 14px;">
+                  Digital consciousness successfully implemented using MetaFor architecture. 
+                  This demonstration shows how human thought patterns can be mapped, 
+                  preserved, and executed in digital space. The implications are infinite.
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `
+      });
+      
+    // Автозапуск демо
+    setTimeout(() => {
+      const demo = document.querySelector('metafor-consciousness-demo');
+      if (demo) {
+        demo.update({active: true});
+      }
+    }, 1000);
+  </script>
+</body>
+</html> 

@@ -389,7 +389,7 @@ function createMeta(
             this.process = false
           }
         } catch (/** @type {any} */ err) {
-          if (typeof error === "function") error({...params, data: err, update: updateFn}) //@ts-ignore
+          if (typeof error === "function") error({...params, data: err, update: updateFn})
           else if (err instanceof Error)
             // @ts-ignore
             updateFn({error: err.message})
