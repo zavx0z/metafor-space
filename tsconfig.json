@@ -30,6 +30,7 @@
     "node_modules/happy-dom/**/*",
     "**/snapshot/**/*",
     "fixtures/browser/index.html",
-    "**/lib/*"
+    "**/lib/*",
+    "**/public/**/*"
   ]
 }

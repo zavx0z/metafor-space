@@ -9,27 +9,8 @@
       }
     }
   </script>
-  <link rel="preload" href="/theme/RussoOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <style>
-    @font-face {
-      font-family: "Russo One";
-      src: url("/theme/RussoOne-Regular.woff2") format("truetype");
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-
-    body {
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    code, .monospace {
-      font-family: "DejaVu Sans Mono", "Courier New", monospace;
-    }
-  </style>
-  <link rel="stylesheet" href="/theme/theme.css"/>
+  <link rel="stylesheet" href="./theme/theme.css"/>
   <link rel="stylesheet" href="index.css">
-
   <link
     rel="icon"
     href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMxMjEyMTIiLz48cGF0aCBkPSJNOCAxNkgyNE0xNiA4VjI0IiBzdHJva2U9IiM5RTlCRUMiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg=="/>
@@ -38,10 +19,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 
   <title>MetaFor</title>
-  <script type="module">
-    await import("./index.js")
-    import "./graph/graph-nodes.js"
-  </script>
+  <script type="module" src="./graph/graph-nodes.js"></script>
+  <script type="module" src="./index.js"></script>
 </head>
 <body>
 <metafor-roadmap></metafor-roadmap>
