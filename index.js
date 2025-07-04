@@ -11,20 +11,16 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
     {
       in: "начало",
       action: () => new Promise((resolve, reject) => {
-        try {
           setTimeout(() => {
-            resolve({status: "end"})
+            // resolve({status: "end"})
           }, 6000)  
-        } catch (error) {
-          reject(new Error(error instanceof Error ? error.message : String(error)))
-        }
       }),
       to: [{state: "конец", when: {status: "end"}}],
     },
     {
       in: "конец",
       action: () => new Promise((resolve) => setTimeout(() => {
-        resolve({status: "start"})
+        // resolve({status: "start"})
       }, 4000)),
       to: [{state: "начало", when: {status: "start"}}],
     },

@@ -39,11 +39,11 @@ export default MetaFor("graph-nodes", {
       title: "получение списка добавляемых акторов",
       filter: ({meta, patch}) => meta.tag === "graph-listener"
         && patch.path === "/context"
-        && ((Object.hasOwn(patch.value, "op") && patch.value.op === "add"))
-        && (Object.hasOwn(patch.value, "nodes") && patch.value.nodes.length)
+        && patch.value.op === "add"
+        && patch.value.nodes?.length
       ,
-      action({patch}) {
-        console.log(patch)
+      action({meta, patch}) {
+        // console.log(meta, patch)
       }
     }
   ])

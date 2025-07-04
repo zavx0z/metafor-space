@@ -119,4 +119,84 @@ describe("MetaFor: патчи /context между акторами", () => {
     expect(siblingEl.context.value).toBe(undefined)
     expect(siblingEl.context.got).toBe(false)
   })
+})
+
+describe("MetaFor: блокировка всплытия между двумя акторами", () => {
+  let parent: MetaAny
+  let child: MetaAny
+
+  beforeAll(() => {
+    MetaFor("block-parent", {development: true})
+      .context(t => ({}))
+      .core()
+      .states("init")
+      .transitions("init", [])
+      .reactions([
+        {
+          title: "Блокирующая реакция",
+          filter: ({patch}) => patch.path === "/context" && patch.value?.value === "block",
+          block: true,
+          action: () => {
+            console.log("block action")
+          }
+        },
+        {
+          title: "Обычная реакция",
+          filter: ({patch}) => patch.path === "/context" && patch.value?.value === "child",
+          action: () => {
+            console.log("child action");
+          }
+        }
+      ])
+      .view({})
+
+    MetaFor("block-child", {development: true})
+      .context(t => ({value: t.string()}))
+      .core()
+      .states("init")
+      .transitions("init", [])
+      .reactions([])
+      .view({
+        render: ({html}) => html`
+          <slot></slot>`
+      })
+
+    render(html`
+      <metafor-block-parent ${ref(e => {
+        if (e) parent = e as MetaAny
+      })}>
+        <metafor-block-child ${ref(e => {
+          if (e) child = e as MetaAny
+        })}></metafor-block-child>
+      </metafor-block-parent>
+    `, document.body)
+  })
+
+  test("Блокирующая реакция не даёт событию дойти до document.body", async () => {
+    let documentHandled = false
+
+    document.body.addEventListener("channel", (event) => {
+      const {patch} = (event as CustomEvent).detail;
+      if (patch.path === "/context" && patch.value?.value === "block") {
+        documentHandled = true
+      }
+    })
+
+    child.update({value: "block"})
+    expect(documentHandled).toBe(false)
+  })
+
+  test("Обычная реакция позволяет событию дойти до document.body", async () => {
+    let documentHandled = false
+
+    document.body.addEventListener("channel", (event) => {
+      const {patch} = (event as CustomEvent).detail;
+      if (patch.path === "/context" && patch.value?.value === "child") {
+        documentHandled = true
+      }
+    })
+
+    child.update({value: "child"})
+    expect(documentHandled).toBe(true)
+  })
 }) 

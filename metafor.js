@@ -478,30 +478,34 @@ function createMeta(
       #reactionCustomEventCb = (ev) => {
         const {meta, patch} = /**@type {import("./metafor").BroadcastMessage}*/(/**@type{CustomEvent}*/(ev).detail)
         if (meta.tag === tag && meta.index === this.index) return
-
-        reactions.forEach((reaction) => {
-          this.#reactionCb({meta, patch})
-          if (reaction.block) {
-            ev.preventDefault()
-            ev.stopPropagation()
-          }
-        })
+        this.#reactionCb({meta, patch}, ev)
       }
 
       get id() {
         return `${tag}/${this.index}`
       }
 
-      /**@param {import("./metafor").BroadcastMessage} message */
-      #reactionCb = ({meta, patch}) => reactions.forEach((reaction) =>
-        (reaction.filter({meta, patch, context: this.context}))
-        && reaction.action({
-          id: this.id,
-          patch, meta,
-          context: this.context,
-          core: this.#core,
-          update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
-        }))
+      /**
+       * @param {import("./metafor").BroadcastMessage} message
+       * @param {Event} [ev]
+       */
+      #reactionCb = ({meta, patch}, ev) => reactions.forEach((reaction) => {
+          if (reaction.filter({meta, patch, context: this.context})) {
+            reaction.action({
+              id: this.id,
+              patch, meta,
+              context: this.context,
+              core: this.#core,
+              update: (ctx) => this._update({ctx, srcName: "reaction", funcName: "unknown"}),
+            })
+            if (!ev) return
+            if (reaction.block) {
+              ev.preventDefault()
+              ev.stopPropagation()
+            }
+          }
+        }
+      )
     }
   )
   return /** @type{Meta<S, C>} */ (document.querySelector("metafor-" + tag))
