@@ -1,4 +1,4 @@
-import {rmdir, mkdir} from "node:fs/promises"
+import {rmdir, copyFile, mkdir} from "node:fs/promises"
 
 try {
   await rmdir("./public", {recursive: true})
@@ -7,10 +7,12 @@ try {
 }
 
 await Bun.build({
-  entrypoints: ['./index.html', "./graph/lib/elk-api.js", "./graph/lib/elk-worker.min.js"],
+  entrypoints: ['./index.html', "./graph/lib/elk-api.js"],
   outdir: './public',
   target: "browser",
   external: ["elkjs", "/theme/RussoOne-Regular.woff2"],
   naming: "[dir]/[name].[ext]",
   minify: true
 })
+
+await copyFile("./graph/lib/elk-worker.min.js", "./public/graph/lib/elk-worker.min.js")

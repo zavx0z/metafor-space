@@ -18,7 +18,6 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "latest"
-      - run: bun install
       - run: bun index.build.ts
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
