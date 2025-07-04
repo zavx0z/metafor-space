@@ -108,7 +108,7 @@ declare global {
     destroy: () => void
   }
 
-  export type MetaAny = Meta<any, any, any>
+  export type MetaAny = Meta<any, any, any> & HTMLElement
   export type SnapshotAny = Snapshot<any, any, any>
 }
 

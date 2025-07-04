@@ -133,8 +133,8 @@ function createMeta(
             ctx,
             srcName: "core",
             funcName: currentCaller || "unknown"
-          }), 
-          context: this.context, 
+          }),
+          context: this.context,
           self,
         })
         // Прокси для self, для синхронизации значений
@@ -232,7 +232,7 @@ function createMeta(
         this.#channel = new BroadcastChannel('channel')
         if (reactions.length) {
           this.#channel.onmessage = ({data}) => this.#reactionCb(data)
-          this.#shadow.addEventListener("channel", this.#reactionCustomEventCb)
+          this.addEventListener("channel", this.#reactionCustomEventCb)
         }
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
         const transition = transitions.find((i) => i.in === initialState)
@@ -377,13 +377,13 @@ function createMeta(
                   else if (data && typeof data === "object" && !(data instanceof Error)) updateFn(data)
                 })
               .catch(
-              /** @param {Error} err*/
+                /** @param {Error} err*/
                 (err) => {
-                if (typeof error === "function") error({...params, data: err, update: updateFn})
-                else if (err instanceof Error)
-                  // @ts-ignore
-                   updateFn({error: err.message})
-              })
+                  if (typeof error === "function") error({...params, data: err, update: updateFn})
+                  else if (err instanceof Error)
+                    // @ts-ignore
+                    updateFn({error: err.message})
+                })
               .finally(() => (this.process = false))
           } else {
             // sync
@@ -464,15 +464,13 @@ function createMeta(
       /**@param {import("./types/meta.ts").PatchMetaFor} patches*/
       #sendPatches = (patches) => {
         const message = {meta: this.#meta, patch: patches}
-        queueMicrotask(() => {
-          /**@type {import("./metafor").BroadcastMessage}*/
-          this.#shadow.dispatchEvent(new CustomEvent('channel', {
-            detail: message,
-            bubbles: true,
-            cancelable: false,
-            composed: true
-          }))
-        })
+        /**@type {import("./metafor").BroadcastMessage}*/
+        this.#shadow.dispatchEvent(new CustomEvent('channel', {
+          detail: message,
+          bubbles: true,
+          cancelable: false,
+          composed: true
+        }))
         // console.log(patches.value)
         if (debug) log(message, this.#core)
       }

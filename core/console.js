@@ -6,10 +6,12 @@ const config = {
     // "graph-meta",
     // "graph-param"
     // "graph-state",
-    "graph-context",
+    // "graph-context",
     // "graph-layout"
-    "test",
-    // "input-enum"
+    // "test",
+    // "input-enum",
+    "graph-nodes",
+    "graph-listener"
   ],
   index: null,
   patch: [

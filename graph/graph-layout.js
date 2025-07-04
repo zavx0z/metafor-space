@@ -95,13 +95,6 @@ export default MetaFor("graph-layout", {development: true})
   ])
   .reactions([
     {
-      title: "Блокировка всплытия",
-      filter: () => true,
-      block: true,
-      action() {
-      }
-    },
-    {
       title: "начало создания meta",
       filter: ({patch, meta}) => (
         meta.tag === "graph-listener"

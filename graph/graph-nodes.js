@@ -29,9 +29,18 @@ export default MetaFor("graph-nodes", {
   ])
   .reactions([
     {
-      title: "",
+      title: "Блокировка всплытия",
+      filter: () => true,
+      block: true,
+      action() {
+      }
+    },
+    {
+      title: "получение списка добавляемых акторов",
       filter: ({meta, patch}) => meta.tag === "graph-listener"
         && patch.path === "/context"
+        && ((Object.hasOwn(patch.value, "op") && patch.value.op === "add"))
+        && (Object.hasOwn(patch.value, "nodes") && patch.value.nodes.length)
       ,
       action({patch}) {
         console.log(patch)
