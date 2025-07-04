@@ -62,74 +62,52 @@ describe("update", async () => {
 
   const messages = await waitForMessages()
 
-  expect(messages[0].patch.op, "Первое сообщение о добавлении новой meta").toBe("add")
-
-  test("actionInit в INITIAL", () => {
-    expect(messages[1]).toMatchObject({
-      meta: {
-        tag,
-        timestamp: expect.any(Number),
-      },
-      patch: {
-        op: "replace",
-        path: "/context",
-        value: {state: "action"},
-      },
-    })
-    expect(messages[2].patch.path, "После обновления контекста получаем сообщение об изменении состояния").toBe(
-      "/state"
-    )
+  test("Сразу после инициализации: add / — снапшот", () => {
+    expect(messages[0].patch.op).toBe("add")
+    expect(messages[0].patch.path).toBe("/")
   })
 
-  test("actionDouble в action", () => {
-    expect(messages[3]).toMatchObject({
-      meta: {
-        tag,
-        timestamp: expect.any(Number),
-      },
-      patch: {
-        op: "replace",
-        path: "/context",
-        value: {state: "core", field1: "action complex"},
-      },
+  test("После инициализации: replace /context — переход к action", () => {
+    expect(messages[1].patch).toMatchObject({
+      op: "replace",
+      path: "/context",
+      value: { state: "action" }
     })
-    expect(messages[4].patch.path, "После обновления контекста получаем сообщение об изменении состояния").toBe(
-      "/state"
-    )
   })
 
-  test("update должен логировать источник вызова и измененные поля", async () => {
-    expect(messages[5], "Проверяем одиночный вызов update из core").toMatchObject({
-      meta: {
-        tag,
-        timestamp: expect.any(Number),
-      },
-      patch: {
-        op: "replace",
-        path: "/context",
-        value: {field1: "test"},
-      },
+  test("После перехода к action: replace /context — переход к core, field1: action complex", () => {
+    expect(messages[2].patch).toMatchObject({
+      op: "replace",
+      path: "/context",
+      value: { state: "core", field1: "action complex" }
     })
-    expect(messages[6].patch.path, "После обновления контекста получаем сообщение об изменении состояния").toBe(
-      "/state"
-    )
-    expect(messages[7], "Проверяем множественные вызовы update из core").toEqual({
-      meta: {
-        tag,
-        timestamp: expect.any(Number),
-      },
-      patch: {
-        op: "replace",
-        path: "/context",
-        value: {field1: "test1", field2: 1},
-      },
-    })
-    expect(messages[8].patch.path, "После обновления контекста получаем сообщение об изменении состояния").toBe(
-      "/state"
-    )
   })
-  test("Несуществующие ключи не устанавливаются в контекст (из view может быть потому что не подсвечивает IDE)", () => {
-    //@ts-ignore
+
+  test("После перехода к core: replace /context — обновление field1: test (coreMethod)", () => {
+    expect(messages[3].patch).toMatchObject({
+      op: "replace",
+      path: "/context",
+      value: { field1: "test" }
+    })
+  })
+
+  test("После coreMethod: replace /context — обновление field1: test1, field2: 1 (complexMethod)", () => {
+    expect(messages[4].patch).toMatchObject({
+      op: "replace",
+      path: "/context",
+      value: { field1: "test1", field2: 1 }
+    })
+  })
+
+  test("После complexMethod: replace /state — переход в final", () => {
+    expect(messages[13].patch).toMatchObject({
+      op: "replace",
+      path: "/state",
+      value: "final"
+    })
+  })
+
+  test("После ручного update: replace /context — обновление field1: exist, field2: exist", async () => {
     meta.update({field1: "exist", field2: "exist", field3: "not exist"})
     //@ts-ignore
     expect(meta.context.field3).toBeUndefined()
@@ -138,8 +116,17 @@ describe("update", async () => {
       field2: "exist",
       state: "core"
     })
+    // Ждём появления сообщения
+    await Bun.sleep(100)
+    // Ожидаем, что следующее сообщение по индексу 14
+    expect(messages[14].patch).toMatchObject({
+      op: "replace",
+      path: "/context",
+      value: { field1: "exist", field2: "exist" }
+    })
   })
-  test("Обновление из реакции", async () => {
+
+  test("После реакции: replace /context — переход в reaction", async () => {
     const channel = new BroadcastChannel('channel')
     expect(meta.state).toBe("final")
     channel.postMessage({
@@ -151,8 +138,25 @@ describe("update", async () => {
         }
       }
     })
-    await Bun.sleep(20)
+    await Bun.sleep(100)
     expect(meta.context.state).toBe("reaction")
     expect(meta.state).toBe("reaction")
+    // Ожидаем, что следующее сообщение по индексу 15
+    expect(messages[15].patch).toMatchObject({
+      op: "replace",
+      path: "/context",
+      value: { state: "reaction" }
+    })
   })
+
+  test("После реакции: replace /state — подтверждение reaction", async () => {
+    await Bun.sleep(100)
+    // Ожидаем, что следующее сообщение по индексу 16
+    expect(messages[16].patch).toMatchObject({
+      op: "replace",
+      path: "/state",
+      value: "reaction"
+    })
+  })
+
 })

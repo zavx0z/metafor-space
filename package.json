@@ -60,7 +60,7 @@
     "test": "bun test",
     "test[watch]": "bun test tests --watch",
 
-    "test:fsm": "bun test tests",
+    "test:MetaFor": "bun test tests",
     "test:lifecycle": "bun test tests/lifecycle",
     "test:lifecycle:withAction": "bun test tests/lifecycle/withAction.spec.ts",
     "test:lifecycle:withoutAction": "bun test tests/lifecycle/withoutAction.spec.ts",
