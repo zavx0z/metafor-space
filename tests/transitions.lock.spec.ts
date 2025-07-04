@@ -6,11 +6,13 @@ test("Блокировка переходов перед входом в нов�
   let value = -1
   const tag = Bun.randomUUIDv7()
   document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
-  const Meta = MetaFor(tag)
+  MetaFor(tag)
     .context((t) => ({
       value: t.number({nullable: true}),
     }))
-    .core()
+    .core(({update}) => ({
+      update
+    }))
     .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", [
       {
@@ -22,8 +24,10 @@ test("Блокировка переходов перед входом в нов�
       },
       {
         in: "PROCESS",
-        action: () => {
-          const end = Date.now() + 500
+        action: ({core, context}) => {
+          core.update({value: 1})
+          value = context.value
+          const end = Date.now() + 444
           while (Date.now() < end) {
             // Блокируем поток
           }
@@ -37,18 +41,8 @@ test("Блокировка переходов перед входом в нов�
     ])
     .reactions([])
     .view({})
-  // .create({
-  //   onTransition: async (_, newState, meta) => {
-  //     if (newState === "PROCESS") {
-  //       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
-  //       meta.update({value: 1}) // не должен вызвать переход, но контекст должен быть обновлен даже при блокировке переходов
-  //       value = meta.context.value
-  //     }
-  //   },
-  // })
-  const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
-
-  await Bun.sleep(1000)
+  const meta = document.querySelector(`metafor-${tag}`) as any
+  await Bun.sleep(500)
   expect(value).toBe(1)
   expect(meta.state).toBe("DONE")
 })

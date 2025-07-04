@@ -33,6 +33,7 @@ export type CoreDefinition<I extends CoreObj, C extends ContextDefinition> = (pa
   update: Update<C>
   context: ContextData<C>
   self: Core<I>
+  element: HTMLElement
 }) => I
 
 /**

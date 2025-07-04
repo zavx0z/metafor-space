@@ -128,11 +128,14 @@ function createMeta(
         let /** @type {string | null} */ currentCaller = null
         const self = /** @type {import("./types/core").Core<I>} */ ({})
         const coreObj = coreDefinition({
+          element: this,
           update: (ctx) => this._update({
             ctx,
             srcName: "core",
             funcName: currentCaller || "unknown"
-          }), context: this.context, self
+          }), 
+          context: this.context, 
+          self,
         })
         // Прокси для self, для синхронизации значений
         Object.entries(coreObj).forEach(([key, value]) => {
