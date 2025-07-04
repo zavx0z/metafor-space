@@ -1,8 +1,7 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
+
 # MetaFor Actor System
 
 ## Создание актора MetaFor
@@ -12,7 +11,7 @@ MetaFor создает актор с типизированным контекс
 ```javascript
 export default MetaFor("actor-name", {development: true})
   .context(t => ({...}))        // 1. Определение контекста
-  .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные  
+  .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные
   .states("state1", "state2")   // 3. Список состояний
   .transitions("state1", [...]) // 4. Переходы и actions
   .reactions([...])             // 5. Реакции на события
@@ -20,6 +19,7 @@ export default MetaFor("actor-name", {development: true})
 ```
 
 **Параметры MetaFor:**
+
 - **`tag`** `string` - Имя актора для регистрации `<metafor-{tag}>` элемента и идентификации в сообщениях
 - **`conf`** `object` (опционально):
   - **`description`** `string` - Описание актора
@@ -32,17 +32,20 @@ MetaFor реализует акторную модель, где каждый к
 ### Основные принципы
 
 **1. Инкапсуляция состояния**
+
 - **Контекст** - типизированные данные с автоматическими проверками переходов
-- **Состояние автомата** - текущая фаза жизненного цикла  
+- **Состояние автомата** - текущая фаза жизненного цикла
 - **Ядро** - переиспользуемые методы и временные структуры
 
 **2. Изоляция выполнения**
+
 - Shadow DOM closed для полной изоляции логики и UX/UI а так же стилей
 - Независимые каналы коммуникации
 - Асинхронная обработка действий
 
 **3. Демократическая архитектура**
 Ключевое преимущество - отсутствие централизованного управления:
+
 - Все акторы равноправны - могут слушать изменения любого другого
 - Нет иерархии командования - только реактивное взаимодействие
 - Простые компоненты могут влиять на сложные системы
@@ -65,16 +68,16 @@ config:
 ---
 flowchart TD
     subgraph s2["Инициализация актора"]
-        A["Создание актора"] 
+        A["Создание актора"]
         B{"Есть действие при инициализации?"}
         C["Присвоение начального состояния и контекста"]
         C2["Присвоение начального состояния и контекста"]
         D["sendPatch: op=add path=/"]
-        D2["sendPatch: op=add path=/"] 
+        D2["sendPatch: op=add path=/"]
         n10["🔒 Блокировка триггеров: process=true"]
         n17(("Ожидание"))
     end
-    
+
     subgraph ActionExecution["Выполнение Action"]
         n1{"Функцию ядра запускает?"}
         n4{"Контекст обновляет?"}
@@ -84,17 +87,17 @@ flowchart TD
         n28["onUpdate сигнал"]
         n29["sendPatch path: /context"]
     end
-    
+
     subgraph s4["Внешние обновления (Реакции)"]
         HD{"Триггеры разблокированы?"}
         n24["Обновление контекста"]
-        n25["onUpdate сигнал"] 
+        n25["onUpdate сигнал"]
         n26["sendPatch path: /context"]
         n31["Есть обновленные параметры?"]
         n32(("Ожидание"))
         n33(("Ожидание"))
     end
-    
+
     subgraph s5["Проверка переходов состояний"]
         HE{"Переходы существуют?"}
         HG{"Условие перехода выполнено?"}
@@ -109,11 +112,11 @@ flowchart TD
         n22["Обновление контекста"]
         n23["sendPatch path: /context"]
     end
-    
+
     subgraph s1["Core функции"]
         n2{"Контекст обновляет?"}
     end
-    
+
     subgraph s6["Обработка реакций"]
         n12{"Функцию ядра запускает?"}
         n13{"Контекст обновляет?"}
@@ -127,7 +130,7 @@ flowchart TD
     C2 --> D2
     D --> n1
     D2 --> n17
-    
+
     n1 -- "Да" --> n2
     n1 --> n4
     n4 -- "Да" --> n27
@@ -136,26 +139,26 @@ flowchart TD
     n28 --> n29
     n29 --> HE
     n14 --> n8
-    
+
     n2 --> n24
     n12 -- "Да" --> n2
     n12 --> n13
     n13 --> n24
-    
+
     n24 --> n31
     n31 -- "Да" --> n25
     n31 -- "Нет" --> n32
     n25 --> n26
     n26 --> HD
-    
+
     HD -- "Да" --> HE
     HD -- "Нет" --> n33
-    
+
     HE -- "Да" --> HG
     HE -- "Нет" --> n15
     HG -- "Да" --> HM
     HG -- "Нет" --> n15
-    
+
     HM -- "Да" --> n11
     HM -- "Нет" --> n15
     n11 --> n22
@@ -165,12 +168,12 @@ flowchart TD
     K --> n20
     n20 --> HL
     HL --> n1
-    
+
     n15 --> n16
     n16 --> n17
 
     style A stroke:none
-    style B stroke:none  
+    style B stroke:none
     style C stroke:none
     style C2 stroke:none
     style D stroke:none,fill:#FFD600,color:#000000
@@ -207,7 +210,7 @@ flowchart TD
 
 1. **MetaFor** - функция создания актора, возвращающая конструктор
 2. **Контекст** - типизированные данные, изменения запускают проверку переходов
-3. **Ядро** - переиспользуемые методы и временные структуры 
+3. **Ядро** - переиспользуемые методы и временные структуры
 4. **Состояния** - глобально видимые фазы жизненного цикла
 5. **Переходы** - правила смены состояний с условиями и действиями
 6. **Реакции** - обработчики событий от других акторов
@@ -218,7 +221,7 @@ flowchart TD
 ```javascript
 export default MetaFor("actor-name", {development: true})  // 1. Создание актора
   .context(t => ({...}))        // 2. Определение контекста
-  .core(({update, context}) => ({...}))  // 3. Ядро, методы и данные  
+  .core(({update, context}) => ({...}))  // 3. Ядро, методы и данные
   .states("state1", "state2")   // 4. Список состояний
   .transitions("state1", [...]) // 5. Переходы и actions
   .reactions([...])             // 6. Реакции на события
@@ -232,17 +235,19 @@ export default MetaFor("actor-name", {development: true})  // 1. Создани�
 Каждый актор имеет уникальный ID: `{tag}/{index}`
 
 **Формирование ID:**
+
 - **`tag`** - имя типа актора ("counter", "user-input")
 - **`index`** - порядковый номер экземпляра (глобальный счетчик)
 
 ```javascript
 // Примеры ID
-"counter/1"      // первый экземпляр counter
-"counter/2"      // второй экземпляр counter  
-"user-input/1"   // первый экземпляр user-input
+"counter/1" // первый экземпляр counter
+"counter/2" // второй экземпляр counter
+"user-input/1" // первый экземпляр user-input
 ```
 
 **Передача в сообщениях:**
+
 ```javascript
 {
   meta: {
@@ -252,13 +257,14 @@ export default MetaFor("actor-name", {development: true})  // 1. Создани�
   },
   patch: {
     path: "/context",  // пути: /, /state, /context
-    op: "replace", 
+    op: "replace",
     value: {counter: 10, active: true}
   }
 }
 ```
 
 **Meta-chain архитектура:**
+
 - При создании - полный снимок состояния
 - Далее - минимальные патчи изменений
 - Валидация через ограничения контекста
@@ -273,6 +279,7 @@ MetaFor(tag, conf?)
 ```
 
 **Параметры:**
+
 - **`tag`** - имя актора для регистрации `<metafor-{tag}>` элемента
 - **`conf`** - опциональная конфигурация:
   - `description` - описание актора
@@ -281,8 +288,9 @@ MetaFor(tag, conf?)
 **Возвращает:** конструктор с методами `.context()`, `.core()`, `.states()`, `.transitions()`, `.reactions()`, `.view()`
 
 **Результат выполнения:**
+
 - Автоматическая регистрация веб-компонента `<metafor-{tag}>`
-- Изоляция через Shadow DOM closed  
+- Изоляция через Shadow DOM closed
 - Уникальная идентификация в системе сообщений
 - Интеграция с браузерными API и SSR
 
@@ -291,6 +299,7 @@ MetaFor(tag, conf?)
 Типизированные данные состояния - основа реактивности.
 
 **Механизм:**
+
 - Изменения контекста запускают проверку переходов состояний
 - Во время выполнения actions переходы блокируются
 - Контекст может обновляться во время блокировки
@@ -313,6 +322,7 @@ MetaFor(tag, conf?)
 Для методов, сервисов подписки и временных структур, доступных из любого состояния.
 
 **Отличие от Actions:**
+
 - **Core** - переиспользуемые методы для всех состояний
 - **Actions** - функции для конкретных состояний
 
@@ -322,22 +332,22 @@ MetaFor(tag, conf?)
   users: new Map(),
   products: [],
   config: {},
-  
+
   // Сервисы подписки
   eventSource: null,
   websocket: null,
   subscriptions: new Set(),
-  
+
   // Переиспользуемые методы
   getUserById: (id) => self.users.get(id),
   updateCounter: () => update({counter: context.counter + 1}),
-  
+
   // Сервисы подписки
   subscribe: (eventName, callback) => {
     self.subscriptions.add({eventName, callback})
     return () => self.subscriptions.delete({eventName, callback})
   },
-  
+
   connectWebSocket: (url) => {
     self.websocket = new WebSocket(url)
     self.websocket.onmessage = (event) => {
@@ -345,9 +355,9 @@ MetaFor(tag, conf?)
       update({lastMessage: data})
     }
   },
-  
+
   // Связь контекста с core
-  getSelectedUsers: () => 
+  getSelectedUsers: () =>
     context.selectedIds.map(id => self.getUserById(id)).filter(Boolean)
 }))
 
@@ -364,37 +374,141 @@ MetaFor(tag, conf?)
 ```
 
 **Глобальность:**
+
 - Видны в main thread, worker, service worker, tabs, windows
 - Синхронизируются через BroadcastChannel
 - Могут передаваться между устройствами
 
 ## 5. Переходы - логика изменений состояний
 
-Правила переходов между состояниями с actions.
+Правила переходов между состояниями с actions и автоматической обработкой результата.
+
+### Автоматическая обработка результата
+
+**Новая система автоматически обрабатывает результат action:**
+
+1. **Автоматический success**: если action возвращает объект для обновления контекста
+2. **Автоматический error**: если action выбрасывает Error
+3. **Ручные success/error**: только для форматирования результата сторонних функций
 
 ```javascript
 .transitions("idle", [
   {
-    in: "idle", 
+    in: "idle",
     to: [{state: "working", when: {data: {isEmpty: false}}}]
   },
   {
     in: "working",
+    // Автоматический success: возвращаем объект для обновления контекста
     action: async ({update, context}) => {
-      // Автоматическая блокировка переходов во время выполнения
       const result = await processData(context.data)
-      update({result, active: false})
-      // Блокировка снимается автоматически
+      return {result, active: false} // Автоматически обновит контекст
     },
     to: [
       {state: "done", when: {active: false}},
       {state: "emergency", when: {error: {isNull: false}}}
     ]
+  },
+  {
+    in: "working",
+    // Автоматический error: выбрасываем Error
+    action: async ({context}) => {
+      if (!context.data) {
+        throw new Error("Данные отсутствуют") // Автоматически обновит error в контексте
+      }
+      return {status: "processed"}
+    },
+    to: [
+      {state: "done", when: {status: "processed"}},
+      {state: "error", when: {error: {isNull: false}}}
+    ]
+  },
+  {
+    in: "working",
+    // Ручной success/error для форматирования сторонних функций
+    action: () => fetch('/api/data'),
+    success: ({update, data}) => {
+      // Форматируем данные перед обновлением
+      update({items: data.items, total: data.total})
+    },
+    error: ({update, data}) => {
+      // Обрабатываем ошибку API
+      update({error: `API Error: ${data.message}`})
+    },
+    to: [
+      {state: "done", when: {items: {length: {min: 1}}}},
+      {state: "error", when: {error: {isNull: false}}}
+    ]
   }
 ])
 ```
 
+### Примеры использования
+
+**Простой случай - автоматическая обработка:**
+
+```javascript
+{
+  in: "начало",
+  action: () => new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({status: "end"}) // Автоматически обновит контекст
+    }, 6000)
+  }),
+  to: [{state: "конец", when: {status: "end"}}],
+}
+```
+
+**Обработка ошибок:**
+
+```javascript
+{
+  in: "начало",
+  action: () => new Promise((resolve, reject) => {
+    try {
+      // какая-то логика
+      resolve({status: "success"})
+    } catch (error) {
+      reject(new Error("Что-то пошло не так")) // Автоматически обновит error
+    }
+  }),
+  to: [
+    {state: "конец", when: {status: "success"}},
+    {state: "ошибка", when: {error: {isNull: false}}}
+  ],
+}
+```
+
+**Сторонние функции с форматированием:**
+
+```javascript
+{
+  in: "загрузка",
+  action: () => fetch('/api/users'),
+  success: ({update, data}) => {
+    // Форматируем ответ API
+    update({
+      users: data.users,
+      total: data.total,
+      loaded: true
+    })
+  },
+  error: ({update, data}) => {
+    // Обрабатываем ошибку API
+    update({
+      error: `Ошибка загрузки: ${data.message}`,
+      loaded: false
+    })
+  },
+  to: [
+    {state: "готово", when: {loaded: true}},
+    {state: "ошибка", when: {error: {isNull: false}}}
+  ]
+}
+```
+
 **Встроенная блокировка:**
+
 - Actions автоматически блокируют проверку переходов
 - Контекст может обновляться во время блокировки
 - Для async/await блокировка снимается после завершения
@@ -418,7 +532,7 @@ MetaFor(tag, conf?)
     }
   },
   {
-    title: "Реакция на глобальные состояния", 
+    title: "Реакция на глобальные состояния",
     filter: ({meta, patch}) => patch.path === "/state",
     action: ({patch, update}) => {
       if (patch.value === "emergency") {
@@ -439,7 +553,7 @@ MetaFor(tag, conf?)
     <div class="actor-${state}">
       <h3>${context.name}</h3>
       <div>Счетчик: ${context.counter}</div>
-      
+
       <!-- Создание дочерних акторов -->
       ${repeat(context.childTasks, (task) => task.id, (task) => html`
         <metafor-child-worker context=${{
@@ -449,7 +563,7 @@ MetaFor(tag, conf?)
       `)}
     </div>
   `,
-  
+
   style: ({css}) => css`
     .actor { padding: 20px; }
   `
@@ -457,6 +571,7 @@ MetaFor(tag, conf?)
 ```
 
 **repeat vs map:**
+
 - **repeat()** - для динамических списков с оптимизацией DOM
 - **map()** - для статических списков
 
@@ -464,11 +579,11 @@ MetaFor(tag, conf?)
 
 ### Три способа взаимодействия
 
-| Направление | Механизм | Область | Использование |
-|-------------|----------|---------|---------------|
-| 🌐 **Все ↔ Все** | Глобальные состояния | Main thread, workers, tabs, устройства | Координация системы |
-| ⬆️ **Ребенок → Родитель** | DOM-события | DOM-дерево | События меняют контекст |
-| ⬇️ **Родитель → Ребенок** | SessionStorage + состояния | Tab/window | Передача данных |
+| Направление               | Механизм                   | Область                                | Использование           |
+| ------------------------- | -------------------------- | -------------------------------------- | ----------------------- |
+| 🌐 **Все ↔ Все**          | Глобальные состояния       | Main thread, workers, tabs, устройства | Координация системы     |
+| ⬆️ **Ребенок → Родитель** | DOM-события                | DOM-дерево                             | События меняют контекст |
+| ⬇️ **Родитель → Ребенок** | SessionStorage + состояния | Tab/window                             | Передача данных         |
 
 ### Передача данных через SessionStorage
 
@@ -478,7 +593,7 @@ MetaFor(tag, conf?)
   in: "idle",
   action: ({update, context}) => {
     sessionStorage.setItem('child-data', JSON.stringify(context.dataToSend))
-    update({dataReady: true})
+    return {dataReady: true} // Автоматически обновит контекст
   },
   to: [{state: "waiting", when: {dataReady: true}}]
 }])
@@ -486,8 +601,8 @@ MetaFor(tag, conf?)
 // Ребенок: реагирует на состояние и читает данные
 .reactions([{
   title: "Получение данных от родителя",
-  filter: ({meta, patch}) => 
-    meta.tag === "parent-actor" && 
+  filter: ({meta, patch}) =>
+    meta.tag === "parent-actor" &&
     patch.path === "/state" && patch.value === "waiting",
   action: ({update}) => {
     const data = JSON.parse(sessionStorage.getItem('child-data') || '{}')
@@ -500,59 +615,59 @@ MetaFor(tag, conf?)
 
 ```javascript
 export default MetaFor("counter")
-  .context(t => ({
-    value: t.number({default: 0}),
-    step: t.number({default: 1}),
-    max: t.number({default: 10})
+  .context((t) => ({
+    value: t.number({ default: 0 }),
+    step: t.number({ default: 1 }),
+    max: t.number({ default: 10 }),
   }))
-  
-  .core(({update, context}) => ({
+
+  .core(({ update, context }) => ({
     increment: () => {
       const newValue = context.value + context.step
-      update({value: Math.min(newValue, context.max)})
+      update({ value: Math.min(newValue, context.max) })
     },
     decrement: () => {
       const newValue = context.value - context.step
-      update({value: Math.max(newValue, 0)})
+      update({ value: Math.max(newValue, 0) })
     },
-    reset: () => update({value: 0})
+    reset: () => update({ value: 0 }),
   }))
-  
+
   .states("active", "max", "min")
-  
+
   .transitions("active", [
     {
       in: "active",
       to: [
-        {state: "max", when: {value: {gte: 10}}},
-        {state: "min", when: {value: {lte: 0}}}
-      ]
+        { state: "max", when: { value: { gte: 10 } } },
+        { state: "min", when: { value: { lte: 0 } } },
+      ],
     },
     {
       in: "max",
-      to: [{state: "active", when: {value: {lt: 10}}}]
+      to: [{ state: "active", when: { value: { lt: 10 } } }],
     },
     {
-      in: "min", 
-      to: [{state: "active", when: {value: {gt: 0}}}]
-    }
+      in: "min",
+      to: [{ state: "active", when: { value: { gt: 0 } } }],
+    },
   ])
-  
+
   .reactions([
     {
       title: "Команды от UI",
-      filter: ({meta}) => meta.tag === "ui-controller",
-      action: ({patch, core}) => {
+      filter: ({ meta }) => meta.tag === "ui-controller",
+      action: ({ patch, core }) => {
         const command = patch.value.command
         if (command === "increment") core.increment()
-        if (command === "decrement") core.decrement() 
+        if (command === "decrement") core.decrement()
         if (command === "reset") core.reset()
-      }
-    }
+      },
+    },
   ])
-  
+
   .view({
-    render: ({html, context, state, core}) => html`
+    render: ({ html, context, state, core }) => html`
       <div class="counter ${state}">
         <div class="value">${context.value}</div>
         <button @click=${core.increment}>+</button>
@@ -561,16 +676,20 @@ export default MetaFor("counter")
         <div class="info">Шаг: ${context.step}, Макс: ${context.max}</div>
       </div>
     `,
-    
-    style: ({css}) => css`
+
+    style: ({ css }) => css`
       .counter {
         padding: 20px;
         border: 2px solid #ccc;
         border-radius: 8px;
         text-align: center;
       }
-      .counter.max { border-color: red; }
-      .counter.min { border-color: blue; }
+      .counter.max {
+        border-color: red;
+      }
+      .counter.min {
+        border-color: blue;
+      }
       .value {
         font-size: 2em;
         font-weight: bold;
@@ -581,7 +700,7 @@ export default MetaFor("counter")
         padding: 10px 15px;
         font-size: 1.2em;
       }
-    `
+    `,
   })
 ```
 
@@ -622,8 +741,8 @@ export default MetaFor("system-controller")
   ])
   .reactions([{
     title: "Простая кнопка управляет сложной системой",
-    filter: ({meta, patch}) => 
-      meta.tag === "emergency-button" && 
+    filter: ({meta, patch}) =>
+      meta.tag === "emergency-button" &&
       patch.path === "/state" && patch.value === "pressed",
     action: ({update, core}) => {
       console.log("Аварийная кнопка нажата!")
@@ -644,26 +763,29 @@ export default MetaFor("system-controller")
 ## Паттерны взаимодействия
 
 ### 1. Слушание состояний
+
 ```javascript
 .reactions([{
   title: "Реакция на активацию кнопки",
-  filter: ({meta, patch}) => 
+  filter: ({meta, patch}) =>
     meta.tag === "button" && patch.path === "/state" && patch.value === "active",
   action: ({update}) => update({buttonPressed: true})
 }])
 ```
 
 ### 2. Слушание контекста
+
 ```javascript
 .reactions([{
   title: "Отслеживание счетчика",
-  filter: ({meta, patch}) => 
+  filter: ({meta, patch}) =>
     meta.tag === "counter" && patch.path === "/context" && patch.value.counter > 10,
   action: ({update}) => update({thresholdReached: true})
 }])
 ```
 
 ### 3. Множественное слушание
+
 ```javascript
 .reactions([
   {
@@ -672,7 +794,7 @@ export default MetaFor("system-controller")
     action: ({patch, update}) => update({lastInput: patch.value})
   },
   {
-    title: "Слушаем систему", 
+    title: "Слушаем систему",
     filter: ({meta}) => meta.tag === "system-status",
     action: ({patch, update}) => update({systemOnline: patch.value.online})
   }
@@ -697,8 +819,8 @@ export default MetaFor("data-processor")
   ])
   .reactions([{
     title: "Получение результата через sessionStorage",
-    filter: ({meta, patch}) => 
-      meta.tag === "task-worker" && 
+    filter: ({meta, patch}) =>
+      meta.tag === "task-worker" &&
       patch.path === "/state" && patch.value === "completed",
     action: ({meta, update, context}) => {
       const result = JSON.parse(sessionStorage.getItem(`task-${meta.index}`) || 'null')
@@ -717,7 +839,7 @@ export default MetaFor("data-processor")
         <h3>Обработчик данных</h3>
         <div>Задач: ${context.tasks.length}</div>
         <div>Завершено: ${context.completed}</div>
-        
+
         ${repeat(context.tasks, (taskId) => taskId, (taskId) => html`
           <metafor-task-worker context=${{taskId}}></metafor-task-worker>
         `)}
@@ -735,7 +857,7 @@ export default MetaFor("task-worker")
     processTask: async (actorIndex) => {
       const result = await heavyProcessing(context.taskId)
       sessionStorage.setItem(`task-${actorIndex}`, JSON.stringify(result))
-      update({status: "completed"})
+      return {status: "completed"} // Автоматически обновит контекст
     }
   }))
   .states("idle", "working", "completed")
@@ -744,7 +866,7 @@ export default MetaFor("task-worker")
       in: "idle",
       action: async ({update, core, element}) => {
         update({status: "working"})
-        await core.processTask(element.index)
+        return await core.processTask(element.index) // Автоматически обновит контекст
       },
       to: [{state: "working", when: {status: "working"}}]
     },
@@ -765,6 +887,7 @@ export default MetaFor("task-worker")
 4. **Изоляция** - ошибки не распространяются между акторами
 5. **Композиция** - легко комбинировать акторы
 6. **Тестирование** - независимое тестирование с учетом реакций
+7. **Автоматическая обработка** - результат action автоматически обновляет контекст
 
 ## Лучшие практики
 
@@ -774,3 +897,6 @@ export default MetaFor("task-worker")
 4. **Используйте типизацию** - четкие контракты сообщений
 5. **Обрабатывайте ошибки** - любой может сломаться
 6. **Логируйте сообщения** - включайте development режим для отладки
+7. **Используйте автоматическую обработку** - возвращайте объекты из action для автоматического обновления контекста
+8. **Выбрасывайте Error** - для автоматического обновления поля error в контексте
+9. **Используйте success/error только для форматирования** - когда нужно обработать результат сторонних функций
