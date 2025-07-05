@@ -11,6 +11,7 @@ import type {ViewDefinition} from "./types/view.ts"
  @template S - Тип состояний
  @template C - Тип контекста
  @template I - Тип ядра
+ @template R - Тип реакций
 
  @property development - Режим разработки с валидацией
  @property description - Описание актора
@@ -26,7 +27,8 @@ import type {ViewDefinition} from "./types/view.ts"
 export type FabricCallbackCreateFuncHelper<
   S extends string,
   C extends ContextDefinition,
-  I extends CoreObj
+  I extends CoreObj,
+  R extends Reactions<C, I> = Reactions<C, I>
 > = {
   development?: boolean
   description?: string
@@ -34,9 +36,9 @@ export type FabricCallbackCreateFuncHelper<
   states: S[]
   initialState: S
   contextDefinition: ContextDefinition
-  transitions: Transitions<S, C, I>
+  transitions: Transitions<S, C, I, R>
   coreDefinition: CoreDefinition<I, C>
-  reactions?: Reactions<C, I>
+  reactions?: R
   view: ViewDefinition<I, C, S>
 }
 /**

@@ -68,3 +68,12 @@ export type Reaction<C extends ContextDefinition, I extends CoreObj> = {
 export type Reactions<C extends ContextDefinition, I extends CoreObj> = {
   [title: string]: Reaction<C, I>
 }
+
+/**
+ Ключи реакций
+
+ Извлекает ключи из объекта реакций для автодополнения в переходах.
+
+ @template R - Тип объекта реакций
+ */
+export type ReactionKeys<R extends Record<string, Reaction<any, any>>> = keyof R & string
