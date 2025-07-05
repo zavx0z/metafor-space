@@ -12,20 +12,17 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
   .transitions("начало", [
     {
       in: "начало",
-      action: () => new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(null)
-          }, 6000)  
+      action: () => new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({status: "end"})
+        }, 6000)
       }),
-      to: [{state: "конец", when: {status: "end"}}],
+      to: {"конец": {status: "end"}},
     },
     {
       in: "конец",
-      action: () => new Promise((resolve) => setTimeout(() => {
-        resolve(null)
-      }, 4000)),
-      to: [{state: "начало", when: {status: "start"}}],
-    },
+      to: {"начало": {status: "start"}},
+    }
   ])
   .view({
     // render: ({html, context}) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`

@@ -13,22 +13,28 @@ const Meta = MetaFor(tag)
   .core().reactions([]).states("IDLE", "RUNNING", "ERROR", "SUCCESS").transitions("IDLE", [
     {
       in: "IDLE",
-      to: [{state: "RUNNING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
+      to: {
+        "RUNNING": {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}
+      }
     },
     {
       in: "RUNNING",
-      to: [
-        {state: "SUCCESS", when: {responseTime: {gt: 0, lt: 5000}, errorCode: 200}},
-        {state: "ERROR", when: {errorCode: {gt: 400, lt: 599}}},
-      ],
+      to: {
+        "SUCCESS": {responseTime: {gt: 0, lt: 5000}, errorCode: 200},
+        "ERROR": {errorCode: {gt: 400, lt: 599}}
+      }
     },
     {
       in: "ERROR",
-      to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
+      to: {
+        "IDLE": {url: {startsWith: "https://"}}
+      }
     },
     {
       in: "SUCCESS",
-      to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
+      to: {
+        "IDLE": {url: {startsWith: "https://"}}
+      }
     },
   ])
       .view({})

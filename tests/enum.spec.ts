@@ -13,7 +13,9 @@ describe("Enum тип", () => {
       .core().reactions([]).states("INITIAL", "FINAL").transitions("INITIAL", [
         {
           in: "INITIAL",
-          to: [{state: "FINAL", when: {status: "active"}}],
+          to: {
+            "FINAL": {status: "active"}
+          }
         },
       ])
       .view({})
@@ -32,7 +34,9 @@ describe("Enum тип", () => {
       .core().reactions([]).states("INITIAL", "ACTIVE").transitions("INITIAL", [
         {
           in: "INITIAL",
-          to: [{state: "ACTIVE", when: {status: "active"}}],
+          to: {
+            "ACTIVE": {status: "active"}
+          }
         },
       ])
       .view({})
@@ -59,11 +63,15 @@ describe("Enum тип", () => {
       .transitions("INITIAL", [
         {
           in: "INITIAL",
-          to: [{state: "ACTIVE", when: {status: {oneOf: ["active", "pending"]}}}],
+          to: {
+            "ACTIVE": {status: {oneOf: ["active", "pending"]}}
+          }
         },
         {
           in: "ACTIVE",
-          to: [{state: "INACTIVE", when: {status: "inactive"}}],
+          to: {
+            "INACTIVE": {status: "inactive"}
+          }
         },
       ])
       .view({})
@@ -100,7 +108,9 @@ describe("Enum тип", () => {
       .core().reactions([]).states("INITIAL", "ACTIVE").transitions("INITIAL", [
         {
           in: "INITIAL",
-          to: [{state: "ACTIVE", when: {status: 2}}],
+          to: {
+            "ACTIVE": {status: 2}
+          }
         },
       ])
       .view({})

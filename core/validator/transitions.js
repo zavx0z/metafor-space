@@ -94,13 +94,14 @@ export function validateCycles({ transitions: transitionsList }) {
 
   // Строим граф переходов
   transitionsList.forEach((transition) => {
-    if (!transitions.has(transition.from)) {
-      transitions.set(transition.from, [])
+    if (!transitions.has(transition.in)) {
+      transitions.set(transition.in, [])
     }
-    transition.to.forEach((trans) => {
-      transitions.get(transition.from)?.push({
-        state: trans.state,
-        conditions: trans.when || {},
+    // Обработка нового формата: объект с ключами-состояниями
+    Object.entries(transition.to).forEach(([state, conditions]) => {
+      transitions.get(transition.in)?.push({
+        state,
+        conditions: conditions || {},
       })
     })
   })

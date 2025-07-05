@@ -66,42 +66,46 @@ export default MetaFor("graph-context", {
   .transitions("измерение", [
     {
       in: "измерение",
-      action: ({element}) => new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          const {width, height, x, y} = element.getBoundingClientRect()
-          resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
-        })
-      }),
-      reaction: ["вычисленное положение"],
-      to: [{state: "позиционирование", when: {layout: true}}],
+      action: ({element}) =>
+        new Promise((resolve) => {
+          requestAnimationFrame(() => {
+            const {width, height, x, y} = element.getBoundingClientRect()
+            resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
+          })
+        }),
+      to: {
+        "позиционирование": {layout: true}
+      },
     },
     {
       in: "позиционирование",
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
-      to: [
-        {state: "неактивно", when: {error: null, active: false}},
-        {state: "активно", when: {error: null, active: true}},
-      ],
+      to: {
+        "неактивно": {error: null, active: false},
+        "активно": {error: null, active: true}
+      },
     },
     {
       in: "в процессе",
-      to: [
-        {state: "неактивно", when: {error: null, active: false, process: false}},
-        {state: "активно", when: {error: null, active: true, process: false}},
-      ],
+      to: {
+        "неактивно": {error: null, active: false, process: false},
+        "активно": {error: null, active: true, process: false}
+      },
     },
     {
       in: "активно",
-      to: [{state: "неактивно", when: {error: null, active: false}}],
+      to: {
+        "неактивно": {error: null, active: false}
+      },
     },
     {
       in: "неактивно",
-      to: [
-        {state: "активно", when: {error: null, active: true, process: false}},
-        {state: "в процессе", when: {error: null, active: true, process: true}},
-      ],
+      to: {
+        "активно": {error: null, active: true, process: false},
+        "в процессе": {error: null, active: true, process: true}
+      },
     },
   ])
   .view({

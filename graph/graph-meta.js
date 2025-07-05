@@ -82,7 +82,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           ctx.shadowOffsetY = 0
         })
       },
-      to: []
+      to: {}
     }
   ])
   .view({

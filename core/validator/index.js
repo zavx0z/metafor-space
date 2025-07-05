@@ -86,21 +86,21 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
 
     if (!transition.to) {
       sendError({ id: tag, message: `Отсутствует обязательное поле 'to' в transitions[${index}]`, src: "transitions" })
-    } else if (!Array.isArray(transition.to)) {
-      sendError({ id: tag, message: `Поле 'to' должно быть массивом в transitions[${index}]`, src: "transitions" })
+    } else if (typeof transition.to !== 'object' || Array.isArray(transition.to)) {
+      sendError({ id: tag, message: `Поле 'to' должно быть объектом в transitions[${index}]`, src: "transitions" })
     } else {
-      transition.to.forEach((to, toIndex) => {
-        if (!to.state) {
+      Object.entries(transition.to).forEach(([state, conditions], toIndex) => {
+        if (!state) {
           sendError({
             id: tag,
-            message: `Отсутствует обязательное поле 'state' в transitions[${index}].to[${toIndex}]`,
+            message: `Отсутствует состояние в transitions[${index}].to[${toIndex}]`,
             src: "transitions",
           })
         }
-        if (!to.when) {
+        if (!conditions || typeof conditions !== 'object') {
           sendError({
             id: tag,
-            message: `Отсутствует обязательное поле 'trigger' в transitions[${index}].to[${toIndex}]`,
+            message: `Отсутствуют условия для состояния '${state}' в transitions[${index}].to[${toIndex}]`,
             src: "transitions",
           })
         }

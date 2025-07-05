@@ -10,15 +10,16 @@ export default MetaFor("test", {description: "Nodes", development: false})
   .transitions("начало", [
     {
       in: "начало",
-      action: () => new Promise((resolve) =>
-        setTimeout(() => resolve({status: "end"}), 4000)),
-      to: [{state: "конец", when: {status: "end"}}]
+      action: () => new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({status: "end"})
+        }, 6000)
+      }),
+      to: {"конец": {status: "end"}}
     },
     {
       in: "конец",
-      action: () => new Promise((resolve) =>
-        setTimeout(() => resolve({status: "start"}), 4000)),
-      to: [{state: "начало", when: {status: "start"}}]
-    },
+      to: {"начало": {status: "start"}}
+    }
   ])
   .view({})

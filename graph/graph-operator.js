@@ -179,13 +179,13 @@ export default MetaFor("graph-operator", {development: true})
         const operator = core.operators[context.op]
         return {title: operator.title, symbol: operator.symbol}
       },
-      to: [{
-        state: "ready", when: {
+      to: {
+        "ready": {
           op: {isNull: false},
           title: {isNull: false},
-          symbol: {isNull: false},
+          symbol: {isNull: false}
         }
-      }]
+      }
     }
   ])
   .view({

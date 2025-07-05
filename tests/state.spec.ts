@@ -14,22 +14,28 @@ describe("Корректные переходы состояний при заг
     .core().reactions([]).states("IDLE", "LOADING", "SUCCESS", "ERROR").transitions("IDLE", [
       {
         in: "IDLE",
-        to: [{state: "LOADING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
+        to: {
+          "LOADING": {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}
+        }
       },
       {
         in: "LOADING",
-        to: [
-          {state: "SUCCESS", when: {responseTime: {gt: 0, lt: 5000}, code: 200}},
-          {state: "ERROR", when: {code: {gt: 400, lt: 599}}},
-        ],
+        to: {
+          "SUCCESS": {responseTime: {gt: 0, lt: 5000}, code: 200},
+          "ERROR": {code: {gt: 400, lt: 599}}
+        }
       },
       {
         in: "ERROR",
-        to: [{state: "LOADING", when: {responseTime: {gt: 0, lt: 5000}, code: {gt: 400, lt: 599}}}],
+        to: {
+          "LOADING": {responseTime: {gt: 0, lt: 5000}, code: {gt: 400, lt: 599}}
+        }
       },
       {
         in: "SUCCESS",
-        to: [{state: "IDLE", when: {url: {include: "complete"}}}],
+        to: {
+          "IDLE": {url: {include: "complete"}}
+        }
       },
     ])
       .view({})

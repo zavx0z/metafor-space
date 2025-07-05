@@ -23,7 +23,7 @@ export default MetaFor('graph-socket')
         element.dataset['direction'] = typeof context.direction !== "undefined" ? context.direction === 'west' ? 'input' : 'output' : ''
         element.dataset['type'] = context.type || 'string'
       },
-      to: [{state: "измерение", when: {error: null}}]
+      to: {"измерение": {error: null}}
     },
     {
       in: "измерение",
@@ -33,7 +33,7 @@ export default MetaFor('graph-socket')
           return res({size: Math.round(width), x: Math.round(x), y: Math.round(y)})
         })
       }),
-      to: []
+      to: {}
     },
   ])
   .view({

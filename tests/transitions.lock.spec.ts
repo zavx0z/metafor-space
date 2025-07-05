@@ -21,7 +21,7 @@ test("Блокировка переходов перед входом в нов�
         action: () => {
           return {value: 11} // Автоматически обновит контекст
         },
-        to: [{state: "PROCESS", when: {value: {gt: 10}}}],
+        to: {"PROCESS": {value: {gt: 10}}},
       },
       {
         in: "PROCESS",
@@ -34,10 +34,10 @@ test("Блокировка переходов перед входом в нов�
           }
           return {value: 15} // Автоматически обновит контекст
         },
-        to: [
-          {state: "DONE", when: {value: {gt: 14}}},
-          {state: "INIT", when: {value: {lt: 4}}},
-        ],
+        to: {
+          "DONE": {value: {gt: 14}},
+          "INIT": {value: {lt: 4}}
+        },
       },
     ])
     .view({})
@@ -64,7 +64,7 @@ test("Блокировка переходов для асинхронного д
           await new Promise((resolve) => setTimeout(resolve, 10))
           return {value: 15} // Автоматически обновит контекст
         },
-        to: [{state: "DONE", when: {value: {gt: 10}}}],
+        to: {"DONE": {value: {gt: 10}}},
       },
     ])
     .view({})
@@ -91,7 +91,7 @@ test("Снятие блокировки после действия", async () =
           await new Promise((resolve) => setTimeout(resolve, 50))
           return {value: 15} // Автоматически обновит контекст
         },
-        to: [{state: "DONE", when: {value: {gt: 10}}}],
+        to: {"DONE": {value: {gt: 10}}},
       },
     ])
     .view({})

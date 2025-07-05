@@ -172,7 +172,7 @@ export default MetaFor("graph-layout", {development: true})
   .transitions('ожидание', [
     {
       in: "ожидание",
-      to: [{state: "получение данных", when: {current: {isNull: false}}}]
+      to: {"получение данных": {current: {isNull: false}}}
     },
     {
       in: "получение данных",
@@ -183,7 +183,7 @@ export default MetaFor("graph-layout", {development: true})
           states: {}, conditions: {}, sockets: {}, params: {}
         })
       },
-      to: [{state: "форматирование данных", when: {data: true, metrics: true}}]
+      to: {"форматирование данных": {data: true, metrics: true}}
     },
     {
       in: "форматирование данных",
@@ -191,20 +191,16 @@ export default MetaFor("graph-layout", {development: true})
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
-        return {current: null}
       },
-      to: [{state: "вычисление", when: {current: {isNull: true}}}]
+      to: {"вычисление": {current: {isNull: true}}}
     },
     {
       in: "вычисление",
-      action: ({core}) => new Promise(async (resolve, reject) => {
-        if (!core.data) return reject("ошибка вычисления")
-        const layout = await core.elk.layout(core.data)
-        // console.log(layout)
-        sessionStorage.setItem(core.data.id, JSON.stringify(layout))
-        return resolve({ready: core.data.id, current: null})
-      }),
-      to: [{state: "ожидание", when: {current: null}}]
+      action: async ({core, context}) => {
+        const layout = await core.elk.layout(core.data, {layoutOptions: core.config})
+        sessionStorage.setItem(context.current, JSON.stringify(layout))
+      },
+      to: {"ожидание": {current: null}}
     }
   ])
   .view({
