@@ -29,13 +29,7 @@ export default MetaFor("graph-context", {
     meta: null,
   }))
   .states("рендер", "измерение", "позиционирование", "неактивно", "активно", "в процессе")
-  .transitions("рендер", [
-    {
-      in: "рендер",
-      action({element}) {
-      },
-      to: [{state: "измерение", when: {error: null}}],
-    },
+  .transitions("измерение", [
     {
       in: "измерение",
       action: ({element}) =>
