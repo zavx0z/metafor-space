@@ -38,16 +38,17 @@ const CONDITIONS = {
  */
 export function validateTriggers({tag, transitions: transitionsList, contextDefinition}) {
   transitionsList.forEach((transition, transitionIndex) => {
-    transition.to.forEach((to) => {
-      if (!to.when) return
+    // Обработка нового формата: объект с ключами-состояниями
+    Object.entries(transition.to).forEach(([state, when]) => {
+      if (!when) return
 
-      if (Object.keys(to.when).length === 0) {
+      if (Object.keys(when).length === 0) {
         throw new Error(
-          `Пустой триггер в переходе из состояния "${transition.in}" в "${to.state}". Триггер должен содержать хотя бы одно условие.`
+          `Пустой триггер в переходе из состояния "${transition.in}" в "${state}". Триггер должен содержать хотя бы одно условие.`
         )
       }
 
-      Object.entries(to.when).forEach(([field, condition]) => {
+      Object.entries(when).forEach(([field, condition]) => {
         const fieldDef = contextDefinition[field]
         if (!fieldDef)
           throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.in}`)
@@ -65,7 +66,7 @@ export function validateTriggers({tag, transitions: transitionsList, contextDefi
           if (invalidKeys.length > 0)
             throw new Error(
               `Недопустимые ключи условия [${invalidKeys.join(", ")}] для типа "${fieldDef.type}" в триггере /${
-                transition.from
+                transition.in
               }/${field}/trigger. Допустимые ключи: ${Array.from(allowedKeys).join(", ")}`
             )
         }

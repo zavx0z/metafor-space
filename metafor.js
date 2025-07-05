@@ -404,17 +404,18 @@ function createMeta(
       #transition = () => {
         const transitionFrom = transitions.find((t) => t.in === this.state)
         if (transitionFrom) {
-          for (const transition of transitionFrom.to) {
-            if (Object.keys(transition.when).length === 0) break
-            if (conditions(transition.when, this.context, contextDefinition)) {
-              const actionDefinition = transitions.find((i) => i.in === transition.state && i.action)
+          // Обработка нового формата: объект с ключами-состояниями
+          for (const [targetState, when] of Object.entries(transitionFrom.to)) {
+            if (Object.keys(when).length === 0) break
+            if (conditions(when, this.context, contextDefinition)) {
+              const actionDefinition = transitions.find((i) => i.in === targetState && i.action)
               if (actionDefinition?.action) {
                 this.process = true
-                this.#state.setValue(transition.state)
+                this.#state.setValue(targetState)
                 if (view.render) this.#updateView()
                 this.#runTransitionAction(actionDefinition)
               } else {
-                this.#state.setValue(transition.state)
+                this.#state.setValue(targetState)
                 if (view.render) this.#updateView()
               }
             }
@@ -438,9 +439,9 @@ function createMeta(
           types: contextDefinition,
           transitions: transitions.map((t) => ({
             in: t.in,
-            to: t.to.map((toState) => ({
-              state: toState.state,
-              when: toState.when,
+            to: Object.entries(t.to).map(([state, when]) => ({
+              state,
+              when,
             })),
           })),
         }
