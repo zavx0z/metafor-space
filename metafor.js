@@ -418,6 +418,7 @@ function createMeta(
                 this.#state.setValue(targetState)
                 if (view.render) this.#updateView()
               }
+              break // Важно! Выходим после первого успешного перехода
             }
           }
         }

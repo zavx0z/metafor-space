@@ -28,7 +28,9 @@ describe("core", () => {
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}],
+          to: {
+            "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {isSpacePressed: true}
+          }
         },
         {
           in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
@@ -36,7 +38,9 @@ describe("core", () => {
             core.handleKeyDown("Space")
             return {actionUpdate: true}
           },
-          to: [{state: "отпуск элемента", when: {isSpacePressed: false, actionUpdate: false}}]
+          to: {
+            "отпуск элемента": {isSpacePressed: false, actionUpdate: false}
+          }
         },
         {
           in: "отпуск элемента",
@@ -44,7 +48,9 @@ describe("core", () => {
             core.handleKeyUp("Space")
             return {actionUpdate: true}
           },
-          to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false, actionUpdate: false}}],
+          to: {
+            "ОЖИДАНИЕ": {isSpacePressed: false, actionUpdate: false}
+          }
         }
       ])
       .view({})
@@ -91,14 +97,18 @@ describe("core", () => {
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
+          to: {
+            "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {isSpacePressed: true}
+          }
         },
         {
           in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
           action: ({core}) => {
             core.handleKeyDown("Space")
           },
-          to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
+          to: {
+            "ОЖИДАНИЕ": {isSpacePressed: false}
+          }
         }
       ])
       .view({})
@@ -128,14 +138,18 @@ describe("core", () => {
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", when: {isSpacePressed: true}}]
+          to: {
+            "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {isSpacePressed: true}
+          }
         },
         {
           in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
           action: ({core}) => {
             core.handleKeyDown("Space")
           },
-          to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
+          to: {
+            "ОЖИДАНИЕ": {isSpacePressed: false}
+          }
         }
       ])
       .view({})
@@ -162,12 +176,16 @@ describe("core", () => {
       .transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ПАРАМЕТР ОБНОВЛЕН", when: {other: 1}}]
+          to: {
+            "ПАРАМЕТР ОБНОВЛЕН": {other: 1}
+          }
         },
         {
           in: "ПАРАМЕТР ОБНОВЛЕН",
           action: ({core}) => core.updateOther(),
-          to: [{state: "ОЖИДАНИЕ", when: {other: 0}}]
+          to: {
+            "ОЖИДАНИЕ": {other: 0}
+          }
         }
       ])
       .view({})
@@ -203,7 +221,7 @@ describe("core", () => {
             action: ({core}) => {
               core.addData(42)
             },
-            to: [{state: "MODIFIED", when: {isUpdated: true}}],
+            to: {"MODIFIED": {isUpdated: true}},
           },
         ])
         .view({})
@@ -236,7 +254,7 @@ describe("core", () => {
           {
             in: "INITIAL",
             action: ({core}) => core.update(),
-            to: [{state: "UPDATED", when: {coreParameter: null}}]
+            to: {"UPDATED": {coreParameter: null}}
           }
         ])
         .view({})

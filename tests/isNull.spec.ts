@@ -34,7 +34,7 @@ describe("null условие перехода", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: null}}]
+          to: {"ДОБАВИТЬ": {size: null}}
         }
       ])
       .view({})
@@ -56,11 +56,11 @@ describe("null условие перехода", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "число", "строка", "булево").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [
-            {state: "число", when: {size: null}},
-            {state: "строка", when: {name: null}},
-            {state: "булево", when: {active: null}},
-          ]
+          to: {
+            "число": {size: null},
+            "строка": {name: null},
+            "булево": {active: null}
+          }
         }
       ])
       .view({})
@@ -87,7 +87,7 @@ describe("null условие перехода", () => {
       .context((t) => ({name: t.string({nullable: true})}))
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
-          in: "ОЖИДАНИЕ", to: [{state: "ДОБАВИТЬ", when: {name: null}}]
+          in: "ОЖИДАНИЕ", to: {"ДОБАВИТЬ": {name: null}}
         }
       ])
       .view({})
@@ -105,7 +105,7 @@ describe("null условие перехода", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {active: null}}]
+          to: {"ДОБАВИТЬ": {active: null}}
         }
       ])
       .view({})
@@ -124,7 +124,7 @@ describe("null условие перехода", () => {
       })).core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {status: null}}]
+          to: {"ДОБАВИТЬ": {status: null}}
         }
       ])
       .view({})
@@ -144,7 +144,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5}}}]
+          to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}}}
         }
       ])
       .view({})
@@ -164,7 +164,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false}}}],
+          to: {"ДОБАВИТЬ": {size: {isNull: false}}},
         },
       ])
       .view({})
@@ -181,7 +181,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
+          to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }
       ])
       .view({})
@@ -201,7 +201,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}],
+          to: {"ДОБАВИТЬ": {size: {isNull: true}}},
         },
       ])
       .view({})
@@ -221,7 +221,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5}, active: true}}]
+          to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}, active: true}}
         }
       ])
       .view({})
@@ -242,7 +242,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: false, gt: 5}, active: true}}]
+          to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}, active: true}}
         }
       ])
       .view({})
@@ -262,7 +262,7 @@ describe("isNull триггер", () => {
       .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
         {
           in: "ОЖИДАНИЕ",
-          to: [{state: "ДОБАВИТЬ", when: {size: {isNull: true}}}]
+          to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }
       ])
       .view({})
