@@ -47,14 +47,14 @@ export declare function MetaFor(
 ): {
   context: <C extends ContextDefinition>(context: (types: ContextTypes) => C) => {
     core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
-      reactions: (reactions: Reactions<C, I>) => {
+      reactions: <R extends Reactions<C, I>>(reactions: R) => {
         states: <S extends string>(...states: S[]) => {
         /**
          * Переходы состояний
          * @param initialState - начальное состояние
          * @param transitions - правила переходов
          */
-        transitions: (initialState: S, transitions: Transitions<S, C, I>) => {
+        transitions: (initialState: S, transitions: Transitions<S, C, I, R>) => {
             view: (view: ViewDefinition<I, C, S>) => Meta<S, C, I>
           }
         }

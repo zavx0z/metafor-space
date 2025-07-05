@@ -14,9 +14,8 @@ export default MetaFor("graph-state", {development: true})
     /**@type{MetaAny|null}*/
     meta: null
   }))
-  .reactions([
-    {
-      title: "вычисленное положение",
+  .reactions({
+    "вычисленное положение": {
       filter: ({meta, patch}) => meta.tag === "graph-layout"
         && patch.path === "/state"
         && patch.value === "ожидание"
@@ -37,7 +36,7 @@ export default MetaFor("graph-state", {development: true})
         update({x: stateGroup.x, y: stateGroup.y, width: stateGroup.width, height: stateGroup.height})
       }
     }
-  ])
+  })
   .states("рендер", "изменение размера", "перемещение")
   .transitions('рендер', [
     {

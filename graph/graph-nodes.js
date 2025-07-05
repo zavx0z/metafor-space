@@ -16,16 +16,14 @@ export default MetaFor("graph-nodes", {
     queue: t.array({title: "Очередь акторов для добавления"})
   }))
   .core()
-  .reactions([
-    {
-      title: "Блокировка всплытия",
+  .reactions({
+    "Блокировка всплытия": {
       filter: () => true,
       block: true,
       action() {
       }
     },
-    {
-      title: "получение списка добавляемых акторов",
+    "получение списка добавляемых акторов": {
       filter: ({meta, patch}) => meta.tag === "graph-listener"
         && patch.path === "/context"
         && patch.value.op === "add"
@@ -35,7 +33,7 @@ export default MetaFor("graph-nodes", {
         // console.log(meta, patch)
       }
     }
-  ])
+  })
   .states("render", "центрирование одной ноды")
   .transitions("render", [
     {

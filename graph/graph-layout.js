@@ -54,9 +54,8 @@ export default MetaFor("graph-layout", {development: true})
       },
     }
   }))
-  .reactions([
-    {
-      title: "начало создания meta",
+  .reactions({
+    "начало создания meta": {
       filter: ({patch, meta}) => (
         meta.tag === "graph-listener"
         && patch.path === '/context'
@@ -70,9 +69,8 @@ export default MetaFor("graph-layout", {development: true})
         update({current: meta})
       }
     },
-    {
-      title: "элементы",
-      filter: ({patch, meta, context}) => (
+    "элементы": {
+      filter: ({patch, meta, context}) => Boolean(
         context.current
         && meta.tag.includes('graph-')
         && patch.path === "/"
@@ -112,9 +110,8 @@ export default MetaFor("graph-layout", {development: true})
         core.count = core.count + 1
       }
     },
-    {
-      title: "размеры",
-      filter: ({patch, meta, context}) => (
+    "размеры": {
+      filter: ({patch, meta, context}) => Boolean(
         context.current
         && meta.tag.includes('graph-')
         && patch.path === "/context"
@@ -156,9 +153,8 @@ export default MetaFor("graph-layout", {development: true})
         if (!core.count) update({metrics: true})
       }
     },
-    {
-      title: "конец создания meta",
-      filter: ({patch, meta, context}) => (
+    "конец создания meta": {
+      filter: ({patch, meta, context}) => Boolean(
         context.current
         && meta.tag === "graph-listener"
         && patch.path === '/context'
@@ -171,7 +167,7 @@ export default MetaFor("graph-layout", {development: true})
         update({data: true})
       }
     }
-  ])
+  })
   .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
   .transitions('ожидание', [
     {

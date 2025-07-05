@@ -11,6 +11,7 @@ import type {
 } from "./context.ts";
 import type {CoreObj} from "./core.ts";
 import type {Action} from "../metafor.t.ts"
+import type {ReactionKeys} from "./reaction.ts"
 
 /** # Переходы
 
@@ -42,9 +43,10 @@ import type {Action} from "../metafor.t.ts"
  @template C - Проброс определения контекста для автодополнения
  @template S - Проброс состояний для автодополнения
  @template I - Проброс ядра для автодополнения
+ @template R - Проброс реакций для автодополнения ключей
  @includeExample tests/core.spec.ts
  */
-export type Transitions<S extends string, C extends ContextDefinition, I extends CoreObj> = Array<Transition<S, C, I>>
+export type Transitions<S extends string, C extends ContextDefinition, I extends CoreObj, R extends Record<string, any> = {}> = Array<Transition<S, C, I, R>>
 
 /** # Переход.
 
@@ -54,8 +56,9 @@ export type Transitions<S extends string, C extends ContextDefinition, I extends
  @template S - Тип состояния
  @template C - Тип данных контекста
  @template I - Тип ядра
+ @template R - Тип реакций для автодополнения ключей
  */
-export type Transition<S extends string, C extends ContextDefinition, I extends CoreObj> = {
+export type Transition<S extends string, C extends ContextDefinition, I extends CoreObj, R extends Record<string, any> = {}> = {
   /** # Исходное состояние
 
    Состояние, находясь в котором, производится проверка условий перехода для целевых состояний.
@@ -70,6 +73,14 @@ export type Transition<S extends string, C extends ContextDefinition, I extends 
    @default undefined
    */
   action?: Action<C, I>
+  /** # Реакции для запуска
+
+   Массив ключей реакций, которые должны быть запущены при выполнении этого перехода.
+   Ключи должны соответствовать ключам в объекте реакций актора.
+
+   @default undefined
+   */
+  reaction?: ReactionKeys<R>[]
   /** # Success callback (опционально)
    * Вызывается при успешном завершении action (resolve/return)
    */

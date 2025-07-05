@@ -8,7 +8,7 @@ MetaFor создает актор с типизированным контекс
 export default MetaFor("actor-name", {development: true})
   .context(t => ({...}))        // 1. Определение контекста
   .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные
-  .reactions([...])             // 3. Реакции на события
+  .reactions({...})             // 3. Реакции на события
   .states("state1", "state2")   // 4. Список состояний
   .transitions("state1", [...]) // 5. Переходы и actions
   .view({...})                  // 6. Представление UI
@@ -49,11 +49,12 @@ MetaFor реализует акторную модель, где каждый к
 
 ```javascript
 // Простая кнопка может управлять сложной системой
-.reactions([{
-  title: "Простая кнопка влияет на сложную систему",
-  filter: ({meta}) => meta.tag === "emergency-button",
-  action: ({update}) => update({mode: "emergency"})
-}])
+.reactions({
+  "Простая кнопка влияет на сложную систему": {
+    filter: ({meta}) => meta.tag === "emergency-button",
+    action: ({update}) => update({mode: "emergency"})
+  }
+})
 ```
 
 ## Жизненный цикл актора
@@ -191,7 +192,7 @@ flowchart TD
 export default MetaFor("actor-name", {development: true})  // 1. Создание актора
   .context(t => ({...}))        // 2. Определение контекста
   .core(({update, context}) => ({...}))  // 3. Ядро, методы и данные
-  .reactions([...])             // 4. Реакции на события
+  .reactions({...})             // 4. Реакции на события
   .states("state1", "state2")   // 5. Список состояний
   .transitions("state1", [...]) // 6. Переходы и actions
   .view({...})                  // 7. Представление UI
@@ -524,10 +525,8 @@ in:
 Обработка событий от других акторов.
 
 ```javascript
-.
-reactions([
-  {
-    title: "События изменяют контекст",
+.reactions({
+  "События изменяют контекст": {
     filter: ({meta, patch}) => meta.tag === "user-input",
     action: ({patch, update, context}) => {
       update({
@@ -537,8 +536,7 @@ reactions([
       })
     }
   },
-  {
-    title: "Реакция на глобальные состояния",
+  "Реакция на глобальные состояния": {
     filter: ({meta, patch}) => patch.path === "/state",
     action: ({patch, update}) => {
       if (patch.value === "emergency") {
@@ -546,7 +544,7 @@ reactions([
       }
     }
   }
-])
+})
 ```
 
 ## 7. Представление - отображение контекста
@@ -721,7 +719,7 @@ export default MetaFor("emergency-button")
   .core(({update}) => ({
     press: () => update({pressed: true})
   }))
-  .reactions([])
+  .reactions({})
   .states("ready", "pressed")
   .transitions("ready", [
     {in: "ready", to: {"pressed": {pressed: true}}}
@@ -743,17 +741,18 @@ export default MetaFor("system-controller")
   .core(({update}) => ({
     shutdown: () => update({mode: "emergency", services: []})
   }))
-  .reactions([{
-    title: "Простая кнопка управляет сложной системой",
-    filter: ({meta, patch}) =>
-      meta.tag === "emergency-button" &&
-      patch.path === "/state" && patch.value === "pressed",
-    action: ({update, core}) => {
-      console.log("Аварийная кнопка нажата!")
-      update({mode: "emergency"})
-      core.shutdown()
+  .reactions({
+    "Простая кнопка управляет сложной системой": {
+      filter: ({meta, patch}) =>
+        meta.tag === "emergency-button" &&
+        patch.path === "/state" && patch.value === "pressed",
+      action: ({update, core}) => {
+        console.log("Аварийная кнопка нажата!")
+        update({mode: "emergency"})
+        core.shutdown()
+      }
     }
-  }])
+  })
   .states("running", "emergency")
   .transitions("running", [
     {in: "running", to: {"emergency": {mode: "emergency"}}}
@@ -773,40 +772,40 @@ export default MetaFor("system-controller")
 ### 1. Слушание состояний
 
 ```javascript
-.reactions([{
-  title: "Реакция на активацию кнопки",
-  filter: ({meta, patch}) =>
-    meta.tag === "button" && patch.path === "/state" && patch.value === "active",
-  action: ({update}) => update({buttonPressed: true})
-}])
+.reactions({
+  "Реакция на активацию кнопки": {
+    filter: ({meta, patch}) =>
+      meta.tag === "button" && patch.path === "/state" && patch.value === "active",
+    action: ({update}) => update({buttonPressed: true})
+  }
+})
 ```
 
 ### 2. Слушание контекста
 
 ```javascript
-.reactions([{
-  title: "Отслеживание счетчика",
-  filter: ({meta, patch}) =>
-    meta.tag === "counter" && patch.path === "/context" && patch.value.counter > 10,
-  action: ({update}) => update({thresholdReached: true})
-}])
+.reactions({
+  "Отслеживание счетчика": {
+    filter: ({meta, patch}) =>
+      meta.tag === "counter" && patch.path === "/context" && patch.value.counter > 10,
+    action: ({update}) => update({thresholdReached: true})
+  }
+})
 ```
 
 ### 3. Множественное слушание
 
 ```javascript
-.reactions([
-  {
-    title: "Слушаем пользователя",
+.reactions({
+  "Слушаем пользователя": {
     filter: ({meta}) => meta.tag === "user-input",
     action: ({patch, update}) => update({lastInput: patch.value})
   },
-  {
-    title: "Слушаем систему",
+  "Слушаем систему": {
     filter: ({meta}) => meta.tag === "system-status",
     action: ({patch, update}) => update({systemOnline: patch.value.online})
   }
-])
+})
 ```
 
 ## Пример параллельной обработки
@@ -820,22 +819,23 @@ export default MetaFor("data-processor")
     results: t.array({default: []})
   }))
   .core(({update, context}) => ({}))
-  .reactions([{
-    title: "Получение результата через sessionStorage",
-    filter: ({meta, patch}) =>
-      meta.tag === "task-worker" &&
-      patch.path === "/state" && patch.value === "completed",
-    action: ({meta, update, context}) => {
-      const result = JSON.parse(sessionStorage.getItem(`task-${meta.index}`) || 'null')
-      if (result) {
-        update({
-          completed: context.completed + 1,
-          results: [...context.results, result.id]
-        })
-        sessionStorage.removeItem(`task-${meta.index}`)
+  .reactions({
+    "Получение результата через sessionStorage": {
+      filter: ({meta, patch}) =>
+        meta.tag === "task-worker" &&
+        patch.path === "/state" && patch.value === "completed",
+      action: ({meta, update, context}) => {
+        const result = JSON.parse(sessionStorage.getItem(`task-${meta.index}`) || 'null')
+        if (result) {
+          update({
+            completed: context.completed + 1,
+            results: [...context.results, result.id]
+          })
+          sessionStorage.removeItem(`task-${meta.index}`)
+        }
       }
     }
-  }])
+  })
   .states("idle", "processing")
   .transitions("idle", [
     {in: "idle", to: {"processing": {tasks: {length: {min: 1}}}}},
@@ -868,7 +868,7 @@ export default MetaFor("task-worker")
       return {status: "completed"} // Автоматически обновит контекст
     }
   }))
-  .reactions([])
+  .reactions({})
   .states("idle", "working", "completed")
   .transitions("idle", [
     {

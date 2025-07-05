@@ -1,8 +1,3 @@
----
-description: dysigne style theme
-globs: 
-alwaysApply: false
----
 # Дизайн-гид Apple Vision Pro для MetaFor
 
 ## Обязательное использование цветов темы
@@ -286,6 +281,148 @@ alwaysApply: false
 }
 ```
 
+## Пример актора с Vision Pro дизайном
+
+```javascript
+export default MetaFor("visionpro-card")
+  .context(t => ({
+    title: t.string({default: "Карточка"}),
+    status: t.enum("idle", "active", "success", "error")({default: "idle"}),
+    description: t.string({default: ""}),
+    interactive: t.boolean({default: true})
+  }))
+  .core(({update}) => ({
+    activate: () => update({status: "active"}),
+    deactivate: () => update({status: "idle"}),
+    setSuccess: () => update({status: "success"}),
+    setError: () => update({status: "error"})
+  }))
+  .reactions({
+    "реакция на внешние события": {
+      filter: ({meta, patch}) => 
+        meta.tag === "external-controller" && 
+        patch.path === "/context",
+      action: ({patch, update, core}) => {
+        const command = patch.value.command
+        if (command === "activate") core.activate()
+        if (command === "deactivate") core.deactivate()
+        if (command === "success") core.setSuccess()
+        if (command === "error") core.setError()
+      }
+    }
+  })
+  .states("idle", "active", "success", "error")
+  .transitions("idle", [
+    {in: "idle", to: [{state: "active", when: {status: "active"}}]},
+    {in: "active", to: [
+      {state: "success", when: {status: "success"}},
+      {state: "error", when: {status: "error"}},
+      {state: "idle", when: {status: "idle"}}
+    ]}
+  ])
+  .view({
+    render: ({html, context, state, core}) => html`
+      <div class="visionpro-card ${state}" 
+           ?interactive=${context.interactive}
+           @click=${context.interactive ? core.activate : null}>
+        <div class="card-header">
+          <h3 class="title">${context.title}</h3>
+          <div class="status-indicator ${context.status}"></div>
+        </div>
+        ${context.description ? html`
+          <p class="description">${context.description}</p>
+        ` : ''}
+        <slot></slot>
+      </div>
+    `,
+    style: ({css}) => css`
+      .visionpro-card {
+        @extend .backdrop;
+        padding: 20px;
+        border-radius: 16px;
+        background: rgba(var(--surface-800), 0.5);
+        border: 1px solid rgba(var(--surface-400), 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
+      }
+      
+      .visionpro-card[interactive] {
+        cursor: pointer;
+      }
+      
+      .visionpro-card[interactive]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(var(--primary-500), 0.2);
+        border-color: rgba(var(--primary-400), 0.5);
+      }
+      
+      .visionpro-card.active {
+        border-color: rgba(var(--primary-400), 0.6);
+        box-shadow: 0 0 20px rgba(var(--primary-500), 0.15);
+      }
+      
+      .visionpro-card.success {
+        border-color: rgba(var(--success-400), 0.6);
+        background: rgba(var(--success-900), 0.3);
+      }
+      
+      .visionpro-card.error {
+        border-color: rgba(var(--error-400), 0.6);
+        background: rgba(var(--error-900), 0.3);
+      }
+      
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      
+      .title {
+        color: rgba(var(--surface-50), 0.95);
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+      
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+      }
+      
+      .status-indicator.idle {
+        background: rgba(var(--surface-500), 0.8);
+        box-shadow: 0 0 8px rgba(var(--surface-500), 0.3);
+      }
+      
+      .status-indicator.active {
+        background: rgba(var(--primary-400), 0.9);
+        box-shadow: 0 0 12px rgba(var(--primary-400), 0.5);
+      }
+      
+      .status-indicator.success {
+        background: rgba(var(--success-400), 0.9);
+        box-shadow: 0 0 12px rgba(var(--success-400), 0.5);
+      }
+      
+      .status-indicator.error {
+        background: rgba(var(--error-400), 0.9);
+        box-shadow: 0 0 12px rgba(var(--error-400), 0.5);
+      }
+      
+      .description {
+        color: rgba(var(--surface-300), 0.8);
+        font-size: 0.9em;
+        line-height: 1.4;
+        margin: 0 0 12px 0;
+      }
+    `
+  })
+```
+
 ## Ключевые правила
 
 1. **Никаких хардкодных цветов** - только CSS-переменные из темы
@@ -296,6 +433,7 @@ alwaysApply: false
 6. **Плавные переходы** с cubic-bezier кривыми
 7. **Пространственность** через transform и тени
 8. **Доступность** с focus-visible и proper contrast
+9. **Именованные реакции** для лучшей читаемости кода
 
 ## Темы для разных контекстов
 
@@ -315,6 +453,11 @@ alwaysApply: false
 /* Светлая тема */
 .theme-light .my-component {
   background: rgba(var(--surface-200), 0.8);
+  color: var(--font-color);
+}
+```
+
+Следуя этим принципам, все компоненты MetaFor будут выглядеть как нативные элементы Apple Vision Pro с единообразной эстетикой и максимальной функциональностью. 
   color: var(--font-color);
 }
 ```
