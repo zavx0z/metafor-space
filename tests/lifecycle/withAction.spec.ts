@@ -19,6 +19,7 @@ describe("MetaFor: инициализация с действиями", async ()
       value: t.string({nullable: true, default: initialContext.value}),
     }))
     .core()
+    .reactions([])
     .states("INITIAL", "OTHER", "NEXT")
     .transitions(initialState, [
       {
@@ -38,7 +39,6 @@ describe("MetaFor: инициализация с действиями", async ()
         to: [{state: "OTHER", when: {value: otherContext.value}}]
       }
     ])
-    .reactions([])
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

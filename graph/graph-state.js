@@ -14,21 +14,6 @@ export default MetaFor("graph-state", {development: true})
     /**@type{MetaAny|null}*/
     meta: null
   }))
-  .states("рендер", "изменение размера", "перемещение")
-  .transitions('рендер', [
-    {
-      in: "рендер",
-      to: [{state: "перемещение", when: {x: {isNull: false}, y: {isNull: false}}}]
-    },
-    {
-      in: "перемещение",
-      action({element, context}) {
-        // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
-        element.style.transform = `translate(${context.x}px, ${context.y}px)`
-      },
-      to: []
-    },
-  ])
   .reactions([
     {
       title: "вычисленное положение",
@@ -52,6 +37,21 @@ export default MetaFor("graph-state", {development: true})
         update({x: stateGroup.x, y: stateGroup.y, width: stateGroup.width, height: stateGroup.height})
       }
     }
+  ])
+  .states("рендер", "изменение размера", "перемещение")
+  .transitions('рендер', [
+    {
+      in: "рендер",
+      to: [{state: "перемещение", when: {x: {isNull: false}, y: {isNull: false}}}]
+    },
+    {
+      in: "перемещение",
+      action({element, context}) {
+        // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
+        element.style.transform = `translate(${context.x}px, ${context.y}px)`
+      },
+      to: []
+    },
   ])
   .view({
     render: ({html}) => html`

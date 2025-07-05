@@ -61,12 +61,12 @@ export default MetaFor("graph-layout", { development: true })
       /* логика */
     },
   }))
+  .reactions([
+    // Реакции на другие акторы
+  ])
   .states("idle", "calculating", "ready")
   .transitions("idle", [
     // Правила переходов
-  ])
-  .reactions([
-    // Реакции на другие акторы
   ])
   .view({
     render: ({ html, context }) => html` <!-- UI представление --> `,

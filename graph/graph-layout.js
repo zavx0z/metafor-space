@@ -54,45 +54,6 @@ export default MetaFor("graph-layout", {development: true})
       },
     }
   }))
-  .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
-  .transitions('ожидание', [
-    {
-      in: "ожидание",
-      to: [{state: "получение данных", when: {current: {isNull: false}}}]
-    },
-    {
-      in: "получение данных",
-      action({context, core}) {
-        if (!context.current) throw new Error("Нет ID мета для обработки данных")
-        let meta = core.meta.get(context.current)
-        if (!meta) core.meta.set(context.current, {
-          states: {}, conditions: {}, sockets: {}, params: {}
-        })
-      },
-      to: [{state: "форматирование данных", when: {data: true, metrics: true}}]
-    },
-    {
-      in: "форматирование данных",
-      action({core, context}) {
-        const dataMeta = core.meta.get(context.current)
-        if (!dataMeta) return
-        core.data = createElkData(context.current, dataMeta, core.config)
-        return {current: null}
-      },
-      to: [{state: "вычисление", when: {current: {isNull: true}}}]
-    },
-    {
-      in: "вычисление",
-      action: ({core}) => new Promise(async (resolve, reject) => {
-        if (!core.data) return reject("ошибка вычисления")
-        const layout = await core.elk.layout(core.data)
-        // console.log(layout)
-        sessionStorage.setItem(core.data.id, JSON.stringify(layout))
-        return resolve({ready: core.data.id, current: null})
-      }),
-      to: [{state: "ожидание", when: {current: null}}]
-    }
-  ])
   .reactions([
     {
       title: "начало создания meta",
@@ -209,6 +170,45 @@ export default MetaFor("graph-layout", {development: true})
       action({update}) {
         update({data: true})
       }
+    }
+  ])
+  .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
+  .transitions('ожидание', [
+    {
+      in: "ожидание",
+      to: [{state: "получение данных", when: {current: {isNull: false}}}]
+    },
+    {
+      in: "получение данных",
+      action({context, core}) {
+        if (!context.current) throw new Error("Нет ID мета для обработки данных")
+        let meta = core.meta.get(context.current)
+        if (!meta) core.meta.set(context.current, {
+          states: {}, conditions: {}, sockets: {}, params: {}
+        })
+      },
+      to: [{state: "форматирование данных", when: {data: true, metrics: true}}]
+    },
+    {
+      in: "форматирование данных",
+      action({core, context}) {
+        const dataMeta = core.meta.get(context.current)
+        if (!dataMeta) return
+        core.data = createElkData(context.current, dataMeta, core.config)
+        return {current: null}
+      },
+      to: [{state: "вычисление", when: {current: {isNull: true}}}]
+    },
+    {
+      in: "вычисление",
+      action: ({core}) => new Promise(async (resolve, reject) => {
+        if (!core.data) return reject("ошибка вычисления")
+        const layout = await core.elk.layout(core.data)
+        // console.log(layout)
+        sessionStorage.setItem(core.data.id, JSON.stringify(layout))
+        return resolve({ready: core.data.id, current: null})
+      }),
+      to: [{state: "ожидание", when: {current: null}}]
     }
   ])
   .view({

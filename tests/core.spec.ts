@@ -23,6 +23,7 @@ describe("core", () => {
           }
         },
       }))
+      .reactions([])
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", "отпуск элемента")
       .transitions("ОЖИДАНИЕ", [
         {
@@ -46,7 +47,6 @@ describe("core", () => {
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false, actionUpdate: false}}],
         }
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -86,6 +86,7 @@ describe("core", () => {
           parameter: coreState.parameter,
         }
       })
+      .reactions([])
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .transitions("ОЖИДАНИЕ", [
         {
@@ -100,7 +101,6 @@ describe("core", () => {
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
         }
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -123,6 +123,7 @@ describe("core", () => {
         },
         parameter: true,
       }))
+      .reactions([])
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
       .transitions("ОЖИДАНИЕ", [
         {
@@ -137,7 +138,6 @@ describe("core", () => {
           to: [{state: "ОЖИДАНИЕ", when: {isSpacePressed: false}}]
         }
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -157,6 +157,7 @@ describe("core", () => {
         parameter: context.parameter,
         updateOther: () => update({other: self.parameter})
       }))
+      .reactions([])
       .states("ОЖИДАНИЕ", "ПАРАМЕТР ОБНОВЛЕН")
       .transitions("ОЖИДАНИЕ", [
         {
@@ -169,7 +170,6 @@ describe("core", () => {
           to: [{state: "ОЖИДАНИЕ", when: {other: 0}}]
         }
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -195,7 +195,8 @@ describe("core", () => {
           },
           getData: () => sharedArray,
         }))
-        .states("INITIAL", "MODIFIED")
+      .reactions([])
+      .states("INITIAL", "MODIFIED")
         .transitions("INITIAL", [
           {
             in: "INITIAL",
@@ -205,7 +206,6 @@ describe("core", () => {
             to: [{state: "MODIFIED", when: {isUpdated: true}}],
           },
         ])
-        .reactions([])
         .view({})
       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -230,7 +230,8 @@ describe("core", () => {
             update({coreParameter: self.coreParameter})
           },
         }))
-        .states("INITIAL", "UPDATED")
+      .reactions([])
+      .states("INITIAL", "UPDATED")
         .transitions("INITIAL", [
           {
             in: "INITIAL",
@@ -238,7 +239,6 @@ describe("core", () => {
             to: [{state: "UPDATED", when: {coreParameter: null}}]
           }
         ])
-        .reactions([])
         .view({})
       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

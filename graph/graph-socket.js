@@ -14,7 +14,8 @@ export default MetaFor('graph-socket')
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
-  .states("рендер", "измерение")
+      .reactions([])
+.states("рендер", "измерение")
   .transitions("рендер", [
     {
       in: "рендер",
@@ -35,7 +36,6 @@ export default MetaFor('graph-socket')
       to: []
     },
   ])
-  .reactions([])
   .view({
     style: ({css}) => {
       const position = -6

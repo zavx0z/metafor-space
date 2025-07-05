@@ -17,18 +17,6 @@ describe("Конструктор MetaFor", () => {
     .core(() => ({
       password: "123456",
     }))
-    .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
-    .transitions("АНОНИМНЫЙ", [
-      {
-        in: "АНОНИМНЫЙ",
-        to: [{state: "АВТОРИЗАЦИЯ", when: {email: {isNull: false}, password: {isNull: false}}}],
-      },
-      {
-        in: "АВТОРИЗАЦИЯ",
-        action: () => ({nickname}),
-        to: [{state: "АВТОРИЗОВАН", when: {nickname: {isNull: false}}}],
-      },
-    ])
 
   // test("view", () =>
   //   expect(Object.hasOwn(Fabric, "view"), "Функция-конструктор представления должна быть присутствовать").toBe(true))
@@ -37,7 +25,21 @@ describe("Конструктор MetaFor", () => {
     expect(Object.hasOwn(Fabric, "reactions"), "Функция-конструктор реакций должна быть присутствовать").toBe(true))
 
   test("Инициализация состояния без действия с контекстом который соответствует условию перехода", () => {
-    const Meta = Fabric.reactions([]).view({})
+    const Meta = Fabric
+      .reactions([])
+      .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
+      .transitions("АНОНИМНЫЙ", [
+        {
+          in: "АНОНИМНЫЙ",
+          to: [{state: "АВТОРИЗАЦИЯ", when: {email: {isNull: false}, password: {isNull: false}}}],
+        },
+        {
+          in: "АВТОРИЗАЦИЯ",
+          action: () => ({nickname}),
+          to: [{state: "АВТОРИЗОВАН", when: {nickname: {isNull: false}}}],
+        },
+      ])
+      .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
     expect(meta.context, "Контекст должен быть обновлен").toEqual({email, nickname, password})

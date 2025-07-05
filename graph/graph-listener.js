@@ -32,6 +32,7 @@ export default MetaFor("graph-listener", {
       instance: null
     }
   })
+  .reactions([])
   .states("ожидание патча", "добавление актора")
   .transitions("ожидание патча", [
     {
@@ -54,7 +55,6 @@ export default MetaFor("graph-listener", {
       ],
     }
   ])
-  .reactions([])
   .view({
     render: ({html}) => html`
       <slot></slot>`

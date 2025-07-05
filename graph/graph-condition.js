@@ -16,30 +16,6 @@ export default MetaFor("graph-condition", {development: true})
     y: t.number({nullable: true}),
   }))
   .core()
-  .states("рендер", "измерение", "позиционирование")
-  .transitions('рендер', [
-    {
-      in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
-    },
-    {
-      in: "измерение",
-      action: ({element}) => new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          const {width, height} = element.getBoundingClientRect()
-          resolve({width: Math.round(width), height: Math.round(height)})
-        })
-      }),
-      to: [{state: "позиционирование", when: {x: {isNull: false}, y: {isNull: false}}}]
-    },
-    {
-      in: "позиционирование",
-      action({element, context}) {
-        element.style.transform = `translate(${context.x}px, ${context.y}px)`
-      },
-      to: []
-    },
-  ])
   .reactions([
     {
       title: "вычисленное положение",
@@ -70,6 +46,30 @@ export default MetaFor("graph-condition", {development: true})
         update({x: layoutCondition.x, y: layoutCondition.y})
       }
     }
+  ])
+  .states("рендер", "измерение", "позиционирование")
+  .transitions('рендер', [
+    {
+      in: "рендер",
+      to: [{state: "измерение", when: {error: null}}]
+    },
+    {
+      in: "измерение",
+      action: ({element}) => new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          const {width, height} = element.getBoundingClientRect()
+          resolve({width: Math.round(width), height: Math.round(height)})
+        })
+      }),
+      to: [{state: "позиционирование", when: {x: {isNull: false}, y: {isNull: false}}}]
+    },
+    {
+      in: "позиционирование",
+      action({element, context}) {
+        element.style.transform = `translate(${context.x}px, ${context.y}px)`
+      },
+      to: []
+    },
   ])
   .view({
     render: ({html, context}) => html`

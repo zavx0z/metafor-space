@@ -16,6 +16,26 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     /**@type{import('./graph-meta.t').Edge[]} */
     edges: []
   }))
+  .reactions([
+    {
+      title: "вычисленное положение",
+      filter: ({meta, patch}) => meta.tag === "graph-layout"
+        && patch.path === "/state"
+        && patch.value === "ожидание"
+      ,
+      action({context, update, core}) {
+        const data = sessionStorage.getItem(context.id)
+        if (!data) {
+          update({error: "Нет данных разметки"})
+          return
+        }
+        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
+        const layout = JSON.parse(data)
+        core.edges = collectEdges(layout)
+        update({width: layout.width, height: layout.height})
+      }
+    }
+  ])
   .states("рендер", "позиционирование")
   .transitions("рендер", [
     {
@@ -66,31 +86,11 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
       to: []
     }
   ])
-  .reactions([
-    {
-      title: "вычисленное положение",
-      filter: ({meta, patch}) => meta.tag === "graph-layout"
-        && patch.path === "/state"
-        && patch.value === "ожидание"
-      ,
-      action({context, update, core}) {
-        const data = sessionStorage.getItem(context.id)
-        if (!data) {
-          update({error: "Нет данных разметки"})
-          return
-        }
-        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
-        const layout = JSON.parse(data)
-        core.edges = collectEdges(layout)
-        update({width: layout.width, height: layout.height})
-      }
-    }
-  ])
   .view({
     render: ({html, context, core, ref}) => html`
       <header ${ref(core.header)}>
         <div><!--кнопки слева--></div>
-        <h2 class="noselect">${context.description||context.id.split("/")[0]}</h2>
+        <h2 class="noselect">${context.description || context.id.split("/")[0]}</h2>
         <div><!--кнопки справа-->
           <button aria-label="Редактировать">
             <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor">

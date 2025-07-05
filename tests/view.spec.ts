@@ -15,9 +15,9 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
+      .reactions([])
       .states("init")
       .transitions("init", [])
-      .reactions([])
       .view({
         render: function ({html, update, context, ref, core}) {
           snapshot = `${context.param ? "true" : "false"}`
@@ -47,9 +47,9 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
+      .reactions([])
       .states("init")
       .transitions("init", [])
-      .reactions([])
       .view({
         render: function ({html, update, context, ref, core}) {
           snapshot = `${context.param ? "true" : "false"}`
@@ -84,9 +84,9 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
+      .reactions([])
       .states("init")
       .transitions("init", [])
-      .reactions([])
       .view({
         render: function ({html, update, context, ref, core}) {
           snapshot = `${context.param ? "true" : "false"}`
@@ -121,9 +121,9 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
+      .reactions([])
       .states("init")
       .transitions("init", [])
-      .reactions([])
       .view({
         render: function ({html, update, context, ref, core}) {
           snapshot = `${context.param ? "true" : "false"}`

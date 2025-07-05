@@ -8,9 +8,9 @@ MetaFor создает актор с типизированным контекс
 export default MetaFor("actor-name", {development: true})
   .context(t => ({...}))        // 1. Определение контекста
   .core(({update, context}) => ({...}))  // 2. Ядро, методы и данные
-  .states("state1", "state2")   // 3. Список состояний
-  .transitions("state1", [...]) // 4. Переходы и actions
-  .reactions([...])             // 5. Реакции на события
+  .reactions([...])             // 3. Реакции на события
+  .states("state1", "state2")   // 4. Список состояний
+  .transitions("state1", [...]) // 5. Переходы и actions
   .view({...})                  // 6. Представление UI
 ```
 
@@ -49,8 +49,7 @@ MetaFor реализует акторную модель, где каждый к
 
 ```javascript
 // Простая кнопка может управлять сложной системой
-.
-reactions([{
+.reactions([{
   title: "Простая кнопка влияет на сложную систему",
   filter: ({meta}) => meta.tag === "emergency-button",
   action: ({update}) => update({mode: "emergency"})
@@ -192,9 +191,9 @@ flowchart TD
 export default MetaFor("actor-name", {development: true})  // 1. Создание актора
   .context(t => ({...}))        // 2. Определение контекста
   .core(({update, context}) => ({...}))  // 3. Ядро, методы и данные
-  .states("state1", "state2")   // 4. Список состояний
-  .transitions("state1", [...]) // 5. Переходы и actions
-  .reactions([...])             // 6. Реакции на события
+  .reactions([...])             // 4. Реакции на события
+  .states("state1", "state2")   // 5. Список состояний
+  .transitions("state1", [...]) // 6. Переходы и actions
   .view({...})                  // 7. Представление UI
 ```
 
@@ -268,7 +267,7 @@ MetaFor(tag, conf ?)
     - `description` - описание актора
     - `development` - режим разработки с валидацией
 
-**Возвращает:** конструктор с методами `.context()`, `.core()`, `.states()`, `.transitions()`, `.reactions()`, `.view()`
+**Возвращает:** конструктор с методами `.context()`, `.core()`, `.reactions()`, `.states()`, `.transitions()`, `.view()`
 
 **Результат выполнения:**
 
@@ -642,6 +641,19 @@ export default MetaFor("counter")
     reset: () => update({value: 0}),
   }))
 
+  .reactions([
+    {
+      title: "Команды от UI",
+      filter: ({meta}) => meta.tag === "ui-controller",
+      action: ({patch, core}) => {
+        const command = patch.value.command
+        if (command === "increment") core.increment()
+        if (command === "decrement") core.decrement()
+        if (command === "reset") core.reset()
+      },
+    },
+  ])
+
   .states("active", "max", "min")
 
   .transitions("active", [
@@ -659,19 +671,6 @@ export default MetaFor("counter")
     {
       in: "min",
       to: [{state: "active", when: {value: {gt: 0}}}],
-    },
-  ])
-
-  .reactions([
-    {
-      title: "Команды от UI",
-      filter: ({meta}) => meta.tag === "ui-controller",
-      action: ({patch, core}) => {
-        const command = patch.value.command
-        if (command === "increment") core.increment()
-        if (command === "decrement") core.decrement()
-        if (command === "reset") core.reset()
-      },
     },
   ])
 
@@ -722,11 +721,11 @@ export default MetaFor("emergency-button")
   .core(({update}) => ({
     press: () => update({pressed: true})
   }))
+  .reactions([])
   .states("ready", "pressed")
   .transitions("ready", [
     {in: "ready", to: [{state: "pressed", when: {pressed: true}}]}
   ])
-  .reactions([])
   .view({
     render: ({html, core, state}) => html`
       <button class="emergency ${state}" @click=${core.press}>
@@ -744,10 +743,6 @@ export default MetaFor("system-controller")
   .core(({update}) => ({
     shutdown: () => update({mode: "emergency", services: []})
   }))
-  .states("running", "emergency")
-  .transitions("running", [
-    {in: "running", to: [{state: "emergency", when: {mode: "emergency"}}]}
-  ])
   .reactions([{
     title: "Простая кнопка управляет сложной системой",
     filter: ({meta, patch}) =>
@@ -759,6 +754,10 @@ export default MetaFor("system-controller")
       core.shutdown()
     }
   }])
+  .states("running", "emergency")
+  .transitions("running", [
+    {in: "running", to: [{state: "emergency", when: {mode: "emergency"}}]}
+  ])
   .view({
     render: ({html, context, state}) => html`
       <div class="system ${state}">
@@ -774,8 +773,7 @@ export default MetaFor("system-controller")
 ### 1. Слушание состояний
 
 ```javascript
-.
-reactions([{
+.reactions([{
   title: "Реакция на активацию кнопки",
   filter: ({meta, patch}) =>
     meta.tag === "button" && patch.path === "/state" && patch.value === "active",
@@ -786,8 +784,7 @@ reactions([{
 ### 2. Слушание контекста
 
 ```javascript
-.
-reactions([{
+.reactions([{
   title: "Отслеживание счетчика",
   filter: ({meta, patch}) =>
     meta.tag === "counter" && patch.path === "/context" && patch.value.counter > 10,
@@ -798,8 +795,7 @@ reactions([{
 ### 3. Множественное слушание
 
 ```javascript
-.
-reactions([
+.reactions([
   {
     title: "Слушаем пользователя",
     filter: ({meta}) => meta.tag === "user-input",
@@ -824,11 +820,6 @@ export default MetaFor("data-processor")
     results: t.array({default: []})
   }))
   .core(({update, context}) => ({}))
-  .states("idle", "processing")
-  .transitions("idle", [
-    {in: "idle", to: [{state: "processing", when: {tasks: {length: {min: 1}}}}]},
-    {in: "processing", to: [{state: "idle", when: {tasks: {isEmpty: true}}}]}
-  ])
   .reactions([{
     title: "Получение результата через sessionStorage",
     filter: ({meta, patch}) =>
@@ -845,6 +836,11 @@ export default MetaFor("data-processor")
       }
     }
   }])
+  .states("idle", "processing")
+  .transitions("idle", [
+    {in: "idle", to: [{state: "processing", when: {tasks: {length: {min: 1}}}}]},
+    {in: "processing", to: [{state: "idle", when: {tasks: {isEmpty: true}}}]}
+  ])
   .view({
     render: ({html, context, repeat}) => html`
       <div class="data-processor">
@@ -872,6 +868,7 @@ export default MetaFor("task-worker")
       return {status: "completed"} // Автоматически обновит контекст
     }
   }))
+  .reactions([])
   .states("idle", "working", "completed")
   .transitions("idle", [
     {
@@ -887,7 +884,6 @@ export default MetaFor("task-worker")
       to: [{state: "completed", when: {status: "completed"}}]
     }
   ])
-  .reactions([])
   .view({})
 ```
 

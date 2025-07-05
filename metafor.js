@@ -54,16 +54,16 @@ export const MetaFor = (tag, conf = {}) => {
           development && import("./core/validator/index.js").then((module) =>
             module.validateCore({tag, core: coreDefinition}))
           return {
-            states(...states) {
-              development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
-              return {
-                transitions(initialState, transitions) {
-                  if (development) {
-                    const data = {tag, transitions: [...transitions], contextDefinition}
-                    import("./core/validator/index.js").then((module) => module.validateTransitions(data))
-                  }
-                  return {
-                    reactions: (reactions) => ({
+            reactions: (reactions) => ({
+              states(...states) {
+                development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
+                return {
+                  transitions(initialState, transitions) {
+                    if (development) {
+                      const data = {tag, transitions: [...transitions], contextDefinition}
+                      import("./core/validator/index.js").then((module) => module.validateTransitions(data))
+                    }
+                    return {
                       view: (view) => createMeta({
                         states,
                         initialState,
@@ -76,11 +76,11 @@ export const MetaFor = (tag, conf = {}) => {
                         coreDefinition,
                         reactions
                       })
-                    })
+                    }
                   }
                 }
               }
-            }
+            })
           }
         }
       }

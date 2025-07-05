@@ -169,6 +169,7 @@ export default MetaFor("graph-operator", {development: true})
       }
     },
   }))
+  .reactions([])
   .states('init', 'ready')
   .transitions('init', [
     {
@@ -187,7 +188,6 @@ export default MetaFor("graph-operator", {development: true})
       }]
     }
   ])
-  .reactions([])
   .view({
     render: ({context, html, state}) => state !== "ready" ? nothing : html`
       <span>${context.symbol}</span>

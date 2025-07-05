@@ -28,6 +28,42 @@ export default MetaFor("graph-context", {
     /**@type{MetaAny|null}*/
     meta: null,
   }))
+  .reactions([
+    {
+      title: "вычисленное положение",
+      filter: ({meta, patch}) => meta.tag === "graph-layout" && patch.path === "/state" && patch.value === "ожидание",
+      action({id, context, update}) {
+        const data = sessionStorage.getItem(context.id)
+        if (!data) {
+          update({error: "Нет данных разметки"})
+          return
+        }
+        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
+        const layout = JSON.parse(data)
+        const stateGroup = layout.children.find((group) => group.id === context.state)
+        if (!stateGroup) {
+          update({error: `Состояние ${context.state} не найдено в layout`})
+          return
+        }
+
+        const layoutContext = stateGroup.children.find((child) => child.id === id)
+        if (!layoutContext) {
+          update({error: `не найден элемент: ${id} для состояния ${context.state}`})
+          console.error(`не найден элемент: ${id} для состояния ${context.state}`, layout)
+          return
+        }
+        update({x: layoutContext.x, y: layoutContext.y, layout: true})
+      },
+    },
+    {
+      title: "активность состояния",
+      filter: ({meta, patch, context}) => context.id === `${meta.tag}/${meta.index}` && patch.path === "/state",
+      action: ({update, patch, context}) => {
+        if (patch.value === context.state) update({process: patch.op === "add", active: true})
+        else update({process: false, active: false})
+      },
+    },
+  ])
   .states("рендер", "измерение", "позиционирование", "неактивно", "активно", "в процессе")
   .transitions("измерение", [
     {
@@ -68,42 +104,6 @@ export default MetaFor("graph-context", {
         {state: "активно", when: {error: null, active: true, process: false}},
         {state: "в процессе", when: {error: null, active: true, process: true}},
       ],
-    },
-  ])
-  .reactions([
-    {
-      title: "вычисленное положение",
-      filter: ({meta, patch}) => meta.tag === "graph-layout" && patch.path === "/state" && patch.value === "ожидание",
-      action({id, context, update}) {
-        const data = sessionStorage.getItem(context.id)
-        if (!data) {
-          update({error: "Нет данных разметки"})
-          return
-        }
-        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
-        const layout = JSON.parse(data)
-        const stateGroup = layout.children.find((group) => group.id === context.state)
-        if (!stateGroup) {
-          update({error: `Состояние ${context.state} не найдено в layout`})
-          return
-        }
-
-        const layoutContext = stateGroup.children.find((child) => child.id === id)
-        if (!layoutContext) {
-          update({error: `не найден элемент: ${id} для состояния ${context.state}`})
-          console.error(`не найден элемент: ${id} для состояния ${context.state}`, layout)
-          return
-        }
-        update({x: layoutContext.x, y: layoutContext.y, layout: true})
-      },
-    },
-    {
-      title: "активность состояния",
-      filter: ({meta, patch, context}) => context.id === `${meta.tag}/${meta.index}` && patch.path === "/state",
-      action: ({update, patch, context}) => {
-        if (patch.value === context.state) update({process: patch.op === "add", active: true})
-        else update({process: false, active: false})
-      },
     },
   ])
   .view({

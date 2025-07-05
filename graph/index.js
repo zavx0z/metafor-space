@@ -5,7 +5,8 @@ export default MetaFor("test", {description: "Nodes", development: false})
     status: t.enum("start", "end")({title: "Статус", default: "end"}),
   }))
   .core()
-  .states("конец", "начало")
+      .reactions([])
+.states("конец", "начало")
   .transitions("начало", [
     {
       in: "начало",
@@ -20,5 +21,4 @@ export default MetaFor("test", {description: "Nodes", development: false})
       to: [{state: "начало", when: {status: "start"}}]
     },
   ])
-  .reactions([])
   .view({})

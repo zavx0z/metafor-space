@@ -41,6 +41,19 @@ export default MetaFor("graph-param")
       meta: null
     }
   })
+  .reactions([
+    {
+      title: "изменение значений",
+      filter: ({meta, patch}) =>
+        meta.tag.includes("input-")
+        && patch.path === "/context"
+        && Object.hasOwn(patch.value, "value")
+      ,
+      action({core, context, patch}) {
+        core.meta.update({[context.param]: patch.value.value})
+      }
+    }
+  ])
   .states("рендер", "измерение", "установка положения")
   .transitions('рендер', [
     {
@@ -61,19 +74,6 @@ export default MetaFor("graph-param")
       in: "установка положения",
       to: []
     },
-  ])
-  .reactions([
-    {
-      title: "изменение значений",
-      filter: ({meta, patch}) =>
-        meta.tag.includes("input-")
-        && patch.path === "/context"
-        && Object.hasOwn(patch.value, "value")
-      ,
-      action({core, context, patch}) {
-        core.meta.update({[context.param]: patch.value.value})
-      }
-    }
   ])
   .view({
     render: ({context, html}) => html`

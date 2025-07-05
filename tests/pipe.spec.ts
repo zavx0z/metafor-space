@@ -11,7 +11,8 @@ describe("Пайплайн", () => {
       progress: t.number({title: "Прогресс", nullable: true, default: 0}),
     }))
     .core()
-    .states("IDLE", "ACTIVE", "COMPLETE")
+      .reactions([])
+.states("IDLE", "ACTIVE", "COMPLETE")
     .transitions("IDLE", [
       {
         in: "IDLE",
@@ -23,8 +24,7 @@ describe("Пайплайн", () => {
         action: () => ({progress: 101}),
         to: [{state: "COMPLETE", when: {progress: {gt: 100}}}],
       },
-    ]).reactions([])
-    .view({})
+    ]).view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
   test("Обновление контекста и переход в COMPLETE", () => {

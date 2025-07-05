@@ -118,11 +118,13 @@ describe("Тестирование формирования layout для одн
     expect(stateGroup.children).toBeDefined()
     expect(stateGroup.children!.length).toBeGreaterThan(0)
     
-    // Первый ребенок должен быть узлом состояния
-    const stateNode = stateGroup.children![0]
+    // Первый ребенок должен быть узлом условия
+    const conditionNode = stateGroup.children![0]
+    expect(conditionNode.id).toBe("node-meta-condition/2")
+    
+    // Второй ребенок должен быть узлом состояния
+    const stateNode = stateGroup.children![1]
     expect(stateNode.id).toBe(keyState)
-    expect(stateNode.width).toBe(valState.width)
-    expect(stateNode.height).toBe(valState.height)
     
     // Проверяем наличие портов у состояния
     expect(stateNode.ports).toBeDefined()

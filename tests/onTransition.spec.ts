@@ -10,9 +10,7 @@ const Meta = MetaFor(tag)
     responseTime: t.number({title: "Время ответа", nullable: true, default: 0}),
     errorCode: t.number({title: "Код ошибки", nullable: true, default: 0}),
   }))
-  .core()
-  .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
-  .transitions("IDLE", [
+  .core().reactions([]).states("IDLE", "RUNNING", "ERROR", "SUCCESS").transitions("IDLE", [
     {
       in: "IDLE",
       to: [{state: "RUNNING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
@@ -32,7 +30,7 @@ const Meta = MetaFor(tag)
       in: "SUCCESS",
       to: [{state: "IDLE", when: {url: {startsWith: "https://"}}}],
     },
-  ])      .reactions([])
+  ])
       .view({})
 const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

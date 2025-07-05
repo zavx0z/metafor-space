@@ -13,6 +13,7 @@ test("Блокировка переходов перед входом в нов�
     .core(({update}) => ({
       update
     }))
+    .reactions([])
     .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", [
       {
@@ -39,7 +40,6 @@ test("Блокировка переходов перед входом в нов�
         ],
       },
     ])
-    .reactions([])
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as any
   await Bun.sleep(500)
@@ -55,6 +55,7 @@ test("Блокировка переходов для асинхронного д
       value: t.number({nullable: true}),
     }))
     .core()
+    .reactions([])
     .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", [
       {
@@ -66,7 +67,6 @@ test("Блокировка переходов для асинхронного д
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
     ])
-    .reactions([])
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -82,6 +82,7 @@ test("Снятие блокировки после действия", async () =
       value: t.number({nullable: true, default: 2}),
     }))
     .core()
+    .reactions([])
     .states("INIT", "DONE")
     .transitions("INIT", [
       {
@@ -93,7 +94,6 @@ test("Снятие блокировки после действия", async () =
         to: [{state: "DONE", when: {value: {gt: 10}}}],
       },
     ])
-    .reactions([])
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

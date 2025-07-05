@@ -11,9 +11,7 @@ describe("Корректные переходы состояний при заг
       responseTime: t.number({title: "Время ответа", nullable: true, default: 0}),
       code: t.number({title: "Код ошибки", nullable: true, default: 0}),
     }))
-    .core()
-    .states("IDLE", "LOADING", "SUCCESS", "ERROR")
-    .transitions("IDLE", [
+    .core().reactions([]).states("IDLE", "LOADING", "SUCCESS", "ERROR").transitions("IDLE", [
       {
         in: "IDLE",
         to: [{state: "LOADING", when: {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}}],
@@ -33,7 +31,7 @@ describe("Корректные переходы состояний при заг
         in: "SUCCESS",
         to: [{state: "IDLE", when: {url: {include: "complete"}}}],
       },
-    ])      .reactions([])
+    ])
       .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

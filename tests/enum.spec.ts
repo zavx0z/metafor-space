@@ -10,15 +10,12 @@ describe("Enum тип", () => {
       .context((t) => ({
         status: t.enum("active", "inactive", "pending")({title: "Статус", nullable: true, default: "inactive"}),
       }))
-      .core()
-      .states("INITIAL", "FINAL")
-      .transitions("INITIAL", [
+      .core().reactions([]).states("INITIAL", "FINAL").transitions("INITIAL", [
         {
           in: "INITIAL",
           to: [{state: "FINAL", when: {status: "active"}}],
         },
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -32,15 +29,12 @@ describe("Enum тип", () => {
       .context((t) => ({
         status: t.enum("active", "inactive")({default: "inactive"}),
       }))
-      .core()
-      .states("INITIAL", "ACTIVE")
-      .transitions("INITIAL", [
+      .core().reactions([]).states("INITIAL", "ACTIVE").transitions("INITIAL", [
         {
           in: "INITIAL",
           to: [{state: "ACTIVE", when: {status: "active"}}],
         },
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -60,6 +54,7 @@ describe("Enum тип", () => {
           update({status: "inactive"})
         },
       }))
+      .reactions([])
       .states("INITIAL", "ACTIVE", "INACTIVE")
       .transitions("INITIAL", [
         {
@@ -71,7 +66,6 @@ describe("Enum тип", () => {
           to: [{state: "INACTIVE", when: {status: "inactive"}}],
         },
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -89,10 +83,7 @@ describe("Enum тип", () => {
       .context((t) => ({
         status: t.enum(1, 2, 3)({title: "Статус", nullable: true, default: 1}),
       }))
-      .core()
-      .states("INITIAL", "FINAL")
-      .transitions("INITIAL", [])
-      .reactions([])
+      .core().reactions([]).states("INITIAL", "FINAL").transitions("INITIAL", [])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -106,15 +97,12 @@ describe("Enum тип", () => {
       .context((t) => ({
         status: t.enum(1, 2)({default: 1}),
       }))
-      .core()
-      .states("INITIAL", "ACTIVE")
-      .transitions("INITIAL", [
+      .core().reactions([]).states("INITIAL", "ACTIVE").transitions("INITIAL", [
         {
           in: "INITIAL",
           to: [{state: "ACTIVE", when: {status: 2}}],
         },
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

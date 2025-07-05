@@ -14,6 +14,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true, default: "123456"}),
       }))
       .core()
+      .reactions([])
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
@@ -39,7 +40,6 @@ describe("Actions", () => {
           ],
         },
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -58,6 +58,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
+      .reactions([])
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
@@ -83,7 +84,6 @@ describe("Actions", () => {
           ],
         },
       ])
-      .reactions([])
       .view({})
 
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
@@ -104,6 +104,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
+      .reactions([])
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
@@ -130,7 +131,7 @@ describe("Actions", () => {
             },
           ],
         },
-      ]).reactions([])
+      ])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -150,6 +151,7 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
+      .reactions([])
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
       .transitions("АНОНИМНЫЙ", [
         {
@@ -175,7 +177,6 @@ describe("Actions", () => {
           ],
         },
       ])
-      .reactions([])
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

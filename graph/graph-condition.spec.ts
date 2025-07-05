@@ -1,5 +1,5 @@
 import { test, describe, expect } from "bun:test"
-import "./node-meta-condition.js"
+import "./graph-condition.js"
 
 describe("node-meta-condition", () => {
   const setupElement = () => {
@@ -85,7 +85,7 @@ describe("node-meta-condition", () => {
     const element = setupElement()
     
     expect(element).toBeDefined()
-    expect(element.tagName.toLowerCase()).toBe('metafor-node-meta-condition')
+    expect(element.tagName.toLowerCase()).toBe('metafor-graph-condition')
   })
 
   test("базовая функциональность элемента", () => {

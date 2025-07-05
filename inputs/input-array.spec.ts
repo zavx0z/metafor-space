@@ -8,9 +8,9 @@ describe("input-array типизация", () => {
         items: t.array({default: ["hello", "world"]}),
       }))
       .core(() => ({}))
+      .reactions([])
       .states("idle")
       .transitions("idle", [])
-      .reactions([])
       .view({})
 
     // Создаем экземпляр для проверки типов
@@ -31,9 +31,9 @@ describe("input-array типизация", () => {
         numbers: t.array({default: [1, 2, 3]}),
       }))
       .core(() => ({}))
+      .reactions([])
       .states("idle")
       .transitions("idle", [])
-      .reactions([])
       .view({})
 
     document.body.innerHTML = '<metafor-test-array-number></metafor-test-array-number>'
@@ -53,9 +53,9 @@ describe("input-array типизация", () => {
         empty: t.array({default: []}),
       }))
       .core(() => ({}))
+      .reactions([])
       .states("idle")
       .transitions("idle", [])
-      .reactions([])
       .view({})
 
     document.body.innerHTML = '<metafor-test-array-empty></metafor-test-array-empty>'

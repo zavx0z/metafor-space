@@ -7,10 +7,7 @@ export default MetaFor("input-string")
     value: t.string({nullable: true}),
     error: t.string({nullable: true}),
   }))
-  .core()
-  .states("рендер")
-  .transitions("рендер", [])
-  .reactions([])
+  .core().reactions([]).states("рендер").transitions("рендер", [])
   .view({
     render: ({context, html, update}) => html`
       <span>${context.title}</span>

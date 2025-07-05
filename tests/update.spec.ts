@@ -22,6 +22,15 @@ describe("update", async () => {
         update({field1: "test1", field2: 1})
       },
     }))
+    .reactions([
+      {
+        title: "",
+        filter: ({patch}) => patch.op === "add",
+        action: ({update}) => {
+          update({state: "reaction"})
+        }
+      }
+    ])
     .states("INITIAL", "action", "core", "core complex", "final", "reaction")
     .transitions("INITIAL", [
       {
@@ -46,15 +55,7 @@ describe("update", async () => {
       },
       {
         in: "final",
-        to:[{state: "reaction", when: {state: "reaction"}}]
-      }
-    ]).reactions([
-      {
-        title: "",
-        filter: ({patch}) => patch.op === "add",
-        action: ({update}) => {
-          update({state: "reaction"})
-        }
+        to: [{state: "reaction", when: {state: "reaction"}}]
       }
     ])
     .view({})
@@ -71,7 +72,7 @@ describe("update", async () => {
     expect(messages[1].patch).toMatchObject({
       op: "replace",
       path: "/context",
-      value: { state: "action" }
+      value: {state: "action"}
     })
   })
 
@@ -79,7 +80,7 @@ describe("update", async () => {
     expect(messages[2].patch).toMatchObject({
       op: "replace",
       path: "/context",
-      value: { state: "core", field1: "action complex" }
+      value: {state: "core", field1: "action complex"}
     })
   })
 
@@ -87,7 +88,7 @@ describe("update", async () => {
     expect(messages[3].patch).toMatchObject({
       op: "replace",
       path: "/context",
-      value: { field1: "test" }
+      value: {field1: "test"}
     })
   })
 
@@ -95,7 +96,7 @@ describe("update", async () => {
     expect(messages[4].patch).toMatchObject({
       op: "replace",
       path: "/context",
-      value: { field1: "test1", field2: 1 }
+      value: {field1: "test1", field2: 1}
     })
   })
 
@@ -122,7 +123,7 @@ describe("update", async () => {
     expect(messages[14].patch).toMatchObject({
       op: "replace",
       path: "/context",
-      value: { field1: "exist", field2: "exist" }
+      value: {field1: "exist", field2: "exist"}
     })
   })
 
@@ -145,7 +146,7 @@ describe("update", async () => {
     expect(messages[15].patch).toMatchObject({
       op: "replace",
       path: "/context",
-      value: { state: "reaction" }
+      value: {state: "reaction"}
     })
   })
 

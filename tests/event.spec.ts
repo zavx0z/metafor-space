@@ -14,8 +14,6 @@ describe("MetaFor: патчи /context между акторами", () => {
     MetaFor('test-parent-23982012', {development: true})
       .context(t => ({value: t.string(), count: t.number({default: 0})}))
       .core()
-      .states("init")
-      .transitions("init", [])
       .reactions([
         {
           title: "Ловим патчи от ребёнка",
@@ -25,6 +23,8 @@ describe("MetaFor: патчи /context между акторами", () => {
           }
         }
       ])
+      .states("init")
+      .transitions("init", [])
       .view({
         render: ({html}) => html`
           <slot></slot>`
@@ -33,8 +33,6 @@ describe("MetaFor: патчи /context между акторами", () => {
     MetaFor('test-child-23982012', {development: true})
       .context(t => ({value: t.string()}))
       .core()
-      .states("init")
-      .transitions("init", [])
       .reactions([
         {
           title: "Ловим патчи от родителя",
@@ -44,6 +42,8 @@ describe("MetaFor: патчи /context между акторами", () => {
           }
         }
       ])
+      .states("init")
+      .transitions("init", [])
       .view({
         render: ({html}) => html`
           <slot></slot>`
@@ -52,8 +52,6 @@ describe("MetaFor: патчи /context между акторами", () => {
     MetaFor('test-sibling-23982012', {development: true})
       .context(t => ({value: t.string(), got: t.boolean({default: false})}))
       .core()
-      .states("init")
-      .transitions("init", [])
       .reactions([
         {
           title: "Сосед ловит патчи от другого соседа",
@@ -63,6 +61,8 @@ describe("MetaFor: патчи /context между акторами", () => {
           }
         }
       ])
+      .states("init")
+      .transitions("init", [])
       .view({})
 
     render(html`
@@ -129,8 +129,6 @@ describe("MetaFor: блокировка всплытия между двумя �
     MetaFor("block-parent", {development: true})
       .context(t => ({}))
       .core()
-      .states("init")
-      .transitions("init", [])
       .reactions([
         {
           title: "Блокирующая реакция",
@@ -148,14 +146,16 @@ describe("MetaFor: блокировка всплытия между двумя �
           }
         }
       ])
+      .states("init")
+      .transitions("init", [])
       .view({})
 
     MetaFor("block-child", {development: true})
       .context(t => ({value: t.string()}))
       .core()
+      .reactions([])
       .states("init")
       .transitions("init", [])
-      .reactions([])
       .view({
         render: ({html}) => html`
           <slot></slot>`

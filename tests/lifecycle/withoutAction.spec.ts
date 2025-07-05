@@ -15,10 +15,7 @@ describe("MetaFor: инициализация без действия", async ()
     .context((t) => ({
       value: t.string({nullable: true, default: initialContext.value})
     }))
-    .core()
-    .states("INITIAL", "OTHER")
-    .transitions(initialState, [])
-    .reactions([])
+    .core().reactions([]).states("INITIAL", "OTHER").transitions(initialState, [])
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

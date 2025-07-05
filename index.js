@@ -7,6 +7,7 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
     error: t.string({title: "Ошибка", nullable: true})
   }))
   .core()
+  .reactions([])
   .states("конец", "начало")
   .transitions("начало", [
     {
@@ -26,7 +27,6 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
       to: [{state: "начало", when: {status: "start"}}],
     },
   ])
-  .reactions([])
   .view({
     // render: ({html, context}) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`
   })
