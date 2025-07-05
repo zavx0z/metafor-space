@@ -1,8 +1,6 @@
 import {getMimeType} from "./fixtures/browser/static.ts"
 import {join} from "node:path"
-import index from "./index.html"
 
-// Путь к корневой директории проекта
 const PROJECT_DIR = join(import.meta.dir, "/")
 
 const server = Bun.serve({
@@ -36,4 +34,5 @@ const server = Bun.serve({
     return new Response("fallback response");
   },
 })
+
 console.log(`Server started on http://${server.hostname}:${server.port}`)
