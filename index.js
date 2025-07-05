@@ -1,4 +1,5 @@
 import {MetaFor} from "./metafor.js"
+await import ("./graph/graph-nodes.js")
 
 export default MetaFor("roadmap", {description: "MetaFor roadmap", development: false})
   .context((t) => ({
