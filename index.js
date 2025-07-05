@@ -17,6 +17,7 @@ export default MetaFor("roadmap", {description: "MetaFor RoadMap", development: 
           resolve({status: "end"})
         }, 6000)
       }),
+      reaction: [],
       to: {
         "конец": {status: "end"},
         "в процессе": {status: "process"}

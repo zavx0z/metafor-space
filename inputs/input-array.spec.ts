@@ -8,7 +8,7 @@ describe("input-array типизация", () => {
         items: t.array({default: ["hello", "world"]}),
       }))
       .core(() => ({}))
-      .reactions([])
+      .reactions({})
       .states("idle")
       .transitions("idle", [])
       .view({})
@@ -31,7 +31,7 @@ describe("input-array типизация", () => {
         numbers: t.array({default: [1, 2, 3]}),
       }))
       .core(() => ({}))
-      .reactions([])
+      .reactions({})
       .states("idle")
       .transitions("idle", [])
       .view({})
@@ -53,7 +53,7 @@ describe("input-array типизация", () => {
         empty: t.array({default: []}),
       }))
       .core(() => ({}))
-      .reactions([])
+      .reactions({})
       .states("idle")
       .transitions("idle", [])
       .view({})

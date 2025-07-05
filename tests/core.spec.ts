@@ -23,17 +23,15 @@ describe("core", () => {
           }
         },
       }))
-      .reactions([])
+      .reactions({})
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА", "отпуск элемента")
-      .transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {
             "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {isSpacePressed: true}
           }
         },
-        {
-          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+        "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {
           action: ({core}) => {
             core.handleKeyDown("Space")
             return {actionUpdate: true}
@@ -42,8 +40,7 @@ describe("core", () => {
             "отпуск элемента": {isSpacePressed: false, actionUpdate: false}
           }
         },
-        {
-          in: "отпуск элемента",
+        "отпуск элемента": {
           action: ({core}) => {
             core.handleKeyUp("Space")
             return {actionUpdate: true}
@@ -52,7 +49,7 @@ describe("core", () => {
             "ОЖИДАНИЕ": {isSpacePressed: false, actionUpdate: false}
           }
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -92,17 +89,15 @@ describe("core", () => {
           parameter: coreState.parameter,
         }
       })
-      .reactions([])
+      .reactions({})
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
-      .transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {
             "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {isSpacePressed: true}
           }
         },
-        {
-          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+        "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {
           action: ({core}) => {
             core.handleKeyDown("Space")
           },
@@ -110,7 +105,7 @@ describe("core", () => {
             "ОЖИДАНИЕ": {isSpacePressed: false}
           }
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -133,17 +128,15 @@ describe("core", () => {
         },
         parameter: true,
       }))
-      .reactions([])
+      .reactions({})
       .states("ОЖИДАНИЕ", "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА")
-      .transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {
             "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {isSpacePressed: true}
           }
         },
-        {
-          in: "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА",
+        "ПЕРЕТАСКИВАНИЕ_ЭЛЕМЕНТА": {
           action: ({core}) => {
             core.handleKeyDown("Space")
           },
@@ -151,7 +144,7 @@ describe("core", () => {
             "ОЖИДАНИЕ": {isSpacePressed: false}
           }
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -171,23 +164,21 @@ describe("core", () => {
         parameter: context.parameter,
         updateOther: () => update({other: self.parameter})
       }))
-      .reactions([])
+      .reactions({})
       .states("ОЖИДАНИЕ", "ПАРАМЕТР ОБНОВЛЕН")
-      .transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {
             "ПАРАМЕТР ОБНОВЛЕН": {other: 1}
           }
         },
-        {
-          in: "ПАРАМЕТР ОБНОВЛЕН",
+        "ПАРАМЕТР ОБНОВЛЕН": {
           action: ({core}) => core.updateOther(),
           to: {
             "ОЖИДАНИЕ": {other: 0}
           }
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -213,17 +204,16 @@ describe("core", () => {
           },
           getData: () => sharedArray,
         }))
-      .reactions([])
+      .reactions({})
       .states("INITIAL", "MODIFIED")
-        .transitions("INITIAL", [
-          {
-            in: "INITIAL",
+        .transitions("INITIAL", {
+          "INITIAL": {
             action: ({core}) => {
               core.addData(42)
             },
             to: {"MODIFIED": {isUpdated: true}},
           },
-        ])
+        })
         .view({})
       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -248,15 +238,14 @@ describe("core", () => {
             update({coreParameter: self.coreParameter})
           },
         }))
-      .reactions([])
+      .reactions({})
       .states("INITIAL", "UPDATED")
-        .transitions("INITIAL", [
-          {
-            in: "INITIAL",
+        .transitions("INITIAL", {
+          "INITIAL": {
             action: ({core}) => core.update(),
             to: {"UPDATED": {coreParameter: null}}
           }
-        ])
+        })
         .view({})
       const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

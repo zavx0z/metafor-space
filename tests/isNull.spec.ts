@@ -10,7 +10,10 @@ describe("null условие перехода", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {
             "ДОБАВИТЬ": {size: null}
@@ -30,7 +33,7 @@ describe("null условие перехода", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core().reactions({}).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: null}}
         }
@@ -51,7 +54,11 @@ describe("null условие перехода", () => {
         active: t.boolean({nullable: false, default: false}),
         status: t.enum("active", "inactive")({nullable: false, default: "active"}),
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "число", "строка", "булево").transitions("ОЖИДАНИЕ", {
+      .core()
+
+      .reactions({})
+      .states("ОЖИДАНИЕ", "число", "строка", "булево")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {
             "число": {size: null},
@@ -82,7 +89,10 @@ describe("null условие перехода", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({name: t.string({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {name: null}}
         }
@@ -99,7 +109,10 @@ describe("null условие перехода", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({active: t.boolean({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {active: null}}
         }
@@ -117,7 +130,10 @@ describe("null условие перехода", () => {
     const Meta = MetaFor(tag)
       .context((t) => ({
         status: t.enum("active", "inactive")({nullable: true})
-      })).core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      })).core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {status: null}}
         }
@@ -136,7 +152,10 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({size: t.number({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}}}
         }
@@ -153,9 +172,12 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({
-        size: t.number({nullable: true, default: null})
+        size: t.number({nullable: true})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false}}}
         }
@@ -171,7 +193,10 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({size: t.number({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }
@@ -190,7 +215,10 @@ describe("isNull триггер", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }
@@ -206,10 +234,13 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({
-        size: t.number({nullable: true, default: null}),
+        size: t.number({nullable: true}),
         active: t.boolean({default: false})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}, active: true}}
         }
@@ -226,10 +257,13 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({
-        size: t.number({nullable: true, default: null}),
+        size: t.number({nullable: true}),
         active: t.boolean({default: false})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}, active: true}}
         }
@@ -248,7 +282,10 @@ describe("isNull триггер", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 10}) // Начинаем с не-null значения
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+      .core()
+      .reactions({})
+      .states("ОЖИДАНИЕ", "ДОБАВИТЬ")
+      .transitions("ОЖИДАНИЕ", {
         "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }

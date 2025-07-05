@@ -2,7 +2,6 @@ import {describe, expect, test} from "bun:test"
 import {MetaFor} from "@metafor/space"
 import {messagesFixture} from "../fixtures/broadcast.ts"
 
-
 describe("update", async () => {
   const tag = Bun.randomUUIDv7()
   const {waitForMessages} = messagesFixture({meta: tag})
@@ -31,32 +30,27 @@ describe("update", async () => {
       }
     })
     .states("INITIAL", "action", "core", "core complex", "final", "reaction")
-    .transitions("INITIAL", [
-      {
-        in: "INITIAL",
+    .transitions("INITIAL", {
+      "INITIAL": {
         action: () => ({state: "action"}),
         to: {"action": {state: "action"}},
       },
-      {
-        in: "action",
+      "action": {
         action: () => ({state: "core", field1: "action complex"}),
         to: {"core": {state: "core"}},
       },
-      {
-        in: "core",
+      "core": {
         action: ({core}) => core.coreMethod(),
         to: {"core complex": {field1: "test"}}
       },
-      {
-        in: "core complex",
+      "core complex": {
         action: ({core}) => core.complexMethod(),
         to: {"final": {field1: "test1", field2: 1}}
       },
-      {
-        in: "final",
+      "final": {
         to: {"reaction": {state: "reaction"}}
       }
-    ])
+    })
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

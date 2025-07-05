@@ -15,7 +15,7 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
-      .reactions([])
+      .reactions({})
       .states("init")
       .transitions("init", [])
       .view({
@@ -47,7 +47,7 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
-      .reactions([])
+      .reactions({})
       .states("init")
       .transitions("init", [])
       .view({
@@ -84,7 +84,7 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
-      .reactions([])
+      .reactions({})
       .states("init")
       .transitions("init", [])
       .view({
@@ -121,7 +121,7 @@ describe("MetaFor view", () => {
       .core(() => ({
         button: buttonRef
       }))
-      .reactions([])
+      .reactions({})
       .states("init")
       .transitions("init", [])
       .view({

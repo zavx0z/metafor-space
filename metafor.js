@@ -24,27 +24,7 @@ const setDevChannel = (channel) => {
  * @param {Record<string, any>} objectTransitions - Переходы в объектном формате
  * @returns {Array<any>} Переходы в массиве
  */
-function convertObjectToArrayFormat(objectTransitions) {
-  const transitionsArray = []
-  
-  for (const [state, config] of Object.entries(objectTransitions)) {
-    if (config && typeof config === 'object') {
-      const transition = {
-        in: state,
-        to: config.to || {}
-      }
-      
-      if (config.action) transition.action = config.action
-      if (config.reaction) transition.reaction = config.reaction
-      if (config.success) transition.success = config.success
-      if (config.error) transition.error = config.error
-      
-      transitionsArray.push(transition)
-    }
-  }
-  
-  return transitionsArray
-}
+// Удаляю функцию convertObjectToArrayFormat и её описание
 
 /** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
@@ -86,13 +66,9 @@ export const MetaFor = (tag, conf = {}) => {
                 development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
                 return {
                   transitions(initialState, transitions) {
-                    // Преобразование объектного формата в массив для обратной совместимости
-                    const transitionsArray = Array.isArray(transitions) 
-                      ? transitions 
-                      : convertObjectToArrayFormat(transitions)
-                    
+                    // transitions теперь только объект
                     if (development) {
-                      const data = {tag, transitions: transitionsArray, contextDefinition}
+                      const data = {tag, transitions, contextDefinition}
                       import("./core/validator/index.js").then((module) => module.validateTransitions(data))
                     }
                     return {
@@ -101,7 +77,7 @@ export const MetaFor = (tag, conf = {}) => {
                         initialState,
                         contextDefinition,
                         view,
-                        transitions: transitionsArray,
+                        transitions,
                         development,
                         description,
                         tag,
@@ -269,7 +245,7 @@ function createMeta(
           this.addEventListener("channel", this.#reactionCustomEventCb)
         }
         this.#sendPatches({path: "/", op: "add", value: this.snapshot()}) // TODO: при восстановлении входить в состояние без вызова действия
-        const transition = transitions.find((i) => i.in === initialState)
+        const transition = transitions[initialState]
         if (transition?.action) {
           this.process = true
           this.#broadcastState(initialState)
@@ -436,20 +412,20 @@ function createMeta(
 
       /** Проверка условий перехода и выполнение действия */
       #transition = () => {
-        const transitionFrom = transitions.find((t) => t.in === this.state)
+        const transitionFrom = transitions[this.state]
         if (transitionFrom) {
           for (const [targetState, when] of Object.entries(transitionFrom.to)) {
             const typedTargetState = targetState
             if (Object.keys(when).length === 0) break
             if (conditions(when, this.context, contextDefinition)) {
-                const actionDefinition = transitions.find((i) => i.in === typedTargetState && i.action)
+              const actionDefinition = transitions[typedTargetState]
               if (actionDefinition?.action) {
                 this.process = true
-                  this.#state.setValue(typedTargetState)
+                this.#state.setValue(typedTargetState)
                 if (view.render) this.#updateView()
                 this.#runTransitionAction(actionDefinition)
               } else {
-                  this.#state.setValue(typedTargetState)
+                this.#state.setValue(typedTargetState)
                 if (view.render) this.#updateView()
               }
               break // Важно! Выходим после первого успешного перехода
@@ -472,8 +448,8 @@ function createMeta(
           core: this.#parsedCore,
           context: this.context,
           types: contextDefinition,
-          transitions: transitions.map((t) => ({
-            in: t.in,
+          transitions: Object.entries(transitions).map(([inState, t]) => ({
+            in: inState,
             to: Object.entries(t.to).map(([state, when]) => ({
               state,
               when,

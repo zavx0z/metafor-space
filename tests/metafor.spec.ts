@@ -26,23 +26,21 @@ describe("Конструктор MetaFor", () => {
 
   test("Инициализация состояния без действия с контекстом который соответствует условию перехода", () => {
     const Meta = Fabric
-      .reactions([])
+      .reactions({})
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
-      .transitions("АНОНИМНЫЙ", [
-        {
-          in: "АНОНИМНЫЙ",
+      .transitions("АНОНИМНЫЙ", {
+        "АНОНИМНЫЙ": {
           to: {
             "АВТОРИЗАЦИЯ": {email: {isNull: false}, password: {isNull: false}}
           }
         },
-        {
-          in: "АВТОРИЗАЦИЯ",
+        "АВТОРИЗАЦИЯ": {
           action: () => ({nickname}),
           to: {
             "АВТОРИЗОВАН": {nickname: {isNull: false}}
           }
         },
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

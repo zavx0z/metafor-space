@@ -14,17 +14,15 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true, default: "123456"}),
       }))
       .core()
-      .reactions([])
+      .reactions({})
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
-      .transitions("АНОНИМНЫЙ", [
-        {
-          in: "АНОНИМНЫЙ",
+      .transitions("АНОНИМНЫЙ", {
+        "АНОНИМНЫЙ": {
           to: {
             "АВТОРИЗАЦИЯ": {email: {isNull: false}, password: {isNull: false}}
           }
         },
-        {
-          in: "АВТОРИЗАЦИЯ",
+        "АВТОРИЗАЦИЯ": {
           action: () => {
             const nickname = "zavx0z"
             return {nickname}
@@ -33,7 +31,7 @@ describe("Actions", () => {
             "АВТОРИЗОВАН": {nickname: {isNull: false}}
           }
         },
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -52,17 +50,15 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .reactions([])
+      .reactions({})
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
-      .transitions("АНОНИМНЫЙ", [
-        {
-          in: "АНОНИМНЫЙ",
+      .transitions("АНОНИМНЫЙ", {
+        "АНОНИМНЫЙ": {
           to: {
             "АВТОРИЗАЦИЯ": {email: {isNull: false}, password: {isNull: false}}
           }
         },
-        {
-          in: "АВТОРИЗАЦИЯ",
+        "АВТОРИЗАЦИЯ": {
           action: async () => {
             await new Promise((resolve) => setTimeout(resolve, 100))
             return {nickname: "async_user"}
@@ -71,7 +67,7 @@ describe("Actions", () => {
             "АВТОРИЗОВАН": {nickname: {isNull: false}}
           }
         },
-      ])
+      })
       .view({})
 
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
@@ -92,17 +88,15 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .reactions([])
+      .reactions({})
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
-      .transitions("АНОНИМНЫЙ", [
-        {
-          in: "АНОНИМНЫЙ",
+      .transitions("АНОНИМНЫЙ", {
+        "АНОНИМНЫЙ": {
           to: {
             "АВТОРИЗАЦИЯ": {email: {isNull: false}, password: {isNull: false}}
           }
         },
-        {
-          in: "АВТОРИЗАЦИЯ",
+        "АВТОРИЗАЦИЯ": {
           action: () => {
             return {
               nickname: "multi_update",
@@ -113,7 +107,7 @@ describe("Actions", () => {
             "АВТОРИЗОВАН": {nickname: {isNull: false}}
           }
         },
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -133,17 +127,15 @@ describe("Actions", () => {
         password: string({title: "Пароль", nullable: true}),
       }))
       .core()
-      .reactions([])
+      .reactions({})
       .states("АНОНИМНЫЙ", "РЕГИСТРАЦИЯ", "АВТОРИЗАЦИЯ", "АВТОРИЗОВАН")
-      .transitions("АНОНИМНЫЙ", [
-        {
-          in: "АНОНИМНЫЙ",
+      .transitions("АНОНИМНЫЙ", {
+        "АНОНИМНЫЙ": {
           to: {
             "АВТОРИЗАЦИЯ": {email: {isNull: false}, password: {isNull: false}}
           }
         },
-        {
-          in: "АВТОРИЗАЦИЯ",
+        "АВТОРИЗАЦИЯ": {
           action: () => {
             actionCalled = true
             return {nickname: "should_not_update"}
@@ -152,7 +144,7 @@ describe("Actions", () => {
             "АВТОРИЗОВАН": {nickname: {isNull: false}}
           }
         },
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

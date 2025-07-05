@@ -78,7 +78,7 @@
 //                 console.debug("No read or write")
 //             },
 //         })
-//         .reactions([])
+//         .reactions({})
 //         .create({
 //             state: "state-1",
 //             context: {

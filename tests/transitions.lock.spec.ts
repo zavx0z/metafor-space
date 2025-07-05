@@ -13,7 +13,7 @@ test("Блокировка переходов перед входом в нов�
     .core(({update}) => ({
       update
     }))
-    .reactions([])
+    .reactions({})
     .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", {
       "INIT": {
@@ -53,7 +53,7 @@ test("Блокировка переходов для асинхронного д
       value: t.number({nullable: true}),
     }))
     .core()
-    .reactions([])
+    .reactions({})
     .states("INIT", "PROCESS", "DONE")
     .transitions("INIT", {
       "INIT": {
@@ -79,7 +79,7 @@ test("Снятие блокировки после действия", async () =
       value: t.number({nullable: true, default: 2}),
     }))
     .core()
-    .reactions([])
+    .reactions({})
     .states("INIT", "DONE")
     .transitions("INIT", {
       "INIT": {

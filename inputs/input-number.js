@@ -8,7 +8,7 @@ export default MetaFor("input-number")
     value: t.string({nullable: true}),
     error: t.string({nullable: true}),
   }))
-  .core().reactions([]).states("рендер").transitions("рендер", [])
+  .core().reactions({}).states("рендер").transitions("рендер", [])
   .view({
     render: ({context, html, update}) => html`
       <span>

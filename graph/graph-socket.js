@@ -14,7 +14,7 @@ export default MetaFor('graph-socket')
     error: t.string({title: "Ошибка", nullable: true}),
   }))
   .core()
-      .reactions([])
+      .reactions({})
 .states("рендер", "измерение")
   .transitions("рендер", [
     {

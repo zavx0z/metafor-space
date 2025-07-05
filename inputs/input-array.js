@@ -8,7 +8,7 @@ export default MetaFor("input-array")
     error: t.string({nullable: true}),
     input: t.string({default: ""}),
   }))
-  .core().reactions([]).states("рендер").transitions("рендер", [])
+  .core().reactions({}).states("рендер").transitions("рендер", [])
   .view({
     render: ({context, html, update}) => html`
       <div>

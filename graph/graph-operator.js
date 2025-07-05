@@ -169,7 +169,7 @@ export default MetaFor("graph-operator", {development: true})
       }
     },
   }))
-  .reactions([])
+  .reactions({})
   .states('init', 'ready')
   .transitions('init', [
     {

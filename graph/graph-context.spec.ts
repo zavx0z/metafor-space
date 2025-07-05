@@ -14,7 +14,7 @@ describe("graph-context с новым форматом переходов", () =
         process: t.boolean({default: false}),
       }))
       .core(() => ({}))
-      .reactions([])
+      .reactions({})
       .states("измерение", "позиционирование", "неактивно", "активно")
       .transitions("измерение", {
         "измерение": {

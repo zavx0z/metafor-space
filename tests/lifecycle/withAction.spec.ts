@@ -19,26 +19,24 @@ describe("MetaFor: инициализация с действиями", async ()
       value: t.string({nullable: true, default: initialContext.value}),
     }))
     .core()
-    .reactions([])
+    .reactions({})
     .states("INITIAL", "OTHER", "NEXT")
-    .transitions(initialState, [
-      {
-        in: "INITIAL",
+    .transitions(initialState, {
+      "INITIAL": {
         action: async () => {
           await Bun.sleep(100)
           return nextContext // Автоматически обновит контекст
         },
         to: {"NEXT": {value: nextContext.value}},
       },
-      {
-        in: "NEXT",
+      "NEXT": {
         action: async () => {
           await Bun.sleep(100)
           return otherContext // Автоматически обновит контекст
         },
         to: {"OTHER": {value: otherContext.value}}
       }
-    ])
+    })
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -62,10 +60,10 @@ describe("MetaFor: инициализация с действиями", async ()
   test("[transition] Последующие патчи содержат обновления контекста и состояний", () => {
     const contextPatches = messages.filter(m => m.patch.path === "/context" && m.patch.op === "replace")
     const statePatches = messages.filter(m => m.patch.path === "/state" && m.patch.op === "replace")
-    
+
     expect(contextPatches.length).toBeGreaterThanOrEqual(2) // Обновления контекста от action
     expect(statePatches.length).toBeGreaterThanOrEqual(2)   // Смены состояний
-    
+
     // Проверяем, что есть патчи для каждого автоперехода
     expect(contextPatches[0].patch.value).toEqual(nextContext)
     expect(contextPatches[1].patch.value).toEqual(otherContext)
@@ -86,7 +84,7 @@ describe("MetaFor: инициализация с действиями", async ()
   test("[transition] Для каждого автоперехода есть патчи на context и state (сообщения)", () => {
     const ops = messages.map(m => m.patch.op)
     expect(ops).toContain("add")
-    expect(ops.filter(x=>x==="replace").length).toBeGreaterThanOrEqual(2)
+    expect(ops.filter(x => x === "replace").length).toBeGreaterThanOrEqual(2)
     const statePatches = messages.filter(m => m.patch.path === "/state")
     const contextPatches = messages.filter(m => m.patch.path === "/context")
     expect(statePatches.length).toBeGreaterThanOrEqual(2)
@@ -105,7 +103,7 @@ describe("MetaFor: инициализация с действиями", async ()
           op: "add",
           path: "/",
           value: expect.objectContaining({
-            context: { value: "initial" },
+            context: {value: "initial"},
             state: "INITIAL",
             states: ["INITIAL", "OTHER", "NEXT"],
             transitions: expect.any(Array),
@@ -135,7 +133,7 @@ describe("MetaFor: инициализация с действиями", async ()
         patch: {
           op: "replace",
           path: "/context",
-          value: { value: "next" },
+          value: {value: "next"},
         },
       },
       {
@@ -171,7 +169,7 @@ describe("MetaFor: инициализация с действиями", async ()
         patch: {
           op: "replace",
           path: "/context",
-          value: { value: "other" },
+          value: {value: "other"},
         },
       },
       {
@@ -207,7 +205,7 @@ describe("MetaFor: инициализация с действиями", async ()
         patch: {
           op: "replace",
           path: "/context",
-          value: { value: "initial" },
+          value: {value: "initial"},
         },
       },
     ])

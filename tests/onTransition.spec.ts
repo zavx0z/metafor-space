@@ -10,34 +10,33 @@ const Meta = MetaFor(tag)
     responseTime: t.number({title: "Время ответа", nullable: true, default: 0}),
     errorCode: t.number({title: "Код ошибки", nullable: true, default: 0}),
   }))
-  .core().reactions([]).states("IDLE", "RUNNING", "ERROR", "SUCCESS").transitions("IDLE", [
-    {
-      in: "IDLE",
+  .core()
+  .reactions({})
+  .states("IDLE", "RUNNING", "ERROR", "SUCCESS")
+  .transitions("IDLE", {
+    "IDLE": {
       to: {
         "RUNNING": {url: {startsWith: "https://"}, responseTime: {gt: 0, lt: 5000}}
       }
     },
-    {
-      in: "RUNNING",
+    "RUNNING": {
       to: {
         "SUCCESS": {responseTime: {gt: 0, lt: 5000}, errorCode: 200},
         "ERROR": {errorCode: {gt: 400, lt: 599}}
       }
     },
-    {
-      in: "ERROR",
+    "ERROR": {
       to: {
         "IDLE": {url: {startsWith: "https://"}}
       }
     },
-    {
-      in: "SUCCESS",
+    "SUCCESS": {
       to: {
         "IDLE": {url: {startsWith: "https://"}}
       }
     },
-  ])
-      .view({})
+  })
+  .view({})
 const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
 describe("Подписка на изменения состояния (onTransition)", () => {

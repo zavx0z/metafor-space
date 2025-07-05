@@ -22,7 +22,7 @@ describe("Синхронизация core и context", async () => {
         update({dataLength: this.data.length, process: null})
       },
     }))
-    .reactions([])
+    .reactions({})
     .states("IDLE", "push", "pop")
     .transitions("IDLE", [
       {

@@ -13,7 +13,7 @@ import {
 describe("Тестирование формирования layout для одного состояния", () => {
   const metaName = "test/1"
   const dataMeta = data.get(metaName)!
-  const keyState = "node-meta-state/1"
+  const keyState = "graph-context/1"
   const valState = dataMeta.states[keyState]
 
   test("createStatePorts - создание портов для состояния", () => {
@@ -120,7 +120,7 @@ describe("Тестирование формирования layout для одн
     
     // Первый ребенок должен быть узлом условия
     const conditionNode = stateGroup.children![0]
-    expect(conditionNode.id).toBe("node-meta-condition/2")
+    expect(conditionNode.id).toBe("graph-condition/1")
     
     // Второй ребенок должен быть узлом состояния
     const stateNode = stateGroup.children![1]

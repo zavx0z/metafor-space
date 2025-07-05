@@ -23,7 +23,7 @@ describe("MetaFor: патчи /context между акторами", () => {
         }
       })
       .states("init")
-      .transitions("init", [])
+      .transitions("init", {})
       .view({
         render: ({html}) => html`
           <slot></slot>`
@@ -41,7 +41,7 @@ describe("MetaFor: патчи /context между акторами", () => {
         }
       })
       .states("init")
-      .transitions("init", [])
+      .transitions("init", {})
       .view({
         render: ({html}) => html`
           <slot></slot>`
@@ -59,7 +59,7 @@ describe("MetaFor: патчи /context между акторами", () => {
         }
       })
       .states("init")
-      .transitions("init", [])
+      .transitions("init", {})
       .view({})
 
     render(html`
@@ -142,15 +142,15 @@ describe("MetaFor: блокировка всплытия между двумя �
         }
       })
       .states("init")
-      .transitions("init", [])
+      .transitions("init", {})
       .view({})
 
     MetaFor("block-child", {development: true})
       .context(t => ({value: t.string()}))
       .core()
-      .reactions([])
+      .reactions({})
       .states("init")
-      .transitions("init", [])
+      .transitions("init", {})
       .view({
         render: ({html}) => html`
           <slot></slot>`

@@ -8,7 +8,7 @@ export default MetaFor("input-enum")
     options: t.array({default: []}),
     error: t.string({nullable: true}),
   }))
-  .core().reactions([]).states("рендер").transitions("рендер", [])
+  .core().reactions({}).states("рендер").transitions("рендер", [])
   .view({
     render: ({context, html, update, repeat}) => {
       // console.log(context.value)
