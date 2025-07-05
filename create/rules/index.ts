@@ -62,7 +62,7 @@ MetaFor("rules", {
   }))
   .transitions("подписка на отмену", [
     {
-      from: "подписка на отмену",
+      in: "подписка на отмену",
       action: ({update}) => {
         process.on("SIGINT", () => {
           update({cancel: true})
@@ -80,7 +80,7 @@ MetaFor("rules", {
       },
     },
     {
-      from: "получение версии create-rules",
+      in: "получение версии create-rules",
       action: async ({update}) => {
         try {
           const version = await currentVersion(__dirname)
@@ -95,7 +95,7 @@ MetaFor("rules", {
       },
     },
     {
-      from: "вывод приветственного сообщения",
+      in: "вывод приветственного сообщения",
       action: async ({context, update}) => {
         console.log(
           chalk.blue(`
@@ -107,7 +107,7 @@ MetaFor("rules", {
       to: {"поиск package.json": {error: null}},
     },
     {
-      from: "поиск package.json",
+      in: "поиск package.json",
       action: async ({context, update, core}) => {
         try {
           const packageJson = await readPackageJson(join(__dirname, context.packageJsonPath))
@@ -124,7 +124,7 @@ MetaFor("rules", {
       },
     },
     {
-      from: "вывод данных о проекте",
+      in: "вывод данных о проекте",
       action: ({context}) => console.log(chalk.green(`Project name: ${context.projectName}`)),
       to: {
         "поиск сгенерированных правил": {error: null},

@@ -55,7 +55,7 @@ export default MetaFor("graph-layout", {development: true})
     }
   }))
   .reactions({
-    "начало создания meta": {
+    "начало создания актора": {
       filter: ({patch, meta}) => (
         meta.tag === "graph-listener"
         && patch.path === '/context'
@@ -153,7 +153,7 @@ export default MetaFor("graph-layout", {development: true})
         if (!core.count) update({metrics: true})
       }
     },
-    "конец создания meta": {
+    "конец создания мета": {
       filter: ({patch, meta, context}) => Boolean(
         context.current
         && meta.tag === "graph-listener"
@@ -191,14 +191,19 @@ export default MetaFor("graph-layout", {development: true})
         const dataMeta = core.meta.get(context.current)
         if (!dataMeta) return
         core.data = createElkData(context.current, dataMeta, core.config)
+        console.log(core.data)
+        return {current: null}
       },
       to: {"вычисление": {current: {isNull: true}}}
     },
     {
       in: "вычисление",
       action: async ({core, context}) => {
-        const layout = await core.elk.layout(core.data, {layoutOptions: core.config})
-        sessionStorage.setItem(context.current, JSON.stringify(layout))
+        if (core.data){
+          console.log(core.data)
+          const layout = await core.elk.layout(core.data)
+          sessionStorage.setItem(context.current, JSON.stringify(layout))
+        } else throw new Error("Отсутствуют данные для layout")
       },
       to: {"ожидание": {current: null}}
     }

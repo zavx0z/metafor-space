@@ -39,9 +39,9 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
   .transitions("рендер", [
     {
       in: "рендер",
-      to: [{
-        state: "позиционирование", when: {width: {isNull: false}, height: {isNull: false}}
-      }]
+      to: {
+        "позиционирование": {width: {isNull: false}, height: {isNull: false}}
+      }
     },
     {
       in: "позиционирование",

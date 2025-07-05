@@ -32,7 +32,7 @@ export default MetaFor("graph-listener", {
       instance: null
     }
   })
-  .reactions([])
+  .reactions({})
   .states("ожидание патча", "добавление актора")
   .transitions("ожидание патча", [
     {
@@ -49,10 +49,10 @@ export default MetaFor("graph-listener", {
         core.snapshot = null
         return {nodes: context.nodes.slice(1)}
       },
-      to: [
-        {state: "ожидание патча", when: {nodes: {isEmpty: true}}},
-        {state: "добавление актора", when: {nodes: {isEmpty: false}}}
-      ],
+      to: {
+        "ожидание патча": {nodes: {isEmpty: true}},
+        "добавление актора": {nodes: {isEmpty: false}}
+      },
     }
   ])
   .view({
