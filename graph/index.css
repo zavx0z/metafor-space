@@ -1,13 +1,3 @@
 :root {
-  --node-shadow-size: 10px;
-  --dash-length: 10px; /* Длина штриха грани */
-  --gap-length: 0px; /* Длина пробела между штрихами */
   --node-border-radius: 7px;
-
-  /* Определяем переменные для цветов кнопки */
-  --button-border-color: rgb(var(--surface-400));
-  --background-color: rgb(var(--surface-500));
-  --button-hover-background: rgb(var(--surface-400));
-  --button-active-background: rgb(var(--surface-500));
-  --button-disabled-background: rgb(var(--surface-800));
 }

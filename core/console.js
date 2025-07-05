@@ -28,7 +28,13 @@ const config = {
     "/",
     "/context",
     "/state",
-  ]
+  ],
+  // Ширины колонок
+  width: {
+    tag: 22,
+    op: 8,
+    path: 15
+  }
 }
 /**
  *
@@ -50,15 +56,11 @@ const isLog = ({meta, patch}, path) => Boolean(
  */
 export function log(message, core) {
   const {meta, patch} = message
-  // Ширины колонок
-  const TAG_WIDTH = 40
-  const OP_WIDTH = 8
-  const PATH_WIDTH = 15
 
-  const tag = String(meta.tag).padEnd(TAG_WIDTH, ' ')
+  const tag = String(meta.tag).padEnd(config.width.tag, ' ')
   const index = String(meta.index).padEnd(4, ' ')
-  const op = centerText(String(patch.op), OP_WIDTH)
-  const path = String(patch.path).padEnd(PATH_WIDTH, ' ')
+  const op = centerText(String(patch.op), config.width.op)
+  const path = String(patch.path).padEnd(config.width.path, ' ')
 
   const value = formattedObj(patch.value)
   const isError = Object.hasOwn(patch.value, 'error')

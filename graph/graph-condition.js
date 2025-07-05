@@ -63,8 +63,7 @@ export default MetaFor("graph-condition", {development: true})
     "позиционирование": {
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
-      },
-      to: {}
+      }
     }
   })
   .view({
@@ -103,7 +102,7 @@ export default MetaFor("graph-condition", {development: true})
         pointer-events: none;
         z-index: -2;
         transition: box-shadow 0.3s ease-in-out;
-        box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px, rgba(0, 0, 0, 0.2) 0 0 0 inset;
+        box-shadow: rgba(0, 0, 0, 0.4) 0 2px 4px, rgba(0, 0, 0, 0.3) 0 7px 13px -3px;
       }
 
       :host:after {

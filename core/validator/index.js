@@ -52,30 +52,52 @@ export function validateContextDefinition({ tag, context }) {
 }
 
 /**
+ Преобразует объектный формат переходов в массив для валидации
+
+ @param {Record<string, any>} objectTransitions - Переходы в объектном формате
+ @returns {Array<any>} Переходы в массиве
+ */
+function convertObjectToArrayFormat(objectTransitions) {
+  return Object.entries(objectTransitions).map(([state, transition]) => ({
+    in: state,
+    to: transition.to || {},
+    action: transition.action,
+    success: transition.success,
+    error: transition.error
+  }))
+}
+
+/**
  Валидация переходов
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Имя частицы
- @param {Array<import('../../types/transitions').Transition<any, any, any, any>>} params.transitions Массив переходов (уже преобразованный из объектного формата)
+ @param {Record<string, any> | Array<import('../../types/transitions').Transition<any, any, any, any>>} params.transitions Переходы в объектном или массивном формате
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTransitions({ tag, transitions, contextDefinition }) {
-  if (!Array.isArray(transitions)) {
+  // Преобразуем объектный формат в массив для валидации
+  let transitionsArray
+  if (Array.isArray(transitions)) {
+    transitionsArray = transitions
+  } else if (typeof transitions === 'object' && transitions !== null) {
+    transitionsArray = convertObjectToArrayFormat(transitions)
+  } else {
     sendError({
       id: tag,
-      message: `Transitions должен быть массивом (или объектом, который преобразуется в массив), получено: ${typeof transitions}`,
+      message: `Transitions должен быть объектом или массивом, получено: ${typeof transitions}`,
       src: "transitions",
     })
     return
   }
 
-  if (transitions.length === 0) {
+  if (transitionsArray.length === 0) {
     sendWarning({ id: tag, message: "Переходы отсутствуют. Мета не будет менять состояние.", src: "transitions" })
     return
   }
 
   // Проверка наличия обязательных полей
-  transitions.forEach((transition, index) => {
+  transitionsArray.forEach((transition, index) => {
     if (!transition.in) {
       sendError({
         id: tag,
@@ -109,11 +131,11 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
   })
 
   // Проверка на циклы
-  validateCycles({ transitions: transitions })
+  validateCycles({ transitions: transitionsArray })
 
   // Валидация триггеров
   try {
-    validateTriggers({ tag, transitions: transitions, contextDefinition })
+    validateTriggers({ tag, transitions: transitionsArray, contextDefinition })
   } catch (error) {
     const { message } = /**@type {Error}*/ (error)
     sendError({ id: tag, message, src: "triggers" })

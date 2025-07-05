@@ -6,32 +6,6 @@
   font-display: swap;
 }
 
-html,
-body {
-  margin: 0;
-  height: 100vh;
-  width: 100vw;
-  color: var(--font-color);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  /*font-family: "Russo One", sans-serif, "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana;*/
-  font-size: calc(1em * 0.875);
-  line-height: 24px;
-  overflow: hidden;
-  touch-action: none;
-  overscroll-behavior: none;
-}
-
-body {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-code, .monospace {
-  font-family: "DejaVu Sans Mono", "Courier New", monospace;
-}
-
 :root {
   /* =~= Theme Colors =~= */
   /* primary | #87ceeb */
@@ -112,83 +86,39 @@ code, .monospace {
   --surface-800: 34 46 64; /* ⬅ #222e40 */
   --surface-900: 27 38 52; /* ⬅ #1b2634 */
   /*  */
+  --background-color: rgb(var(--surface-900));
   --backdrop-filter-blur: blur(22px);
   --background-alpha: 0.5;
-}
 
-.theme-dark,
-.theme-light,
-.theme-xr {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-*,
-*::before,
-*::after {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-.theme-desktop {
   --font-color: rgb(var(--surface-50));
-  --background-color: rgb(var(--surface-900));
-
-  --window-background-color: rgb(var(--surface-800));
-  --widget-background-color: rgb(var(--surface-700));
-  --widget-color: rgb(var(--surface-400));
-
-  --highlight-background-color: rgb(var(--surface-600));
-  --highlight-color: rgb(var(--primary-400));
-  --highlight-color-editor: rgb(var(--primary-500) / 0.2);
-
-  html,
-  body {
-    background-color: transparent;
-  }
+  --font-shadow: 2px 2px 4px rgb(var(--surface-900));
 }
 
-.theme-dark,
-.theme-xr {
-  --font-color: rgb(var(--surface-50));
-  --background-color: rgb(var(--surface-900));
-
-  --window-background-color: rgb(var(--surface-800));
-  --widget-background-color: rgb(var(--surface-700));
-  --widget-color: rgb(var(--surface-400));
-
-  --highlight-background-color: rgb(var(--surface-600));
-  --highlight-color: rgb(var(--primary-400));
-  --highlight-color-editor: rgb(var(--primary-500) / 0.2);
-
-  html,
-  body {
-    background-color: rgb(var(--surface-900));
-  }
+html,
+body {
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(var(--surface-900));
+  color: var(--font-color);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  /*font-family: "Russo One", sans-serif, "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana;*/
+  font-size: calc(1em * 0.875);
+  line-height: 24px;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
 }
 
-.theme-xr {
-  html,
-  body {
-    background-color: rgb(var(--surface-900));
-  }
+body {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.theme-light {
-  color-scheme: light;
-
-  --font-color: rgb(var(--surface-900));
-  --background-color: rgb(var(--surface-50));
-  --window-background-color: rgb(var(--surface-100));
-  --widget-background-color: rgb(var(--surface-200));
-  --widget-color: rgb(var(--surface-500));
-
-  --highlight-background-color: rgb(var(--surface-300));
-  --highlight-color: rgb(var(--primary-600));
-  --highlight-color-editor: rgb(var(--primary-500) / 0.2);
-
-  html,
-  body {
-    background-color: rgb(var(--surface-50));
-  }
+code, .monospace {
+  font-family: "DejaVu Sans Mono", "Courier New", monospace;
 }
 
 .noselect {
@@ -211,11 +141,7 @@ code, .monospace {
   -ms-backdrop-filter: var(--backdrop-filter-blur);
   box-sizing: border-box;
 
-  --shadow-color: rgba(var(--surface-300) / 0.8);
-
-  .theme-dark &:before {
-    --shadow-color: rgba(var(--surface-800) / 0.8);
-  }
+  --shadow-color: rgba(var(--surface-800) / 0.8);
 
   &:before {
     content: "";
@@ -276,6 +202,13 @@ button {
 
 /* Стили для кнопки */
 button {
+  /* Определяем переменные для цветов кнопки */
+  --button-border-color: rgb(var(--surface-400));
+  --background-color: rgb(var(--surface-500));
+  --button-hover-background: rgb(var(--surface-400));
+  --button-active-background: rgb(var(--surface-500));
+  --button-disabled-background: rgb(var(--surface-800));
+
   /* height: 26px; */
   border: 1px solid var(--button-border-color);
   border-radius: 4px;
