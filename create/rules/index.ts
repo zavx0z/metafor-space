@@ -74,10 +74,10 @@ MetaFor("rules", {
         })
         update({cancel: false})
       },
-      to: [
-        {state: "получение версии create-rules", when: {cancel: false}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "получение версии create-rules": {cancel: false},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "получение версии create-rules",
@@ -89,10 +89,10 @@ MetaFor("rules", {
           update({error: (error as Error).message})
         }
       },
-      to: [
-        {state: "вывод приветственного сообщения", when: {version: {isNull: false}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "вывод приветственного сообщения": {version: {isNull: false}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "вывод приветственного сообщения",
@@ -104,7 +104,7 @@ MetaFor("rules", {
         `)
         )
       },
-      to: [{state: "поиск package.json", when: {error: null}}],
+      to: {"поиск package.json": {error: null}},
     },
     {
       from: "поиск package.json",
@@ -117,20 +117,20 @@ MetaFor("rules", {
           update({error: (error as Error).message})
         }
       },
-      to: [
-        {state: "вывод данных о проекте", when: {error: null}},
-        {state: "ошибка чтения package.json", when: {error: {isNull: false}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "вывод данных о проекте": {error: null},
+        "ошибка чтения package.json": {error: {isNull: false}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "вывод данных о проекте",
       action: ({context}) => console.log(chalk.green(`Project name: ${context.projectName}`)),
-      to: [
-        {state: "поиск сгенерированных правил", when: {error: null}},
-        {state: "ошибка чтения package.json", when: {error: {isNull: false}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "поиск сгенерированных правил": {error: null},
+        "ошибка чтения package.json": {error: {isNull: false}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "поиск директории с правилами",
@@ -143,10 +143,10 @@ MetaFor("rules", {
           update({error: "Директория с правилами не найдена"})
         }
       },
-      to: [
-        {state: "создание директории правил", when: {rulesPath: {isNull: true}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "создание директории правил": {rulesPath: {isNull: true}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "создание директории правил",
@@ -155,10 +155,10 @@ MetaFor("rules", {
         console.log(chalk.green("Директория с правилами создана"))
         update({rulesPath: context.rulesPath})
       },
-      to: [
-        {state: "поиск сгенерированных правил", when: {rulesPath: {isNull: false}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "поиск сгенерированных правил": {rulesPath: {isNull: false}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "поиск сгенерированных правил",
@@ -171,11 +171,11 @@ MetaFor("rules", {
           update({error: `Правила не найдены: ${rulePath}`})
         }
       },
-      to: [
-        {state: "правила найдены и удалены", when: {rulePath: {isNull: false}}},
-        {state: "ошибка удаления правил", when: {error: {isNull: false}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "правила найдены и удалены": {rulePath: {isNull: false}},
+        "ошибка удаления правил": {error: {isNull: false}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "правила найдены и удалены",
@@ -183,10 +183,10 @@ MetaFor("rules", {
         rmSync(context.rulePath, {force: true})
         console.log(chalk.green("Обновление правил..."))
       },
-      to: [
-        {state: "генерация правил", when: {error: null}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "генерация правил": {error: null},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "ошибка удаления правил",
@@ -194,52 +194,52 @@ MetaFor("rules", {
         console.log(chalk.red(`Ошибка удаления правил: ${context.error}`))
         update({error: null})
       },
-      to: [],
+      to: {},
     },
     {
       from: "генерация правил",
       action: () => {
         console.log(chalk.green("Генерация правил..."))
       },
-      to: [
-        {state: "правила сгенерированы", when: {error: null}},
-        {state: "ошибка генерации правил", when: {error: {isNull: false}}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "правила сгенерированы": {error: null},
+        "ошибка генерации правил": {error: {isNull: false}},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "правила сгенерированы",
       action: () => {
         console.log(chalk.green("Правила сгенерированы"))
       },
-      to: [
-        {state: "завершение работы", when: {error: null}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "завершение работы": {error: null},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "ошибка генерации правил",
       action: ({context}) => {
         console.log(chalk.red(`Ошибка генерации правил: ${context.error}`))
       },
-      to: [
-        {state: "завершение работы", when: {error: null}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "завершение работы": {error: null},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "данные от пользователя",
-      to: [
-        {state: "генерация правил", when: {error: null}},
-        {state: "отмена пользователем", when: {cancel: true}},
-      ],
+      to: {
+        "генерация правил": {error: null},
+        "отмена пользователем": {cancel: true}
+      },
     },
     {
       from: "отмена пользователем",
       action: () => {
         console.log(chalk.red("Отмена выполнения create-rules пользователем."))
       },
-      to: [{state: "завершение работы", when: {cancel: true}}],
+      to: {"завершение работы": {cancel: true}},
     },
     {
       from: "завершение работы",
@@ -248,7 +248,7 @@ MetaFor("rules", {
         // core.destroy()
         process.exit(0)
       },
-      to: [],
+      to: {},
     },
   ])
   // .view({

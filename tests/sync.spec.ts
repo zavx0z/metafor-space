@@ -27,25 +27,25 @@ describe("Синхронизация core и context", async () => {
     .transitions("IDLE", [
       {
         in: "IDLE",
-        to: [
-          {state: "push", when: {process: "push"}},
-          {state: "pop", when: {process: "pop"}}
-        ]
+        to: {
+          "push": {process: "push"},
+          "pop": {process: "pop"}
+        }
       },
       {
         in: "push",
         action: ({core}) => {
           core.pushData()
         },
-        to: [
-          {state: "IDLE", when: {process: null}},
-          {state: "pop", when: {process: "pop"}}
-        ]
+        to: {
+          "IDLE": {process: null},
+          "pop": {process: "pop"}
+        }
       },
       {
         in: "pop",
         action: ({core}) => core.popData(),
-        to: [{state: "IDLE", when: {process: null}}]
+        to: {"IDLE": {process: null}}
       }
     ])
     .view({})

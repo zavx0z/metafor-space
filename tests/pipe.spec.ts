@@ -17,12 +17,12 @@ describe("Пайплайн", () => {
       {
         in: "IDLE",
         action: () => ({username: "user123", progress: 20}),
-        to: [{state: "ACTIVE", when: {username: {include: "user"}, progress: {gt: 0, lt: 50}}}],
+        to: {"ACTIVE": {username: {include: "user"}, progress: {gt: 0, lt: 50}}},
       },
       {
         in: "ACTIVE",
         action: () => ({progress: 101}),
-        to: [{state: "COMPLETE", when: {progress: {gt: 100}}}],
+        to: {"COMPLETE": {progress: {gt: 100}}},
       },
     ]).view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>

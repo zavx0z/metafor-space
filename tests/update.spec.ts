@@ -36,26 +36,26 @@ describe("update", async () => {
       {
         in: "INITIAL",
         action: () => ({state: "action"}),
-        to: [{state: "action", when: {state: "action"}}],
+        to: {"action": {state: "action"}},
       },
       {
         in: "action",
         action: () => ({state: "core", field1: "action complex"}),
-        to: [{state: "core", when: {state: "core"}}],
+        to: {"core": {state: "core"}},
       },
       {
         in: "core",
         action: ({core}) => core.coreMethod(),
-        to: [{state: "core complex", when: {field1: "test"}}]
+        to: {"core complex": {field1: "test"}}
       },
       {
         in: "core complex",
         action: ({core}) => core.complexMethod(),
-        to: [{state: "final", when: {field1: "test1", field2: 1}}]
+        to: {"final": {field1: "test1", field2: 1}}
       },
       {
         in: "final",
-        to: [{state: "reaction", when: {state: "reaction"}}]
+        to: {"reaction": {state: "reaction"}}
       }
     ])
     .view({})
