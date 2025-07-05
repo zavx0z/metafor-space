@@ -54,11 +54,12 @@
     "typescript": "^5.8.2"
   },
   "scripts": {
+    "run": "bun index.server.ts",
+    "build": "bun index.build.ts",
     "publish-pkg": "bun run ./scripts/updateVersion.ts ./ && bun publish",
     "docs": "bunx typedoc",
     "rules": "bunx rimraf typedoc-rules && bunx typedoc --options ./rules.jsonc && bunx concat-md --hide-anchor-links typedoc-rules > rule.mdc && bunx rimraf typedoc-rules",
     "test": "bun test",
-    "build": "bun index.build.ts",
     "TEST:METAFOR-------------": "bun test ./tests/*",
     "test:MetaFor[watch]": "bun test tests --watch",
     "test:lifecycle": "bun test tests/lifecycle",

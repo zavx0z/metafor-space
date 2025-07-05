@@ -18,8 +18,8 @@ export function createConditionPorts(sockets, stateName, config) {
     .map(([keySocket, socket]) => ({
       id: keySocket,
       layoutOptions: socket.direction === 'west' ? config.port.west : config.port.east,
-      width: socket.size / 2,
-      height: socket.size / 2
+      width: (socket.size ?? 12) / 2,
+      height: (socket.size ?? 12) / 2
     }))
 }
 
@@ -113,12 +113,22 @@ export function createStateGroup(keyState, valState, metrics, config) {
 
 /** @type {import("./graph-layout.t.js").createElkData} */
 export function createElkData(metaId, metrics, config) {
+  // Получаем уникальные состояния из transitions (conditions)
+  const statesInTransitions = new Set()
+  Object.values(metrics.conditions).forEach(condition => {
+    statesInTransitions.add(condition.from)
+    statesInTransitions.add(condition.to)
+  })
+  
+  // Создаем группы только для состояний, участвующих в transitions
+  const stateGroups = Object.entries(metrics.states)
+    .filter(([keyState, valState]) => statesInTransitions.has(valState.state))
+    .map(([keyState, valState]) => createStateGroup(keyState, valState, metrics, config))
+  
   return {
     id: metaId,
     layoutOptions: config.base,
-    children: Object.entries(metrics.states).map(([keyState, valState]) =>
-      createStateGroup(keyState, valState, metrics, config)
-    ),
+    children: stateGroups,
     edges: createExternalEdges(metrics.sockets)
   }
 }

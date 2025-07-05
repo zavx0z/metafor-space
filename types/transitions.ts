@@ -106,7 +106,7 @@ export type Transition<S extends string, C extends ContextDefinition, I extends 
    Набор целевых состояний, в которые возможен переход из состояния, указанного в `from`.
    Каждое целевое состояние сопровождается набором условий, при которых переход возможен.
    */
-  to: To<S, C>
+  to: Partial<Record<S, When<C>>>
 }
 
 /** # Целевые состояния в переходе
@@ -115,7 +115,7 @@ export type Transition<S extends string, C extends ContextDefinition, I extends 
  @template S - Тип состояния
  @template C - Тип данных контекста
  */
-type To<S extends string, C extends ContextDefinition> = Partial<Record<S, When<C>>>
+type To<S extends string, C extends ContextDefinition> = { [K in S]?: When<C> }
 
 /** # Условия сравнения для перехода
 

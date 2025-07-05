@@ -4,11 +4,11 @@ await import ("./graph/graph-nodes.js")
 
 export default MetaFor("roadmap", {description: "MetaFor roadmap", development: false})
   .context((t) => ({
-    status: t.enum("start", "end")({title: "Статус", default: "end"}),
+    status: t.enum("start", "process", "end")({title: "Статус", default: "end"}),
     error: t.string({title: "Ошибка", nullable: true})
   }))
   .core()
-  .reactions([])
+  .reactions({})
   .states("конец", "в процессе", "начало")
   .transitions("начало", [
     {
@@ -20,11 +20,14 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
       }),
       to: {
         "конец": {status: "end"},
+        "в процессе": {status: "process"}
       },
     },
     {
       in: "конец",
-      to: {"начало": {status: "start"}},
+      to: {
+        "начало": {status: "start"}
+      },
     }
   ])
   .view({

@@ -109,6 +109,8 @@ function createMeta(
     reactions = {},
     view
   }) {
+  /** @type {S[]} */
+  const typedStates = states
   development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
   let idx = 0
 
@@ -405,22 +407,21 @@ function createMeta(
         const transitionFrom = transitions.find((t) => t.in === this.state)
         if (transitionFrom) {
           for (const [targetState, when] of Object.entries(transitionFrom.to)) {
-            /** @type {S} */
             const typedTargetState = targetState
             if (Object.keys(when).length === 0) break
-                          if (conditions(when, this.context, contextDefinition)) {
+            if (conditions(when, this.context, contextDefinition)) {
                 const actionDefinition = transitions.find((i) => i.in === typedTargetState && i.action)
-                if (actionDefinition?.action) {
-                  this.process = true
+              if (actionDefinition?.action) {
+                this.process = true
                   this.#state.setValue(typedTargetState)
-                  if (view.render) this.#updateView()
-                  this.#runTransitionAction(actionDefinition)
-                } else {
+                if (view.render) this.#updateView()
+                this.#runTransitionAction(actionDefinition)
+              } else {
                   this.#state.setValue(typedTargetState)
-                  if (view.render) this.#updateView()
-                }
-                break // Важно! Выходим после первого успешного перехода
+                if (view.render) this.#updateView()
               }
+              break // Важно! Выходим после первого успешного перехода
+            }
           }
         }
       }

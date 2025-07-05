@@ -188,10 +188,10 @@ export default MetaFor("graph-layout", {development: true})
     {
       in: "форматирование данных",
       action({core, context}) {
-        const dataMeta = core.meta.get(context.current)
-        if (!dataMeta) return
-        core.data = createElkData(context.current, dataMeta, core.config)
-        console.log(core.data)
+        const metrics = core.meta.get(context.current)
+        if (!metrics) return
+        console.log(metrics)
+        core.data = createElkData(context.current, metrics, core.config)
         return {current: null}
       },
       to: {"вычисление": {current: {isNull: true}}}
@@ -200,7 +200,6 @@ export default MetaFor("graph-layout", {development: true})
       in: "вычисление",
       action: async ({core}) => {
         if (core.data){
-          console.log(core.data)
           const layout = await core.elk.layout(core.data)
           sessionStorage.setItem(core.data.id, JSON.stringify(layout))
         } else throw new Error("Отсутствуют данные для layout")
