@@ -404,12 +404,7 @@ function createMeta(
       #transition = () => {
         const transitionFrom = transitions.find((t) => t.in === this.state)
         if (transitionFrom) {
-          // Поддержка обоих форматов: старого (массив) и нового (объект)
-          const toEntries = Array.isArray(transitionFrom.to) 
-            ? transitionFrom.to.map(t => [t.state, t.when])
-            : Object.entries(transitionFrom.to)
-            
-          for (const [targetState, when] of toEntries) {
+          for (const [targetState, when] of Object.entries(transitionFrom.to)) {
             if (Object.keys(when).length === 0) break
             if (conditions(when, this.context, contextDefinition)) {
               const actionDefinition = transitions.find((i) => i.in === targetState && i.action)
@@ -444,7 +439,7 @@ function createMeta(
           types: contextDefinition,
           transitions: transitions.map((t) => ({
             in: t.in,
-            to: Array.isArray(t.to) ? t.to : Object.entries(t.to).map(([state, when]) => ({
+            to: Object.entries(t.to).map(([state, when]) => ({
               state,
               when,
             })),

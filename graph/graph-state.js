@@ -42,7 +42,7 @@ export default MetaFor("graph-state", {development: true})
   .transitions('рендер', [
     {
       in: "рендер",
-      to: [{state: "перемещение", when: {x: {isNull: false}, y: {isNull: false}}}]
+      to: {"перемещение": {x: {isNull: false}, y: {isNull: false}}}
     },
     {
       in: "перемещение",
@@ -50,7 +50,7 @@ export default MetaFor("graph-state", {development: true})
         // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
-      to: []
+      to: {}
     },
   ])
   .view({

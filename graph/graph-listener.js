@@ -37,7 +37,7 @@ export default MetaFor("graph-listener", {
   .transitions("ожидание патча", [
     {
       in: "ожидание патча",
-      to: [{state: "добавление актора", when: {op: "add"}}],
+      to: {"добавление актора": {op: "add"}}
     },
     {
       in: "добавление актора",

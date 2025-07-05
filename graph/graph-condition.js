@@ -51,7 +51,7 @@ export default MetaFor("graph-condition", {development: true})
   .transitions('рендер', [
     {
       in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
+      to: {"измерение": {error: null}}
     },
     {
       in: "измерение",
@@ -61,14 +61,14 @@ export default MetaFor("graph-condition", {development: true})
           resolve({width: Math.round(width), height: Math.round(height)})
         })
       }),
-      to: [{state: "позиционирование", when: {x: {isNull: false}, y: {isNull: false}}}]
+      to: {"позиционирование": {x: {isNull: false}, y: {isNull: false}}}
     },
     {
       in: "позиционирование",
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
-      to: []
+      to: {}
     },
   ])
   .view({

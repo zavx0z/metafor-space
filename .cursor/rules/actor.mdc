@@ -381,7 +381,7 @@ states("idle", "working", "done", "emergency")
 transitions("idle", [
   {
     in: "idle",
-    to: [{state: "working", when: {data: {isEmpty: false}}}]
+    to: {"working": {data: {isEmpty: false}}}
   },
   {
     in: "working",
@@ -390,10 +390,10 @@ transitions("idle", [
       const result = await processData(context.data)
       return {result, active: false} // Автоматически обновит контекст
     },
-    to: [
-      {state: "done", when: {active: false}},
-      {state: "emergency", when: {error: {isNull: false}}}
-    ]
+    to: {
+      "done": {active: false},
+      "emergency": {error: {isNull: false}}
+    }
   },
   {
     in: "working",
@@ -404,10 +404,10 @@ transitions("idle", [
       }
       return {status: "processed"}
     },
-    to: [
-      {state: "done", when: {status: "processed"}},
-      {state: "error", when: {error: {isNull: false}}}
-    ]
+    to: {
+      "done": {status: "processed"},
+      "error": {error: {isNull: false}}
+    }
   },
   {
     in: "working",
@@ -421,10 +421,10 @@ transitions("idle", [
       // Обрабатываем ошибку API
       update({error: `API Error: ${data.message}`})
     },
-    to: [
-      {state: "done", when: {items: {length: {min: 1}}}},
-      {state: "error", when: {error: {isNull: false}}}
-    ]
+    to: {
+      "done": {items: {length: {min: 1}}},
+      "error": {error: {isNull: false}}
+    }
   }
 ])
 ```
@@ -446,7 +446,7 @@ in:
   }),
     to
 :
-  [{state: "конец", when: {status: "end"}}],
+  {"конец": {status: "end"}},
 }
 ```
 
@@ -468,10 +468,10 @@ in:
   }),
     to
 :
-  [
-    {state: "конец", when: {status: "success"}},
-    {state: "ошибка", when: {error: {isNull: false}}}
-  ],
+  {
+    "конец": {status: "success"},
+    "ошибка": {error: {isNull: false}}
+  },
 }
 ```
 
@@ -505,10 +505,10 @@ in:
   },
     to
 :
-  [
-    {state: "готово", when: {loaded: true}},
-    {state: "ошибка", when: {error: {isNull: false}}}
-  ]
+  {
+    "готово": {loaded: true},
+    "ошибка": {error: {isNull: false}}
+  }
 }
 ```
 
@@ -659,18 +659,18 @@ export default MetaFor("counter")
   .transitions("active", [
     {
       in: "active",
-      to: [
-        {state: "max", when: {value: {gte: 10}}},
-        {state: "min", when: {value: {lte: 0}}},
-      ],
+      to: {
+        "max": {value: {gte: 10}},
+        "min": {value: {lte: 0}}
+      },
     },
     {
       in: "max",
-      to: [{state: "active", when: {value: {lt: 10}}}],
+      to: {"active": {value: {lt: 10}}},
     },
     {
       in: "min",
-      to: [{state: "active", when: {value: {gt: 0}}}],
+      to: {"active": {value: {gt: 0}}},
     },
   ])
 
@@ -724,7 +724,7 @@ export default MetaFor("emergency-button")
   .reactions([])
   .states("ready", "pressed")
   .transitions("ready", [
-    {in: "ready", to: [{state: "pressed", when: {pressed: true}}]}
+    {in: "ready", to: {"pressed": {pressed: true}}}
   ])
   .view({
     render: ({html, core, state}) => html`
@@ -756,7 +756,7 @@ export default MetaFor("system-controller")
   }])
   .states("running", "emergency")
   .transitions("running", [
-    {in: "running", to: [{state: "emergency", when: {mode: "emergency"}}]}
+    {in: "running", to: {"emergency": {mode: "emergency"}}}
   ])
   .view({
     render: ({html, context, state}) => html`
@@ -838,8 +838,8 @@ export default MetaFor("data-processor")
   }])
   .states("idle", "processing")
   .transitions("idle", [
-    {in: "idle", to: [{state: "processing", when: {tasks: {length: {min: 1}}}}]},
-    {in: "processing", to: [{state: "idle", when: {tasks: {isEmpty: true}}}]}
+    {in: "idle", to: {"processing": {tasks: {length: {min: 1}}}}},
+    {in: "processing", to: {"idle": {tasks: {isEmpty: true}}}}
   ])
   .view({
     render: ({html, context, repeat}) => html`
@@ -877,11 +877,11 @@ export default MetaFor("task-worker")
         update({status: "working"})
         return await core.processTask(element.index) // Автоматически обновит контекст
       },
-      to: [{state: "working", when: {status: "working"}}]
+      to: {"working": {status: "working"}}
     },
     {
       in: "working",
-      to: [{state: "completed", when: {status: "completed"}}]
+      to: {"completed": {status: "completed"}}
     }
   ])
   .view({})

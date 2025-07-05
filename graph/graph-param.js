@@ -58,21 +58,21 @@ export default MetaFor("graph-param")
   .transitions('рендер', [
     {
       in: "рендер",
-      to: [{state: "измерение", when: {error: null}}]
+      to: {"измерение": {error: null}}
     },
     {
       in: "измерение",
       action: ({element}) => new Promise((resolve) => {
         requestAnimationFrame(() => {
-          const {width, height, x, y} = element.getBoundingClientRect()
-          resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
+          const {width, height} = element.getBoundingClientRect()
+          resolve({width: Math.round(width), height: Math.round(height)})
         })
       }),
-      to: [{state: "установка положения", when: {x: {isNull: false}, y: {isNull: false}}}]
+      to: {"установка положения": {x: {isNull: false}, y: {isNull: false}}}
     },
     {
       in: "установка положения",
-      to: []
+      to: {}
     },
   ])
   .view({

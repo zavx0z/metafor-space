@@ -15,9 +15,10 @@ export const template = (snapshot, instance) => {
           id: snapshot.id,
           state: i
         }}>
-          ${snapshot.transitions.map((transition) => transition.to
-            .filter(t => t.state === i)
-            .map(condition =>
+          ${snapshot.transitions.map((transition) => {
+            // Находим все переходы в это состояние
+            const transitionsToState = transition.to.filter(t => t.state === i)
+            return transitionsToState.map(condition =>
               Object.entries(condition.when).map(([key, value]) => {
                 let op
                 let val
@@ -65,7 +66,9 @@ export const template = (snapshot, instance) => {
                     </metafor-graph-operator>
                   </metafor-graph-condition>
                 `
-              })))}
+              })
+            )
+          })}
           <metafor-graph-context .core=${{meta: instance}} context=${{
             id: snapshot.id,
             state: i

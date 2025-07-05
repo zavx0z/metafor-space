@@ -40,12 +40,12 @@ export default MetaFor("graph-nodes", {
   .transitions("render", [
     {
       in: "render",
-      to: [{state: "центрирование одной ноды", when: {error: null, queue: {length: 1}}}]
+      to: {"центрирование одной ноды": {error: null, queue: {length: 1}}}
     },
     {
-      in: "центрирование одной ноды",
-      to: [{state: "render", when: {error: {isNull: false}}}]
-    },
+      in: "центрирование одной ноды", 
+      to: {"render": {error: {isNull: false}}}
+    }
   ])
   .view({
     render: ({html}) => html`
