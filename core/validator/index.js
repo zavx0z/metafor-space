@@ -56,14 +56,14 @@ export function validateContextDefinition({ tag, context }) {
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Имя частицы
- @param {Array<import('../../types/transitions').Transition<any, any, any, any>>} params.transitions Массив переходов
+ @param {Array<import('../../types/transitions').Transition<any, any, any, any>>} params.transitions Массив переходов (уже преобразованный из объектного формата)
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTransitions({ tag, transitions, contextDefinition }) {
   if (!Array.isArray(transitions)) {
     sendError({
       id: tag,
-      message: `Transitions должен быть массивом, получено: ${typeof transitions}`,
+      message: `Transitions должен быть массивом (или объектом, который преобразуется в массив), получено: ${typeof transitions}`,
       src: "transitions",
     })
     return

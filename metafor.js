@@ -19,6 +19,33 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
+/**
+ * Преобразование объектного формата переходов в массив для обратной совместимости
+ * @param {Record<string, any>} objectTransitions - Переходы в объектном формате
+ * @returns {Array<any>} Переходы в массиве
+ */
+function convertObjectToArrayFormat(objectTransitions) {
+  const transitionsArray = []
+  
+  for (const [state, config] of Object.entries(objectTransitions)) {
+    if (config && typeof config === 'object') {
+      const transition = {
+        in: state,
+        to: config.to || {}
+      }
+      
+      if (config.action) transition.action = config.action
+      if (config.reaction) transition.reaction = config.reaction
+      if (config.success) transition.success = config.success
+      if (config.error) transition.error = config.error
+      
+      transitionsArray.push(transition)
+    }
+  }
+  
+  return transitionsArray
+}
+
 /** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
   const {development, description} = conf
@@ -59,8 +86,13 @@ export const MetaFor = (tag, conf = {}) => {
                 development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
                 return {
                   transitions(initialState, transitions) {
+                    // Преобразование объектного формата в массив для обратной совместимости
+                    const transitionsArray = Array.isArray(transitions) 
+                      ? transitions 
+                      : convertObjectToArrayFormat(transitions)
+                    
                     if (development) {
-                      const data = {tag, transitions: [...transitions], contextDefinition}
+                      const data = {tag, transitions: transitionsArray, contextDefinition}
                       import("./core/validator/index.js").then((module) => module.validateTransitions(data))
                     }
                     return {
@@ -69,7 +101,7 @@ export const MetaFor = (tag, conf = {}) => {
                         initialState,
                         contextDefinition,
                         view,
-                        transitions,
+                        transitions: transitionsArray,
                         development,
                         description,
                         tag,

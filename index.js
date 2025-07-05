@@ -10,9 +10,8 @@ export default MetaFor("roadmap", {description: "MetaFor RoadMap", development: 
   .core()
   .reactions({})
   .states("конец", "в процессе", "начало")
-  .transitions("начало", [
-    {
-      in: "начало",
+  .transitions("начало", {
+    "начало": {
       action: () => new Promise((resolve) => {
         setTimeout(() => {
           resolve({status: "end"})
@@ -21,21 +20,19 @@ export default MetaFor("roadmap", {description: "MetaFor RoadMap", development: 
       to: {
         "конец": {status: "end"},
         "в процессе": {status: "process"}
-      },
+      }
     },
-    {
-      in: "конец",
+    "конец": {
       to: {
         "начало": {status: "start"}
-      },
+      }
     },
-    // {
-    //   in: "в процессе",
+    // "в процессе": {
     //   to: {
     //     "конец": {status: "end"}
     //   }
     // }
-  ])
+  })
   .view({
     // render: ({html, context}) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`
   })

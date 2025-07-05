@@ -38,20 +38,18 @@ export default MetaFor("graph-state", {development: true})
     }
   })
   .states("рендер", "изменение размера", "перемещение")
-  .transitions('рендер', [
-    {
-      in: "рендер",
+  .transitions('рендер', {
+    "рендер": {
       to: {"перемещение": {x: {isNull: false}, y: {isNull: false}}}
     },
-    {
-      in: "перемещение",
+    "перемещение": {
       action({element, context}) {
         // element.style.cssText = `width: ${context.width}px; height: ${context.height}px;`
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
       to: {}
-    },
-  ])
+    }
+  })
   .view({
     render: ({html}) => html`
       <slot></slot>

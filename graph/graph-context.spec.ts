@@ -16,21 +16,19 @@ describe("graph-context с новым форматом переходов", () =
       .core(() => ({}))
       .reactions([])
       .states("измерение", "позиционирование", "неактивно", "активно")
-      .transitions("измерение", [
-        {
-          in: "измерение",
+      .transitions("измерение", {
+        "измерение": {
           to: {
             "позиционирование": {layout: true}
           }
         },
-        {
-          in: "позиционирование", 
+        "позиционирование": {
           to: {
             "неактивно": {error: null, active: false},
             "активно": {error: null, active: true}
           }
         }
-      ])
+      })
       .view({})
       
     const meta = document.querySelector(`metafor-${tag}`)

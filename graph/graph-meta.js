@@ -36,15 +36,13 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     }
   })
   .states("рендер", "позиционирование")
-  .transitions("рендер", [
-    {
-      in: "рендер",
+  .transitions("рендер", {
+    "рендер": {
       to: {
         "позиционирование": {width: {isNull: false}, height: {isNull: false}}
       }
     },
-    {
-      in: "позиционирование",
+    "позиционирование": {
       action({element, context, core}) {
         const headerBB = /**@type{DOMRect} */ (core.header?.value?.getBoundingClientRect())
         element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
@@ -84,7 +82,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
       },
       to: {}
     }
-  ])
+  })
   .view({
     render: ({html, context, core, ref}) => html`
       <header ${ref(core.header)}>
