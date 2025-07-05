@@ -405,20 +405,22 @@ function createMeta(
         const transitionFrom = transitions.find((t) => t.in === this.state)
         if (transitionFrom) {
           for (const [targetState, when] of Object.entries(transitionFrom.to)) {
+            /** @type {S} */
+            const typedTargetState = targetState
             if (Object.keys(when).length === 0) break
-            if (conditions(when, this.context, contextDefinition)) {
-              const actionDefinition = transitions.find((i) => i.in === targetState && i.action)
-              if (actionDefinition?.action) {
-                this.process = true
-                this.#state.setValue(targetState)
-                if (view.render) this.#updateView()
-                this.#runTransitionAction(actionDefinition)
-              } else {
-                this.#state.setValue(targetState)
-                if (view.render) this.#updateView()
+                          if (conditions(when, this.context, contextDefinition)) {
+                const actionDefinition = transitions.find((i) => i.in === typedTargetState && i.action)
+                if (actionDefinition?.action) {
+                  this.process = true
+                  this.#state.setValue(typedTargetState)
+                  if (view.render) this.#updateView()
+                  this.#runTransitionAction(actionDefinition)
+                } else {
+                  this.#state.setValue(typedTargetState)
+                  if (view.render) this.#updateView()
+                }
+                break // Важно! Выходим после первого успешного перехода
               }
-              break // Важно! Выходим после первого успешного перехода
-            }
           }
         }
       }

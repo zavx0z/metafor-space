@@ -58,7 +58,7 @@
     "docs": "bunx typedoc",
     "rules": "bunx rimraf typedoc-rules && bunx typedoc --options ./rules.jsonc && bunx concat-md --hide-anchor-links typedoc-rules > rule.mdc && bunx rimraf typedoc-rules",
     "test": "bun test",
-    "METAFOR": "bun index.build.ts",
+    "build": "bun index.build.ts",
     "TEST:METAFOR-------------": "bun test ./tests/*",
     "test:MetaFor[watch]": "bun test tests --watch",
     "test:lifecycle": "bun test tests/lifecycle",

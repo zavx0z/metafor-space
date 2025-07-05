@@ -138,7 +138,7 @@ export default MetaFor("graph-context", {
         -o-backdrop-filter: var(--backdrop-filter-blur);
         -ms-backdrop-filter: var(--backdrop-filter-blur);
 
-        --background-color: rgba(var(--surface-700) / var(--background-alpha));
+        --background-color: rgba(var(--surface-700)/.9);
 
         position: fixed;
         display: flex;
@@ -182,7 +182,7 @@ export default MetaFor("graph-context", {
 
         & header {
           padding: 8px 24px;
-          background-color: rgba(var(--surface-500) / var(--background-alpha));
+          background-color: rgba(var(--surface-500) / .9);
           border-radius: var(--node-border-radius);
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;

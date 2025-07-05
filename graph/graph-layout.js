@@ -198,11 +198,11 @@ export default MetaFor("graph-layout", {development: true})
     },
     {
       in: "вычисление",
-      action: async ({core, context}) => {
+      action: async ({core}) => {
         if (core.data){
           console.log(core.data)
           const layout = await core.elk.layout(core.data)
-          sessionStorage.setItem(context.current, JSON.stringify(layout))
+          sessionStorage.setItem(core.data.id, JSON.stringify(layout))
         } else throw new Error("Отсутствуют данные для layout")
       },
       to: {"ожидание": {current: null}}

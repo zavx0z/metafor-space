@@ -1,4 +1,5 @@
 import {MetaFor} from "./metafor.js"
+
 await import ("./graph/graph-nodes.js")
 
 export default MetaFor("roadmap", {description: "MetaFor roadmap", development: false})
@@ -8,7 +9,7 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
   }))
   .core()
   .reactions([])
-  .states("конец", "начало")
+  .states("конец", "в процессе", "начало")
   .transitions("начало", [
     {
       in: "начало",
@@ -17,7 +18,9 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
           resolve({status: "end"})
         }, 6000)
       }),
-      to: {"конец": {status: "end"}},
+      to: {
+        "конец": {status: "end"},
+      },
     },
     {
       in: "конец",
