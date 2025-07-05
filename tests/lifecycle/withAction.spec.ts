@@ -28,7 +28,7 @@ describe("MetaFor: инициализация с действиями", async ()
           await Bun.sleep(100)
           return nextContext // Автоматически обновит контекст
         },
-        to: [{state: "NEXT", when: {value: nextContext.value}}],
+        to: {"NEXT": {value: nextContext.value}},
       },
       {
         in: "NEXT",
@@ -36,7 +36,7 @@ describe("MetaFor: инициализация с действиями", async ()
           await Bun.sleep(100)
           return otherContext // Автоматически обновит контекст
         },
-        to: [{state: "OTHER", when: {value: otherContext.value}}]
+        to: {"OTHER": {value: otherContext.value}}
       }
     ])
     .view({})
