@@ -25,6 +25,8 @@ export default MetaFor("input-string")
       :host {
         display: flex;
         align-items: center;
+        min-height: 32px;
+        width: 100%;
       }
 
       span {
@@ -42,6 +44,8 @@ export default MetaFor("input-string")
         padding: 4px 8px;
         outline: none;
         min-width: 40px;
+        flex-grow: 1;
+        text-align: right;
       }
     `
   }) 

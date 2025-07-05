@@ -28,6 +28,8 @@ export default MetaFor("input-number")
       :host {
         display: flex;
         align-items: center;
+        min-height: 32px;
+        width: 100%;
       }
 
       span {
@@ -46,6 +48,7 @@ export default MetaFor("input-number")
         outline: none;
         min-width: 40px;
         text-align: right;
+        width: 100%;
       }
 
       /* Убираем стрелочки для Chrome, Safari, Edge */

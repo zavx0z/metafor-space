@@ -29,7 +29,9 @@ export default MetaFor("input-boolean")
         display: flex;
         align-items: center;
         min-width: 222px;
+        min-height: 32px;
         justify-content: space-between;
+        width: 100%;
       }
 
       .param-title {

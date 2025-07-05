@@ -42,6 +42,7 @@ export default MetaFor("input-enum")
         align-items: center;
         white-space: nowrap;
         width: 100%;
+        min-height: 32px;
       }
 
       span {

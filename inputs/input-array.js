@@ -68,6 +68,8 @@ export default MetaFor("input-array")
       :host {
         display: flex;
         align-items: center;
+        min-height: 32px;
+        width: 100%;
 
         & > div {
           display: flex;
@@ -97,7 +99,6 @@ export default MetaFor("input-array")
               border-radius: 14px;
               padding: 2px 6px 2px 8px;
               font-size: 13px;
-              alignment-baseline: center;
               margin: 0 2px;
               box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
               user-select: none;
@@ -148,6 +149,11 @@ export default MetaFor("input-array")
         border-radius: 50%;
         width: 22px;
         height: 22px;
+        padding: 0;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         margin-left: 2px;
         cursor: pointer;
         transition: background 0.2s;
