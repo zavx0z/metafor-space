@@ -28,9 +28,8 @@ export default MetaFor("graph-context", {
     /**@type{MetaAny|null}*/
     meta: null,
   }))
-  .reactions([
-    {
-      title: "вычисленное положение",
+  .reactions({
+    "вычисленное положение": {
       filter: ({meta, patch}) => meta.tag === "graph-layout" && patch.path === "/state" && patch.value === "ожидание",
       action({id, context, update}) {
         const data = sessionStorage.getItem(context.id)
@@ -53,28 +52,27 @@ export default MetaFor("graph-context", {
           return
         }
         update({x: layoutContext.x, y: layoutContext.y, layout: true})
-      },
+      }
     },
-    {
-      title: "активность состояния",
+    "активность состояния": {
       filter: ({meta, patch, context}) => context.id === `${meta.tag}/${meta.index}` && patch.path === "/state",
       action: ({update, patch, context}) => {
         if (patch.value === context.state) update({process: patch.op === "add", active: true})
         else update({process: false, active: false})
-      },
-    },
-  ])
+      }
+    }
+  })
   .states("рендер", "измерение", "позиционирование", "неактивно", "активно", "в процессе")
   .transitions("измерение", [
     {
       in: "измерение",
-      action: ({element}) =>
-        new Promise((resolve) => {
-          requestAnimationFrame(() => {
-            const {width, height, x, y} = element.getBoundingClientRect()
-            resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
-          })
-        }),
+      action: ({element}) => new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          const {width, height, x, y} = element.getBoundingClientRect()
+          resolve({width: Math.round(width), height: Math.round(height), x: Math.round(x), y: Math.round(y)})
+        })
+      }),
+      reaction: ["вычисленное положение"],
       to: [{state: "позиционирование", when: {layout: true}}],
     },
     {
@@ -107,7 +105,7 @@ export default MetaFor("graph-context", {
     },
   ])
   .view({
-    onMount({component, core, update, context}) {
+    onMount({core, update, context}) {
       if (core.meta) {
         update({active: context.state === core.meta.state})
         core.meta.onUpdate((i) => {

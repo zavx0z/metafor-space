@@ -16,9 +16,8 @@ export default MetaFor("graph-condition", {development: true})
     y: t.number({nullable: true}),
   }))
   .core()
-  .reactions([
-    {
-      title: "вычисленное положение",
+  .reactions({
+    "вычисленное положение": {
       filter: ({meta, patch}) => meta.tag === "graph-layout"
         && patch.path === "/state"
         && patch.value === "ожидание"
@@ -46,7 +45,7 @@ export default MetaFor("graph-condition", {development: true})
         update({x: layoutCondition.x, y: layoutCondition.y})
       }
     }
-  ])
+  })
   .states("рендер", "измерение", "позиционирование")
   .transitions('рендер', [
     {

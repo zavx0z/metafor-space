@@ -22,15 +22,14 @@ describe("update", async () => {
         update({field1: "test1", field2: 1})
       },
     }))
-    .reactions([
-      {
-        title: "",
+    .reactions({
+      "": {
         filter: ({patch}) => patch.op === "add",
         action: ({update}) => {
           update({state: "reaction"})
         }
       }
-    ])
+    })
     .states("INITIAL", "action", "core", "core complex", "final", "reaction")
     .transitions("INITIAL", [
       {

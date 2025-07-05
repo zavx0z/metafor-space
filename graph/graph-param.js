@@ -41,9 +41,8 @@ export default MetaFor("graph-param")
       meta: null
     }
   })
-  .reactions([
-    {
-      title: "изменение значений",
+  .reactions({
+    "изменение значений": {
       filter: ({meta, patch}) =>
         meta.tag.includes("input-")
         && patch.path === "/context"
@@ -53,7 +52,7 @@ export default MetaFor("graph-param")
         core.meta.update({[context.param]: patch.value.value})
       }
     }
-  ])
+  })
   .states("рендер", "измерение", "установка положения")
   .transitions('рендер', [
     {

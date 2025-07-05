@@ -106,7 +106,7 @@ function createMeta(
     contextDefinition,
     transitions,
     coreDefinition,
-    reactions = [],
+    reactions = {},
     view
   }) {
   development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
@@ -230,7 +230,7 @@ function createMeta(
         if (!this.index) this.index = idx += 1
 
         this.#channel = new BroadcastChannel('channel')
-        if (reactions.length) {
+        if (Object.keys(reactions).length) {
           this.#channel.onmessage = ({data}) => this.#reactionCb(data)
           this.addEventListener("channel", this.#reactionCustomEventCb)
         }
@@ -489,7 +489,7 @@ function createMeta(
        * @param {import("./metafor").BroadcastMessage} message
        * @param {Event} [ev]
        */
-      #reactionCb = ({meta, patch}, ev) => reactions.forEach((reaction) => {
+      #reactionCb = ({meta, patch}, ev) => Object.values(reactions).forEach((reaction) => {
           if (reaction.filter({meta, patch, context: this.context})) {
             reaction.action({
               id: this.id,

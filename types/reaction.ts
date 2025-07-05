@@ -36,26 +36,22 @@ type ReactionFilterParam<C extends ContextDefinition> = {
  @template C - Тип контекста актора
  @template I - Тип ядра актора
 
- @property title - Название реакции для отладки
  @property block - Блокировать ли дальнейшее распространение события
  @property filter - Функция фильтрации сообщений
  @property action - Функция, выполняемая при срабатывании фильтра
  */
 export type Reaction<C extends ContextDefinition, I extends CoreObj> = {
-  title: string
   block?: boolean
-  // path?: string
-  // op?: "add" | "remove" | "update"
   filter: ({context, patch, meta}: ReactionFilterParam<C>) => boolean
   action: ({id, patch, context, update, core}: ReactionActionParam<C, I>) => void
 }
 
-// & Partial<MetaDataMessage>
-
 /** # Реакции
 
- Массив реакций актора на изменения в других акторах системы.
+ Объект реакций актора на изменения в других акторах системы.
 
+  Ключ — название реакции (строка, для отладки и читаемости).
+ Значение — объект с фильтром и действием.
  Каждая реакция содержит фильтр для определения релевантных сообщений и действие для их обработки.
  Фильтрация может происходить по любым полям сообщения:
  - meta.tag - тип актора-источника
@@ -69,4 +65,6 @@ export type Reaction<C extends ContextDefinition, I extends CoreObj> = {
  @template C - Тип контекста актора
  @template I - Тип ядра актора
  */
-export type Reactions<C extends ContextDefinition, I extends CoreObj> = Array<Reaction<C, I>>
+export type Reactions<C extends ContextDefinition, I extends CoreObj> = {
+  [title: string]: Reaction<C, I>
+}

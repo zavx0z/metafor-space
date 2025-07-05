@@ -14,15 +14,14 @@ describe("MetaFor: патчи /context между акторами", () => {
     MetaFor('test-parent-23982012', {development: true})
       .context(t => ({value: t.string(), count: t.number({default: 0})}))
       .core()
-      .reactions([
-        {
-          title: "Ловим патчи от ребёнка",
+      .reactions({
+        "Ловим патчи от ребёнка": {
           filter: ({meta, patch}) => meta.tag === 'test-child-23982012' && patch.path === "/context",
           action: ({context, update, patch}) => {
             update({count: context.count + 1, value: patch.value.value})
           }
         }
-      ])
+      })
       .states("init")
       .transitions("init", [])
       .view({
@@ -33,15 +32,14 @@ describe("MetaFor: патчи /context между акторами", () => {
     MetaFor('test-child-23982012', {development: true})
       .context(t => ({value: t.string()}))
       .core()
-      .reactions([
-        {
-          title: "Ловим патчи от родителя",
+      .reactions({
+        "Ловим патчи от родителя": {
           filter: ({meta, patch}) => meta.tag === 'test-parent-23982012' && patch.path === "/context",
           action: ({update, patch}) => {
             update({value: patch.value.value})
           }
         }
-      ])
+      })
       .states("init")
       .transitions("init", [])
       .view({
@@ -52,15 +50,14 @@ describe("MetaFor: патчи /context между акторами", () => {
     MetaFor('test-sibling-23982012', {development: true})
       .context(t => ({value: t.string(), got: t.boolean({default: false})}))
       .core()
-      .reactions([
-        {
-          title: "Сосед ловит патчи от другого соседа",
+      .reactions({
+        "Сосед ловит патчи от другого соседа": {
           filter: ({meta, patch}) => meta.tag === 'test-sibling-23982012' && patch.path === "/context",
           action: ({update}) => {
             update({got: true})
           }
         }
-      ])
+      })
       .states("init")
       .transitions("init", [])
       .view({})
@@ -129,23 +126,21 @@ describe("MetaFor: блокировка всплытия между двумя �
     MetaFor("block-parent", {development: true})
       .context(t => ({}))
       .core()
-      .reactions([
-        {
-          title: "Блокирующая реакция",
+      .reactions({
+        "Блокирующая реакция": {
           filter: ({patch}) => patch.path === "/context" && patch.value?.value === "block",
           block: true,
           action: () => {
             console.log("block action")
           }
         },
-        {
-          title: "Обычная реакция",
+        "Обычная реакция": {
           filter: ({patch}) => patch.path === "/context" && patch.value?.value === "child",
           action: () => {
             console.log("child action");
           }
         }
-      ])
+      })
       .states("init")
       .transitions("init", [])
       .view({})

@@ -16,9 +16,8 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
     /**@type{import('./graph-meta.t').Edge[]} */
     edges: []
   }))
-  .reactions([
-    {
-      title: "вычисленное положение",
+  .reactions({
+    "вычисленное положение": {
       filter: ({meta, patch}) => meta.tag === "graph-layout"
         && patch.path === "/state"
         && patch.value === "ожидание"
@@ -35,7 +34,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         update({width: layout.width, height: layout.height})
       }
     }
-  ])
+  })
   .states("рендер", "позиционирование")
   .transitions("рендер", [
     {
