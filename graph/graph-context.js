@@ -63,9 +63,8 @@ export default MetaFor("graph-context", {
     }
   })
   .states("рендер", "измерение", "позиционирование", "неактивно", "активно", "в процессе")
-  .transitions("измерение", [
-    {
-      in: "измерение",
+  .transitions("измерение", {
+    "измерение": {
       action: ({element}) =>
         new Promise((resolve) => {
           requestAnimationFrame(() => {
@@ -75,39 +74,35 @@ export default MetaFor("graph-context", {
         }),
       to: {
         "позиционирование": {layout: true}
-      },
+      }
     },
-    {
-      in: "позиционирование",
+    "позиционирование": {
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
       to: {
         "неактивно": {error: null, active: false},
         "активно": {error: null, active: true}
-      },
+      }
     },
-    {
-      in: "в процессе",
+    "в процессе": {
       to: {
         "неактивно": {error: null, active: false, process: false},
         "активно": {error: null, active: true, process: false}
-      },
+      }
     },
-    {
-      in: "активно",
+    "активно": {
       to: {
         "неактивно": {error: null, active: false}
-      },
+      }
     },
-    {
-      in: "неактивно",
+    "неактивно": {
       to: {
         "активно": {error: null, active: true, process: false},
         "в процессе": {error: null, active: true, process: true}
-      },
-    },
-  ])
+      }
+    }
+  })
   .view({
     onMount({core, update, context}) {
       if (core.meta) {

@@ -10,14 +10,13 @@ describe("null условие перехода", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {
             "ДОБАВИТЬ": {size: null}
           }
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
     meta.update({size: null})
@@ -31,12 +30,11 @@ describe("null условие перехода", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: null}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
     meta.update({size: null})
@@ -53,16 +51,15 @@ describe("null условие перехода", () => {
         active: t.boolean({nullable: false, default: false}),
         status: t.enum("active", "inactive")({nullable: false, default: "active"}),
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "число", "строка", "булево").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "число", "строка", "булево").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {
             "число": {size: null},
             "строка": {name: null},
             "булево": {active: null}
           }
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -85,11 +82,11 @@ describe("null условие перехода", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({name: t.string({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ", to: {"ДОБАВИТЬ": {name: null}}
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
+          to: {"ДОБАВИТЬ": {name: null}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -102,12 +99,11 @@ describe("null условие перехода", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({active: t.boolean({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {active: null}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -121,12 +117,11 @@ describe("null условие перехода", () => {
     const Meta = MetaFor(tag)
       .context((t) => ({
         status: t.enum("active", "inactive")({nullable: true})
-      })).core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      })).core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {status: null}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -141,12 +136,11 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({size: t.number({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -161,12 +155,11 @@ describe("isNull триггер", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: null})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
-          to: {"ДОБАВИТЬ": {size: {isNull: false}}},
-        },
-      ])
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
+          to: {"ДОБАВИТЬ": {size: {isNull: false}}}
+        }
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -178,12 +171,11 @@ describe("isNull триггер", () => {
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     const Meta = MetaFor(tag)
       .context((t) => ({size: t.number({nullable: true})}))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -198,12 +190,11 @@ describe("isNull триггер", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 0})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
-          to: {"ДОБАВИТЬ": {size: {isNull: true}}},
-        },
-      ])
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
+          to: {"ДОБАВИТЬ": {size: {isNull: true}}}
+        }
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -218,12 +209,11 @@ describe("isNull триггер", () => {
         size: t.number({nullable: true, default: null}),
         active: t.boolean({default: false})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}, active: true}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -239,12 +229,11 @@ describe("isNull триггер", () => {
         size: t.number({nullable: true, default: null}),
         active: t.boolean({default: false})
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: false, gt: 5}, active: true}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -259,12 +248,11 @@ describe("isNull триггер", () => {
       .context((t) => ({
         size: t.number({nullable: true, default: 10}) // Начинаем с не-null значения
       }))
-      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", [
-        {
-          in: "ОЖИДАНИЕ",
+      .core().reactions([]).states("ОЖИДАНИЕ", "ДОБАВИТЬ").transitions("ОЖИДАНИЕ", {
+        "ОЖИДАНИЕ": {
           to: {"ДОБАВИТЬ": {size: {isNull: true}}}
         }
-      ])
+      })
       .view({})
     const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

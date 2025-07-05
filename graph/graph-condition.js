@@ -47,13 +47,11 @@ export default MetaFor("graph-condition", {development: true})
     }
   })
   .states("рендер", "измерение", "позиционирование")
-  .transitions('рендер', [
-    {
-      in: "рендер",
+  .transitions('рендер', {
+    "рендер": {
       to: {"измерение": {error: null}}
     },
-    {
-      in: "измерение",
+    "измерение": {
       action: ({element}) => new Promise((resolve) => {
         requestAnimationFrame(() => {
           const {width, height} = element.getBoundingClientRect()
@@ -62,14 +60,13 @@ export default MetaFor("graph-condition", {development: true})
       }),
       to: {"позиционирование": {x: {isNull: false}, y: {isNull: false}}}
     },
-    {
-      in: "позиционирование",
+    "позиционирование": {
       action({element, context}) {
         element.style.transform = `translate(${context.x}px, ${context.y}px)`
       },
       to: {}
-    },
-  ])
+    }
+  })
   .view({
     render: ({html, context}) => html`
       <metafor-graph-socket

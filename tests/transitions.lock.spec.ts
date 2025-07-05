@@ -15,16 +15,14 @@ test("Блокировка переходов перед входом в нов�
     }))
     .reactions([])
     .states("INIT", "PROCESS", "DONE")
-    .transitions("INIT", [
-      {
-        in: "INIT",
+    .transitions("INIT", {
+      "INIT": {
         action: () => {
           return {value: 11} // Автоматически обновит контекст
         },
-        to: {"PROCESS": {value: {gt: 10}}},
+        to: {"PROCESS": {value: {gt: 10}}}
       },
-      {
-        in: "PROCESS",
+      "PROCESS": {
         action: ({core, context}) => {
           core.update({value: 1})
           value = context.value
@@ -37,9 +35,9 @@ test("Блокировка переходов перед входом в нов�
         to: {
           "DONE": {value: {gt: 14}},
           "INIT": {value: {lt: 4}}
-        },
-      },
-    ])
+        }
+      }
+    })
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as any
   await Bun.sleep(500)
@@ -57,16 +55,15 @@ test("Блокировка переходов для асинхронного д
     .core()
     .reactions([])
     .states("INIT", "PROCESS", "DONE")
-    .transitions("INIT", [
-      {
-        in: "INIT",
+    .transitions("INIT", {
+      "INIT": {
         action: async () => {
           await new Promise((resolve) => setTimeout(resolve, 10))
           return {value: 15} // Автоматически обновит контекст
         },
-        to: {"DONE": {value: {gt: 10}}},
-      },
-    ])
+        to: {"DONE": {value: {gt: 10}}}
+      }
+    })
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 
@@ -84,16 +81,15 @@ test("Снятие блокировки после действия", async () =
     .core()
     .reactions([])
     .states("INIT", "DONE")
-    .transitions("INIT", [
-      {
-        in: "INIT",
+    .transitions("INIT", {
+      "INIT": {
         action: async () => {
           await new Promise((resolve) => setTimeout(resolve, 50))
           return {value: 15} // Автоматически обновит контекст
         },
-        to: {"DONE": {value: {gt: 10}}},
-      },
-    ])
+        to: {"DONE": {value: {gt: 10}}}
+      }
+    })
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
 

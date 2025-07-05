@@ -40,19 +40,99 @@ import type {ReactionKeys} from "./reaction.ts"
  2. **Приоритетность**: Переходы проверяются в порядке их определения, срабатывает первый подходящий.
  3. **Валидация**: Система выполняет проверку типов данных и соответствия условиям триггеров при обработке во время работы приложения. Это обеспечивает корректность данных в момент их фактического использования.
 
+ ## Новый объектный формат
+
+ Переходы теперь объявляются как объект, где ключи - это состояния, а значения - конфигурация переходов для каждого состояния:
+
+ ```javascript
+ .transitions("начальное", {
+   "состояние1": {
+     action: async ({context, update}) => {
+       // действие при входе в состояние
+       return {newValue: "результат"}
+     },
+     to: {
+       "состояние2": {условия: "перехода"},
+       "состояние3": {другие: "условия"}
+     }
+   },
+   "состояние2": {
+     to: {
+       "состояние1": {обратные: "условия"}
+     }
+   }
+ })
+ ```
+
  @template C - Проброс определения контекста для автодополнения
  @template S - Проброс состояний для автодополнения
  @template I - Проброс ядра для автодополнения
  @template R - Проброс реакций для автодополнения ключей
  @includeExample tests/core.spec.ts
  */
-export type Transitions<S extends string, C extends ContextDefinition, I extends CoreObj, R extends Record<string, any> = {}> = Array<Transition<S, C, I, R>>
+export type Transitions<S extends string, C extends ContextDefinition, I extends CoreObj, R extends Record<string, any> = {}> = Partial<Record<S, TransitionDefinition<S, C, I, R>>>
 
-/** # Переход.
+/** # Определение перехода для состояния
+
+ Конфигурация переходов для конкретного состояния.
+ Содержит действие при входе в состояние и возможные переходы в другие состояния.
+
+ @template S - Тип состояния
+ @template C - Тип данных контекста
+ @template I - Тип ядра
+ @template R - Тип реакций для автодополнения ключей
+ */
+export type TransitionDefinition<S extends string, C extends ContextDefinition, I extends CoreObj, R extends Record<string, any> = {}> = {
+  /** # Действие
+
+   Действие, выполняется при входе в это состояние.
+   Может быть использовано для выполнения побочных эффектов при переходе.
+
+   @default undefined
+   */
+  action?: Action<C, I>
+  /** # Реакции для запуска
+
+   Массив ключей реакций, которые должны быть запущены при входе в это состояние.
+   Ключи должны соответствовать ключам в объекте реакций актора.
+
+   @default undefined
+   */
+  reaction?: ReactionKeys<R>[]
+  /** # Success callback (опционально)
+   * Вызывается при успешном завершении action (resolve/return)
+   */
+  success?: ({update, data, context, element, core}: {
+    update: Update<C>
+    data: any
+    context: ContextData<C>
+    element: HTMLElement
+    core: CoreObj
+  }) => void | Promise<void>
+  /** # Error callback (опционально)
+   * Вызывается при ошибке в action (reject/throw)
+   */
+  error?: ({update, data, context, element, core}: {
+    update: Update<C>
+    data: any
+    context: ContextData<C>
+    element: HTMLElement
+    core: CoreObj
+  }) => void | Promise<void>
+  /** # Целевые состояния
+
+   Набор целевых состояний, в которые возможен переход из текущего состояния.
+   Каждое целевое состояние сопровождается набором условий, при которых переход возможен.
+   */
+  to: Partial<Record<S, When<C>>>
+}
+
+/** # Переход (legacy)
 
  Это ключевой механизм для автоматического перехода в новое состояние при соблюдении условий.
  Каждый переход описывает возможное изменение состояния системы при выполнении определенных условий.
 
+ @deprecated Используйте новый объектный формат переходов
  @template S - Тип состояния
  @template C - Тип данных контекста
  @template I - Тип ядра
