@@ -74,28 +74,41 @@ export function createInternalEdges(sockets, stateName) {
 }
 
 /** @type {import("./graph-layout.t.js").createExternalEdges} */
-export function createExternalEdges(sockets) {
-  return Object.entries(sockets)
-    .filter(([_, socket]) =>
-      socket.parent === "state"
-      && socket.direction === "east"
-    )
-    .map(([key, socketCond]) => {
-      const target = Object.entries(sockets)
-        .find(([_, socketState]) =>
-          socketState.param === socketCond.param
-          && socketState.state !== socketCond.state
-          && socketState.parent === "condition"
-          && socketState.direction === "west"
-        )
-      if (typeof target === 'undefined') return
-      return {
-        id: `${key}->${target[0]}`,
-        sources: [key],
-        targets: [target[0]]
-      }
+export function createExternalEdges(sockets, conditions) {
+  const edges = []
+  
+  // Проходим по всем условиям переходов
+  Object.values(conditions).forEach(condition => {
+    // Находим выходной сокет исходного состояния для данного параметра
+    const sourceSocket = Object.entries(sockets)
+      .find(([_, socket]) =>
+        socket.state === condition.from
+        && socket.param === condition.param
+        && socket.parent === "state"
+        && socket.direction === "east"
+      )
+    
+    if (!sourceSocket) return
+    
+    // Находим входной сокет условия для целевого состояния
+    const targetSocket = Object.entries(sockets)
+      .find(([_, socket]) =>
+        socket.state === condition.to
+        && socket.param === condition.param
+        && socket.parent === "condition"
+        && socket.direction === "west"
+      )
+    
+    if (!targetSocket) return
+    
+    edges.push({
+      id: `${sourceSocket[0]}->${targetSocket[0]}`,
+      sources: [sourceSocket[0]],
+      targets: [targetSocket[0]]
     })
-    .filter(edge => edge !== undefined)
+  })
+  
+  return edges
 }
 
 /** @type {import("./graph-layout.t.js").createStateGroup} */
@@ -129,6 +142,6 @@ export function createElkData(metaId, metrics, config) {
     id: metaId,
     layoutOptions: config.base,
     children: stateGroups,
-    edges: createExternalEdges(metrics.sockets)
+    edges: createExternalEdges(metrics.sockets, metrics.conditions)
   }
 }

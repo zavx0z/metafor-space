@@ -2,7 +2,7 @@ import {MetaFor} from "./metafor.js"
 
 await import ("./graph/graph-nodes.js")
 
-export default MetaFor("roadmap", {description: "MetaFor roadmap", development: false})
+export default MetaFor("roadmap", {description: "MetaFor RoadMap", development: false})
   .context((t) => ({
     status: t.enum("start", "process", "end")({title: "Статус", default: "end"}),
     error: t.string({title: "Ошибка", nullable: true})
@@ -28,7 +28,13 @@ export default MetaFor("roadmap", {description: "MetaFor roadmap", development: 
       to: {
         "начало": {status: "start"}
       },
-    }
+    },
+    // {
+    //   in: "в процессе",
+    //   to: {
+    //     "конец": {status: "end"}
+    //   }
+    // }
   ])
   .view({
     // render: ({html, context}) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`
