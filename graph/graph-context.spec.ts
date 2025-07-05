@@ -2,7 +2,7 @@ import {describe, expect, test} from "bun:test"
 import {MetaFor} from "../metafor.js"
 
 describe("graph-context с новым форматом переходов", () => {
-  test("новый формат переходов должен работать", () => {
+  test("новый формат переходов должен работать", async () => {
     const tag = "test-context-transitions"
     document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
     
@@ -36,15 +36,19 @@ describe("graph-context с новым форматом переходов", () =
     const meta = document.querySelector(`metafor-${tag}`)
     
     expect(meta).toBeTruthy()
-    expect(meta.getAttribute('state')).toBe('измерение')
+    
+    // Ждем инициализации
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    expect(meta.state).toBe('измерение')
     
     // Проверяем переход по условию
     meta.update({layout: true})
-    expect(meta.getAttribute('state')).toBe('позиционирование')
+    expect(meta.state).toBe('позиционирование')
     
     // Проверяем следующий переход
     meta.update({active: false, error: null})
-    expect(meta.getAttribute('state')).toBe('неактивно')
+    expect(meta.state).toBe('неактивно')
   })
 })
 
