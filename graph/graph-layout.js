@@ -187,7 +187,7 @@ export default MetaFor("graph-layout", {development: true})
       action({core, context}) {
         const metrics = core.meta.get(context.current)
         if (!metrics) return
-        console.log(metrics)
+        // console.log(metrics)
         core.data = createElkData(context.current, metrics, core.config)
         return {current: null}
       },

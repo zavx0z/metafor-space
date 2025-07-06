@@ -1,7 +1,7 @@
 import { validateContextDefinition as validateContextDefinitionNotWrapped } from "./context.js"
 import { validateCore as validateCoreNotWrapped } from "./core.js"
 import { validateCycles } from "./transitions.js"
-import { validateTriggers } from "./trigger.js"
+import { validateTriggers } from "./condition.js"
 // import { validateParticleOptions as validateParticleOptionsNotWrapped } from "./create.js"
 import { validateStates as validateStatesNotWrapped } from "./state.js"
 
@@ -20,7 +20,7 @@ channel.onmessage = ({ data }) => {
  @typedef {Object} Message
  @property {string} id Идентификатор частицы
  @property {string} message Сообщение
- @property {"actions" | "triggers" | "transitions" | "states" | "debug" | "create"} src Источник сообщения
+ @property {"actions" | "triggers" | "transitions" | "states" | "core" | "create"} src Источник сообщения
  */
 
 /**
@@ -52,91 +52,70 @@ export function validateContextDefinition({ tag, context }) {
 }
 
 /**
- Преобразует объектный формат переходов в массив для валидации
-
- @param {Record<string, any>} objectTransitions - Переходы в объектном формате
- @returns {Array<any>} Переходы в массиве
- */
-function convertObjectToArrayFormat(objectTransitions) {
-  return Object.entries(objectTransitions).map(([state, transition]) => ({
-    in: state,
-    to: transition.to || {},
-    action: transition.action,
-    success: transition.success,
-    error: transition.error
-  }))
-}
-
-/**
  Валидация переходов
 
  @param {Object} params Параметры валидации
  @param {string} params.tag Имя частицы
- @param {Record<string, any> | Array<import('../../types/transitions').Transition<any, any, any, any>>} params.transitions Переходы в объектном или массивном формате
+ @param {Record<string, import('../../types/transitions').Transition<any, any, any>>} params.transitions Переходы в объектном формате
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
 export function validateTransitions({ tag, transitions, contextDefinition }) {
-  // Преобразуем объектный формат в массив для валидации
-  let transitionsArray
-  if (Array.isArray(transitions)) {
-    transitionsArray = transitions
-  } else if (typeof transitions === 'object' && transitions !== null) {
-    transitionsArray = convertObjectToArrayFormat(transitions)
-  } else {
+  if (typeof transitions !== 'object' || transitions === null) {
     sendError({
       id: tag,
-      message: `Transitions должен быть объектом или массивом, получено: ${typeof transitions}`,
+      message: `Transitions должен быть объектом, получено: ${typeof transitions}`,
       src: "transitions",
     })
     return
   }
 
-  if (transitionsArray.length === 0) {
+  const transitionsEntries = Object.entries(transitions)
+  if (transitionsEntries.length === 0) {
     sendWarning({ id: tag, message: "Переходы отсутствуют. Мета не будет менять состояние.", src: "transitions" })
     return
   }
 
   // Проверка наличия обязательных полей
-  transitionsArray.forEach((transition, index) => {
-    if (!transition.in) {
-      sendError({
-        id: tag,
-        message: `Отсутствует обязательное поле 'in' в transitions[${index}]`,
-        src: "transitions",
-      })
-    }
-
-    if (!transition.to) {
-      sendError({ id: tag, message: `Отсутствует обязательное поле 'to' в transitions[${index}]`, src: "transitions" })
-    } else if (typeof transition.to !== 'object' || Array.isArray(transition.to)) {
-      sendError({ id: tag, message: `Поле 'to' должно быть объектом в transitions[${index}]`, src: "transitions" })
-    } else {
-      if (!transition.to) return
-      Object.entries(transition.to).forEach(([state, conditions], toIndex) => {
-        if (!state) {
-          sendError({
-            id: tag,
-            message: `Отсутствует состояние в transitions[${index}].to[${toIndex}]`,
-            src: "transitions",
-          })
-        }
-        if (!conditions || typeof conditions !== 'object') {
-          sendError({
-            id: tag,
-            message: `Отсутствуют условия для состояния '${state}' в transitions[${index}].to[${toIndex}]`,
-            src: "transitions",
-          })
-        }
-      })
+  transitionsEntries.forEach(([fromState, transition]) => {
+    if (transition.to) {
+      if (typeof transition.to !== 'object' || Array.isArray(transition.to)) {
+        sendError({ 
+          id: tag, 
+          message: `Поле 'to' должно быть объектом в transitions['${fromState}']`, 
+          src: "transitions" 
+        })
+      } else {
+        Object.entries(transition.to).forEach(([toState, conditions]) => {
+          if (!toState) {
+            sendError({
+              id: tag,
+              message: `Отсутствует целевое состояние в transitions['${fromState}'].to`,
+              src: "transitions",
+            })
+          }
+          if (!conditions || typeof conditions !== 'object') {
+            sendError({
+              id: tag,
+              message: `Отсутствуют условия для состояния '${toState}' в transitions['${fromState}'].to`,
+              src: "transitions",
+            })
+          }
+        })
+      }
     }
   })
 
   // Проверка на циклы
-  validateCycles({ transitions: transitionsArray })
+  try {
+    validateCycles({ transitions })
+  } catch (error) {
+    const { message } = /**@type {Error}*/ (error)
+    sendError({ id: tag, message, src: "triggers" })
+  }
 
   // Валидация триггеров
   try {
-    validateTriggers({ tag, transitions: transitionsArray, contextDefinition })
+    validateTriggers({ tag, transitions, contextDefinition })
   } catch (error) {
     const { message } = /**@type {Error}*/ (error)
     sendError({ id: tag, message, src: "triggers" })

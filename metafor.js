@@ -63,7 +63,10 @@ export const MetaFor = (tag, conf = {}) => {
           return {
             reactions: (reactions) => ({
               states(...states) {
-                development && import("./debug/validator/index.js").then((module) => module.validateStates({tag, states}))
+                development && import("./debug/validator/index.js").then((module) => module.validateStates({
+                  tag,
+                  states
+                }))
                 return {
                   transitions(initialState, transitions) {
                     // transitions теперь только объект
@@ -118,7 +121,6 @@ function createMeta(
     view
   }) {
   /** @type {S[]} */
-  const typedStates = states
   development && import("./debug/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
   let idx = 0
 
@@ -412,24 +414,26 @@ function createMeta(
 
       /** Проверка условий перехода и выполнение действия */
       #transition = () => {
-        const transitionFrom = transitions[this.state]
-        if (transitionFrom && transitionFrom.to) {
-          for (const [targetState, when] of Object.entries(transitionFrom.to)) {
-            const typedTargetState = targetState
-            if (Object.keys(when).length === 0) break
-            if (conditions(when, this.context, contextDefinition)) {
-              const actionDefinition = transitions[typedTargetState]
-              if (actionDefinition?.action) {
-                this.process = true
-                this.#state.setValue(typedTargetState)
-                if (view.render) this.#updateView()
-                this.#runTransitionAction(actionDefinition)
-              } else {
-                this.#state.setValue(typedTargetState)
-                if (view.render) this.#updateView()
-              }
-              break // Важно! Выходим после первого успешного перехода
+        /**@type{import("./types/transitions").Transition<S, C, I>} */
+        const transition = /**@type{import("./types/transitions").Transition<S, C, I>} */ (transitions[this.state])
+        if (!transition) return
+        if (!transition.to) return
+
+        for (const [targetState, condition] of Object.entries(transition.to)) {
+          if (Object.keys(condition).length === 0) break
+
+          if (guard(condition, this.context, contextDefinition)) {
+            const actionDefinition = transitions[targetState]
+            if (actionDefinition?.action) {
+              this.process = true
+              this.#state.setValue(targetState)
+              if (view.render) this.#updateView()
+              this.#runTransitionAction(actionDefinition)
+            } else {
+              this.#state.setValue(targetState)
+              if (view.render) this.#updateView()
             }
+            break
           }
         }
       }
@@ -530,7 +534,7 @@ function createMeta(
  @param {import('./types/context').ContextData<C>} context
  @param {import('./types/context').ContextDefinition} types
  */
-export function conditions(when, context, types) {
+export function guard(when, context, types) {
   for (const key in when) {
     const condition = when[key]
     const value = context[key]

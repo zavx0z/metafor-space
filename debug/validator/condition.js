@@ -33,34 +33,32 @@ const CONDITIONS = {
 
  @param {Object} params
  @param {string} params.tag Имя частицы
- @param {Array<import('../../types/transitions').Transition<any,any, any>>} params.transitions Массив переходов
+ @param {Record<string, import('../../types/transitions').Transition<any,any, any>>} params.transitions Объект переходов
  @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
  */
-export function validateTriggers({tag, transitions: transitionsList, contextDefinition}) {
-  transitionsList.forEach((transition, transitionIndex) => {
-    // Обработка нового формата: объект с ключами-состояниями
+export function validateTriggers({tag, transitions, contextDefinition}) {
+  Object.entries(transitions).forEach(([fromState, transition]) => {
     if (!transition.to) return
-    Object.entries(transition.to).forEach(([state, when]) => {
+    Object.entries(transition.to).forEach(([toState, when]) => {
       if (!when) return
 
       if (Object.keys(when).length === 0) {
         throw new Error(
-          `Пустой триггер в переходе из состояния "${transition.in}" в "${state}". Триггер должен содержать хотя бы одно условие.`
+          `Пустой триггер в переходе из состояния "${fromState}" в "${toState}". Триггер должен содержать хотя бы одно условие.`
         )
       }
 
-      if (!when) return
       Object.entries(when).forEach(([field, condition]) => {
         const fieldDef = contextDefinition[field]
         if (!fieldDef)
-          throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${transition.in}`)
+          throw new Error(`Поле "${field}" не найдено в определении контекста для триггера ${fromState}`)
 
         validateTrigger(field, fieldDef, condition)
 
         if (typeof condition === "object" && condition !== null) {
           const conditionKeys = Object.keys(condition)
           if (conditionKeys.length === 0)
-            throw new Error(`Пустое условие в триггере /${transition.in}/${field}/trigger`)
+            throw new Error(`Пустое условие в триггере /${fromState}/${field}/trigger`)
 
           const allowedKeys = CONDITIONS[fieldDef.type]
           const invalidKeys = conditionKeys.filter((key) => !allowedKeys.has(key))
@@ -68,7 +66,7 @@ export function validateTriggers({tag, transitions: transitionsList, contextDefi
           if (invalidKeys.length > 0)
             throw new Error(
               `Недопустимые ключи условия [${invalidKeys.join(", ")}] для типа "${fieldDef.type}" в триггере /${
-                transition.in
+                fromState
               }/${field}/trigger. Допустимые ключи: ${Array.from(allowedKeys).join(", ")}`
             )
         }

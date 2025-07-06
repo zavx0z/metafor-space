@@ -86,22 +86,23 @@ function canCreateCycle({ fromState, toState, forwardConditions, backwardConditi
  Проверяет циклические зависимости
  
  @param {Object} params
- @param {Array<import('../../types/transitions').Transition<any, any, any>>} params.transitions Массив переходов
+ @param {Record<string, import('../../types/transitions').Transition<any, any, any>>} params.transitions Объект переходов
  */
-export function validateCycles({ transitions: transitionsList }) {
+export function validateCycles({ transitions }) {
   /** @type {Map<string, Array<{state: string, conditions: Record<string, any>}>>} */
-  const transitions = new Map()
+  const transitionsMap = new Map()
 
-  // Строим граф переходов
-  transitionsList.forEach((transition) => {
-    if (!transitions.has(transition.in)) {
-      transitions.set(transition.in, [])
+  // Строим граф переходов из объектного формата
+  Object.entries(transitions).forEach(([fromState, transition]) => {
+    if (!transitionsMap.has(fromState)) {
+      transitionsMap.set(fromState, [])
     }
-    // Обработка нового формата: объект с ключами-состояниями
+    
     if (!transition.to) return
-    Object.entries(transition.to).forEach(([state, conditions]) => {
-      transitions.get(transition.in)?.push({
-        state,
+    
+    Object.entries(transition.to).forEach(([toState, conditions]) => {
+      transitionsMap.get(fromState)?.push({
+        state: toState,
         conditions: conditions || {},
       })
     })
@@ -123,10 +124,10 @@ export function validateCycles({ transitions: transitionsList }) {
         const current = cycle[i]
         const next = cycle[(i + 1) % cycle.length]
 
-        const forwardTransitions = transitions.get(current.state) || []
+        const forwardTransitions = transitionsMap.get(current.state) || []
         const forwardTransition = forwardTransitions.find((t) => t.state === next.state)
 
-        const backwardTransitions = transitions.get(next.state) || []
+        const backwardTransitions = transitionsMap.get(next.state) || []
         const backwardTransition = backwardTransitions.find((t) => t.state === current.state)
 
         if (forwardTransition && backwardTransition) {
@@ -141,11 +142,11 @@ export function validateCycles({ transitions: transitionsList }) {
       return
     }
     visited.add(state)
-    const nextTransitions = transitions.get(state) || []
+    const nextTransitions = transitionsMap.get(state) || []
     for (const transition of nextTransitions)
       checkCycles(transition.state, visited, [...path, { state, conditions: transition.conditions }])
     visited.delete(state)
   }
   // Проверяем циклы из каждого состояния
-  for (const state of transitions.keys()) checkCycles(state)
+  for (const state of transitionsMap.keys()) checkCycles(state)
 }

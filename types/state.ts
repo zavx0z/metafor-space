@@ -10,7 +10,7 @@
  @property onChange - Добавить слушатель изменений состояния
  @property clear - Очистить всех слушателей
  */
-export type Signal<S> = {
+export type Signal<S extends string> = {
   value: () => S
   setValue: (state: S) => void
   onChange: (listener: SignalListener<S>) => () => void
@@ -26,4 +26,4 @@ export type Signal<S> = {
  @param preview - Предыдущее состояние актора
  @param current - Новое текущее состояние актора
  */
-type SignalListener<S> = (preview: S, current: S) => void
+type SignalListener<S extends string> = (preview: S, current: S) => void
