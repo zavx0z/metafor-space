@@ -413,7 +413,7 @@ function createMeta(
       /** Проверка условий перехода и выполнение действия */
       #transition = () => {
         const transitionFrom = transitions[this.state]
-        if (transitionFrom) {
+        if (transitionFrom && transitionFrom.to) {
           for (const [targetState, when] of Object.entries(transitionFrom.to)) {
             const typedTargetState = targetState
             if (Object.keys(when).length === 0) break

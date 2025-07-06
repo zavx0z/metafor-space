@@ -111,6 +111,7 @@ export function validateTransitions({ tag, transitions, contextDefinition }) {
     } else if (typeof transition.to !== 'object' || Array.isArray(transition.to)) {
       sendError({ id: tag, message: `Поле 'to' должно быть объектом в transitions[${index}]`, src: "transitions" })
     } else {
+      if (!transition.to) return
       Object.entries(transition.to).forEach(([state, conditions], toIndex) => {
         if (!state) {
           sendError({

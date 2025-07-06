@@ -98,6 +98,7 @@ export function validateCycles({ transitions: transitionsList }) {
       transitions.set(transition.in, [])
     }
     // Обработка нового формата: объект с ключами-состояниями
+    if (!transition.to) return
     Object.entries(transition.to).forEach(([state, conditions]) => {
       transitions.get(transition.in)?.push({
         state,

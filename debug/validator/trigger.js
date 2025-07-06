@@ -39,6 +39,7 @@ const CONDITIONS = {
 export function validateTriggers({tag, transitions: transitionsList, contextDefinition}) {
   transitionsList.forEach((transition, transitionIndex) => {
     // Обработка нового формата: объект с ключами-состояниями
+    if (!transition.to) return
     Object.entries(transition.to).forEach(([state, when]) => {
       if (!when) return
 
@@ -48,6 +49,7 @@ export function validateTriggers({tag, transitions: transitionsList, contextDefi
         )
       }
 
+      if (!when) return
       Object.entries(when).forEach(([field, condition]) => {
         const fieldDef = contextDefinition[field]
         if (!fieldDef)
