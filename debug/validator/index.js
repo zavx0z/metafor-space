@@ -2,7 +2,6 @@ import { validateContextDefinition as validateContextDefinitionNotWrapped } from
 import { validateCore as validateCoreNotWrapped } from "./core.js"
 import { validateCycles } from "./transitions.js"
 import { validateTriggers } from "./condition.js"
-// import { validateParticleOptions as validateParticleOptionsNotWrapped } from "./create.js"
 import { validateStates as validateStatesNotWrapped } from "./state.js"
 
 const channel = new BroadcastChannel("validator")
