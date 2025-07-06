@@ -120,7 +120,6 @@ function createMeta(
     reactions = {},
     view
   }) {
-  /** @type {S[]} */
   development && import("./debug/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
   let idx = 0
 
@@ -423,14 +422,19 @@ function createMeta(
           if (Object.keys(condition).length === 0) break
 
           if (guard(condition, this.context, contextDefinition)) {
-            const actionDefinition = transitions[targetState]
+            if (!(targetState in transitions)) {
+              console.warn(`${tag}: ${String(targetState)} отсутствует в переходах!`, transitions)
+              continue
+            }
+            /** @type {import('./types/transitions').Transition<S, C, I>|undefined} */
+            const actionDefinition = transitions[/** @type {S} */ (targetState)]
             if (actionDefinition?.action) {
               this.process = true
-              this.#state.setValue(targetState)
+              this.#state.setValue(/** @type {S} */ (targetState))
               if (view.render) this.#updateView()
               this.#runTransitionAction(actionDefinition)
             } else {
-              this.#state.setValue(targetState)
+              this.#state.setValue(/** @type {S} */ (targetState))
               if (view.render) this.#updateView()
             }
             break
