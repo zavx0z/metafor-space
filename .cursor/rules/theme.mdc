@@ -312,14 +312,18 @@ export default MetaFor("visionpro-card")
     }
   })
   .states("idle", "active", "success", "error")
-  .transitions("idle", [
-    {in: "idle", to: [{state: "active", when: {status: "active"}}]},
-    {in: "active", to: [
-      {state: "success", when: {status: "success"}},
-      {state: "error", when: {status: "error"}},
-      {state: "idle", when: {status: "idle"}}
-    ]}
-  ])
+  .transitions("idle", {
+    "idle": {
+      to: {"active": {status: "active"}}
+    },
+    "active": {
+      to: {
+        "success": {status: "success"},
+        "error": {status: "error"},
+        "idle": {status: "idle"}
+      }
+    }
+  })
   .view({
     render: ({html, context, state, core}) => html`
       <div class="visionpro-card ${state}" 

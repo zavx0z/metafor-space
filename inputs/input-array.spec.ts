@@ -10,7 +10,7 @@ describe("input-array типизация", () => {
       .core(() => ({}))
       .reactions({})
       .states("idle")
-      .transitions("idle", [])
+      .transitions("idle", {})
       .view({})
 
     // Создаем экземпляр для проверки типов
@@ -33,7 +33,7 @@ describe("input-array типизация", () => {
       .core(() => ({}))
       .reactions({})
       .states("idle")
-      .transitions("idle", [])
+      .transitions("idle", {})
       .view({})
 
     document.body.innerHTML = '<metafor-test-array-number></metafor-test-array-number>'
@@ -55,7 +55,7 @@ describe("input-array типизация", () => {
       .core(() => ({}))
       .reactions({})
       .states("idle")
-      .transitions("idle", [])
+      .transitions("idle", {})
       .view({})
 
     document.body.innerHTML = '<metafor-test-array-empty></metafor-test-array-empty>'

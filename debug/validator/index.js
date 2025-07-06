@@ -20,7 +20,7 @@ channel.onmessage = ({ data }) => {
  @typedef {Object} Message
  @property {string} id Идентификатор частицы
  @property {string} message Сообщение
- @property {"actions" | "triggers" | "transitions" | "states" | "core" | "create"} src Источник сообщения
+ @property {"actions" | "triggers" | "transitions" | "states" | "debug" | "create"} src Источник сообщения
  */
 
 /**

@@ -177,6 +177,6 @@ const formattedObj = (value) =>
 
 /** @param {import("../types/core").CoreObj} core */
 const logCore = (core) => {
-  console.log("snapshot core: ", {...core})
-  console.log("current  core: ", core)
+  console.log("snapshot debug: ", {...core})
+  console.log("current  debug: ", core)
 }

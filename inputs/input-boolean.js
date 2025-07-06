@@ -7,7 +7,10 @@ export default MetaFor("input-boolean")
     value: t.boolean({nullable: true}),
     error: t.string({nullable: true}),
   }))
-  .core().reactions({}).states("рендер").transitions("рендер", [])
+  .core()
+  .reactions({})
+  .states("рендер")
+  .transitions("рендер", {})
   .view({
     render: ({context, html, update}) => html`
       <span class="param-title">${context.title}</span>

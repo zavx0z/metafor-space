@@ -187,8 +187,8 @@ describe("core", () => {
 })
 
 describe("core", () => {
-  describe("Взаимодействие с общими данными через core", () => {
-    test("Данные в core доступны для модификации без замены", () => {
+  describe("Взаимодействие с общими данными через debug", () => {
+    test("Данные в debug доступны для модификации без замены", () => {
 
       const sharedArray: object[] = []
       const tag = Bun.randomUUIDv7()

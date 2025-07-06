@@ -63,9 +63,9 @@ export default MetaFor("graph-layout", { development: true })
     // Реакции на другие акторы
   })
   .states("idle", "calculating", "ready")
-  .transitions("idle", [
+  .transitions("idle", {
     // Правила переходов
-  ])
+  })
   .view({
     render: ({ html, context }) => html` <!-- UI представление --> `,
     style: ({ css }) => css`
@@ -421,9 +421,9 @@ export default MetaFor("graph-layout", { development: true })
     // Реакции на другие акторы
   })
   .states("idle", "calculating", "ready")
-  .transitions("idle", [
+  .transitions("idle", {
     // Правила переходов
-  ])
+  })
   .view({
     render: ({ html, context }) => html` <!-- UI представление --> `,
     style: ({ css }) => css`

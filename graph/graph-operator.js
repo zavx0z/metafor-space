@@ -170,10 +170,9 @@ export default MetaFor("graph-operator", {development: true})
     },
   }))
   .reactions({})
-  .states('init', 'ready')
-  .transitions('init', [
-    {
-      in: "init",
+  .states('инициализация оператора', 'ready')
+  .transitions('инициализация оператора', {
+    "инициализация оператора": {
       action({context, core}) {
         if (!context.op) throw new Error("Не установлен в контекст значение параметра op")
         const operator = core.operators[context.op]
@@ -187,7 +186,7 @@ export default MetaFor("graph-operator", {development: true})
         }
       }
     }
-  ])
+  })
   .view({
     render: ({context, html, state}) => state !== "ready" ? nothing : html`
       <span>${context.symbol}</span>

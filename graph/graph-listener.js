@@ -34,13 +34,11 @@ export default MetaFor("graph-listener", {
   })
   .reactions({})
   .states("ожидание патча", "добавление актора")
-  .transitions("ожидание патча", [
-    {
-      in: "ожидание патча",
+  .transitions("ожидание патча", {
+    "ожидание патча": {
       to: {"добавление актора": {op: "add"}}
     },
-    {
-      in: "добавление актора",
+    "добавление актора": {
       action: ({element, core, context}) => {
         if (!core.snapshot) throw new Error(`Отсутствует снимок meta - ${context.nodes[context.nodes.length]}`)
         /**@type{import("../metafor").Snapshot<any, any, any>}*/
@@ -52,9 +50,9 @@ export default MetaFor("graph-listener", {
       to: {
         "ожидание патча": {nodes: {isEmpty: true}},
         "добавление актора": {nodes: {isEmpty: false}}
-      },
+      }
     }
-  ])
+  })
   .view({
     render: ({html}) => html`
       <slot></slot>`

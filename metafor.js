@@ -4,8 +4,8 @@ import {ref} from "./html/directives/ref.js"
 import {repeat} from "./html/directives/repeat.js"
 
 const debug = localStorage.getItem('debug') === "true"
-let log = /** @type {(message: import("./metafor").BroadcastMessage, core: CoreObj)=>void}*/(message, core) => void {}
-if (debug) log = (await import('./core/console.js')).log
+let log = /** @type {(message: import("./metafor").BroadcastMessage, debug: CoreObj)=>void}*/(message, core) => void {}
+if (debug) log = (await import('./debug/console.js')).log
 
 let devChannel = /**@type{BroadcastChannel}*/(/**@type{unknown}*/(undefined))
 /**
@@ -30,7 +30,7 @@ const setDevChannel = (channel) => {
 export const MetaFor = (tag, conf = {}) => {
   const {development, description} = conf
   if (development) {
-    import("./core/validator/index.js")
+    import("./debug/validator/index.js")
     setDevChannel(new BroadcastChannel("validator"))
     // todo: добавить проверку имени
   }
@@ -53,23 +53,23 @@ export const MetaFor = (tag, conf = {}) => {
         }),
         enum: (...values) => (params = {}) => ({type: "enum", values, ...params})
       })
-      development && import("./core/validator/index.js").then((module) =>
+      development && import("./debug/validator/index.js").then((module) =>
         module.validateContextDefinition({tag, context: contextDefinition}))
       return {
         core(core) {
           const coreDefinition = core || (() => Object.create({}))
-          development && import("./core/validator/index.js").then((module) =>
+          development && import("./debug/validator/index.js").then((module) =>
             module.validateCore({tag, core: coreDefinition}))
           return {
             reactions: (reactions) => ({
               states(...states) {
-                development && import("./core/validator/index.js").then((module) => module.validateStates({tag, states}))
+                development && import("./debug/validator/index.js").then((module) => module.validateStates({tag, states}))
                 return {
                   transitions(initialState, transitions) {
                     // transitions теперь только объект
                     if (development) {
                       const data = {tag, transitions, contextDefinition}
-                      import("./core/validator/index.js").then((module) => module.validateTransitions(data))
+                      import("./debug/validator/index.js").then((module) => module.validateTransitions(data))
                     }
                     return {
                       view: (view) => createMeta({
@@ -119,7 +119,7 @@ function createMeta(
   }) {
   /** @type {S[]} */
   const typedStates = states
-  development && import("./core/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
+  development && import("./debug/validator/index.js").then((module) => module.validateCreateOptions({tag, states}))
   let idx = 0
 
   customElements.define("metafor-" + tag,
@@ -450,10 +450,10 @@ function createMeta(
           types: contextDefinition,
           transitions: Object.entries(transitions).map(([inState, t]) => ({
             in: inState,
-            to: Object.entries(t.to).map(([state, when]) => ({
+            to: t.to ? Object.entries(t.to).map(([state, when]) => ({
               state,
               when,
-            })),
+            })) : [],
           })),
         }
       }

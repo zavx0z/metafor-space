@@ -16,17 +16,15 @@ export default MetaFor('graph-socket')
   .core()
       .reactions({})
 .states("рендер", "измерение")
-  .transitions("рендер", [
-    {
-      in: "рендер",
+  .transitions("рендер", {
+    "рендер": {
       action({element, context}) {
         element.dataset['direction'] = typeof context.direction !== "undefined" ? context.direction === 'west' ? 'input' : 'output' : ''
         element.dataset['type'] = context.type || 'string'
       },
       to: {"измерение": {error: null}}
     },
-    {
-      in: "измерение",
+    "измерение": {
       action: ({element}) => new Promise((res) => {
         requestAnimationFrame(() => {
           const {width, x, y} = element.getBoundingClientRect()
@@ -35,7 +33,7 @@ export default MetaFor('graph-socket')
       }),
       to: {}
     },
-  ])
+  })
   .view({
     style: ({css}) => {
       const position = -6

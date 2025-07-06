@@ -35,16 +35,14 @@ export default MetaFor("graph-nodes", {
     }
   })
   .states("render", "центрирование одной ноды")
-  .transitions("render", [
-    {
-      in: "render",
+  .transitions("render", {
+    "render": {
       to: {"центрирование одной ноды": {error: null, queue: {length: 1}}}
     },
-    {
-      in: "центрирование одной ноды", 
+    "центрирование одной ноды": {
       to: {"render": {error: {isNull: false}}}
     }
-  ])
+  })
   .view({
     render: ({html}) => html`
       <metafor-graph-layout>
@@ -61,3 +59,4 @@ export default MetaFor("graph-nodes", {
       }
     `,
   })
+

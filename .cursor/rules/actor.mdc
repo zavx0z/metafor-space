@@ -341,7 +341,7 @@ core(({update, context, self}) => ({
     }
   },
 
-  // Связь контекста с core
+  // Связь контекста с debug
   getSelectedUsers: () =>
     context.selectedIds.map(id => self.getUserById(id)).filter(Boolean)
 }))
@@ -367,41 +367,54 @@ states("idle", "working", "done", "emergency")
 
 ## 5. Переходы - логика изменений состояний
 
-Правила переходов между состояниями с actions и автоматической обработкой результата.
+Правила переходов между состояниями с автоматической обработкой результата.
 
-### Автоматическая обработка результата
+### Объектный формат
+
+```javascript
+.transitions("начальное", {
+  "состояние1": {
+    action: async ({context, update}) => {
+      // действие при входе в состояние
+      return {newValue: "результат"}
+    },
+    to: {
+      "состояние2": {условия: "перехода"},
+      "состояние3": {другие: "условия"}
+    }
+  }
+})
+```
+
+### Автоматическая обработка
 
 **Система автоматически обрабатывает результат action:**
 
-1. **Автоматический success**: если action возвращает объект для обновления контекста
-2. **Автоматический error**: если action выбрасывает Error
-3. **Ручные success/error**: только для форматирования результата сторонних функций
+1. **Success**: если action возвращает объект - автоматически обновляет контекст
+2. **Error**: если action выбрасывает Error - автоматически обновляет поле `error`
+3. **Форматирование**: `success`/`error` колбеки для ручного форматирования данных обновления контекста
 
 ```javascript
-.
-transitions("idle", [
-  {
-    in: "idle",
+.transitions("idle", {
+  "idle": {
     to: {"working": {data: {isEmpty: false}}}
   },
-  {
-    in: "working",
-    // Автоматический success: возвращаем объект для обновления контекста
-    action: async ({update, context}) => {
+  "working": {
+    // Автоматический success
+    action: async ({context}) => {
       const result = await processData(context.data)
       return {result, active: false} // Автоматически обновит контекст
     },
     to: {
       "done": {active: false},
-      "emergency": {error: {isNull: false}}
+      "error": {error: {isNull: false}}
     }
   },
-  {
-    in: "working",
-    // Автоматический error: выбрасываем Error
+  "working": {
+    // Автоматический error
     action: async ({context}) => {
       if (!context.data) {
-        throw new Error("Данные отсутствуют") // Автоматически обновит error в контексте
+        throw new Error("Данные отсутствуют") // Автоматически обновит error
       }
       return {status: "processed"}
     },
@@ -410,115 +423,24 @@ transitions("idle", [
       "error": {error: {isNull: false}}
     }
   },
-  {
-    in: "working",
-    // Ручной success/error для форматирования сторонних функций
+  "working": {
+    // Форматирование сторонних функций
     action: () => fetch('/api/data'),
-    success: ({update, data}) => {
-      // Форматируем данные перед обновлением
-      update({items: data.items, total: data.total})
-    },
-    error: ({update, data}) => {
-      // Обрабатываем ошибку API
-      update({error: `API Error: ${data.message}`})
-    },
+    success: ({update, data}) => update({items: data.items}),
+    error: ({update, data}) => update({error: `API Error: ${data.message}`}),
     to: {
       "done": {items: {length: {min: 1}}},
       "error": {error: {isNull: false}}
     }
   }
-])
+})
 ```
 
-### Примеры использования
-
-**Простой случай - автоматическая обработка:**
-
-```javascript
-{
-in:
-  "начало",
-    action
-:
-  () => new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({status: "end"}) // Автоматически обновит контекст
-    }, 6000)
-  }),
-    to
-:
-  {"конец": {status: "end"}},
-}
-```
-
-**Обработка ошибок:**
-
-```javascript
-{
-in:
-  "начало",
-    action
-:
-  () => new Promise((resolve, reject) => {
-    try {
-      // какая-то логика
-      resolve({status: "success"})
-    } catch (error) {
-      reject(new Error("Что-то пошло не так")) // Автоматически обновит error
-    }
-  }),
-    to
-:
-  {
-    "конец": {status: "success"},
-    "ошибка": {error: {isNull: false}}
-  },
-}
-```
-
-**Сторонние функции с форматированием:**
-
-```javascript
-{
-in:
-  "загрузка",
-    action
-:
-  () => fetch('/api/users'),
-    success
-:
-  ({update, data}) => {
-    // Форматируем ответ API
-    update({
-      users: data.users,
-      total: data.total,
-      loaded: true
-    })
-  },
-    error
-:
-  ({update, data}) => {
-    // Обрабатываем ошибку API
-    update({
-      error: `Ошибка загрузки: ${data.message}`,
-      loaded: false
-    })
-  },
-    to
-:
-  {
-    "готово": {loaded: true},
-    "ошибка": {error: {isNull: false}}
-  }
-}
-```
-
-**Встроенная блокировка:**
+### Блокировка переходов
 
 - Actions автоматически блокируют проверку переходов
 - Контекст может обновляться во время блокировки
-- Для async/await блокировка снимается после завершения
-- Для промисов нужно возвращать промис из action
+- Блокировка снимается после завершения action
 
 ## 6. Реакции - события меняют контекст
 
@@ -594,19 +516,19 @@ view({
 
 ```javascript
 // Родитель: сохраняет данные и меняет состояние
-.
-transitions("idle", [{
-  in: "idle",
-  action: ({update, context}) => {
-    sessionStorage.setItem('child-data', JSON.stringify(context.dataToSend))
-    return {dataReady: true} // Автоматически обновит контекст
-  },
-  to: [{state: "waiting", when: {dataReady: true}}]
-}])
+.transitions("idle", {
+  "idle": {
+    action: ({update, context}) => {
+      sessionStorage.setItem('child-data', JSON.stringify(context.dataToSend))
+      return {dataReady: true} // Автоматически обновит контекст
+    },
+    to: {"waiting": {dataReady: true}}
+  }
+})
 
-  // Ребенок: реагирует на состояние и читает данные
-  .reactions([{
-    title: "Получение данных от родителя",
+// Ребенок: реагирует на состояние и читает данные
+.reactions({
+  "Получение данных от родителя": {
     filter: ({meta, patch}) =>
       meta.tag === "parent-actor" &&
       patch.path === "/state" && patch.value === "waiting",
@@ -614,7 +536,8 @@ transitions("idle", [{
       const data = JSON.parse(sessionStorage.getItem('child-data') || '{}')
       update({receivedData: data})
     }
-  }])
+  }
+})
 ```
 
 ## Простой пример актора
@@ -639,38 +562,34 @@ export default MetaFor("counter")
     reset: () => update({value: 0}),
   }))
 
-  .reactions([
-    {
-      title: "Команды от UI",
+  .reactions({
+    "Команды от UI": {
       filter: ({meta}) => meta.tag === "ui-controller",
       action: ({patch, core}) => {
         const command = patch.value.command
         if (command === "increment") core.increment()
         if (command === "decrement") core.decrement()
         if (command === "reset") core.reset()
-      },
-    },
-  ])
+      }
+    }
+  })
 
   .states("active", "max", "min")
 
-  .transitions("active", [
-    {
-      in: "active",
+  .transitions("active", {
+    "active": {
       to: {
         "max": {value: {gte: 10}},
         "min": {value: {lte: 0}}
-      },
+      }
     },
-    {
-      in: "max",
-      to: {"active": {value: {lt: 10}}},
+    "max": {
+      to: {"active": {value: {lt: 10}}}
     },
-    {
-      in: "min",
-      to: {"active": {value: {gt: 0}}},
-    },
-  ])
+    "min": {
+      to: {"active": {value: {gt: 0}}}
+    }
+  })
 
   .view({
     render: ({html, context, state, core}) => html`
@@ -721,9 +640,11 @@ export default MetaFor("emergency-button")
   }))
   .reactions({})
   .states("ready", "pressed")
-  .transitions("ready", [
-    {in: "ready", to: {"pressed": {pressed: true}}}
-  ])
+  .transitions("ready", {
+    "ready": {
+      to: {"pressed": {pressed: true}}
+    }
+  })
   .view({
     render: ({html, core, state}) => html`
       <button class="emergency ${state}" @click=${core.press}>
@@ -754,9 +675,11 @@ export default MetaFor("system-controller")
     }
   })
   .states("running", "emergency")
-  .transitions("running", [
-    {in: "running", to: {"emergency": {mode: "emergency"}}}
-  ])
+  .transitions("running", {
+    "running": {
+      to: {"emergency": {mode: "emergency"}}
+    }
+  })
   .view({
     render: ({html, context, state}) => html`
       <div class="system ${state}">
@@ -837,10 +760,14 @@ export default MetaFor("data-processor")
     }
   })
   .states("idle", "processing")
-  .transitions("idle", [
-    {in: "idle", to: {"processing": {tasks: {length: {min: 1}}}}},
-    {in: "processing", to: {"idle": {tasks: {isEmpty: true}}}}
-  ])
+  .transitions("idle", {
+    "idle": {
+      to: {"processing": {tasks: {length: {min: 1}}}}
+    },
+    "processing": {
+      to: {"idle": {tasks: {isEmpty: true}}}
+    }
+  })
   .view({
     render: ({html, context, repeat}) => html`
       <div class="data-processor">
@@ -870,20 +797,18 @@ export default MetaFor("task-worker")
   }))
   .reactions({})
   .states("idle", "working", "completed")
-  .transitions("idle", [
-    {
-      in: "idle",
+  .transitions("idle", {
+    "idle": {
       action: async ({update, core, element}) => {
         update({status: "working"})
         return await core.processTask(element.index) // Автоматически обновит контекст
       },
       to: {"working": {status: "working"}}
     },
-    {
-      in: "working",
+    "working": {
       to: {"completed": {status: "completed"}}
     }
-  ])
+  })
   .view({})
 ```
 
@@ -908,8 +833,5 @@ export default MetaFor("task-worker")
 5. **Обрабатывайте ошибки** - любой может сломаться
 6. **Логируйте сообщения** - включайте development режим для отладки
 7. **Используйте автоматическую обработку** - возвращайте объекты из action для автоматического обновления контекста
-8. **Выбрасывайте Error** - для автоматического обновления поля error в контексте
-9. **Используйте success/error только для форматирования** - когда нужно обработать результат сторонних функций
-
 8. **Выбрасывайте Error** - для автоматического обновления поля error в контексте
 9. **Используйте success/error только для форматирования** - когда нужно обработать результат сторонних функций

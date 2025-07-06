@@ -54,13 +54,11 @@ export default MetaFor("graph-param")
     }
   })
   .states("рендер", "измерение", "установка положения")
-  .transitions('рендер', [
-    {
-      in: "рендер",
+  .transitions('рендер', {
+    "рендер": {
       to: {"измерение": {error: null}}
     },
-    {
-      in: "измерение",
+    "измерение": {
       action: ({element}) => new Promise((resolve) => {
         requestAnimationFrame(() => {
           const {width, height} = element.getBoundingClientRect()
@@ -68,12 +66,8 @@ export default MetaFor("graph-param")
         })
       }),
       to: {"установка положения": {x: {isNull: false}, y: {isNull: false}}}
-    },
-    {
-      in: "установка положения",
-      to: {}
-    },
-  ])
+    }
+  })
   .view({
     render: ({context, html}) => html`
       <metafor-graph-socket context=${{

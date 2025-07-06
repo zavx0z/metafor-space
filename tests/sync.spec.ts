@@ -24,16 +24,14 @@ describe("Синхронизация core и context", async () => {
     }))
     .reactions({})
     .states("IDLE", "push", "pop")
-    .transitions("IDLE", [
-      {
-        in: "IDLE",
+    .transitions("IDLE", {
+      "IDLE": {
         to: {
           "push": {process: "push"},
           "pop": {process: "pop"}
         }
       },
-      {
-        in: "push",
+      "push": {
         action: ({core}) => {
           core.pushData()
         },
@@ -42,12 +40,11 @@ describe("Синхронизация core и context", async () => {
           "pop": {process: "pop"}
         }
       },
-      {
-        in: "pop",
+      "pop": {
         action: ({core}) => core.popData(),
         to: {"IDLE": {process: null}}
       }
-    ])
+    })
     .view({})
   const meta = document.querySelector(`metafor-${tag}`) as Meta<typeof Meta.state, typeof Meta.types>
   let count = 50
@@ -62,7 +59,7 @@ describe("Синхронизация core и context", async () => {
     // console.log("upd", values)
     if (typeof values.dataLength === 'number' && values.dataLength > 47) {
       test("Данные ядра синхронизируются с контекстом", () => {
-        // meta.core.popData()
+
         meta.update({process: "pop"})
         // Simulate heavy synchronous computation (~1 second)
         // let result = 0
@@ -70,7 +67,7 @@ describe("Синхронизация core и context", async () => {
         //   result += Math.sin(i) * Math.cos(i)
         // }
         expect(meta.context.dataLength).toBe(0)
-        // expect(meta.core.data.length).toBe(0)
+
       })
     }
   })

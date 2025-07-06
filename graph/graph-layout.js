@@ -169,13 +169,11 @@ export default MetaFor("graph-layout", {development: true})
     }
   })
   .states('ожидание', 'получение данных', "форматирование данных", 'вычисление')
-  .transitions('ожидание', [
-    {
-      in: "ожидание",
+  .transitions('ожидание', {
+    "ожидание": {
       to: {"получение данных": {current: {isNull: false}}}
     },
-    {
-      in: "получение данных",
+    "получение данных": {
       action({context, core}) {
         if (!context.current) throw new Error("Нет ID мета для обработки данных")
         let meta = core.meta.get(context.current)
@@ -185,8 +183,7 @@ export default MetaFor("graph-layout", {development: true})
       },
       to: {"форматирование данных": {data: true, metrics: true}}
     },
-    {
-      in: "форматирование данных",
+    "форматирование данных": {
       action({core, context}) {
         const metrics = core.meta.get(context.current)
         if (!metrics) return
@@ -196,17 +193,16 @@ export default MetaFor("graph-layout", {development: true})
       },
       to: {"вычисление": {current: {isNull: true}}}
     },
-    {
-      in: "вычисление",
+    "вычисление": {
       action: async ({core}) => {
-        if (core.data){
+        if (core.data) {
           const layout = await core.elk.layout(core.data)
           sessionStorage.setItem(core.data.id, JSON.stringify(layout))
         } else throw new Error("Отсутствуют данные для layout")
       },
       to: {"ожидание": {current: null}}
     }
-  ])
+  })
   .view({
     render: ({html}) => html`
       <slot></slot>

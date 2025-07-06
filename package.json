@@ -21,25 +21,13 @@
   "module": "metafor.js",
   "types": "metafor.d.ts",
   "files": [
-    "metafor.js",
-    "types/*.d.ts",
-    "validator",
-    "types",
-    "core/web/component.js",
-    "dom/html/html.d.ts",
-    "dom/html/html.js",
-    "dom/html/directives/*",
-    "dom/html/directive.js",
-    "dom/html/async-directive.js",
-    "dom/html/types/*"
+    "metafor.js"
   ],
   "exports": {
     ".": {
       "types": "./metafor.d.ts",
       "default": "./metafor.js"
-    },
-    "./validator": "./validator/index.js",
-    "./core/web/component": "./core/web/component.js"
+    }
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "18.0.1",

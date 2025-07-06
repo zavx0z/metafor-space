@@ -7,23 +7,21 @@ export default MetaFor("test", {description: "Nodes", development: false})
   .core()
   .reactions({})
   .states("конец", "начало")
-  .transitions("начало", [
-    {
-      in: "начало",
+  .transitions("начало", {
+    "начало": {
       action: () => new Promise((resolve) => {
         setTimeout(() => {
           resolve({status: "end"})
         }, 6000)
       }),
       to: {
-        "конец": {status: "end"},
+        "конец": {status: "end"}
       }
     },
-    {
-      in: "конец",
+    "конец": {
       to: {
-        "начало": {status: "start"},
+        "начало": {status: "start"}
       }
     }
-  ])
+  })
   .view({})
