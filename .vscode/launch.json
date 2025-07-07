@@ -6,16 +6,20 @@
     "configurations": [
         {
             "type": "bun",
-            "internalConsoleOptions": "neverOpen",
             "request": "launch",
             "name": "Run All Tests",
             "program": "${workspaceFolder}",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "strictEnv": false,
+            "watchMode": false,
+            "stopOnEntry": false,
+            "noDebug": false,
+            "runtime": "bun",
             "runtimeArgs": [
                 "test"
-            ],
-            "cwd": "${workspaceFolder}",
-            "noDebug": true,
-            "watchMode": false
+            ]
         },
         {
             "type": "bun",
