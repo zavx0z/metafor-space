@@ -4,7 +4,36 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
+        {
+            "type": "bun",
+            "internalConsoleOptions": "neverOpen",
+            "request": "launch",
+            "name": "Run All Tests",
+            "program": "${workspaceFolder}",
+            "runtimeArgs": [
+                "test"
+            ],
+            "cwd": "${workspaceFolder}",
+            "noDebug": true,
+            "watchMode": false
+        },
+        {
+            "type": "bun",
+            "request": "launch",
+            "name": "Run Bun Test",
+            "program": "${file}",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "strictEnv": false,
+            "watchMode": false,
+            "stopOnEntry": false,
+            "noDebug": false,
+            "runtime": "bun",
+            "runtimeArgs": [
+                "test"
+            ]
+        },
         {
             "type": "bun",
             "internalConsoleOptions": "neverOpen",
@@ -26,48 +55,23 @@
             "program": "${file}",
             "cwd": "${workspaceFolder}",
             "noDebug": true,
-            "watchMode": false
-        },
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Run All Tests",
-            "program": "bun",
-            "args": ["test"],
-            "cwd": "${workspaceFolder}",
-            "noDebug": true,
-            "watchMode": false
-        },
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Run Tests (Watch)",
-            "program": "bun",
-            "args": ["test", "--watch"],
-            "cwd": "${workspaceFolder}",
-            "noDebug": true,
-            "watchMode": true
-        },
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Run Current Test File",
-            "program": "bun",
-            "args": ["test", "${file}"],
-            "cwd": "${workspaceFolder}",
-            "noDebug": true,
-            "watchMode": false
+            "watchMode": false,
+            "runtime": "bun",
+            "runtimeArgs": [
+                "test"
+            ]
         },
         {
             "type": "bun",
             "internalConsoleOptions": "neverOpen",
             "request": "launch",
             "name": "Debug Tests",
-            "program": "bun",
-            "args": ["test", "${file}", "--inspect"],
+            "program": "${workspaceFolder}",
+            "runtimeArgs": [
+                "test",
+                "${file}",
+                "--inspect"
+            ],
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
             "watchMode": false,
@@ -82,20 +86,6 @@
             "name": "Attach Bun",
             "url": "ws://localhost:6499/",
             "stopOnEntry": false
-        },
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Debug Tests with Timeout",
-            "program": "bun",
-            "args": ["test", "${file}", "--inspect", "--timeout", "30000"],
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "watchMode": false,
-            "env": {
-                "NODE_ENV": "test"
-            }
         }
     ]
 }

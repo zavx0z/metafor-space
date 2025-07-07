@@ -31,14 +31,14 @@
     "typescript.updateImportsOnFileMove.enabled": "always",
     
     // Настройки для Bun
-    "bun.enable": true,
-    "bun.lsp.enable": true,
+    "bun.runtime": "~/.bun/bin/bun",
+    "bun.debugTerminal.enabled": true,
+    "bun.debugTerminal.stopOnEntry": false,
     
     // Настройки для тестов
     "testing.automaticallyOpenPeekView": "never",
     "testing.followRunningTest": true,
     "testing.gutterEnabled": true,
-    "testing.openTesting": "openOnTestStart",
     
     // Настройки терминала
     "terminal.integrated.defaultProfile.osx": "zsh",
