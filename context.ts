@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { ContextTypes, ContextSchema, ExtractValues, UpdateValues } from './context.t'
+import type { ContextTypes, ContextSchema, ExtractValues, UpdateValues, JsonPatch } from './context.t'
 
 const createStringType = {
   required: (params = {}) => ({ type: 'string' as const, required: true as const, ...params }),
@@ -46,19 +46,6 @@ export const types: ContextTypes = {
     return Object.assign((options = {}) => enumBase.optional(options), enumBase)
   }
 }
-
-/**
- * Тип для JSON Patch (RFC 6902, упрощённый)
- * Используется для передачи изменений в подписчиках onUpdate.
- *
- * @example
- * { op: 'replace', path: '/name', value: 'Новое имя' }
- * { op: 'remove', path: '/age' }
- */
-type JsonPatch =
-  | { op: 'replace'; path: string; value: any }
-  | { op: 'add'; path: string; value: any }
-  | { op: 'remove'; path: string }
 
 /**
  * Класс для работы с типизированными контекстами.

@@ -94,3 +94,8 @@ export type ExtractValue<T> =
   never
 export type ExtractValues<S extends ContextSchema> = { [K in keyof S]: ExtractValue<S[K]> }
 export type UpdateValues<T> = { [K in keyof T]?: T[K] }
+
+export type JsonPatch =
+  | { op: 'replace'; path: string; value: any }
+  | { op: 'add'; path: string; value: any }
+  | { op: 'remove'; path: string }
