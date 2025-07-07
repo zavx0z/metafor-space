@@ -9,6 +9,7 @@ describe("Новый API с state", () => {
         age: types.number.optional(),
       }))
       .states({})
+      .view()
 
     expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
     expect(context.age, "Поле age должно быть null по умолчанию").toBe(null)
@@ -62,6 +63,7 @@ describe("Новый API с state", () => {
           },
         },
       })
+      .view()
     expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
     expect(context.status, 'Поле status должно быть "idle" по умолчанию').toBe("idle")
 
@@ -90,6 +92,7 @@ describe("Новый API с state", () => {
           },
         },
       })
+      .view()
 
     expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
     expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
@@ -104,6 +107,7 @@ describe("Новый API с state", () => {
         name: types.string.required({ default: "Гость" }),
       }))
       .states({})
+      .view()
 
     let patches: any[] = []
     onUpdate((p: any[]) => {
@@ -130,6 +134,7 @@ describe("Новый API с state", () => {
           to: { "ожидание": { status: "процесс" } },
         },
       })
+      .view()
     // @ts-expect-error
     stateConfig["ошибка"]
     // Проверяем, что допустимые ключи доступны
@@ -179,6 +184,7 @@ describe("Новый API с state", () => {
           },
         },
       })
+      .view()
 
     expect(context.status, 'Статус должен быть "idle" по умолчанию').toBe("idle")
     expect(context.name, 'Имя должно быть "Гость" по умолчанию').toBe("Гость")
@@ -219,6 +225,7 @@ describe("Новый API с state", () => {
           },
         },
       })
+      .view()
 
     expect(context.status, 'Статус должен быть "pending" по умолчанию').toBe("pending")
     expect(context.isActive, 'isActive должен быть false по умолчанию').toBe(false)
@@ -246,6 +253,7 @@ describe("Новый API с state", () => {
           },
         },
       })
+      .view()
 
     expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
     expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
@@ -254,5 +262,53 @@ describe("Новый API с state", () => {
     update({ active: true, error: null })
     expect(context.active, 'Поле active должно обновиться на true').toBe(true)
     expect(context.error, 'Поле error должно остаться null').toBe(null)
+  })
+
+  it("метод view() возвращает объект с контекстом и методами", () => {
+    const view = MetaFor("user")
+      .context((types) => ({
+        name: types.string.required({ default: "Гость" }),
+        age: types.number.optional(),
+        isActive: types.boolean.required({ default: false }),
+      }))
+      .states({
+        idle: {
+          to: {
+            active: { isActive: false },
+          },
+        },
+        active: {
+          to: {
+            idle: { isActive: true },
+          },
+        },
+      })
+      .view()
+    
+    expect(view.context, "view.context должен содержать контекст").toBeDefined()
+    expect(view.update, "view.update должен быть функцией").toBeTypeOf("function")
+    expect(view.onUpdate, "view.onUpdate должен быть функцией").toBeTypeOf("function")
+    expect(view.stateConfig, "view.stateConfig должен содержать конфигурацию состояний").toBeDefined()
+    
+    expect(view.context.name, 'view.context.name должен быть "Гость"').toBe("Гость")
+    expect(view.context.age, "view.context.age должен быть null").toBe(null)
+    expect(view.context.isActive, "view.context.isActive должен быть false").toBe(false)
+    
+    // Проверяем, что update работает через view
+    view.update({ name: "Иван", age: 25 })
+    expect(view.context.name, 'view.context.name должен обновиться на "Иван"').toBe("Иван")
+    expect(view.context.age, "view.context.age должен обновиться на 25").toBe(25)
+    
+    // Проверяем, что onUpdate работает через view
+    let patches: any[] = []
+    const unsubscribe = view.onUpdate((p: any[]) => {
+      patches = p
+    })
+    
+    view.update({ isActive: true })
+    expect(patches.length, "onUpdate должен вызываться").toBeGreaterThan(0)
+    expect(view.context.isActive, "view.context.isActive должен обновиться на true").toBe(true)
+    
+    unsubscribe()
   })
 })

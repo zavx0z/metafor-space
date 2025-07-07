@@ -11,7 +11,7 @@ describe("Основная функциональность создания и 
       bio: types.string.optional(),
       priority: types.enum("low", "medium", "high")(),
       tags: types.array.optional({ default: [] }),
-    })).states({})
+    })).states({}).view()
     expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
     expect(context.role, 'Поле role должно быть "user" по умолчанию').toBe("user")
     expect(context.nickname, "Поле nickname должно быть null по умолчанию").toBe(null)
@@ -24,7 +24,7 @@ describe("Основная функциональность создания и 
     const { context, update } = MetaFor("user").context((types) => ({
       name: types.string.required({ default: "Гость" }),
       nickname: types.string(),
-    })).states({})
+    })).states({}).view()
     update({ name: "test" })
     expect(context.name, 'Поле name должно обновиться на "test"').toBe("test")
     update({ nickname: "nick" })
@@ -37,7 +37,7 @@ describe("Основная функциональность создания и 
   it("не допускает undefined для optional полей (TS)", () => {
     const { context, update } = MetaFor("user").context((types) => ({
       nickname: types.string(),
-    })).states({})
+    })).states({}).view()
     // update({ nickname: undefined }) // TS должен ругаться
     update({ nickname: null })
     expect(context.nickname, "Поле nickname должно быть null после update").toBe(null)
@@ -48,7 +48,7 @@ describe("Основная функциональность создания и 
     // types.enum({})() // TS должен ругаться
     const { context, update } = MetaFor("user").context((types) => ({
       role: types.enum("user", "admin")(),
-    })).states({})
+    })).states({}).view()
     expect(context.role, "Поле role должно быть null по умолчанию").toBe(null)
     update({ role: "admin" })
     expect(context.role, 'Поле role должно обновиться на "admin"').toBe("admin")
@@ -60,7 +60,7 @@ describe("Основная функциональность создания и 
       tags: types.array<string>({ default: ["a", "b"] }),
       numbers: types.array<number>(),
       flags: types.array<boolean>(),
-    })).states({})
+    })).states({}).view()
     expect(context.tags, 'Поле tags должно быть ["a", "b"] по умолчанию').toEqual(["a", "b"])
     expect(context.numbers, "Поле numbers должно быть null по умолчанию").toBe(null)
     expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
@@ -79,7 +79,7 @@ describe("Основная функциональность создания и 
       tags: types.array.required<string>({ default: [] }),
       permissions: types.array<number>(),
       flags: types.array<boolean>(),
-    })).states({})
+    })).states({}).view()
     update({
       title: "Новый заголовок",
       description: "Новое описание",
@@ -111,7 +111,7 @@ describe("Основная функциональность создания и 
       const { context } = MetaFor("user").context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({})
+      })).states({}).view()
       // context.name = "other" // будет ошибка линтинга
       // Попытка прямого изменения должна вызывать ошибку
       expect(() => {
@@ -131,7 +131,7 @@ describe("Основная функциональность создания и 
       const { context } = MetaFor("user").context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({})
+      })).states({}).view()
 
       // Попытка удаления свойства должна вызывать ошибку
       expect(() => {
@@ -147,7 +147,7 @@ describe("Основная функциональность создания и 
       const { context } = MetaFor("user").context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({})
+      })).states({}).view()
 
       // Чтение значений должно работать
       expect(context.name, 'Поле name должно быть "Гость"').toBe("Гость")
@@ -158,7 +158,7 @@ describe("Основная функциональность создания и 
       const { context, update } = MetaFor("user").context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({})
+      })).states({}).view()
 
       // Обновление через update() должно работать
       update({ name: "Новое имя", status: "process" })
@@ -170,7 +170,7 @@ describe("Основная функциональность создания и 
       const { context, update } = MetaFor("user").context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({})
+      })).states({}).view()
 
       update({ name: "Новое имя" })
 
@@ -199,7 +199,7 @@ describe("Примеры использования (документация)",
       role: types.enum("user", "admin", "moderator").required({ default: "user" }),
       tags: types.array.optional(),
     }
-    const { context, update } = MetaFor("user").context(() => schema).states({})
+    const { context, update } = MetaFor("user").context(() => schema).states({}).view()
     expect(context, "userContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
       name: "Гость",
       age: null,
@@ -230,7 +230,7 @@ describe("Примеры использования (документация)",
       category: types.enum("electronics", "clothing", "books").optional(),
       images: types.array.required({ default: [] }),
     }
-    const { context, update } = MetaFor("product").context(() => schema).states({})
+    const { context, update } = MetaFor("product").context(() => schema).states({}).view()
     expect(context, "productContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
       id: "",
       name: "Новый продукт",
@@ -267,7 +267,7 @@ describe("Примеры использования (документация)",
       published: types.boolean.required({ default: false }),
       views: types.number.required({ default: 0 }),
     }
-    const { context, update } = MetaFor("article").context(() => schema).states({})
+    const { context, update } = MetaFor("article").context(() => schema).states({}).view()
     expect(context, "articleContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
       title: "Заголовок",
       content: null,
@@ -298,7 +298,7 @@ describe("onUpdate", () => {
       name: types.string.required({ default: "Гость" }),
       age: types.number.optional(),
       isActive: types.boolean.required({ default: true }),
-    })).states({})
+    })).states({}).view()
     let received: any = null
     onUpdate((patches: any) => {
       received = patches
@@ -315,7 +315,7 @@ describe("onUpdate", () => {
   it("функция отписки работает корректно", () => {
     const { update, onUpdate } = MetaFor("user").context((types) => ({
       name: types.string.required({ default: "Гость" }),
-    })).states({})
+    })).states({}).view()
     let called = 0
     const unsubscribe = onUpdate(() => {
       called++
@@ -330,7 +330,7 @@ describe("onUpdate", () => {
   it("несколько подписчиков получают патчи", () => {
     const { update, onUpdate } = MetaFor("user").context((types) => ({
       name: types.string.required({ default: "Гость" }),
-    })).states({})
+    })).states({}).view()
     let a = 0,
       b = 0
     onUpdate(() => {
@@ -348,7 +348,7 @@ describe("onUpdate", () => {
     const { update, onUpdate } = MetaFor("user").context((types) => ({
       name: types.string.required({ default: "Гость" }),
       age: types.number.optional(),
-    })).states({})
+    })).states({}).view()
     let patches: any[] = []
     onUpdate((p: any) => {
       patches = p

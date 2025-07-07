@@ -4,7 +4,7 @@
  */
 
 import { createContext } from "./context"
-import type { ContextSchema, ContextTypes, ContextInstance, ContextWithState as ContextWithStateCb } from "./context.t"
+import type { ContextSchema, ContextTypes, ContextInstance, ContextWithStateCb, ExtractValues, UpdateValues } from "./context.t"
 import type { StateConfig } from "./state.t"
 import type { ContextWithStateConfig } from "./metafor.t"
 
@@ -53,7 +53,16 @@ export function MetaFor(name: string) {
          * @returns Объект с иммутабельным контекстом и методами update и onUpdate
          */
         states<S extends string>(states: StateConfig<S, T>): ContextWithStateConfig<T, S> {
-          return { context, update, onUpdate, stateConfig: states }
+          return { 
+            view() {
+              return {
+                context,
+                update,
+                onUpdate,
+                stateConfig: states
+              }
+            }
+          }
         },
       }
     },

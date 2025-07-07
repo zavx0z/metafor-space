@@ -21,6 +21,7 @@ describe("Условия переходов между состояниями", 
           },
         },
         })
+        .view()
 
       expect(context.active, "Поле active должно быть false по умолчанию").toBe(false)
       expect(context.error, "Поле error должно быть null по умолчанию").toBe(null)
@@ -59,6 +60,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.status, 'Статус должен быть "idle" по умолчанию').toBe("idle")
       update({ status: "loading" })
@@ -85,6 +87,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
       update({ isActive: true })
@@ -108,6 +111,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.isVerified, "isVerified должен быть null по умолчанию").toBe(null)
       update({ isVerified: true })
@@ -138,6 +142,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
       expect(context.isVerified, "isVerified должен быть null по умолчанию").toBe(null)
@@ -163,6 +168,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
       update({ name: "Иван" })
@@ -195,6 +201,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.email, "email должен быть null по умолчанию").toBe(null)
       update({ email: "test@example.com" })
@@ -225,6 +232,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
       expect(context.email, "email должен быть null по умолчанию").toBe(null)
@@ -259,6 +267,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.username, "username должен быть null по умолчанию").toBe(null)
       update({ username: "john_doe" })
@@ -285,6 +294,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       expect(context.score, "score должен быть 0 по умолчанию").toBe(0)
@@ -309,6 +319,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       update({ age: 30 })
@@ -345,6 +356,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       expect(context.score, "score должен быть 0 по умолчанию").toBe(0)
@@ -375,6 +387,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.rating, "rating должен быть null по умолчанию").toBe(null)
       update({ rating: 5 })
@@ -406,6 +419,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.status, 'status должен быть "pending" по умолчанию').toBe("pending")
       update({ status: "approved" })
@@ -429,6 +443,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.role, "role должен быть null по умолчанию").toBe(null)
       update({ role: "admin" })
@@ -463,6 +478,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.status, 'status должен быть "draft" по умолчанию').toBe("draft")
       update({ status: "review" })
@@ -489,6 +505,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       expect(context.permissions, "permissions должен быть [] по умолчанию").toEqual([])
@@ -513,6 +530,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       update({ tags: ["javascript"] })
@@ -559,6 +577,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       expect(context.scores, "scores должен быть [] по умолчанию").toEqual([])
@@ -607,6 +626,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
@@ -677,6 +697,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       expect(context.email, "email должен быть null по умолчанию").toBe(null)
       expect(context.password, 'password должен быть "" по умолчанию').toBe("")
@@ -734,6 +755,7 @@ describe("Условия переходов между состояниями", 
             },
           },
         })
+        .view()
 
       // Проверяем, что контекст доступен для чтения
       expect(typeof context.name, "context.name должен быть строкой").toBe("string")
@@ -763,6 +785,7 @@ describe("Условия переходов между состояниями", 
             to: { idle: { status: "success" } },
           },
         })
+        .view()
 
       // @ts-expect-error - несуществующее состояние должно вызывать ошибку TypeScript
       stateConfig["error"]
