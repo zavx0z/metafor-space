@@ -1,6 +1,5 @@
 ---
-description:
-globs:
+description: структура проекта
 alwaysApply: false
 ---
 # Правило: Структура модулей и функциональных пакетов MetaFor (TypeScript)
