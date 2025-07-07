@@ -4,7 +4,7 @@
  */
 
 import { createContext } from "./context"
-import type { ContextSchema, ExtractValues, UpdateValues, ContextTypes } from "./context.t"
+import type { ContextSchema, ExtractValues, UpdateValues, ContextTypes, JsonPatch } from "./context.t"
 
 /**
  * Основная функция MetaFor
@@ -62,7 +62,7 @@ export function MetaFor(name: string) {
        * @param cb - функция, вызываемая при обновлении контекста
        * @returns функция для отписки
        */
-      onUpdate: (cb: (patches: any[]) => void) => () => void
+      onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
     } {
       return createContext(schema) as any
     },
