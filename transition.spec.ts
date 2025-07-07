@@ -10,24 +10,24 @@ describe("Условия переходов между состояниями", 
           active: types.boolean.required({ default: false }),
         }))
         .states({
-          "неактивно": {
+          неактивно: {
             to: {
-              "активно": { error: null, active: false },
+              активно: { error: null, active: false },
             },
           },
-          "активно": {
+          активно: {
             to: {
-              "неактивно": { error: null, active: true },
+              неактивно: { error: null, active: true },
             },
           },
         })
 
-      expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
-      expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
+      expect(context.active, "Поле active должно быть false по умолчанию").toBe(false)
+      expect(context.error, "Поле error должно быть null по умолчанию").toBe(null)
 
       update({ active: true, error: null })
-      expect(context.active, 'Поле active должно обновиться на true').toBe(true)
-      expect(context.error, 'Поле error должно остаться null').toBe(null)
+      expect(context.active, "Поле active должно обновиться на true").toBe(true)
+      expect(context.error, "Поле error должно остаться null").toBe(null)
     })
 
     it("поддерживает переходы с проверкой статуса", () => {
@@ -86,9 +86,9 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.isActive, 'isActive должен быть false по умолчанию').toBe(false)
+      expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
       update({ isActive: true })
-      expect(context.isActive, 'isActive должен обновиться на true').toBe(true)
+      expect(context.isActive, "isActive должен обновиться на true").toBe(true)
     })
 
     it("поддерживает проверку на null для optional булевых полей", () => {
@@ -109,9 +109,9 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.isVerified, 'isVerified должен быть null по умолчанию').toBe(null)
+      expect(context.isVerified, "isVerified должен быть null по умолчанию").toBe(null)
       update({ isVerified: true })
-      expect(context.isVerified, 'isVerified должен обновиться на true').toBe(true)
+      expect(context.isVerified, "isVerified должен обновиться на true").toBe(true)
     })
 
     it("поддерживает объект с условиями для булевых значений", () => {
@@ -123,24 +123,24 @@ describe("Условия переходов между состояниями", 
         .states({
           pending: {
             to: {
-              active: { 
+              active: {
                 isActive: { eq: false },
-                isVerified: { null: false }
+                isVerified: { null: false },
               },
             },
           },
           active: {
             to: {
-              pending: { 
+              pending: {
                 isActive: { eq: true },
-                isVerified: { null: true }
+                isVerified: { null: true },
               },
             },
           },
         })
 
-      expect(context.isActive, 'isActive должен быть false по умолчанию').toBe(false)
-      expect(context.isVerified, 'isVerified должен быть null по умолчанию').toBe(null)
+      expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
+      expect(context.isVerified, "isVerified должен быть null по умолчанию").toBe(null)
     })
   })
 
@@ -177,26 +177,26 @@ describe("Условия переходов между состояниями", 
         .states({
           invalid: {
             to: {
-              valid: { 
-                email: { 
+              valid: {
+                email: {
                   null: false,
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                }
+                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                },
               },
             },
           },
           valid: {
             to: {
-              invalid: { 
-                email: { 
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                }
+              invalid: {
+                email: {
+                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                },
               },
             },
           },
         })
 
-      expect(context.email, 'email должен быть null по умолчанию').toBe(null)
+      expect(context.email, "email должен быть null по умолчанию").toBe(null)
       update({ email: "test@example.com" })
       expect(context.email, 'email должен обновиться на "test@example.com"').toBe("test@example.com")
     })
@@ -210,24 +210,24 @@ describe("Условия переходов между состояниями", 
         .states({
           anonymous: {
             to: {
-              named: { 
+              named: {
                 name: { notEq: "Гость" },
-                email: null
+                email: null,
               },
             },
           },
           named: {
             to: {
-              anonymous: { 
+              anonymous: {
                 name: "Гость",
-                email: { null: false }
+                email: { null: false },
               },
             },
           },
         })
 
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
-      expect(context.email, 'email должен быть null по умолчанию').toBe(null)
+      expect(context.email, "email должен быть null по умолчанию").toBe(null)
     })
 
     it("поддерживает сложные строковые условия", () => {
@@ -238,29 +238,29 @@ describe("Условия переходов между состояниями", 
         .states({
           invalid: {
             to: {
-              valid: { 
+              valid: {
                 username: {
                   null: false,
                   length: { min: 3, max: 20 },
                   pattern: /^[a-zA-Z0-9_]+$/,
                   notInclude: "admin",
-                  notStartsWith: "test"
-                }
+                  notStartsWith: "test",
+                },
               },
             },
           },
           valid: {
             to: {
-              invalid: { 
+              invalid: {
                 username: {
-                  length: { min: 1, max: 2 }
-                }
+                  length: { min: 1, max: 2 },
+                },
               },
             },
           },
         })
 
-      expect(context.username, 'username должен быть null по умолчанию').toBe(null)
+      expect(context.username, "username должен быть null по умолчанию").toBe(null)
       update({ username: "john_doe" })
       expect(context.username, 'username должен обновиться на "john_doe"').toBe("john_doe")
     })
@@ -286,10 +286,10 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.age, 'age должен быть null по умолчанию').toBe(null)
-      expect(context.score, 'score должен быть 0 по умолчанию').toBe(0)
+      expect(context.age, "age должен быть null по умолчанию").toBe(null)
+      expect(context.score, "score должен быть 0 по умолчанию").toBe(0)
       update({ age: 25 })
-      expect(context.age, 'age должен обновиться на 25').toBe(25)
+      expect(context.age, "age должен обновиться на 25").toBe(25)
     })
 
     it("поддерживает проверку на null", () => {
@@ -310,9 +310,9 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.age, 'age должен быть null по умолчанию').toBe(null)
+      expect(context.age, "age должен быть null по умолчанию").toBe(null)
       update({ age: 30 })
-      expect(context.age, 'age должен обновиться на 30').toBe(30)
+      expect(context.age, "age должен обновиться на 30").toBe(30)
     })
 
     it("поддерживает сложные числовые условия", () => {
@@ -324,33 +324,33 @@ describe("Условия переходов между состояниями", 
         .states({
           beginner: {
             to: {
-              intermediate: { 
+              intermediate: {
                 age: { null: false, gte: 18 },
-                score: { gte: 100, lt: 500 }
+                score: { gte: 100, lt: 500 },
               },
             },
           },
           intermediate: {
             to: {
-              expert: { 
-                score: { gte: 500, lt: 1000 }
+              expert: {
+                score: { gte: 500, lt: 1000 },
               },
             },
           },
           expert: {
             to: {
-              beginner: { 
-                score: { lt: 100 }
+              beginner: {
+                score: { lt: 100 },
               },
             },
           },
         })
 
-      expect(context.age, 'age должен быть null по умолчанию').toBe(null)
-      expect(context.score, 'score должен быть 0 по умолчанию').toBe(0)
+      expect(context.age, "age должен быть null по умолчанию").toBe(null)
+      expect(context.score, "score должен быть 0 по умолчанию").toBe(0)
       update({ age: 25, score: 250 })
-      expect(context.age, 'age должен обновиться на 25').toBe(25)
-      expect(context.score, 'score должен обновиться на 250').toBe(250)
+      expect(context.age, "age должен обновиться на 25").toBe(25)
+      expect(context.score, "score должен обновиться на 250").toBe(250)
     })
 
     it("поддерживает диапазоны чисел", () => {
@@ -376,9 +376,9 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.rating, 'rating должен быть null по умолчанию').toBe(null)
+      expect(context.rating, "rating должен быть null по умолчанию").toBe(null)
       update({ rating: 5 })
-      expect(context.rating, 'rating должен обновиться на 5').toBe(5)
+      expect(context.rating, "rating должен обновиться на 5").toBe(5)
     })
   })
 
@@ -430,7 +430,7 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.role, 'role должен быть null по умолчанию').toBe(null)
+      expect(context.role, "role должен быть null по умолчанию").toBe(null)
       update({ role: "admin" })
       expect(context.role, 'role должен обновиться на "admin"').toBe("admin")
     })
@@ -490,8 +490,8 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.tags, 'tags должен быть null по умолчанию').toBe(null)
-      expect(context.permissions, 'permissions должен быть [] по умолчанию').toEqual([])
+      expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
+      expect(context.permissions, "permissions должен быть [] по умолчанию").toEqual([])
       update({ tags: ["typescript", "react"] })
       expect(context.tags, 'tags должен обновиться на ["typescript", "react"]').toEqual(["typescript", "react"])
     })
@@ -514,7 +514,7 @@ describe("Условия переходов между состояниями", 
           },
         })
 
-      expect(context.tags, 'tags должен быть null по умолчанию').toBe(null)
+      expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       update({ tags: ["javascript"] })
       expect(context.tags, 'tags должен обновиться на ["javascript"]').toEqual(["javascript"])
     })
@@ -528,43 +528,43 @@ describe("Условия переходов между состояниями", 
         .states({
           beginner: {
             to: {
-              intermediate: { 
-                tags: { 
+              intermediate: {
+                tags: {
                   null: false,
                   length: { min: 1, max: 5 },
-                  includes: "javascript"
+                  includes: "javascript",
                 },
                 scores: {
                   length: { min: 3 },
-                  every: (score: number) => score >= 0
-                }
+                  every: (score: number) => score >= 0,
+                },
               },
             },
           },
           intermediate: {
             to: {
-              expert: { 
-                tags: { 
+              expert: {
+                tags: {
                   length: { min: 3 },
-                  some: (tag: string) => tag.includes("advanced")
-                }
+                  some: (tag: string) => tag.includes("advanced"),
+                },
               },
             },
           },
           expert: {
             to: {
-              beginner: { 
-                tags: { isEmpty: true }
+              beginner: {
+                tags: { isEmpty: true },
               },
             },
           },
         })
 
-      expect(context.tags, 'tags должен быть null по умолчанию').toBe(null)
-      expect(context.scores, 'scores должен быть [] по умолчанию').toEqual([])
+      expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
+      expect(context.scores, "scores должен быть [] по умолчанию").toEqual([])
       update({ tags: ["javascript", "typescript"], scores: [85, 90, 95] })
-      expect(context.tags, 'tags должен обновиться').toEqual(["javascript", "typescript"])
-      expect(context.scores, 'scores должен обновиться').toEqual([85, 90, 95])
+      expect(context.tags, "tags должен обновиться").toEqual(["javascript", "typescript"])
+      expect(context.scores, "scores должен обновиться").toEqual([85, 90, 95])
     })
   })
 
@@ -581,57 +581,57 @@ describe("Условия переходов между состояниями", 
         .states({
           pending: {
             to: {
-              approved: { 
+              approved: {
                 name: { notEq: "Гость" },
                 age: { null: false, gte: 18 },
                 isActive: true,
                 status: "pending",
-                tags: { null: false, length: { min: 1 } }
+                tags: { null: false, length: { min: 1 } },
               },
             },
           },
           approved: {
             to: {
-              rejected: { 
+              rejected: {
                 status: "approved",
-                isActive: false
+                isActive: false,
               },
             },
           },
           rejected: {
             to: {
-              pending: { 
+              pending: {
                 status: "rejected",
-                tags: { isEmpty: true }
+                tags: { isEmpty: true },
               },
             },
           },
         })
 
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
-      expect(context.age, 'age должен быть null по умолчанию').toBe(null)
-      expect(context.isActive, 'isActive должен быть false по умолчанию').toBe(false)
+      expect(context.age, "age должен быть null по умолчанию").toBe(null)
+      expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
       expect(context.status, 'status должен быть "pending" по умолчанию').toBe("pending")
-      expect(context.tags, 'tags должен быть null по умолчанию').toBe(null)
+      expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
 
-      update({ 
-        name: "Иван", 
-        age: 25, 
-        isActive: true, 
-        tags: ["developer", "typescript"] 
+      update({
+        name: "Иван",
+        age: 25,
+        isActive: true,
+        tags: ["developer", "typescript"],
       })
-      
+
       expect(context.name, 'name должен обновиться на "Иван"').toBe("Иван")
-      expect(context.age, 'age должен обновиться на 25').toBe(25)
-      expect(context.isActive, 'isActive должен обновиться на true').toBe(true)
-      expect(context.tags, 'tags должен обновиться').toEqual(["developer", "typescript"])
+      expect(context.age, "age должен обновиться на 25").toBe(25)
+      expect(context.isActive, "isActive должен обновиться на true").toBe(true)
+      expect(context.tags, "tags должен обновиться").toEqual(["developer", "typescript"])
     })
 
     it("поддерживает сложную валидацию формы", () => {
       const { context, update } = MetaFor("form")
         .context((types) => ({
           email: types.string.optional(),
-          password: types.string.optional(),
+          password: types.string.required({ default: "" }),
           username: types.string.optional(),
           age: types.number.optional(),
           agreeToTerms: types.boolean.required({ default: false }),
@@ -639,62 +639,64 @@ describe("Условия переходов между состояниями", 
         .states({
           "не заполнено": {
             to: {
-              "заполняется": {
+              заполняется: {
                 email: { null: false, include: "@" },
-                password: { null: false, length: { min: 8 } },
-                username: { null: false, pattern: /^[a-zA-Z0-9_]+$/ }
+                password: { length: { min: 8 } },
+                username: { null: false, pattern: /^[a-zA-Z0-9_]+$/ },
               },
             },
           },
-          "заполняется": {
+          заполняется: {
             to: {
               "валидно": {
                 email: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-                password: { length: { min: 8, max: 128 } },
+                // Следующая строка должна вызывать ошибку TypeScript, потому что password — required:
+                // @ts-expect-error - required поле не поддерживает проверку на null
+                password: { null: true, length: { min: 8, max: 128 } },
                 username: { length: { min: 3, max: 20 } },
                 age: { gte: 13 },
-                agreeToTerms: true
+                agreeToTerms: true,
               },
               "не валидно": {
-                email: { null: false, notInclude: "@" }
+                email: { null: false, notInclude: "@" },
               },
             },
           },
-          "валидно": {
+          валидно: {
             to: {
-              "заполняется": {
-                email: null
+              заполняется: {
+                email: null,
               },
             },
           },
           "не валидно": {
             to: {
-              "заполняется": {
-                email: { include: "@" }
+              заполняется: {
+                email: { include: "@" },
               },
             },
           },
         })
 
-      expect(context.email, 'email должен быть null по умолчанию').toBe(null)
-      expect(context.password, 'password должен быть null по умолчанию').toBe(null)
-      expect(context.username, 'username должен быть null по умолчанию').toBe(null)
-      expect(context.age, 'age должен быть null по умолчанию').toBe(null)
-      expect(context.agreeToTerms, 'agreeToTerms должен быть false по умолчанию').toBe(false)
+      expect(context.email, "email должен быть null по умолчанию").toBe(null)
+      expect(context.password, 'password должен быть "" по умолчанию').toBe("")
+      expect(context.username, "username должен быть null по умолчанию").toBe(null)
+      expect(context.age, "age должен быть null по умолчанию").toBe(null)
+      expect(context.agreeToTerms, "agreeToTerms должен быть false по умолчанию").toBe(false)
 
-      update({ 
+      update({
         email: "test@example.com",
         password: "secure pass 123",
         username: "test user",
         age: 25,
-        agreeToTerms: true
+        agreeToTerms: true,
       })
 
-      expect(context.email, 'email должен обновиться').toBe("test@example.com")
-      expect(context.password, 'password должен обновиться').toBe("secure pass 123")
-      expect(context.username, 'username должен обновиться').toBe("test user")
-      expect(context.age, 'age должен обновиться').toBe(25)
-      expect(context.agreeToTerms, 'agreeToTerms должен обновиться').toBe(true)
+      expect(context.email, "email должен обновиться").toBe("test@example.com")
+      expect(context.password, "password должен обновиться").toBe("secure pass 123")
+      expect(context.username, "username должен обновиться").toBe("test user")
+      expect(context.age, "age должен обновиться").toBe(25)
+      expect(context.agreeToTerms, "agreeToTerms должен обновиться").toBe(true)
     })
   })
 
@@ -716,7 +718,7 @@ describe("Условия переходов между состояниями", 
                 age: { gte: 18 },
                 isActive: { eq: true },
                 status: "pending",
-                tags: { includes: "typescript" }
+                tags: { includes: "typescript" },
               },
             },
           },
@@ -727,18 +729,22 @@ describe("Условия переходов между состояниями", 
                 age: 18,
                 isActive: true,
                 status: "pending",
-                tags: ["typescript"]
+                tags: ["typescript"],
               },
             },
           },
         })
 
       // Проверяем, что контекст доступен для чтения
-      expect(typeof context.name, 'context.name должен быть строкой').toBe('string')
-      expect(typeof context.age === 'number' || context.age === null, 'context.age должен быть number | null').toBe(true)
-      expect(typeof context.isActive, 'context.isActive должен быть boolean').toBe('boolean')
-      expect(typeof context.status, 'context.status должен быть строкой').toBe('string')
-      expect(Array.isArray(context.tags) || context.tags === null, 'context.tags должен быть массивом или null').toBe(true)
+      expect(typeof context.name, "context.name должен быть строкой").toBe("string")
+      expect(typeof context.age === "number" || context.age === null, "context.age должен быть number | null").toBe(
+        true
+      )
+      expect(typeof context.isActive, "context.isActive должен быть boolean").toBe("boolean")
+      expect(typeof context.status, "context.status должен быть строкой").toBe("string")
+      expect(Array.isArray(context.tags) || context.tags === null, "context.tags должен быть массивом или null").toBe(
+        true
+      )
     })
 
     it("проверяет автодополнение ключей состояний", () => {
@@ -767,4 +773,4 @@ describe("Условия переходов между состояниями", 
       expect(Object.keys(stateConfig)).toContain("success")
     })
   })
-}) 
+})
