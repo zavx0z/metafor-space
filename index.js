@@ -11,3 +11,6 @@ const {context, update} = MetaFor("roadmap", {description: "MetaFor RoadMap", de
     update({status: "process"})
     console.log(context)
   }, 1000)
+
+  context.status = "other"
+  console.log(context)

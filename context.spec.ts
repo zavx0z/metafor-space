@@ -104,4 +104,83 @@ describe('MetaFor', () => {
     expect(ctx.context.permissions).toEqual([1, 2, 3])
     expect(ctx.context.flags).toEqual([true, false, true])
   })
+
+  describe('Иммутабельность контекста', () => {
+    it('запрещает прямое изменение значений контекста', () => {
+      const ctx = MetaFor('user').context(types => ({
+        name: types.string.required({ default: 'Гость' }),
+        status: types.enum('start', 'process', 'end').required({ default: 'start' }),
+      }))
+      // ctx.context.name = "other" // будет ошибка линтинга
+      // Попытка прямого изменения должна вызывать ошибку
+      expect(() => {
+        (ctx.context as any).name = 'Новое имя'
+      }).toThrow('Прямое изменение контекста запрещено')
+
+      expect(() => {
+        (ctx.context as any).status = 'process'
+      }).toThrow('Прямое изменение контекста запрещено')
+
+      expect(() => {
+        (ctx.context as any).newField = 'значение'
+      }).toThrow('Прямое изменение контекста запрещено')
+    })
+
+    it('запрещает удаление свойств контекста', () => {
+      const ctx = MetaFor('user').context(types => ({
+        name: types.string.required({ default: 'Гость' }),
+        status: types.enum('start', 'process', 'end').required({ default: 'start' }),
+      }))
+
+      // Попытка удаления свойства должна вызывать ошибку
+      expect(() => {
+        delete (ctx.context as any).name
+      }).toThrow('Удаление свойств контекста запрещено')
+
+      expect(() => {
+        delete (ctx.context as any).status
+      }).toThrow('Удаление свойств контекста запрещено')
+    })
+
+    it('позволяет читать значения контекста', () => {
+      const ctx = MetaFor('user').context(types => ({
+        name: types.string.required({ default: 'Гость' }),
+        status: types.enum('start', 'process', 'end').required({ default: 'start' }),
+      }))
+
+      // Чтение значений должно работать
+      expect(ctx.context.name).toBe('Гость')
+      expect(ctx.context.status).toBe('start')
+    })
+
+    it('обновление через update() работает корректно', () => {
+      const ctx = MetaFor('user').context(types => ({
+        name: types.string.required({ default: 'Гость' }),
+        status: types.enum('start', 'process', 'end').required({ default: 'start' }),
+      }))
+
+      // Обновление через update() должно работать
+      ctx.update({ name: 'Новое имя', status: 'process' })
+      expect(ctx.context.name).toBe('Новое имя')
+      expect(ctx.context.status).toBe('process')
+    })
+
+    it('контекст остается иммутабельным после обновления', () => {
+      const ctx = MetaFor('user').context(types => ({
+        name: types.string.required({ default: 'Гость' }),
+        status: types.enum('start', 'process', 'end').required({ default: 'start' }),
+      }))
+
+      ctx.update({ name: 'Новое имя' })
+
+      // После обновления прямое изменение все еще должно быть запрещено
+      expect(() => {
+        (ctx.context as any).name = 'Другое имя'
+      }).toThrow('Прямое изменение контекста запрещено')
+
+      expect(() => {
+        (ctx.context as any).status = 'end'
+      }).toThrow('Прямое изменение контекста запрещено')
+    })
+  })
 }) 

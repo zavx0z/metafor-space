@@ -46,7 +46,7 @@ export function MetaFor(name: string) {
     context<const T extends ContextSchema>(
       schema: ((types: ContextTypes) => T) | T
     ): {
-      /** Текущее состояние контекста */
+      /** Текущее состояние контекста (только для чтения) */
       context: ExtractValues<T>
       /**
        * Обновляет значения в контексте
@@ -61,34 +61,54 @@ export function MetaFor(name: string) {
       update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
     } {
       const actualSchema = typeof schema === "function" ? (schema as any)(types) : schema as T
-      const context = {} as ExtractValues<T>
+      const contextData = {} as ExtractValues<T>
+      
+      // Инициализация значений по умолчанию
       for (const key in actualSchema) {
         const definition = actualSchema[key]
         if (!definition) continue
         if ("default" in definition && definition.default !== undefined) {
-          ;(context as any)[key] = definition.default
+          ;(contextData as any)[key] = definition.default
         } else {
           const isRequired = definition.required === true
           switch (definition.type) {
-            case "string": (context as any)[key] = isRequired ? "" : null; break
-            case "number": (context as any)[key] = isRequired ? 0 : null; break
-            case "boolean": (context as any)[key] = isRequired ? false : null; break
-            case "array": (context as any)[key] = isRequired ? [] : null; break
+            case "string": (contextData as any)[key] = isRequired ? "" : null; break
+            case "number": (contextData as any)[key] = isRequired ? 0 : null; break
+            case "boolean": (contextData as any)[key] = isRequired ? false : null; break
+            case "array": (contextData as any)[key] = isRequired ? [] : null; break
             case "enum":
               const enumDef = definition as any
-              ;(context as any)[key] = isRequired ? enumDef.values[0] : null
+              ;(contextData as any)[key] = isRequired ? enumDef.values[0] : null
               break
           }
         }
       }
+
+      // Создаем иммутабельный контекст с Proxy
+      const immutableContext = new Proxy({} as ExtractValues<T>, {
+        get(target, prop) {
+          return (contextData as any)[prop]
+        },
+        set(target, prop, value) {
+          throw new Error(`Прямое изменение контекста запрещено. Используйте метод update() для изменения значений. Попытка изменить: ${String(prop)}`)
+        },
+        deleteProperty(target, prop) {
+          throw new Error(`Удаление свойств контекста запрещено. Попытка удалить: ${String(prop)}`)
+        }
+      })
+
+      // Делаем только Proxy иммутабельным
+      Object.freeze(immutableContext)
+      
       function update(values: UpdateValues<ExtractValues<T>>): ExtractValues<T> {
         const filteredValues = Object.fromEntries(
           Object.entries(values).filter(([_, value]) => value !== undefined)
         ) as Partial<ExtractValues<T>>
-        Object.assign(context, filteredValues)
-        return { ...context }
+        Object.assign(contextData, filteredValues)
+        return { ...contextData }
       }
-      return { context, update }
+      
+      return { context: immutableContext, update }
     },
   }
 }
