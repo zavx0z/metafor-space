@@ -8,8 +8,14 @@ export type StateTransitions<T extends string> = {
 /**
  * Конфигурация одного состояния
  */
+export type StateProcess = {
+  action: () => void
+  error: () => void
+  success?: () => void
+}
+
 export type StateDefinition<T extends string> = {
-  action?: () => void
+  process?: StateProcess
   to: StateTransitions<T>
 }
 

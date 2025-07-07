@@ -26,7 +26,10 @@ describe("Новый API с state", () => {
       }))
       .states({
         idle: {
-          action: () => {},
+          process: {
+            action: () => {},
+            error: () => {},
+          },
           to: {
             loading: {},
           },
@@ -43,7 +46,11 @@ describe("Новый API с state", () => {
           },
         },
         error: {
-          action() {},
+          process: {
+            action: () => {},
+            error: () => {},
+            success: () => {},
+          },
           to: {
             idle: {},
           },
