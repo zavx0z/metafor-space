@@ -10,16 +10,16 @@ describe("Условия переходов между состояниями", 
           active: types.boolean.required({ default: false }),
         }))
         .states({
-          неактивно: {
-            to: {
-              активно: { error: null, active: false },
-            },
+                  "неактивно": {
+          to: {
+            "активно": { error: null, active: false },
           },
-          активно: {
-            to: {
-              неактивно: { error: null, active: true },
-            },
+        },
+        "активно": {
+          to: {
+            "неактивно": { error: null, active: true },
           },
+        },
         })
 
       expect(context.active, "Поле active должно быть false по умолчанию").toBe(false)
@@ -639,14 +639,14 @@ describe("Условия переходов между состояниями", 
         .states({
           "не заполнено": {
             to: {
-              заполняется: {
+              "заполняется": {
                 email: { null: false, include: "@" },
                 password: { length: { min: 8 } },
                 username: { null: false, pattern: /^[a-zA-Z0-9_]+$/ },
               },
             },
           },
-          заполняется: {
+          "заполняется": {
             to: {
               "валидно": {
                 email: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
@@ -662,16 +662,16 @@ describe("Условия переходов между состояниями", 
               },
             },
           },
-          валидно: {
+          "валидно": {
             to: {
-              заполняется: {
+              "заполняется": {
                 email: null,
               },
             },
           },
           "не валидно": {
             to: {
-              заполняется: {
+              "заполняется": {
                 email: { include: "@" },
               },
             },
