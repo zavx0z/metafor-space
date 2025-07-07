@@ -1,32 +1,44 @@
-MetaFor
-Современная библиотека для создания динамических контекстов с типизированными параметрами в TypeScript/JavaScript.
+# 🚀 MetaFor
 
-📚 Документация
+> Современная библиотека для создания динамических контекстов с типизированными параметрами в TypeScript/JavaScript
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.4+-blue.svg)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/Bun-1.2+-green.svg)](https://bun.sh/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+## 📚 Документация
+
 Документация API генерируется в отдельном подпроекте для оптимизации основного проекта.
 
-Особенности
-✅ Функциональный API - удобные методы для создания типов
-✅ Система required/optional полей - по умолчанию поля optional (допускают null)
-✅ Только null для optional полей - никакого undefined
-✅ Автоматический вывод типов - полное автодополнение в TypeScript
-✅ Runtime защита от undefined - undefined значения игнорируются
-✅ Совместимость с vanilla JavaScript - можно использовать без TypeScript
-Ограничения типов
-enum — допускает только строки и числа (литеральные значения)
-array — допускает только строки, числа или булево (string | number | boolean)
-Массивы и enum должны быть однородными по типу (например, только строки или только числа)
-Установка
-npm install metafor
-🏗️ Структура проекта
-metafor/
-├── metafor.ts          # Основная функция MetaFor и примеры
-├── context.ts          # Функциональность (объект types)
-├── context.t.ts        # Типы и интерфейсы
-├── context.spec.ts     # Тесты
-└── README.md
-Использование
-Базовый пример
-import { MetaFor, types } from 'metafor'
+## ✨ Особенности
+
+- ✅ **Функциональный API** - удобные методы для создания типов
+- ✅ **Система required/optional полей** - по умолчанию поля optional (допускают null)
+- ✅ **Только null для optional полей** - никакого undefined
+- ✅ **Автоматический вывод типов** - полное автодополнение в TypeScript
+- ✅ **Runtime защита от undefined** - undefined значения игнорируются
+- ✅ **Совместимость с vanilla JavaScript** - можно использовать без TypeScript
+
+## ⚠️ Ограничения типов
+
+- **enum** — допускает только строки и числа (литеральные значения)
+- **array** — допускает только строки, числа или булево (`string | number | boolean`)
+- Массивы и enum должны быть однородными по типу (например, только строки или только числа)
+
+## 🛠️ Установка
+
+```bash
+bun add @metafor/space
+```
+
+
+
+## 🚀 Использование
+
+### Базовый пример
+
+```typescript
+import { MetaFor, types } from '@metafor/space'
 
 const userContext = MetaFor('user').context({
   // Required поля - не могут быть null
@@ -60,8 +72,13 @@ userContext.update({priority: null})      // OK - optional поле
 // ❌ undefined значения отклоняются на runtime
 // userContext.update({name: undefined})  // ❌ Error - TypeScript запрещает
 // userContext.update({role: undefined})  // ❌ Error - TypeScript запрещает
-Доступные типы
-String
+```
+
+## 📋 Доступные типы
+
+### String
+
+```typescript
 // Required string
 name: types.string.required({ default: 'Гость' })
 
@@ -70,67 +87,98 @@ nickname: types.string()
 
 // Optional string (явно)
 bio: types.string.optional()
-Number
+```
+
+### Number
+
+```typescript
 // Required number
 age: types.number.required({ default: 18 })
 
 // Optional number
 score: types.number()
-Boolean
+```
+
+### Boolean
+
+```typescript
 // Required boolean
 isActive: types.boolean.required({ default: true })
 
 // Optional boolean
 isVerified: types.boolean()
-Enum
+```
+
+### Enum
+
+```typescript
 // Required enum
 role: types.enum('user', 'admin', 'moderator').required({ default: 'user' })
 // ❌ Только строки или числа!
 
 // Optional enum
 priority: types.enum('low', 'medium', 'high')()
-Array
+```
+
+### Array
+
+```typescript
 // Required array
 tags: types.array.required({ default: [] })
 // ❌ Только строки, числа или булево!
 
 // Optional array
 permissions: types.array()
-API
-MetaFor(name: string)
+```
+
+## 🔧 API
+
+### `MetaFor(name: string)`
+
 Создает новый экземпляр MetaFor с указанным именем.
 
-types
+### `types`
+
 Объект с методами для создания типов:
 
-types.string.required(options?) - обязательное строковое поле
-types.string(options?) - опциональное строковое поле
-types.string.optional(options?) - опциональное строковое поле (явно)
-types.number.required(options?) - обязательное числовое поле
-types.number(options?) - опциональное числовое поле
-types.boolean.required(options?) - обязательное булево поле
-types.boolean(options?) - опциональное булево поле
-types.enum(...values).required(options?) - обязательное enum поле
-types.enum(...values)(options?) - опциональное enum поле
-types.array.required(options?) - обязательное поле массива
-types.array(options?) - опциональное поле массива
-context.update(values)
+| Метод | Описание |
+|-------|----------|
+| `types.string.required(options?)` | Обязательное строковое поле |
+| `types.string(options?)` | Опциональное строковое поле |
+| `types.string.optional(options?)` | Опциональное строковое поле (явно) |
+| `types.number.required(options?)` | Обязательное числовое поле |
+| `types.number(options?)` | Опциональное числовое поле |
+| `types.boolean.required(options?)` | Обязательное булево поле |
+| `types.boolean(options?)` | Опциональное булево поле |
+| `types.enum(...values).required(options?)` | Обязательное enum поле |
+| `types.enum(...values)(options?)` | Опциональное enum поле |
+| `types.array.required(options?)` | Обязательное поле массива |
+| `types.array(options?)` | Опциональное поле массива |
+
+### `context.update(values)`
+
 Обновляет значения в контексте. Принимает объект с новыми значениями.
 
-Важно: undefined значения игнорируются на runtime и запрещены TypeScript.
+> **Важно:** undefined значения игнорируются на runtime и запрещены TypeScript.
 
-Типизация
+## 🎯 Типизация
+
 Библиотека обеспечивает полную типизацию:
 
-Required поля - имеют тип без null и undefined
-Optional поля - имеют тип с null, но без undefined
-Enum поля - имеют литеральные типы значений
-Update функция - запрещает undefined на уровне TypeScript
-Требования
-TypeScript 4.4+ (для exactOptionalPropertyTypes)
-Node.js 16+ или современный браузер
-Лицензия
+- **Required поля** - имеют тип без null и undefined
+- **Optional поля** - имеют тип с null, но без undefined
+- **Enum поля** - имеют литеральные типы значений
+- **Update функция** - запрещает undefined на уровне TypeScript
+
+## 📋 Требования
+
+- TypeScript 4.4+ (для exactOptionalPropertyTypes)
+- Bun 1.2+ или современный браузер
+
+## 📄 Лицензия
+
 MIT
 
-Readme
-Keywords
+---
+
+**MetaFor** - Создавайте типизированные контексты с легкостью! 🎉

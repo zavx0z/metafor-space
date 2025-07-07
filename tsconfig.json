@@ -42,6 +42,7 @@
     ".vscode/**/*",
     "assets/**/*",
     "fixtures/browser/index.html",
+    "metafor.d.ts"
   ],
   "include": [
     "./*.ts"
