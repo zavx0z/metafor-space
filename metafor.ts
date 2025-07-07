@@ -52,7 +52,7 @@ export function MetaFor(name: string) {
          * @param states - Конфигурация состояний и переходов
          * @returns Объект с иммутабельным контекстом и методами update и onUpdate
          */
-        states<S extends string>(states: StateConfig<S>): ContextWithStateConfig<T, S> {
+        states<S extends string>(states: StateConfig<S, T>): ContextWithStateConfig<T, S> {
           return { context, update, onUpdate, stateConfig: states }
         },
       }

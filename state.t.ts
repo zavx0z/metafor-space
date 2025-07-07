@@ -8,18 +8,20 @@ export type StateTransitions<T extends string> = {
 /**
  * Конфигурация одного состояния
  */
-export type StateProcess = {
+import type { UpdateValues, ExtractValues, ContextSchema } from "./context.t"
+
+export type StateProcess<T extends ContextSchema = any> = {
   action: () => void
-  error: () => void
-  success?: () => void
+  error: (params: { update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T> }) => void
+  success?: (params: { update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T> }) => void
 }
 
-export type StateDefinition<T extends string> = {
-  process?: StateProcess
+export type StateDefinition<T extends string, C extends ContextSchema = any> = {
+  process?: StateProcess<C>
   to: StateTransitions<T>
 }
 
 /**
  * Конфигурация всех состояний
  */
-export type StateConfig<T extends string> = Record<T, StateDefinition<T>>
+export type StateConfig<T extends string, C extends ContextSchema = any> = Record<T, StateDefinition<T, C>>

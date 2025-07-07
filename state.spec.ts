@@ -28,13 +28,18 @@ describe("Новый API с state", () => {
         idle: {
           process: {
             action: () => {},
-            error: () => {},
+            error: ({ update }) => {},
           },
           to: {
             loading: {},
           },
         },
         loading: {
+          process: {
+            action: () => {},
+            error: ({ update }) => {},
+            success: ({ update }) => {},
+          },
           to: {
             success: {},
             error: {},
@@ -46,11 +51,6 @@ describe("Новый API с state", () => {
           },
         },
         error: {
-          process: {
-            action: () => {},
-            error: () => {},
-            success: () => {},
-          },
           to: {
             idle: {},
           },
@@ -101,5 +101,48 @@ describe("Новый API с state", () => {
     // Проверяем, что допустимые ключи доступны
     expect(Object.keys(stateConfig)).toContain("ожидание")
     expect(Object.keys(stateConfig)).toContain("процесс")
+  })
+
+  it("process функции получают update с полной типизацией", () => {
+    const { context, update } = MetaFor("user")
+      .context((types) => ({
+        name: types.string.required({ default: "Гость" }),
+        status: types.enum("idle", "loading", "success", "error").required({ default: "idle" }),
+      }))
+      .states({
+        idle: {
+          process: {
+            action: () => {},
+            error: ({ update }) => update({ status: "error" }),
+          },
+          to: {
+            loading: {},
+          },
+        },
+        loading: {
+          process: {
+            action: () => {},
+            error: ({ update }) => update({ status: "error" }),
+            success: ({ update }) => update({ name: "Успешно обновлено" }),
+          },
+          to: {
+            success: {},
+            error: {},
+          },
+        },
+        success: {
+          to: {
+            idle: {},
+          },
+        },
+        error: {
+          to: {
+            idle: {},
+          },
+        },
+      })
+
+    expect(context.status, 'Статус должен быть "idle" по умолчанию').toBe("idle")
+    expect(context.name, 'Имя должно быть "Гость" по умолчанию').toBe("Гость")
   })
 })
