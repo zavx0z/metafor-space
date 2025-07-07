@@ -3,6 +3,8 @@
  * @packageDocumentation
  */
 
+import type { Template } from "./html";
+
 // ==================== БАЗОВЫЕ ТИПЫ ====================
 
 export type Primitive = null | undefined | boolean | number | string | symbol | bigint;
@@ -50,7 +52,7 @@ export interface CompiledTemplateResult {
   values: unknown[];
 }
 
-export interface CompiledTemplate {
+export interface CompiledTemplate extends Omit<Template, 'el'> {
   el?: HTMLTemplateElement;
   h: TemplateStringsArray;
 }

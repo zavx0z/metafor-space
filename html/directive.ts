@@ -4,7 +4,7 @@ import type {Disconnectable, Part} from './html.t'
  * Интерфейс класса-директивы (конструктор).
  */
 export interface DirectiveClass {
-  new (part: PartInfo): Directive;
+  new (part: PartInfo): Directive
 }
 
 /**
@@ -37,9 +37,9 @@ export const PartType = {
   BOOLEAN_ATTRIBUTE: 4,
   EVENT: 5,
   ELEMENT: 6,
-} as const;
+} as const
 
-export type PartType = (typeof PartType)[keyof typeof PartType];
+export type PartType = (typeof PartType)[keyof typeof PartType]
 
 /**
  * Информация о части типа CHILD.
@@ -86,7 +86,7 @@ export const directive =
     // Это свойство не должно быть минифицировано.
     ['_$litDirective$']: c,
     values,
-  });
+  })
 
 /**
  * Базовый класс для создания пользовательских директив.

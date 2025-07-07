@@ -3,14 +3,14 @@
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-import {nothing, type ElementPart} from '../html.js';
+import {nothing, type ElementPart} from '../html.js'
 
-import {directive, AsyncDirective} from '../async-directive.js';
+import {directive, AsyncDirective} from '../async-directive.js'
 
 /**
  * Creates a new Ref object, which is container for a reference to an element.
  */
-export const createRef = <T = Element>() => new Ref<T>();
+export const createRef = <T = Element>() => new Ref<T>()
 
 /**
  * An object that holds a ref value.
@@ -20,13 +20,13 @@ class Ref<T = Element> {
    * The current Element value of the ref, or else `undefined` if the ref is no
    * longer rendered.
    */
-  readonly value?: T;
+  readonly value?: T
 }
 
-export type {Ref};
+export type {Ref}
 
 interface RefInternal {
-  value: Element | undefined;
+  value: Element | undefined
 }
 
 // When callbacks are used for refs, this map tracks the last value the callback
@@ -37,39 +37,39 @@ interface RefInternal {
 const lastElementForContextAndCallback = new WeakMap<
   object,
   WeakMap<Function, Element | undefined>
->();
+>()
 
-export type RefOrCallback<T = Element> = Ref<T> | ((el: T | undefined) => void);
+export type RefOrCallback<T = Element> = Ref<T> | ((el: T | undefined) => void)
 
 class RefDirective extends AsyncDirective {
-  private _element?: Element;
-  private _ref?: RefOrCallback;
-  private _context?: object;
+  private _element?: Element
+  private _ref?: RefOrCallback
+  private _context?: object
 
   render(_ref?: RefOrCallback) {
-    return nothing;
+    return nothing
   }
 
   override update(part: ElementPart, [ref]: Parameters<this['render']>) {
-    const refChanged = ref !== this._ref;
+    const refChanged = ref !== this._ref
     if (refChanged && this._ref !== undefined) {
       // The ref passed to the directive has changed;
       // unset the previous ref's value
-      this._updateRefValue(undefined);
+      this._updateRefValue(undefined)
     }
     if (refChanged || this._lastElementForRef !== this._element) {
       // We either got a new ref or this is the first render;
       // store the ref/element & update the ref value
-      this._ref = ref;
-      this._context = part.options?.host;
-      this._updateRefValue((this._element = part.element));
+      this._ref = ref
+      this._context = part.options?.host
+      this._updateRefValue((this._element = part.element))
     }
-    return nothing;
+    return nothing
   }
 
   private _updateRefValue(element: Element | undefined) {
     if (!this.isConnected) {
-      element = undefined;
+      element = undefined
     }
     if (typeof this._ref === 'function') {
       // If the current ref was called with a previous value, call with
@@ -81,23 +81,23 @@ class RefDirective extends AsyncDirective {
       // both the context and the callback, since we allow passing unbound
       // functions that are called on options.host, and we want to treat
       // these as unique "instances" of a function.
-      const context = this._context ?? globalThis;
+      const context = this._context ?? globalThis
       let lastElementForCallback =
-        lastElementForContextAndCallback.get(context);
+        lastElementForContextAndCallback.get(context)
       if (lastElementForCallback === undefined) {
-        lastElementForCallback = new WeakMap();
-        lastElementForContextAndCallback.set(context, lastElementForCallback);
+        lastElementForCallback = new WeakMap()
+        lastElementForContextAndCallback.set(context, lastElementForCallback)
       }
       if (lastElementForCallback.get(this._ref) !== undefined) {
-        this._ref.call(this._context, undefined);
+        this._ref.call(this._context, undefined)
       }
-      lastElementForCallback.set(this._ref, element);
+      lastElementForCallback.set(this._ref, element)
       // Call the ref with the new element value
       if (element !== undefined) {
-        this._ref.call(this._context, element);
+        this._ref.call(this._context, element)
       }
     } else {
-      (this._ref as RefInternal)!.value = element;
+      (this._ref as RefInternal)!.value = element
     }
   }
 
@@ -106,7 +106,7 @@ class RefDirective extends AsyncDirective {
       ? lastElementForContextAndCallback
           .get(this._context ?? globalThis)
           ?.get(this._ref)
-      : this._ref?.value;
+      : this._ref?.value
   }
 
   override disconnected() {
@@ -115,14 +115,14 @@ class RefDirective extends AsyncDirective {
     // only happens in the event of the directive being cleared (not via manual
     // disconnection)
     if (this._lastElementForRef === this._element) {
-      this._updateRefValue(undefined);
+      this._updateRefValue(undefined)
     }
   }
 
   override reconnected() {
     // If we were manually disconnected, we can safely put our element back in
     // the box, since no rendering could have occurred to change its state
-    this._updateRefValue(this._element);
+    this._updateRefValue(this._element)
   }
 }
 
@@ -151,10 +151,10 @@ class RefDirective extends AsyncDirective {
  * render(html`<input ${ref(callback)}>`, container);
  * ```
  */
-export const ref = directive(RefDirective);
+export const ref = directive(RefDirective)
 
 /**
  * The type of the class that powers this directive. Necessary for naming the
  * directive's return type.
  */
-export type {RefDirective};
+export type {RefDirective}

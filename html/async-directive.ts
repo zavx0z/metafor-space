@@ -13,7 +13,7 @@
  *
  * The strategy is to introduce a `AsyncDirective` subclass of
  * `Directive` that climbs the "parent" tree in its constructor to note which
- * branches of lit-html's "logical tree" of data structures contain such
+ * branches of @metafor/html's "logical tree" of data structures contain such
  * directives and thus need to be crawled when a subtree is being cleared (or
  * manually disconnected) in order to run the `disconnected` callback.
  *
@@ -35,7 +35,7 @@
  * `_$notifyDirectiveConnectionChanged` on any directives that are encountered
  * in that tree, running the required callbacks.
  *
- * A given "logical tree" of lit-html data-structures might look like this:
+ * A given "logical tree" of @metafor/html data-structures might look like this:
  *
  *  ChildPart(N1) _$dC=[D2,T3]
  *   ._directive
@@ -118,13 +118,13 @@
  * `isConnected: true` down the tree, signaling which callback to run.
  */
 
-import type {AttributePart, ChildPart} from './html.js';
+import type {AttributePart, ChildPart} from './html.js'
 import  type{ Disconnectable, Part} from "./html.t.js"
-import {isSingleExpression} from './directive-helpers.js';
-import {Directive, type PartInfo, PartType} from './directive.js';
-export * from './directive.js';
+import {isSingleExpression} from './directive-helpers.js'
+import {Directive, type PartInfo, PartType} from './directive.js'
+export * from './directive.js'
 
-const DEV_MODE = true;
+const DEV_MODE = true
 
 /**
  * Recursively walks down the tree of Parts/TemplateInstances/Directives to set
@@ -137,9 +137,9 @@ const notifyChildrenConnectedChanged = (
   parent: Disconnectable,
   isConnected: boolean
 ): boolean => {
-  const children = parent._$disconnectableChildren;
+  const children = parent._$disconnectableChildren
   if (children === undefined) {
-    return false;
+    return false
   }
   for (const obj of children) {
     // The existence of `_$notifyDirectiveConnectionChanged` is used as a "brand" to
@@ -153,12 +153,12 @@ const notifyChildrenConnectedChanged = (
     (obj as AsyncDirective)['_$notifyDirectiveConnectionChanged']?.(
       isConnected,
       false
-    );
+    )
     // Disconnect Part/TemplateInstance
-    notifyChildrenConnectedChanged(obj, isConnected);
+    notifyChildrenConnectedChanged(obj, isConnected)
   }
-  return true;
-};
+  return true
+}
 
 /**
  * Removes the given child from its parent list of disconnectable children, and
@@ -167,33 +167,33 @@ const notifyChildrenConnectedChanged = (
  * become empty.
  */
 const removeDisconnectableFromParent = (obj: Disconnectable) => {
-  let parent, children;
+  let parent, children
   do {
     if ((parent = obj._$parent) === undefined) {
-      break;
+      break
     }
-    children = parent._$disconnectableChildren!;
-    children.delete(obj);
-    obj = parent;
-  } while (children?.size === 0);
-};
+    children = parent._$disconnectableChildren!
+    children.delete(obj)
+    obj = parent
+  } while (children?.size === 0)
+}
 
 const addDisconnectableToParent = (obj: Disconnectable) => {
   // Climb the parent tree, creating a sparse tree of children needing
   // disconnection
   for (let parent; (parent = obj._$parent); obj = parent) {
-    let children = parent._$disconnectableChildren;
+    let children = parent._$disconnectableChildren
     if (children === undefined) {
-      parent._$disconnectableChildren = children = new Set();
+      parent._$disconnectableChildren = children = new Set()
     } else if (children.has(obj)) {
       // Once we've reached a parent that already contains this child, we
       // can short-circuit
-      break;
+      break
     }
-    children.add(obj);
-    installDisconnectAPI(parent);
+    children.add(obj)
+    installDisconnectAPI(parent)
   }
-};
+}
 
 /**
  * Changes the parent reference of the ChildPart, and updates the sparse tree of
@@ -204,11 +204,11 @@ const addDisconnectableToParent = (obj: Disconnectable) => {
  */
 function reparentDisconnectables(this: ChildPart, newParent: Disconnectable) {
   if (this._$disconnectableChildren !== undefined) {
-    removeDisconnectableFromParent(this);
-    this._$parent = newParent;
-    addDisconnectableToParent(this);
+    removeDisconnectableFromParent(this)
+    this._$parent = newParent
+    addDisconnectableToParent(this)
   } else {
-    this._$parent = newParent;
+    this._$parent = newParent
   }
 }
 
@@ -239,10 +239,10 @@ function notifyChildPartConnectedChanged(
   isClearingValue = false,
   fromPartIndex = 0
 ) {
-  const value = this._$committedValue;
-  const children = this._$disconnectableChildren;
+  const value = this._$committedValue
+  const children = this._$disconnectableChildren
   if (children === undefined || children.size === 0) {
-    return;
+    return
   }
   if (isClearingValue) {
     if (Array.isArray(value)) {
@@ -250,18 +250,18 @@ function notifyChildPartConnectedChanged(
       // disconnected and removed from this ChildPart's disconnectable
       // children (starting at `fromPartIndex` in the case of truncation)
       for (let i = fromPartIndex; i < value.length; i++) {
-        notifyChildrenConnectedChanged(value[i], false);
-        removeDisconnectableFromParent(value[i]);
+        notifyChildrenConnectedChanged(value[i], false)
+        removeDisconnectableFromParent(value[i])
       }
     } else if (value != null) {
       // TemplateInstance case: If the value has disconnectable children (will
       // only be in the case that it is a TemplateInstance), we disconnect it
       // and remove it from this ChildPart's disconnectable children
-      notifyChildrenConnectedChanged(value as Disconnectable, false);
-      removeDisconnectableFromParent(value as Disconnectable);
+      notifyChildrenConnectedChanged(value as Disconnectable, false)
+      removeDisconnectableFromParent(value as Disconnectable)
     }
   } else {
-    notifyChildrenConnectedChanged(this, isConnected);
+    notifyChildrenConnectedChanged(this, isConnected)
   }
 }
 
@@ -271,10 +271,10 @@ function notifyChildPartConnectedChanged(
 const installDisconnectAPI = (obj: Disconnectable) => {
   if ((obj as ChildPart).type == PartType.CHILD) {
     (obj as ChildPart)._$notifyConnectionChanged ??=
-      notifyChildPartConnectedChanged;
-    (obj as ChildPart)._$reparentDisconnectables ??= reparentDisconnectables;
+      notifyChildPartConnectedChanged
+    (obj as ChildPart)._$reparentDisconnectables ??= reparentDisconnectables
   }
-};
+}
 
 /**
  * An abstract `Directive` base class whose `disconnected` method will be
@@ -302,10 +302,10 @@ export abstract class AsyncDirective extends Directive {
   /**
    * The connection state for this Directive.
    */
-  isConnected!: boolean;
+  isConnected!: boolean
 
   // @internal
-  override _$disconnectableChildren?: Set<Disconnectable> = undefined;
+  override _$disconnectableChildren?: Set<Disconnectable> = undefined
   /**
    * Initialize the part with internal fields
    * @param part
@@ -317,9 +317,9 @@ export abstract class AsyncDirective extends Directive {
     parent: Disconnectable,
     attributeIndex: number | undefined
   ) {
-    super._$initialize(part, parent, attributeIndex);
-    addDisconnectableToParent(this);
-    this.isConnected = part._$isConnected;
+    super._$initialize(part, parent, attributeIndex)
+    addDisconnectableToParent(this)
+    this.isConnected = part._$isConnected
   }
   // This property needs to remain unminified.
   /**
@@ -339,16 +339,16 @@ export abstract class AsyncDirective extends Directive {
     isClearingDirective = true
   ) {
     if (isConnected !== this.isConnected) {
-      this.isConnected = isConnected;
+      this.isConnected = isConnected
       if (isConnected) {
-        this.reconnected?.();
+        this.reconnected?.()
       } else {
-        this.disconnected?.();
+        this.disconnected?.()
       }
     }
     if (isClearingDirective) {
-      notifyChildrenConnectedChanged(this, isConnected);
-      removeDisconnectableFromParent(this);
+      notifyChildrenConnectedChanged(this, isConnected)
+      removeDisconnectableFromParent(this)
     }
   }
 
@@ -364,16 +364,16 @@ export abstract class AsyncDirective extends Directive {
    */
   setValue(value: unknown) {
     if (isSingleExpression(this.__part as unknown as PartInfo)) {
-      this.__part._$setValue(value, this);
+      this.__part._$setValue(value, this)
     } else {
       // this.__attributeIndex will be defined in this case, but
       // assert it in dev mode
       if (DEV_MODE && this.__attributeIndex === undefined) {
-        throw new Error(`Expected this.__attributeIndex to be a number`);
+        throw new Error(`Expected this.__attributeIndex to be a number`)
       }
-      const newValues = [...(this.__part._$committedValue as Array<unknown>)];
-      newValues[this.__attributeIndex!] = value;
-      (this.__part as AttributePart)._$setValue(newValues, this, 0);
+      const newValues = [...(this.__part._$committedValue as Array<unknown>)]
+      newValues[this.__attributeIndex!] = value
+      (this.__part as AttributePart)._$setValue(newValues, this, 0)
     }
   }
 

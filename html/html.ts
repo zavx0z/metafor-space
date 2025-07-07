@@ -34,13 +34,13 @@ import type {
   TrustedTypesWindow
 } from './html.t'
 
-const DEV_MODE = true;
-const ENABLE_EXTRA_SECURITY_HOOKS = true;
-const ENABLE_SHADYDOM_NOPATCH = true;
-const NODE_MODE = false;
+const DEV_MODE = true
+const ENABLE_EXTRA_SECURITY_HOOKS = true
+const ENABLE_SHADYDOM_NOPATCH = true
+const NODE_MODE = false
 
 // Позволяет минификаторам переименовывать ссылки на globalThis
-const global = globalThis;
+const global = globalThis
 
 /**
  * Содержит типы, которые являются частью нестабильного debug API.
@@ -57,25 +57,25 @@ const global = globalThis;
 const debugLogEvent = DEV_MODE
   ? (event: LitUnstable.DebugLog.Entry) => {
     const shouldEmit = (global as unknown as DebugLoggingWindow)
-      .emitLitDebugLogEvents;
+      .emitLitDebugLogEvents
     if (!shouldEmit) {
-      return;
+      return
     }
     global.dispatchEvent(
       new CustomEvent<LitUnstable.DebugLog.Entry>('html-debug', {
         detail: event,
       })
-    );
+    )
   }
-  : undefined;
+  : undefined
 // Используется для связывания beginRender и endRender при вложенных рендерах,
 // когда из-за ошибок не вызывается endRender.
-let debugLogRenderId = 0;
+let debugLogRenderId = 0
 
-let issueWarning: (code: string, warning: string) => void;
+let issueWarning: (code: string, warning: string) => void
 
 if (DEV_MODE) {
-  global.litIssuedWarnings ??= new Set();
+  global.litIssuedWarnings ??= new Set()
 
   /**
    * Выдает предупреждение, если мы еще не выдали его, на основе `code` или
@@ -84,23 +84,23 @@ if (DEV_MODE) {
    */
   issueWarning = (code: string, warning: string) => {
     warning += code
-      ? ` См. https://lit.dev/msg/${code} для получения дополнительной информации.`
-      : '';
+      ? ` См. https://metafor.dev/msg/${code} для получения дополнительной информации.`
+      : ''
     if (
       !global.litIssuedWarnings!.has(warning) &&
       !global.litIssuedWarnings!.has(code)
     ) {
-      console.warn(warning);
-      global.litIssuedWarnings!.add(warning);
+      console.warn(warning)
+      global.litIssuedWarnings!.add(warning)
     }
-  };
+  }
 
   queueMicrotask(() => {
     issueWarning(
       'dev-mode',
-      `Lit находится в режиме разработки. Не рекомендуется для продакшена!`
-    );
-  });
+      `@metafor/html находится в режиме разработки. Не рекомендуется для продакшена!`
+    )
+  })
 }
 
 const wrap =
@@ -108,9 +108,9 @@ const wrap =
   global.ShadyDOM?.inUse &&
   global.ShadyDOM?.noPatch === true
     ? (global.ShadyDOM!.wrap as <T extends Node>(node: T) => T)
-    : <T extends Node>(node: T) => node;
+    : <T extends Node>(node: T) => node
 
-const trustedTypes = (global as unknown as TrustedTypesWindow).trustedTypes;
+const trustedTypes = (global as unknown as TrustedTypesWindow).trustedTypes
 
 /**
  * Наша политика TrustedType для HTML, которая объявляется с помощью функции
@@ -121,10 +121,10 @@ const trustedTypes = (global as unknown as TrustedTypesWindow).trustedTypes;
  * выражения. Следовательно, он считается безопасным по конструкции.
  */
 const policy = trustedTypes
-  ? trustedTypes.createPolicy('lit-html', {
+  ? trustedTypes.createPolicy('html', {
     createHTML: (s) => s,
   })
-  : undefined;
+  : undefined
 
 /**
  * Используется для очистки любого значения перед его записью в DOM. Это может
@@ -150,81 +150,81 @@ const policy = trustedTypes
  */
 
 
-const identityFunction: ValueSanitizer = (value: unknown) => value;
+const identityFunction: ValueSanitizer = (value: unknown) => value
 const noopSanitizer: SanitizerFactory = (
   _node: Node,
   _name: string,
   _type: 'property' | 'attribute'
-) => identityFunction;
+) => identityFunction
 
 /** Устанавливает глобальный фабрик очистки. */
 const setSanitizer = (newSanitizer: SanitizerFactory) => {
   if (!ENABLE_EXTRA_SECURITY_HOOKS) {
-    return;
+    return
   }
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(
-      `Попытка перезаписать существующую политику безопасности lit-html.` +
+      `Попытка перезаписать существующую политику безопасности @metafor/html.` +
       ` setSanitizeDOMValueFactory должен быть вызван не более одного раза.`
-    );
+    )
   }
-  sanitizerFactoryInternal = newSanitizer;
-};
+  sanitizerFactoryInternal = newSanitizer
+}
 
 /**
  * Используется только в внутренних тестах, не является частью публичного API.
  */
 const _testOnlyClearSanitizerFactoryDoNotCallOrElse = () => {
-  sanitizerFactoryInternal = noopSanitizer;
-};
+  sanitizerFactoryInternal = noopSanitizer
+}
 
 const createSanitizer: SanitizerFactory = (node, name, type) => {
-  return sanitizerFactoryInternal(node, name, type);
-};
+  return sanitizerFactoryInternal(node, name, type)
+}
 
 // Добавляется к имени атрибута, чтобы отметить атрибут как связанный, чтобы
 // мы могли его легко найти.
-const boundAttributeSuffix = '$html$';
+const boundAttributeSuffix = '$html$'
 
 // Этот маркер используется в множестве синтаксических позициях в HTML, поэтому
 // он должен быть допустимым именем элемента и атрибута. Мы не поддерживаем
 // динамические имена (еще), но это по крайней мере гарантирует, что дерево
 // разбора ближе к намерению шаблона.
-const marker = `html$${Math.random().toFixed(9).slice(2)}$`;
+const marker = `html$${Math.random().toFixed(9).slice(2)}$`
 
 // Строка, используемая для определения того, является ли комментарий маркерным
 // комментарием.
-const markerMatch = '?' + marker;
+const markerMatch = '?' + marker
 
 // Текст, используемый для вставки узла маркерного комментария. Мы используем
 // синтаксис обработки инструкций, потому что он немного меньше, но парсится
 // как узел комментария.
-const nodeMarker = `<${markerMatch}>`;
+const nodeMarker = `<${markerMatch}>`
 
 const d =
   NODE_MODE && global.document === undefined
     ? ({
       createTreeWalker() {
-        return {};
+        return {}
       },
     } as unknown as Document)
-    : document;
+    : document
 
 // Создает динамический маркер. Мы никогда не должны искать эти узлы в DOM.
-const createMarker = () => d.createComment('');
+const createMarker = () => d.createComment('')
 
 // https://tc39.github.io/ecma262/#sec-typeof-operator
 const isPrimitive = (value: unknown): value is Primitive =>
-  value === null || (typeof value != 'object' && typeof value != 'function');
-const isArray = Array.isArray;
+  value === null || (typeof value != 'object' && typeof value != 'function')
+const isArray = Array.isArray
 const isIterable = (value: unknown): value is Iterable<unknown> =>
   isArray(value) ||
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  typeof (value as any)?.[Symbol.iterator] === 'function';
+  typeof (value as any)?.[Symbol.iterator] === 'function'
 
-const SPACE_CHAR = `[ \t\n\f\r]`;
-const ATTR_VALUE_CHAR = `[^ \t\n\f\r"'\`<>=]`;
-const NAME_CHAR = `[^\\s"'>=/]`;
+const SPACE_CHAR = `[ \t\n\f\r]`
+const ATTR_VALUE_CHAR = `[^ \t\n\f\r"'\`<>=]`
+const NAME_CHAR = `[^\\s"'>=/]`
 
 // Эти регулярные выражения представляют пять состояний сканера HTML шаблона,
 // которые мы заботимся. Они соответствуют концу состояния, которое они
@@ -240,17 +240,17 @@ const NAME_CHAR = `[^\\s"'>=/]`;
  * Конец текста: `<` за которым следует:
  *   (начало комментария) или (тег) или (динамическое связывание тега)
  */
-const textEndRegex = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g;
-const COMMENT_START = 1;
-const TAG_NAME = 2;
-const DYNAMIC_TAG_NAME = 3;
+const textEndRegex = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g
+const COMMENT_START = 1
+const TAG_NAME = 2
+const DYNAMIC_TAG_NAME = 3
 
-const commentEndRegex = /-->/g;
+const commentEndRegex = /-->/g
 /**
  * Комментарии, которые не начинаются с <!--, как </{, могут заканчиваться
  * одним `>`
  */
-const comment2EndRegex = />/g;
+const comment2EndRegex = />/g
 
 /**
  * Регулярное выражение tagEnd соответствует позиции "внутри открывающего"
@@ -279,21 +279,21 @@ const comment2EndRegex = />/g;
 const tagEndRegex = new RegExp(
   `>|${SPACE_CHAR}(?:(${NAME_CHAR}+)(${SPACE_CHAR}*=${SPACE_CHAR}*(?:${ATTR_VALUE_CHAR}|("|')|))|$)`,
   'g'
-);
-const ENTIRE_MATCH = 0;
-const ATTRIBUTE_NAME = 1;
-const SPACES_AND_EQUALS = 2;
-const QUOTE_CHAR = 3;
+)
+const ENTIRE_MATCH = 0
+const ATTRIBUTE_NAME = 1
+const SPACES_AND_EQUALS = 2
+const QUOTE_CHAR = 3
 
-const singleQuoteAttrEndRegex = /'/g;
-const doubleQuoteAttrEndRegex = /"/g;
+const singleQuoteAttrEndRegex = /'/g
+const doubleQuoteAttrEndRegex = /"/g
 /**
  * Соответствует необработанным текстовым элементам.
  *
  * Комментарии не парсятся внутри необработанных текстовых элементов, поэтому
  * нам нужно искать в их текстовом содержимом строки маркеров.
  */
-const rawTextElement = /^(?:script|style|textarea|title)$/i;
+const rawTextElement = /^(?:script|style|textarea|title)$/i
 
 /** Типы TemplateResult */
 // Важно: эти должны соответствовать значениям в PartType
@@ -314,7 +314,7 @@ const tag =
         console.warn(
           'Некоторые строковые шаблоны undefined.\n' +
           'Это, вероятно, вызвано нелегальными последовательностями escape-последовательностей восьмеричного кода.'
-        );
+        )
       }
       if (DEV_MODE) {
         // Импорт static-html.js вызывает циклическую зависимость, которую g3 не
@@ -326,8 +326,8 @@ const tag =
           issueWarning(
             '',
             `Статические значения 'literal' или 'unsafeStatic' не могут использоваться в нестатических шаблонах.\n` +
-            `Пожалуйста, используйте статическую функцию 'html' для тега, чтобы увидеть https://lit.dev/docs/templates/expressions/#static-expressions`
-          );
+            `Пожалуйста, используйте статическую функцию 'html' для тега, чтобы увидеть https://metafor.dev/docs/templates/expressions/#static-expressions`
+          )
         }
       }
       return {
@@ -335,8 +335,8 @@ const tag =
         ['_$htmlType$']: type,
         strings,
         values,
-      };
-    };
+      }
+    }
 
 /**
  * Интерпретирует литеральный шаблон как HTML-шаблон, который может эффективно
@@ -352,7 +352,7 @@ const tag =
  * что и ранее отрендеренный результат, он эффективно обновляется вместо
  * замены.
  */
-export const html = tag(HTML_RESULT);
+export const html = tag(HTML_RESULT)
 
 /**
  * Интерпретирует литеральный шаблон как фрагмент SVG, который может эффективно
@@ -378,7 +378,7 @@ export const html = tag(HTML_RESULT);
  * элемента и, следовательно, не будет правильно содержаться в HTML-элементе
  * `<svg>`.
  */
-export const svg = tag(SVG_RESULT);
+export const svg = tag(SVG_RESULT)
 
 /**
  * Интерпретирует литеральный шаблон как фрагмент MathML, который может эффективно
@@ -404,13 +404,13 @@ export const svg = tag(SVG_RESULT);
  * элемента и, следовательно, не будет правильно содержаться в HTML-элементе
  * `<math>`.
  */
-export const mathml = tag(MATHML_RESULT);
+export const mathml = tag(MATHML_RESULT)
 
 /**
  * Значение-отправка, которое сигнализирует о том, что значение было обработано
  * директивой и не должно записываться в DOM.
  */
-export const noChange = Symbol.for('html-noChange');
+export const noChange = Symbol.for('html-noChange')
 
 /**
  * Значение-отправка, которое сигнализирует о том, что ChildPart должен полностью
@@ -433,7 +433,7 @@ export const noChange = Symbol.for('html-noChange');
  * атрибут, в то время как `undefined` и `null` будут рендерить пустую строку.
  * В свойственных выражениях `nothing` становится `undefined`.
  */
-export const nothing = Symbol.for('html-nothing');
+export const nothing = Symbol.for('html-nothing')
 
 /**
  * Кэш подготовленных шаблонов, ключами которого являются TemplateStringsArray
@@ -442,15 +442,15 @@ export const nothing = Symbol.for('html-nothing');
  * статическими и быть одним из html, svg, или attr. Это ограничение
  * упрощает поиск в кэше, который является горячим путем для рендеринга.
  */
-const templateCache = new WeakMap<TemplateStringsArray, Template>();
+const templateCache = new WeakMap<TemplateStringsArray, Template>()
 
 
 const walker = d.createTreeWalker(
   d,
   129 /* NodeFilter.SHOW_{ELEMENT|COMMENT} */
-);
+)
 
-let sanitizerFactoryInternal: SanitizerFactory = noopSanitizer;
+let sanitizerFactoryInternal: SanitizerFactory = noopSanitizer
 
 //
 // Классы только ниже, объявления константных переменных только выше...
@@ -715,12 +715,12 @@ class Template {
             /^(?:textarea|template)$/i!.test(tag) &&
             (node as Element).innerHTML.includes(marker)
           ) {
-            const m =
-              `Выражения не поддерживаются внутри \`${tag}\` ` +
-              `элементов. См. https://lit.dev/msg/expression-in-${tag} для получения дополнительной информации.`;
-            if (tag === 'template') {
-              throw new Error(m);
-            } else issueWarning('', m);
+                      const m =
+            `Выражения не поддерживаются внутри \`${tag}\` ` +
+            `элементов. См. https://metafor.dev/msg/expression-in-${tag} для получения дополнительной информации.`
+          if (tag === 'template') {
+            throw new Error(m)
+          } else issueWarning('', m)
           }
         }
         // TODO (justinfagnani): для попыток динамических имен тегов мы не
@@ -1873,20 +1873,20 @@ export const _$LH = {
 // Применяем полифилы, если они доступны
 const polyfillSupport = DEV_MODE
   ? global.litHtmlPolyfillSupportDevMode
-  : global.litHtmlPolyfillSupport;
-polyfillSupport?.(Template, ChildPart);
+  : global.litHtmlPolyfillSupport
+polyfillSupport?.(Template, ChildPart)
 
 // ВАЖНО: не меняйте имя свойства или выражение присваивания.
-// Эта строка будет использоваться в регулярных выражениях для поиска использования lit-html.
-(global.litHtmlVersions ??= []).push('3.3.0');
+// Эта строка будет использоваться в регулярных выражениях для поиска использования @metafor/html.
+(global.litHtmlVersions ??= []).push('3.3.0')
 if (DEV_MODE && global.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning!(
       'multiple-versions',
-      `Загружены несколько версий Lit. ` +
+      `Загружены несколько версий @metafor/html. ` +
       `Загрузка нескольких версий не рекомендуется.`
-    );
-  });
+    )
+  })
 }
 
 /**
