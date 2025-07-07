@@ -18,11 +18,13 @@ describe("Новый API с state", () => {
     expect(context.age, "Поле age должно обновиться на 25").toBe(25)
   })
 
-  it("работает с stateConfig", () => {
+  it("работает с stateConfig и условиями переходов", () => {
     const { context, update } = MetaFor("user")
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("idle", "loading", "success", "error").required({ default: "idle" }),
+        error: types.string.optional(),
+        active: types.boolean.required({ default: false }),
       }))
       .states({
         idle: {
@@ -33,7 +35,7 @@ describe("Новый API с state", () => {
             error: ({ update }) => update({ status: "error" }),
           },
           to: {
-            loading: {},
+            loading: { status: "idle" },
           },
         },
         loading: {
@@ -45,18 +47,18 @@ describe("Новый API с state", () => {
             success: ({ update }) => update({ name: "Успешно обновлено" }),
           },
           to: {
-            success: {},
-            error: {},
+            success: { status: "loading" },
+            error: { status: "loading" },
           },
         },
         success: {
           to: {
-            idle: {},
+            idle: { status: "success" },
           },
         },
         error: {
           to: {
-            idle: {},
+            idle: { status: "error" },
           },
         },
       })
@@ -66,6 +68,34 @@ describe("Новый API с state", () => {
     update({ name: "Пользователь", status: "loading" })
     expect(context.name, 'Поле name должно обновиться на "Пользователь"').toBe("Пользователь")
     expect(context.status, 'Поле status должно обновиться на "loading"').toBe("loading")
+  })
+
+  it("поддерживает сложные условия переходов", () => {
+    const { context, update } = MetaFor("user")
+      .context((types) => ({
+        name: types.string.required({ default: "Гость" }),
+        error: types.string.optional(),
+        active: types.boolean.required({ default: false }),
+        age: types.number.optional(),
+      }))
+      .states({
+        "неактивно": {
+          to: {
+            "активно": { error: null, active: false },
+          },
+        },
+        "активно": {
+          to: {
+            "неактивно": { error: null, active: true },
+          },
+        },
+      })
+
+    expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
+    expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
+
+    update({ active: true, error: null })
+    expect(context.active, 'Поле active должно обновиться на true').toBe(true)
   })
 
   it("поддерживает onUpdate", () => {
@@ -94,10 +124,10 @@ describe("Новый API с state", () => {
       }))
       .states({
         ожидание: {
-          to: { процесс: {} },
+          to: { процесс: { status: "ожидание" } },
         },
         процесс: {
-          to: { ожидание: {} },
+          to: { ожидание: { status: "процесс" } },
         },
       })
     // @ts-expect-error
@@ -122,7 +152,7 @@ describe("Новый API с state", () => {
             error: ({ update }) => update({ status: "error" }),
           },
           to: {
-            loading: {},
+            loading: { status: "idle" },
           },
         },
         loading: {
@@ -134,23 +164,95 @@ describe("Новый API с state", () => {
             success: ({ update }) => update({ name: "Успешно обновлено" }),
           },
           to: {
-            success: {},
-            error: {},
+            success: { status: "loading" },
+            error: { status: "loading" },
           },
         },
         success: {
           to: {
-            idle: {},
+            idle: { status: "success" },
           },
         },
         error: {
           to: {
-            idle: {},
+            idle: { status: "error" },
           },
         },
       })
 
     expect(context.status, 'Статус должен быть "idle" по умолчанию').toBe("idle")
     expect(context.name, 'Имя должно быть "Гость" по умолчанию').toBe("Гость")
+  })
+
+  it("поддерживает различные типы условий", () => {
+    const { context, update } = MetaFor("user")
+      .context((types) => ({
+        name: types.string.required({ default: "Гость" }),
+        age: types.number.optional(),
+        isActive: types.boolean.required({ default: false }),
+        tags: types.array.optional<string>(),
+        status: types.enum("pending", "approved", "rejected").required({ default: "pending" }),
+        error: types.string.optional(),
+      }))
+      .states({
+        pending: {
+          to: {
+            approved: { 
+              status: "pending",
+              isActive: true,
+              age: { isNull: false, gte: 18 }
+            },
+            rejected: { 
+              status: "pending",
+              error: { isNull: false }
+            },
+          },
+        },
+        approved: {
+          to: {
+            pending: { status: "approved" },
+          },
+        },
+        rejected: {
+          to: {
+            pending: { status: "rejected" },
+          },
+        },
+      })
+
+    expect(context.status, 'Статус должен быть "pending" по умолчанию').toBe("pending")
+    expect(context.isActive, 'isActive должен быть false по умолчанию').toBe(false)
+
+    update({ age: 25, isActive: true })
+    expect(context.age, 'Возраст должен обновиться на 25').toBe(25)
+    expect(context.isActive, 'isActive должен обновиться на true').toBe(true)
+  })
+
+  it("пример использования условий переходов как в документации", () => {
+    const { context, update } = MetaFor("user")
+      .context((types) => ({
+        error: types.string.optional(),
+        active: types.boolean.required({ default: false }),
+      }))
+      .states({
+        "неактивно": {
+          to: {
+            "активно": { error: null, active: false },
+          },
+        },
+        "активно": {
+          to: {
+            "неактивно": { error: null, active: true },
+          },
+        },
+      })
+
+    expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
+    expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
+
+    // Проверяем, что условия переходов корректно типизированы
+    update({ active: true, error: null })
+    expect(context.active, 'Поле active должно обновиться на true').toBe(true)
+    expect(context.error, 'Поле error должно остаться null').toBe(null)
   })
 })
