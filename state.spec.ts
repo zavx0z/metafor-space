@@ -200,11 +200,11 @@ describe("Новый API с state", () => {
             approved: { 
               status: "pending",
               isActive: true,
-              age: { isNull: false, gte: 18 }
+              age: { null: false, gte: 18 }
             },
             rejected: { 
               status: "pending",
-              error: { isNull: false }
+              error: { null: false }
             },
           },
         },

@@ -125,7 +125,7 @@ describe("Условия переходов между состояниями", 
             to: {
               active: { 
                 isActive: { eq: false },
-                isVerified: { isNull: false }
+                isVerified: { null: false }
               },
             },
           },
@@ -133,7 +133,7 @@ describe("Условия переходов между состояниями", 
             to: {
               pending: { 
                 isActive: { eq: true },
-                isVerified: { isNull: true }
+                isVerified: { null: true }
               },
             },
           },
@@ -179,7 +179,7 @@ describe("Условия переходов между состояниями", 
             to: {
               valid: { 
                 email: { 
-                  isNull: false,
+                  null: false,
                   pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
                 }
               },
@@ -220,7 +220,7 @@ describe("Условия переходов между состояниями", 
             to: {
               anonymous: { 
                 name: "Гость",
-                email: { isNull: false }
+                email: { null: false }
               },
             },
           },
@@ -240,7 +240,7 @@ describe("Условия переходов между состояниями", 
             to: {
               valid: { 
                 username: {
-                  isNull: false,
+                  null: false,
                   length: { min: 3, max: 20 },
                   pattern: /^[a-zA-Z0-9_]+$/,
                   notInclude: "admin",
@@ -305,7 +305,7 @@ describe("Условия переходов между состояниями", 
           },
           known: {
             to: {
-              unknown: { age: { isNull: false } },
+              unknown: { age: { null: false } },
             },
           },
         })
@@ -325,7 +325,7 @@ describe("Условия переходов между состояниями", 
           beginner: {
             to: {
               intermediate: { 
-                age: { isNull: false, gte: 18 },
+                age: { null: false, gte: 18 },
                 score: { gte: 100, lt: 500 }
               },
             },
@@ -425,7 +425,7 @@ describe("Условия переходов между состояниями", 
           },
           assigned: {
             to: {
-              unassigned: { role: { isNull: false } },
+              unassigned: { role: { null: false } },
             },
           },
         })
@@ -485,7 +485,7 @@ describe("Условия переходов между состояниями", 
           },
           tagged: {
             to: {
-              empty: { tags: { isNull: false, isEmpty: false } },
+              empty: { tags: { null: false, isEmpty: false } },
             },
           },
         })
@@ -509,7 +509,7 @@ describe("Условия переходов между состояниями", 
           },
           tagged: {
             to: {
-              untagged: { tags: { isNull: false } },
+              untagged: { tags: { null: false } },
             },
           },
         })
@@ -530,7 +530,7 @@ describe("Условия переходов между состояниями", 
             to: {
               intermediate: { 
                 tags: { 
-                  isNull: false,
+                  null: false,
                   length: { min: 1, max: 5 },
                   includes: "javascript"
                 },
@@ -583,10 +583,10 @@ describe("Условия переходов между состояниями", 
             to: {
               approved: { 
                 name: { notEq: "Гость" },
-                age: { isNull: false, gte: 18 },
+                age: { null: false, gte: 18 },
                 isActive: true,
                 status: "pending",
-                tags: { isNull: false, length: { min: 1 } }
+                tags: { null: false, length: { min: 1 } }
               },
             },
           },
@@ -640,9 +640,9 @@ describe("Условия переходов между состояниями", 
           "не заполнено": {
             to: {
               "заполняется": {
-                email: { isNull: false, include: "@" },
-                password: { isNull: false, length: { min: 8 } },
-                username: { isNull: false, pattern: /^[a-zA-Z0-9_]+$/ }
+                email: { null: false, include: "@" },
+                password: { null: false, length: { min: 8 } },
+                username: { null: false, pattern: /^[a-zA-Z0-9_]+$/ }
               },
             },
           },
@@ -656,7 +656,7 @@ describe("Условия переходов между состояниями", 
                 agreeToTerms: true
               },
               "не валидно": {
-                email: { isNull: false, notInclude: "@" }
+                email: { null: false, notInclude: "@" }
               },
             },
           },

@@ -12,17 +12,16 @@ import type { ContextSchema, ExtractValues } from "./context.t"
 
  | Параметр   | Тип     | Описание                           |
  | ---------- | ------- | ---------------------------------- |
- | isNull     | boolean | Является ли значение null          |
+ | null       | boolean | Является ли значение null          |
  | eq         | boolean | Равно указанному булеву значению   |
  | notEq      | boolean | Не равно указанному булеву значению|
  | logicalEq  | boolean | Логическое равенство               |
- | notNull    | boolean | Не является ли значение null       |
  */
 export type CondBoolean =
   | boolean
   | null
   | {
-      isNull?: boolean
+      null?: boolean
       eq?: boolean
       notEq?: boolean
       logicalEq?: boolean
@@ -35,7 +34,7 @@ export type CondBoolean =
 
  | Параметр  | Тип         | Описание                       |
  | --------- | ----------- | ------------------------------ |
- | isNull    | boolean     | Является ли значение null      |
+ | null      | boolean     | Является ли значение null      |
  | eq        | E[number]   | Равно указанному значению      |
  | notEq     | E[number]   | Не равно указанному значению   |
  | oneOf     | E[number][] | Одно из указанных значений     |
@@ -47,7 +46,7 @@ export type CondEnum<E extends readonly (string | number)[]> =
   | E[number]
   | null
   | {
-      isNull?: boolean
+      null?: boolean
       eq?: E[number]
       notEq?: E[number]
       oneOf?: E[number][]
@@ -61,7 +60,7 @@ export type CondEnum<E extends readonly (string | number)[]> =
 
  | Параметр       | Тип                                  | Описание                              |
  | -------------- | ------------------------------------ | ------------------------------------- |
- | isNull         | boolean                              | Является ли значение null             |
+ | null           | boolean                              | Является ли значение null             |
  | startsWith     | string                               | Начинается ли с указанной строки      |
  | endsWith       | string                               | Заканчивается ли на указанную строку  |
  | include        | string                               | Включает ли указанную подстроку       |
@@ -79,7 +78,7 @@ export type CondString =
   | RegExp
   | null
   | {
-      isNull?: boolean
+      null?: boolean
       startsWith?: string
       endsWith?: string
       include?: string
@@ -100,7 +99,7 @@ export type CondString =
 
  | Параметр | Тип              | Описание                              |
  | -------- | ---------------- | ------------------------------------- |
- | isNull   | boolean          | Является ли значение null             |
+ | null     | boolean          | Является ли значение null             |
  | eq       | number           | Равно указанному числу                |
  | gt       | number           | Больше указанного числа               |
  | gte      | number           | Больше или равно указанному числу     |
@@ -117,7 +116,7 @@ export type CondNumber =
   | number
   | null
   | {
-      isNull?: boolean
+      null?: boolean
       eq?: number
       gt?: number
       gte?: number
@@ -138,7 +137,7 @@ export type CondNumber =
 
  | Параметр    | Тип              | Описание                              |
  | ----------- | ---------------- | ------------------------------------- |
- | isNull      | boolean          | Является ли значение null             |
+ | null        | boolean          | Является ли значение null             |
  | length      | number \| { min?: number; max?: number } | Длина массива                    |
  | includes    | any              | Содержит ли массив указанный элемент  |
  | notIncludes | any              | Не содержит ли массив указанный элемент|
@@ -150,7 +149,7 @@ export type CondArray<T = any> =
   | T[]
   | null
   | {
-      isNull?: boolean
+      null?: boolean
       length?: number | { min?: number; max?: number }
       includes?: T
       notIncludes?: T

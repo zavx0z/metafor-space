@@ -10,10 +10,12 @@
         "**/node_modules": true,
         "**/__pycache__": true,
         ".venv": true,
-        ".vscode": true
+        ".vscode": true,
+        ".idea": true
     },
     "hide-files.files": [
-        ".vscode"
+        ".vscode",
+        ".idea"
     ],
     "cSpell.words": [
         "Бандл",
