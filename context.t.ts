@@ -99,3 +99,30 @@ export type JsonPatch =
   | { op: 'replace'; path: string; value: any }
   | { op: 'add'; path: string; value: any }
   | { op: 'remove'; path: string }
+
+// ==================== ТИПЫ ДЛЯ КОНТЕКСТА ====================
+export interface ContextInstance<T extends ContextSchema> {
+  /** Текущее состояние контекста (только для чтения) */
+  context: ExtractValues<T>
+  /**
+   * Обновляет значения в контексте
+   * @param values - объект с новыми значениями
+   * @returns Обновленный контекст
+   */
+  update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
+  /**
+   * Подписка на обновления контекста
+   * @param cb - функция, вызываемая при обновлении контекста
+   * @returns функция для отписки
+   */
+  onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
+}
+
+export interface ContextWithState<T extends ContextSchema> {
+  /**
+   * Создает состояние контекста с возможностью управления переходами
+   * @param stateConfig - Конфигурация состояний и переходов
+   * @returns Объект с иммутабельным контекстом и методами update и onUpdate
+   */
+  states: <S extends string>(stateConfig: Record<S, { [K in S]?: {} }>) => ContextInstance<T> & { stateConfig: Record<S, { [K in S]?: {} }> }
+}

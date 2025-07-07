@@ -4,7 +4,9 @@
  */
 
 import { createContext } from "./context"
-import type { ContextSchema, ExtractValues, UpdateValues, ContextTypes, JsonPatch } from "./context.t"
+import type { ContextSchema, ContextTypes, ContextInstance, ContextWithState as ContextWithStateCb } from "./context.t"
+import type { StateConfig } from "./state.t"
+import type { ContextWithStateConfig } from "./metafor.t"
 
 /**
  * Основная функция MetaFor
@@ -18,7 +20,7 @@ import type { ContextSchema, ExtractValues, UpdateValues, ContextTypes, JsonPatc
  * const userContext = MetaFor('user').context(types => ({
  *   name: types.string.required({ default: 'Гость' }),
  *   age: types.number.optional()
- * }))
+ * })).state({})
  * userContext.context // доступ к значениям
  * userContext.update({ name: 'Иван' })
  */
@@ -28,7 +30,7 @@ export function MetaFor(name: string) {
      * Создает типизированный контекст на основе схемы.
      * @template T - Схема контекста
      * @param schema - Функция, принимающая types и возвращающая схему, либо сама схема
-     * @returns Объект с иммутабельным контекстом и методом update
+     * @returns Объект с методом state для создания состояния
      *
      * @example
      * const context = MetaFor('user').context(types => ({
@@ -36,35 +38,24 @@ export function MetaFor(name: string) {
      *   role: types.enum('user', 'admin').required({ default: 'user' }),
      *   nickname: types.string(),
      *   tags: types.array.optional()
-     * }))
+     * })).state({})
      * context.context.name // string (required)
      * context.context.role // 'user' | 'admin' (required)
      * context.context.nickname // string | null (optional)
      * context.context.tags // string[] | null (optional)
      */
-    context<const T extends ContextSchema>(
-      schema: ((types: ContextTypes) => T) | T
-    ): {
-      /** Текущее состояние контекста (только для чтения) */
-      context: ExtractValues<T>
-      /**
-       * Обновляет значения в контексте
-       * @param values - объект с новыми значениями
-       * @returns Обновленный контекст
-       *
-       * @example
-       * context.update({ name: 'Новое имя', nickname: 'nick' })
-       * context.update({ nickname: null }) // для optional полей
-       */
-      update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
-      /**
-       * Подписка на обновления контекста
-       * @param cb - функция, вызываемая при обновлении контекста
-       * @returns функция для отписки
-       */
-      onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
-    } {
-      return createContext(schema) as any
+    context<const T extends ContextSchema>(schema: ((types: ContextTypes) => T) | T): ContextWithStateCb<T> {
+      const { context, update, onUpdate } = createContext(schema) as ContextInstance<T>
+      return {
+        /**
+         * Создает состояние контекста с возможностью управления переходами
+         * @param states - Конфигурация состояний и переходов
+         * @returns Объект с иммутабельным контекстом и методами update и onUpdate
+         */
+        states<S extends string>(states: StateConfig<S>): ContextWithStateConfig<T, S> {
+          return { context, update, onUpdate, stateConfig: states }
+        },
+      }
     },
   }
 }
