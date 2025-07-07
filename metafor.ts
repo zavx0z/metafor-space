@@ -1,47 +1,46 @@
 /**
- * MetaFor - библиотека для создания динамических контекстов с типизированными параметрами
+ * MetaFor — фасад для создания динамических типизированных контекстов
  * @packageDocumentation
  */
 
-import { types } from "./context"
+import { createContext } from "./context"
 import type { ContextSchema, ExtractValues, UpdateValues, ContextTypes } from "./context.t"
 
 /**
  * Основная функция MetaFor
- * Создает экземпляр MetaFor с указанным именем
- * @param name - имя контекста
+ * Создает экземпляр MetaFor с указанным именем (имя используется только для идентификации, не влияет на логику).
+ * Возвращает объект с методом context для создания типизированного контекста.
+ *
+ * @param name - Имя контекста (произвольная строка, для идентификации)
  * @returns Объект с методом context для создания типизированного контекста
  *
  * @example
- * ```typescript
  * const userContext = MetaFor('user').context(types => ({
  *   name: types.string.required({ default: 'Гость' }),
  *   age: types.number.optional()
  * }))
- * ```
+ * userContext.context // доступ к значениям
+ * userContext.update({ name: 'Иван' })
  */
 export function MetaFor(name: string) {
   return {
     /**
-     * Создает типизированный контекст на основе схемы
-     * @template T - схема контекста
-     * @param schema - функция, принимающая types и возвращающая схему
-     * @returns Объект с контекстом и методом update
+     * Создает типизированный контекст на основе схемы.
+     * @template T - Схема контекста
+     * @param schema - Функция, принимающая types и возвращающая схему, либо сама схема
+     * @returns Объект с иммутабельным контекстом и методом update
      *
      * @example
-     * ```typescript
      * const context = MetaFor('user').context(types => ({
      *   name: types.string.required({ default: 'Гость' }),
      *   role: types.enum('user', 'admin').required({ default: 'user' }),
      *   nickname: types.string(),
-     *   tags: types.array<string>()
+     *   tags: types.array.optional()
      * }))
-     *
-     * // context.context.name - string (required)
-     * // context.context.role - 'user' | 'admin' (required)
-     * // context.context.nickname - string | null (optional)
-     * // context.context.tags - string[] | null (optional)
-     * ```
+     * context.context.name // string (required)
+     * context.context.role // 'user' | 'admin' (required)
+     * context.context.nickname // string | null (optional)
+     * context.context.tags // string[] | null (optional)
      */
     context<const T extends ContextSchema>(
       schema: ((types: ContextTypes) => T) | T
@@ -54,61 +53,12 @@ export function MetaFor(name: string) {
        * @returns Обновленный контекст
        *
        * @example
-       * ```typescript
        * context.update({ name: 'Новое имя', nickname: 'nick' })
        * context.update({ nickname: null }) // для optional полей
        */
       update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
     } {
-      const actualSchema = typeof schema === "function" ? (schema as any)(types) : schema as T
-      const contextData = {} as ExtractValues<T>
-      
-      // Инициализация значений по умолчанию
-      for (const key in actualSchema) {
-        const definition = actualSchema[key]
-        if (!definition) continue
-        if ("default" in definition && definition.default !== undefined) {
-          ;(contextData as any)[key] = definition.default
-        } else {
-          const isRequired = definition.required === true
-          switch (definition.type) {
-            case "string": (contextData as any)[key] = isRequired ? "" : null; break
-            case "number": (contextData as any)[key] = isRequired ? 0 : null; break
-            case "boolean": (contextData as any)[key] = isRequired ? false : null; break
-            case "array": (contextData as any)[key] = isRequired ? [] : null; break
-            case "enum":
-              const enumDef = definition as any
-              ;(contextData as any)[key] = isRequired ? enumDef.values[0] : null
-              break
-          }
-        }
-      }
-
-      // Создаем иммутабельный контекст с Proxy
-      const immutableContext = new Proxy({} as ExtractValues<T>, {
-        get(target, prop) {
-          return (contextData as any)[prop]
-        },
-        set(target, prop, value) {
-          throw new Error(`Прямое изменение контекста запрещено. Используйте метод update() для изменения значений. Попытка изменить: ${String(prop)}`)
-        },
-        deleteProperty(target, prop) {
-          throw new Error(`Удаление свойств контекста запрещено. Попытка удалить: ${String(prop)}`)
-        }
-      })
-
-      // Делаем только Proxy иммутабельным
-      Object.freeze(immutableContext)
-      
-      function update(values: UpdateValues<ExtractValues<T>>): ExtractValues<T> {
-        const filteredValues = Object.fromEntries(
-          Object.entries(values).filter(([_, value]) => value !== undefined)
-        ) as Partial<ExtractValues<T>>
-        Object.assign(contextData, filteredValues)
-        return { ...contextData }
-      }
-      
-      return { context: immutableContext, update }
+      return createContext(schema)
     },
   }
 }

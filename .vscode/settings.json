@@ -1,0 +1,56 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/CVS": true,
+        "**/*.crswap": true,
+        "**/node_modules": true,
+        "**/__pycache__": true,
+        ".venv": true,
+        ".vscode": true,
+        ".cursor/rules": true,
+        ".cursor": true
+    },
+    "hide-files.files": [
+        ".vscode",
+        ".cursor/rules",
+        ".cursor"
+    ],
+    "cSpell.words": [
+        "билда",
+        "иммутабельности",
+        "Иммутабельность",
+        "иммутабельный",
+        "иммутабельным",
+        "коммита",
+        "рефакторингом",
+        "снапшотов"
+    ],
+    // Настройки для тестов
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    
+    // Настройки для Bun
+    "bun.enable": true,
+    "bun.lsp.enable": true,
+    
+    // Настройки для тестов
+    "testing.automaticallyOpenPeekView": "never",
+    "testing.followRunningTest": true,
+    "testing.gutterEnabled": true,
+    "testing.openTesting": "openOnTestStart",
+    
+    // Настройки терминала
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.profiles.osx": {
+        "zsh": {
+            "path": "/bin/zsh",
+            "args": ["-l"]
+        }
+    },
+    "testing.automaticallyOpenTestResults": "openOnTestStart"
+}
