@@ -57,8 +57,14 @@ export function MetaFor(name: string) {
        * context.update({ nickname: null }) // для optional полей
        */
       update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
+      /**
+       * Подписка на обновления контекста
+       * @param cb - функция, вызываемая при обновлении контекста
+       * @returns функция для отписки
+       */
+      onUpdate: (cb: (patches: any[]) => void) => () => void
     } {
-      return createContext(schema)
+      return createContext(schema) as any
     },
   }
 }

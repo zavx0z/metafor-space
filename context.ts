@@ -48,6 +48,19 @@ export const types: ContextTypes = {
 }
 
 /**
+ * Тип для JSON Patch (RFC 6902, упрощённый)
+ * Используется для передачи изменений в подписчиках onUpdate.
+ *
+ * @example
+ * { op: 'replace', path: '/name', value: 'Новое имя' }
+ * { op: 'remove', path: '/age' }
+ */
+type JsonPatch =
+  | { op: 'replace'; path: string; value: any }
+  | { op: 'add'; path: string; value: any }
+  | { op: 'remove'; path: string }
+
+/**
  * Класс для работы с типизированными контекстами.
  * Позволяет создавать, читать, обновлять и клонировать контекст на основе схемы.
  *
@@ -64,6 +77,12 @@ export class Context<T extends ContextSchema> {
   private contextData: ExtractValues<T>
   /** @internal */
   private immutableContext: ExtractValues<T>
+  /**
+   * Список подписчиков на обновления контекста.
+   * Каждый подписчик получает массив JSON Patch при изменении.
+   * @internal
+   */
+  private updateSubscribers: Array<(patches: JsonPatch[]) => void> = []
 
   /**
    * Создает новый экземпляр контекста на основе схемы.
@@ -140,6 +159,29 @@ export class Context<T extends ContextSchema> {
   }
 
   /**
+   * Подписка на обновления контекста.
+   * Позволяет получать уведомления о каждом update в виде массива JSON Patch (RFC 6902).
+   * Возвращает функцию для отписки.
+   *
+   * @param callback - функция, вызываемая при обновлении контекста
+   * @returns функция для отписки
+   *
+   * @example
+   * const unsubscribe = ctx.onUpdate(patches => {
+   *   console.log('Изменения:', patches)
+   * })
+   * // ...
+   * unsubscribe() // для отписки
+   */
+  onUpdate(callback: (patches: JsonPatch[]) => void): () => void {
+    this.updateSubscribers.push(callback)
+    return () => {
+      const idx = this.updateSubscribers.indexOf(callback)
+      if (idx !== -1) this.updateSubscribers.splice(idx, 1)
+    }
+  }
+
+  /**
    * Обновляет значения в контексте.
    * Только переданные значения будут обновлены, остальные останутся без изменений.
    *
@@ -153,7 +195,22 @@ export class Context<T extends ContextSchema> {
     const filteredValues = Object.fromEntries(
       Object.entries(values).filter(([_, value]) => value !== undefined)
     ) as Partial<ExtractValues<T>>
+    // Формируем JSON Patch
+    const patches: JsonPatch[] = []
+    for (const [key, value] of Object.entries(filteredValues)) {
+      if (value === null) {
+        patches.push({ op: 'remove', path: `/${key}` })
+      } else {
+        patches.push({ op: 'replace', path: `/${key}`, value })
+      }
+    }
     Object.assign(this.contextData, filteredValues)
+    // Оповещаем подписчиков
+    if (patches.length > 0) {
+      for (const cb of this.updateSubscribers) {
+        try { cb(patches) } catch {}
+      }
+    }
     return { ...this.contextData }
   }
 
@@ -193,6 +250,12 @@ export function createContext<const T extends ContextSchema>(
    * @returns Обновленный контекст
    */
   update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
+  /**
+   * Подписка на обновления контекста
+   * @param cb - функция, вызываемая при обновлении контекста
+   * @returns функция для отписки
+   */
+  onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
 } {
   const actualSchema = typeof schema === "function" ? (schema as any)(types) : schema as T
   const contextInstance = new Context(actualSchema)
@@ -201,7 +264,8 @@ export function createContext<const T extends ContextSchema>(
     get context() {
       return contextInstance.context
     },
-    update: (values: UpdateValues<ExtractValues<T>>) => contextInstance.update(values)
+    update: (values: UpdateValues<ExtractValues<T>>) => contextInstance.update(values),
+    onUpdate: (cb: (patches: JsonPatch[]) => void) => contextInstance.onUpdate(cb)
   }
 }
 

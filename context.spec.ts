@@ -300,3 +300,65 @@ describe("Примеры использования (документация)",
     })
   })
 })
+
+describe("onUpdate", () => {
+  it("вызывает коллбек с правильными патчами при update", () => {
+    const ctx = MetaFor("user").context(types => ({
+      name: types.string.required({ default: "Гость" }),
+      age: types.number.optional(),
+      isActive: types.boolean.required({ default: true }),
+    }))
+    let received: any = null
+    ctx.onUpdate(patches => { received = patches })
+    ctx.update({ name: "Иван", age: 25 })
+    expect(received, "onUpdate должен вызываться с патчами").toEqual([
+      { op: "replace", path: "/name", value: "Иван" },
+      { op: "replace", path: "/age", value: 25 },
+    ])
+    ctx.update({ age: null })
+    expect(received, "onUpdate должен вызываться с патчем remove").toEqual([
+      { op: "remove", path: "/age" },
+    ])
+  })
+
+  it("функция отписки работает корректно", () => {
+    const ctx = MetaFor("user").context(types => ({
+      name: types.string.required({ default: "Гость" })
+    }))
+    let called = 0
+    const unsubscribe = ctx.onUpdate(() => { called++ })
+    ctx.update({ name: "Вася" })
+    expect(called, "onUpdate должен быть вызван").toBe(1)
+    unsubscribe()
+    ctx.update({ name: "Петя" })
+    expect(called, "onUpdate не должен вызываться после отписки").toBe(1)
+  })
+
+  it("несколько подписчиков получают патчи", () => {
+    const ctx = MetaFor("user").context(types => ({
+      name: types.string.required({ default: "Гость" })
+    }))
+    let a = 0, b = 0
+    ctx.onUpdate(() => { a++ })
+    ctx.onUpdate(() => { b++ })
+    ctx.update({ name: "Оля" })
+    expect(a, "Первый подписчик должен быть вызван").toBe(1)
+    expect(b, "Второй подписчик должен быть вызван").toBe(1)
+  })
+
+  it("патчи соответствуют формату JSON Patch", () => {
+    const ctx = MetaFor("user").context(types => ({
+      name: types.string.required({ default: "Гость" }),
+      age: types.number.optional(),
+    }))
+    let patches: any[] = []
+    ctx.onUpdate(p => { patches = p })
+    ctx.update({ name: "Лена" })
+    expect(patches[0].op, "op должен быть 'replace'").toBe("replace")
+    expect(patches[0].path, "path должен быть '/name'").toBe("/name")
+    expect(patches[0]).toHaveProperty("value", "Лена")
+    ctx.update({ age: null })
+    expect(patches[0].op, "op должен быть 'remove'").toBe("remove")
+    expect(patches[0].path, "path должен быть '/age'").toBe("/age")
+  })
+})
