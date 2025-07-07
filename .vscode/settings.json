@@ -10,14 +10,10 @@
         "**/node_modules": true,
         "**/__pycache__": true,
         ".venv": true,
-        ".vscode": true,
-        ".cursor/rules": true,
-        ".cursor": true
+        ".vscode": true
     },
     "hide-files.files": [
-        ".vscode",
-        ".cursor/rules",
-        ".cursor"
+        ".vscode"
     ],
     "cSpell.words": [
         "билда",
