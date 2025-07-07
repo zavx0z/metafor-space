@@ -41,10 +41,11 @@
     ".idx/**/*",
     ".vscode/**/*",
     "assets/**/*",
-    "fixtures/browser/index.html",
+    "fixture/browser/index.html",
     "metafor.d.ts"
   ],
   "include": [
-    "./*.ts"
+    "./*.ts",
+    "fixture/global.d.ts"
   ]
 }

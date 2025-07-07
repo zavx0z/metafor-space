@@ -2,18 +2,7 @@ import { describe, it, expect } from "bun:test"
 import { MetaFor } from "./metafor"
 import { types } from "./context"
 
-// Вспомогательная функция для преобразования Proxy в обычный объект
-function toPlainObject(proxy: any, schema: any): any {
-  const result: any = {}
-  // Получаем все ключи из схемы
-  const keys = Object.keys(schema)
-  for (const key of keys) {
-    result[key] = proxy[key]
-  }
-  return result
-}
-
-describe("MetaFor", () => {
+describe("Основная функциональность создания и обновления контекстов", () => {
   it("создаёт контекст с правильными типами и значениями по умолчанию", () => {
     const userContext = MetaFor("user").context((types) => ({
       name: types.string.required({ default: "Гость" }),
@@ -211,19 +200,22 @@ describe("Примеры использования (документация)",
       tags: types.array.optional(),
     }
     const userContext = MetaFor("user").context(() => schema)
-    expect(
-      toPlainObject(userContext.context, schema),
-      "userContext должен содержать значения по умолчанию для всех полей"
-    ).toEqual({
-      name: "Гость",
-      age: null,
-      isActive: true,
-      role: "user",
-      tags: null,
-    })
+    expect(userContext.context, "userContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(
+      schema,
+      {
+        name: "Гость",
+        age: null,
+        isActive: true,
+        role: "user",
+        tags: null,
+      }
+    )
 
     const updated = userContext.update({ name: "Иван", age: 25 })
-    expect(updated, "После update должны обновиться только переданные поля, остальные остаться прежними").toEqual({
+    expect(
+      updated,
+      "После update должны обновиться только переданные поля, остальные остаться прежними"
+    ).toPlainObjectEqual(schema, {
       name: "Иван",
       age: 25,
       isActive: true,
@@ -243,9 +235,9 @@ describe("Примеры использования (документация)",
     }
     const productContext = MetaFor("product").context(() => schema)
     expect(
-      toPlainObject(productContext.context, schema),
+      productContext.context,
       "productContext должен содержать значения по умолчанию для всех полей"
-    ).toEqual({
+    ).toPlainObjectEqual(schema, {
       id: "",
       name: "Новый продукт",
       price: 0,
@@ -261,7 +253,10 @@ describe("Примеры использования (документация)",
       inStock: true,
       category: "electronics",
     })
-    expect(updated, "После update должны обновиться только переданные поля, остальные остаться прежними").toEqual({
+    expect(
+      updated,
+      "После update должны обновиться только переданные поля, остальные остаться прежними"
+    ).toPlainObjectEqual(schema, {
       id: "prod-123",
       name: "iPhone 15",
       price: 99999,
@@ -280,9 +275,9 @@ describe("Примеры использования (документация)",
     }
     const articleContext = MetaFor("article").context(() => schema)
     expect(
-      toPlainObject(articleContext.context, schema),
+      articleContext.context,
       "articleContext должен содержать значения по умолчанию для всех полей"
-    ).toEqual({
+    ).toPlainObjectEqual(schema, {
       title: "Заголовок",
       content: null,
       published: false,
@@ -294,7 +289,10 @@ describe("Примеры использования (документация)",
       content: "Содержание статьи",
       published: true,
     })
-    expect(updated, "После update должны обновиться только переданные поля, остальные остаться прежними").toEqual({
+    expect(
+      updated,
+      "После update должны обновиться только переданные поля, остальные остаться прежними"
+    ).toPlainObjectEqual(schema, {
       title: "Новый заголовок",
       content: "Содержание статьи",
       published: true,
