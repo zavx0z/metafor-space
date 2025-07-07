@@ -1,16 +1,19 @@
 import { MetaFor } from "@metafor/space"
 
-const {context, update} = MetaFor("roadmap", {description: "MetaFor RoadMap", development: false})
+const { context, update } = MetaFor("roadmap", { description: "MetaFor RoadMap", development: false })
   .context((t) => ({
-    status: t.enum("start", "process", "end").required({title: "Статус", default: "start"}),
-    error: t.string.optional({title: "Ошибка", nullable: true})
+    status: t.enum("start", "process", "end").required({ title: "Статус", default: "start" }),
+    error: t.string.optional({ title: "Ошибка", nullable: true }),
   }))
+  .states({})
 
-  console.log(context)
-  setTimeout(()=>{
-    update({status: "process"})
-    console.log(context)
-  }, 1000)
+console.log(context)
 
-  context.status = "other"
+setTimeout(() => {
+  update({ status: "process" })
   console.log(context)
+}, 1000)
+
+context.status = "other"
+
+console.log(context)

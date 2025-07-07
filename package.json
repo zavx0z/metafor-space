@@ -32,7 +32,7 @@
   "scripts": {
     "test": "bun test",
     "build": "bun metafor.build.ts",
-    "publish-pkg": "bun run ./scripts/updateVersion.ts ./ && bun publish"
+    "publish-pkg": "bun metafor.build.ts --publish"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "18.0.1",
@@ -44,5 +44,6 @@
   },
   "peerDependencies": {
     "typescript": "5.8.3"
-  }
+  },
+  "lastBundleSize": 2888
 }
