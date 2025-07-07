@@ -5,7 +5,10 @@ const { context, update } = MetaFor("roadmap", { description: "MetaFor RoadMap",
     status: t.enum("start", "process", "end").required({ title: "Статус", default: "start" }),
     error: t.string.optional({ title: "Ошибка", nullable: true }),
   }))
-  .states({})
+  .states({
+    "начало": {},
+    "конец": {}
+  })
 
 console.log(context)
 

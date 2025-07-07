@@ -5,4 +5,15 @@ export type StateTransitions<T extends string> = {
   [K in T]?: {} // второй уровень — пустой объект
 }
 
-export type StateConfig<T extends string> = Record<T, StateTransitions<T>>
+/**
+ * Конфигурация одного состояния
+ */
+export type StateDefinition<T extends string> = {
+  action?: () => void
+  to: StateTransitions<T>
+}
+
+/**
+ * Конфигурация всех состояний
+ */
+export type StateConfig<T extends string> = Record<T, StateDefinition<T>>

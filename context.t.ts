@@ -124,5 +124,5 @@ export interface ContextWithState<T extends ContextSchema> {
    * @param stateConfig - Конфигурация состояний и переходов
    * @returns Объект с иммутабельным контекстом и методами update и onUpdate
    */
-  states: <S extends string>(stateConfig: Record<S, { [K in S]?: {} }>) => ContextInstance<T> & { stateConfig: Record<S, { [K in S]?: {} }> }
+  states: <S extends string>(stateConfig: import("./state.t").StateConfig<S>) => ContextInstance<T> & { stateConfig: import("./state.t").StateConfig<S> }
 }
