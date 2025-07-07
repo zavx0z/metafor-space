@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'bun:test'
 import { MetaFor } from './metafor'
-import { types } from './context'
 
 describe('MetaFor', () => {
   it('создаёт контекст с правильными типами и значениями по умолчанию', () => {
