@@ -47,6 +47,6 @@
   ],
   "include": [
     "./*.ts",
-    "fixture/global.d.ts"
+    "*.d.ts"
   ]
 }
