@@ -40,6 +40,23 @@
         },
         {
             "type": "bun",
+            "request": "launch",
+            "name": "test:html",
+            "program": "${workspaceFolder}/html",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "strictEnv": false,
+            "watchMode": false,
+            "stopOnEntry": false,
+            "noDebug": false,
+            "runtime": "bun",
+            "runtimeArgs": [
+                "test"
+            ]
+        },
+        {
+            "type": "bun",
             "internalConsoleOptions": "neverOpen",
             "request": "launch",
             "name": "Debug File",

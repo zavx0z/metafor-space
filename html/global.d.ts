@@ -14,7 +14,7 @@ declare global {
   var litElementPolyfillSupportDevMode: typeof litElementPolyfillSupport;
 
   var litElementVersions: undefined | Array<string>;
-  var litIssuedWarnings: undefined | Set<string | undefined>;
+  var litIssuedWarnings: Set<string>
 }
 
 export {};

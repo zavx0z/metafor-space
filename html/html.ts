@@ -11,7 +11,7 @@ import {
   EVENT_PART,
   ELEMENT_PART,
   COMMENT_PART,
-} from './html.t.js';
+} from './html.t'
 import type {
   Primitive,
   ResultType,
@@ -32,7 +32,7 @@ import type {
   RootPart,
   TrustedHTML,
   TrustedTypesWindow
-} from './html.t.js';
+} from './html.t'
 
 const DEV_MODE = true;
 const ENABLE_EXTRA_SECURITY_HOOKS = true;
@@ -56,17 +56,17 @@ const global = globalThis;
  */
 const debugLogEvent = DEV_MODE
   ? (event: LitUnstable.DebugLog.Entry) => {
-      const shouldEmit = (global as unknown as DebugLoggingWindow)
-        .emitLitDebugLogEvents;
-      if (!shouldEmit) {
-        return;
-      }
-      global.dispatchEvent(
-        new CustomEvent<LitUnstable.DebugLog.Entry>('lit-debug', {
-          detail: event,
-        })
-      );
+    const shouldEmit = (global as unknown as DebugLoggingWindow)
+      .emitLitDebugLogEvents;
+    if (!shouldEmit) {
+      return;
     }
+    global.dispatchEvent(
+      new CustomEvent<LitUnstable.DebugLog.Entry>('html-debug', {
+        detail: event,
+      })
+    );
+  }
   : undefined;
 // Используется для связывания beginRender и endRender при вложенных рендерах,
 // когда из-за ошибок не вызывается endRender.
@@ -122,8 +122,8 @@ const trustedTypes = (global as unknown as TrustedTypesWindow).trustedTypes;
  */
 const policy = trustedTypes
   ? trustedTypes.createPolicy('lit-html', {
-      createHTML: (s) => s,
-    })
+    createHTML: (s) => s,
+  })
   : undefined;
 
 /**
@@ -165,7 +165,7 @@ const setSanitizer = (newSanitizer: SanitizerFactory) => {
   if (sanitizerFactoryInternal !== noopSanitizer) {
     throw new Error(
       `Попытка перезаписать существующую политику безопасности lit-html.` +
-        ` setSanitizeDOMValueFactory должен быть вызван не более одного раза.`
+      ` setSanitizeDOMValueFactory должен быть вызван не более одного раза.`
     );
   }
   sanitizerFactoryInternal = newSanitizer;
@@ -184,13 +184,13 @@ const createSanitizer: SanitizerFactory = (node, name, type) => {
 
 // Добавляется к имени атрибута, чтобы отметить атрибут как связанный, чтобы
 // мы могли его легко найти.
-const boundAttributeSuffix = '$lit$';
+const boundAttributeSuffix = '$html$';
 
 // Этот маркер используется в множестве синтаксических позициях в HTML, поэтому
 // он должен быть допустимым именем элемента и атрибута. Мы не поддерживаем
 // динамические имена (еще), но это по крайней мере гарантирует, что дерево
 // разбора ближе к намерению шаблона.
-const marker = `lit$${Math.random().toFixed(9).slice(2)}$`;
+const marker = `html$${Math.random().toFixed(9).slice(2)}$`;
 
 // Строка, используемая для определения того, является ли комментарий маркерным
 // комментарием.
@@ -204,10 +204,10 @@ const nodeMarker = `<${markerMatch}>`;
 const d =
   NODE_MODE && global.document === undefined
     ? ({
-        createTreeWalker() {
-          return {};
-        },
-      } as unknown as Document)
+      createTreeWalker() {
+        return {};
+      },
+    } as unknown as Document)
     : document;
 
 // Создает динамический маркер. Мы никогда не должны искать эти узлы в DOM.
@@ -299,45 +299,44 @@ const rawTextElement = /^(?:script|style|textarea|title)$/i;
 // Важно: эти должны соответствовать значениям в PartType
 
 
-
 /**
  * Генерирует функцию тега, которая возвращает TemplateResult с заданным
  * типом результата.
  */
 const tag =
   <T extends ResultType>(type: T) =>
-  (strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<T> => {
-    // Предупреждает о последовательностях escape-последовательностей восьмеричного
-    // кода в шаблонах
-    // Мы делаем это здесь, а не в рендере, чтобы предупреждение было ближе к
-    // определению шаблона.
-    if (DEV_MODE && strings.some((s) => s === undefined)) {
-      console.warn(
-        'Некоторые строковые шаблоны undefined.\n' +
+    (strings: TemplateStringsArray, ...values: unknown[]): TemplateResult<T> => {
+      // Предупреждает о последовательностях escape-последовательностей восьмеричного
+      // кода в шаблонах
+      // Мы делаем это здесь, а не в рендере, чтобы предупреждение было ближе к
+      // определению шаблона.
+      if (DEV_MODE && strings.some((s) => s === undefined)) {
+        console.warn(
+          'Некоторые строковые шаблоны undefined.\n' +
           'Это, вероятно, вызвано нелегальными последовательностями escape-последовательностей восьмеричного кода.'
-      );
-    }
-    if (DEV_MODE) {
-      // Импорт static-html.js вызывает циклическую зависимость, которую g3 не
-      // обрабатывает. Вместо этого мы знаем, что статические значения должны
-      // иметь поле `_$litStatic$`.
-      if (
-        values.some((val) => (val as {_$litStatic$: unknown})?.['_$litStatic$'])
-      ) {
-        issueWarning(
-          '',
-          `Статические значения 'literal' или 'unsafeStatic' не могут использоваться в нестатических шаблонах.\n` +
-            `Пожалуйста, используйте статическую функцию 'html' для тега, чтобы увидеть https://lit.dev/docs/templates/expressions/#static-expressions`
         );
       }
-    }
-    return {
-      // Это свойство должно оставаться неминифицированным.
-      ['_$litType$']: type,
-      strings,
-      values,
+      if (DEV_MODE) {
+        // Импорт static-html.js вызывает циклическую зависимость, которую g3 не
+        // обрабатывает. Вместо этого мы знаем, что статические значения должны
+        // иметь поле `_$htmlStatic$`.
+        if (
+          values.some((val) => (val as { _$htmlStatic$: unknown })?.['_$htmlStatic$'])
+        ) {
+          issueWarning(
+            '',
+            `Статические значения 'literal' или 'unsafeStatic' не могут использоваться в нестатических шаблонах.\n` +
+            `Пожалуйста, используйте статическую функцию 'html' для тега, чтобы увидеть https://lit.dev/docs/templates/expressions/#static-expressions`
+          );
+        }
+      }
+      return {
+        // Это свойство должно оставаться неминифицированным.
+        ['_$htmlType$']: type,
+        strings,
+        values,
+      };
     };
-  };
 
 /**
  * Интерпретирует литеральный шаблон как HTML-шаблон, который может эффективно
@@ -411,7 +410,7 @@ export const mathml = tag(MATHML_RESULT);
  * Значение-отправка, которое сигнализирует о том, что значение было обработано
  * директивой и не должно записываться в DOM.
  */
-export const noChange = Symbol.for('lit-noChange');
+export const noChange = Symbol.for('html-noChange');
 
 /**
  * Значение-отправка, которое сигнализирует о том, что ChildPart должен полностью
@@ -434,7 +433,7 @@ export const noChange = Symbol.for('lit-noChange');
  * атрибут, в то время как `undefined` и `null` будут рендерить пустую строку.
  * В свойственных выражениях `nothing` становится `undefined`.
  */
-export const nothing = Symbol.for('lit-nothing');
+export const nothing = Symbol.for('html-nothing');
 
 /**
  * Кэш подготовленных шаблонов, ключами которого являются TemplateStringsArray
@@ -444,7 +443,6 @@ export const nothing = Symbol.for('lit-nothing');
  * упрощает поиск в кэше, который является горячим путем для рендеринга.
  */
 const templateCache = new WeakMap<TemplateStringsArray, Template>();
-
 
 
 const walker = d.createTreeWalker(
@@ -579,7 +577,7 @@ const getTemplateHtml = (
           if (DEV_MODE) {
             throw new Error(
               'Связывания в именах тегов не поддерживаются. Пожалуйста, используйте статические шаблоны вместо этого. ' +
-                'См. https://lit.dev/docs/templates/expressions/#static-expressions'
+              'См. https://lit.dev/docs/templates/expressions/#static-expressions'
             );
           }
           regex = tagEndRegex;
@@ -628,9 +626,9 @@ const getTemplateHtml = (
       // значении атрибута.
       console.assert(
         attrNameEndIndex === -1 ||
-          regex === tagEndRegex ||
-          regex === singleQuoteAttrEndRegex ||
-          regex === doubleQuoteAttrEndRegex,
+        regex === tagEndRegex ||
+        regex === singleQuoteAttrEndRegex ||
+        regex === doubleQuoteAttrEndRegex,
         'unexpected parse state B'
       );
     }
@@ -656,11 +654,11 @@ const getTemplateHtml = (
         ? s + nodeMarker
         : attrNameEndIndex >= 0
           ? (attrNames.push(attrName!),
-            s.slice(0, attrNameEndIndex) +
-              boundAttributeSuffix +
-              s.slice(attrNameEndIndex)) +
-            marker +
-            end
+          s.slice(0, attrNameEndIndex) +
+          boundAttributeSuffix +
+          s.slice(attrNameEndIndex)) +
+          marker +
+          end
           : s + marker + (attrNameEndIndex === -2 ? i : end);
   }
 
@@ -675,6 +673,7 @@ const getTemplateHtml = (
 
 /** @internal */
 export type {Template};
+
 class Template {
   /** @internal */
   el!: HTMLTemplateElement;
@@ -683,7 +682,7 @@ class Template {
 
   constructor(
     // Это свойство должно оставаться неминифицированным.
-    {strings, ['_$litType$']: type}: UncompiledTemplateResult,
+    {strings, ['_$htmlType$']: type}: UncompiledTemplateResult,
     options?: RenderOptions
   ) {
     let node: Node | null;
@@ -813,13 +812,13 @@ class Template {
       if (attrNames.length !== attrNameIndex) {
         throw new Error(
           `Обнаружен дублирующий атрибут связывания. Это происходит, если ваш шаблон ` +
-            `имеет дублирующие атрибуты на элементном теге. Например ` +
-            `"<input ?disabled=\${true} ?disabled=\${false}>" содержит ` +
-            `дублирующий атрибут "disabled". Ошибка была обнаружена в ` +
-            `следующем шаблоне: \n` +
-            '`' +
-            strings.join('${...}') +
-            '`'
+          `имеет дублирующие атрибуты на элементном теге. Например ` +
+          `"<input ?disabled=\${true} ?disabled=\${false}>" содержит ` +
+          `дублирующий атрибут "disabled". Ошибка была обнаружена в ` +
+          `следующем шаблоне: \n` +
+          '`' +
+          strings.join('${...}') +
+          '`'
         );
       }
     }
@@ -828,13 +827,13 @@ class Template {
     // избежать утечки памяти, но каждый раз, когда мы подготавливаем шаблон,
     // мы сразу же его рендерим и переиспользуем walker в new TemplateInstance._clone().
     debugLogEvent &&
-      debugLogEvent({
-        kind: 'template prep',
-        template: this,
-        clonableTemplate: this.el,
-        parts: this.parts,
-        strings,
-      });
+    debugLogEvent({
+      kind: 'template prep',
+      template: this,
+      clonableTemplate: this.el,
+      parts: this.parts,
+      strings,
+    });
   }
 
   // Переопределяется через `litHtmlPolyfillSupport` для поддержки платформы.
@@ -845,7 +844,6 @@ class Template {
     return el;
   }
 }
-
 
 
 function resolveDirective(
@@ -866,7 +864,7 @@ function resolveDirective(
   const nextDirectiveConstructor = isPrimitive(value)
     ? undefined
     : // Это свойство должно оставаться неминифицированным.
-      (value as DirectiveResult)['_$litDirective$'];
+    (value as DirectiveResult)['_$litDirective$'];
   if (currentDirective?.constructor !== nextDirectiveConstructor) {
     // Это свойство должно оставаться неминифицированным.
     currentDirective?.['_$notifyDirectiveConnectionChanged']?.(false);
@@ -895,6 +893,7 @@ function resolveDirective(
 }
 
 export type {TemplateInstance};
+
 /**
  * Обновляемый экземпляр шаблона. Хранит ссылки на части, используемые для
  * обновления экземпляра шаблона.
@@ -979,14 +978,14 @@ class TemplateInstance implements Disconnectable {
     for (const part of this._$parts) {
       if (part !== undefined) {
         debugLogEvent &&
-          debugLogEvent({
-            kind: 'set part',
-            part,
-            value: values[i],
-            valueIndex: i,
-            values,
-            templateInstance: this,
-          });
+        debugLogEvent({
+          kind: 'set part',
+          part,
+          value: values[i],
+          valueIndex: i,
+          values,
+          templateInstance: this,
+        });
         if ((part as AttributePart).strings !== undefined) {
           (part as AttributePart)._$setValue(values, part as AttributePart, i);
           // Количество значений, которые потребляет часть, равно
@@ -1013,6 +1012,7 @@ class TemplateInstance implements Disconnectable {
  */
 
 export type {ChildPart};
+
 class ChildPart implements Disconnectable {
   readonly type = CHILD_PART;
   readonly options: RenderOptions | undefined;
@@ -1049,12 +1049,14 @@ class ChildPart implements Disconnectable {
   // Следующие поля будут добавлены на ChildParts по требованию AsyncDirective
   /** @internal */
   _$disconnectableChildren?: Set<Disconnectable> = undefined;
+
   /** @internal */
   _$notifyConnectionChanged?(
     isConnected: boolean,
     removeFromParent?: boolean,
     from?: number
   ): void;
+
   /** @internal */
   _$reparentDisconnectables?(parent: Disconnectable): void;
 
@@ -1143,13 +1145,13 @@ class ChildPart implements Disconnectable {
       if (value === nothing || value == null || value === '') {
         if (this._$committedValue !== nothing) {
           debugLogEvent &&
-            debugLogEvent({
-              kind: 'commit nothing to child',
-              start: this._$startNode,
-              end: this._$endNode,
-              parent: this._$parent,
-              options: this.options,
-            });
+          debugLogEvent({
+            kind: 'commit nothing to child',
+            start: this._$startNode,
+            end: this._$endNode,
+            parent: this._$parent,
+            options: this.options,
+          });
           this._$clear();
         }
         this._$committedValue = nothing;
@@ -1157,13 +1159,13 @@ class ChildPart implements Disconnectable {
         this._commitText(value);
       }
       // Это свойство должно оставаться неминифицированным.
-    } else if ((value as TemplateResult)['_$litType$'] !== undefined) {
+    } else if ((value as TemplateResult)['_$htmlType$'] !== undefined) {
       this._commitTemplateResult(value as TemplateResult);
     } else if ((value as Node).nodeType !== undefined) {
       if (DEV_MODE && this.options?.host === value) {
         this._commitText(
           `[probable mistake: rendered a template's host in itself ` +
-            `(commonly caused by writing \${this} in a template]`
+          `(commonly caused by writing \${this} in a template]`
         );
         console.warn(
           `Попытка отрендерить хост шаблона`,
@@ -1223,13 +1225,13 @@ class ChildPart implements Disconnectable {
         }
       }
       debugLogEvent &&
-        debugLogEvent({
-          kind: 'commit node',
-          start: this._$startNode,
-          parent: this._$parent,
-          value: value,
-          options: this.options,
-        });
+      debugLogEvent({
+        kind: 'commit node',
+        start: this._$startNode,
+        parent: this._$parent,
+        value: value,
+        options: this.options,
+      });
       this._$committedValue = this._insert(value);
     }
   }
@@ -1251,12 +1253,12 @@ class ChildPart implements Disconnectable {
         value = this._textSanitizer(value);
       }
       debugLogEvent &&
-        debugLogEvent({
-          kind: 'commit text',
-          node,
-          value,
-          options: this.options,
-        });
+      debugLogEvent({
+        kind: 'commit text',
+        node,
+        value,
+        options: this.options,
+      });
       (node as Text).data = value as string;
     } else {
       if (ENABLE_EXTRA_SECURITY_HOOKS) {
@@ -1271,22 +1273,22 @@ class ChildPart implements Disconnectable {
         }
         value = this._textSanitizer(value);
         debugLogEvent &&
-          debugLogEvent({
-            kind: 'commit text',
-            node: textNode,
-            value,
-            options: this.options,
-          });
+        debugLogEvent({
+          kind: 'commit text',
+          node: textNode,
+          value,
+          options: this.options,
+        });
         textNode.data = value as string;
       } else {
         this._commitNode(d.createTextNode(value as string));
         debugLogEvent &&
-          debugLogEvent({
-            kind: 'commit text',
-            node: wrap(this._$startNode).nextSibling as Text,
-            value,
-            options: this.options,
-          });
+        debugLogEvent({
+          kind: 'commit text',
+          node: wrap(this._$startNode).nextSibling as Text,
+          value,
+          options: this.options,
+        });
       }
     }
     this._$committedValue = value;
@@ -1296,56 +1298,56 @@ class ChildPart implements Disconnectable {
     result: TemplateResult | CompiledTemplateResult
   ): void {
     // Это свойство должно оставаться неминифицированным.
-    const {values, ['_$litType$']: type} = result;
-    // Если $litType$ является числом, result является простым TemplateResult,
+    const {values, ['_$htmlType$']: type} = result;
+    // Если $htmlType$ является числом, result является простым TemplateResult,
     // и мы получаем шаблон из кэша шаблонов. Если нет, result является
-    // CompiledTemplateResult, _$litType$ является CompiledTemplate, и нам
+    // CompiledTemplateResult, _$htmlType$ является CompiledTemplate, и нам
     // нужно создать элемент <template>, который мы впервые видим.
     const template: Template | CompiledTemplate =
       typeof type === 'number'
         ? this._$getTemplate(result as UncompiledTemplateResult)
         : (type.el === undefined &&
-            (type.el = Template.createElement(
-              trustFromTemplateString(type.h, type.h[0]),
-              this.options
-            )),
+        (type.el = Template.createElement(
+          trustFromTemplateString(type.h, type.h[0]),
+          this.options
+        )),
           type);
 
     if ((this._$committedValue as TemplateInstance)?._$template === template) {
       debugLogEvent &&
-        debugLogEvent({
-          kind: 'template updating',
-          template,
-          instance: this._$committedValue as TemplateInstance,
-          parts: (this._$committedValue as TemplateInstance)._$parts,
-          options: this.options,
-          values,
-        });
+      debugLogEvent({
+        kind: 'template updating',
+        template,
+        instance: this._$committedValue as TemplateInstance,
+        parts: (this._$committedValue as TemplateInstance)._$parts,
+        options: this.options,
+        values,
+      });
       (this._$committedValue as TemplateInstance)._update(values);
     } else {
       const instance = new TemplateInstance(template as Template, this);
       const fragment = instance._clone(this.options);
       debugLogEvent &&
-        debugLogEvent({
-          kind: 'template instantiated',
-          template,
-          instance,
-          parts: instance._$parts,
-          options: this.options,
-          fragment,
-          values,
-        });
+      debugLogEvent({
+        kind: 'template instantiated',
+        template,
+        instance,
+        parts: instance._$parts,
+        options: this.options,
+        fragment,
+        values,
+      });
       instance._update(values);
       debugLogEvent &&
-        debugLogEvent({
-          kind: 'template instantiated and updated',
-          template,
-          instance,
-          parts: instance._$parts,
-          options: this.options,
-          fragment,
-          values,
-        });
+      debugLogEvent({
+        kind: 'template instantiated and updated',
+        template,
+        instance,
+        parts: instance._$parts,
+        options: this.options,
+        fragment,
+        values,
+      });
       this._commitNode(fragment);
       this._$committedValue = instance;
     }
@@ -1466,8 +1468,7 @@ class ChildPart implements Disconnectable {
 
 
 
-export type {AttributePart};
-class AttributePart implements Disconnectable {
+export class AttributePart implements Disconnectable {
   readonly type:
     | typeof ATTRIBUTE_PART
     | typeof PROPERTY_PART
@@ -1614,13 +1615,13 @@ class AttributePart implements Disconnectable {
         value = this._sanitizer(value ?? '');
       }
       debugLogEvent &&
-        debugLogEvent({
-          kind: 'commit attribute',
-          element: this.element,
-          name: this.name,
-          value,
-          options: this.options,
-        });
+      debugLogEvent({
+        kind: 'commit attribute',
+        element: this.element,
+        name: this.name,
+        value,
+        options: this.options,
+      });
       (wrap(this.element) as Element).setAttribute(
         this.name,
         (value ?? '') as string
@@ -1630,6 +1631,7 @@ class AttributePart implements Disconnectable {
 }
 
 export type {PropertyPart};
+
 class PropertyPart extends AttributePart {
   override readonly type = PROPERTY_PART;
 
@@ -1646,39 +1648,39 @@ class PropertyPart extends AttributePart {
       value = this._sanitizer(value);
     }
     debugLogEvent &&
-      debugLogEvent({
-        kind: 'commit property',
-        element: this.element,
-        name: this.name,
-        value,
-        options: this.options,
-      });
+    debugLogEvent({
+      kind: 'commit property',
+      element: this.element,
+      name: this.name,
+      value,
+      options: this.options,
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.element as any)[this.name] = value === nothing ? undefined : value;
   }
 }
 
 export type {BooleanAttributePart};
+
 class BooleanAttributePart extends AttributePart {
   override readonly type = BOOLEAN_ATTRIBUTE_PART;
 
   /** @internal */
   override _commitValue(value: unknown) {
     debugLogEvent &&
-      debugLogEvent({
-        kind: 'commit boolean attribute',
-        element: this.element,
-        name: this.name,
-        value: !!(value && value !== nothing),
-        options: this.options,
-      });
+    debugLogEvent({
+      kind: 'commit boolean attribute',
+      element: this.element,
+      name: this.name,
+      value: !!(value && value !== nothing),
+      options: this.options,
+    });
     (wrap(this.element) as Element).toggleAttribute(
       this.name,
       !!value && value !== nothing
     );
   }
 }
-
 
 
 /**
@@ -1694,6 +1696,7 @@ class BooleanAttributePart extends AttributePart {
  * опции слушателя меняются.
  */
 export type {EventPart};
+
 class EventPart extends AttributePart {
   override readonly type = EVENT_PART;
 
@@ -1709,8 +1712,8 @@ class EventPart extends AttributePart {
     if (DEV_MODE && this.strings !== undefined) {
       throw new Error(
         `У \`<${element.localName}>\` есть \`@${name}=...\` слушатель с ` +
-          'недопустимым содержимым. Слушатели событий в шаблонах должны иметь ' +
-          'точно одно выражение и не должно быть окружающего текста.'
+        'недопустимым содержимым. Слушатели событий в шаблонах должны иметь ' +
+        'точно одно выражение и не должно быть окружающего текста.'
       );
     }
   }
@@ -1734,11 +1737,11 @@ class EventPart extends AttributePart {
     const shouldRemoveListener =
       (newListener === nothing && oldListener !== nothing) ||
       (newListener as EventListenerWithOptions).capture !==
-        (oldListener as EventListenerWithOptions).capture ||
+      (oldListener as EventListenerWithOptions).capture ||
       (newListener as EventListenerWithOptions).once !==
-        (oldListener as EventListenerWithOptions).once ||
+      (oldListener as EventListenerWithOptions).once ||
       (newListener as EventListenerWithOptions).passive !==
-        (oldListener as EventListenerWithOptions).passive;
+      (oldListener as EventListenerWithOptions).passive;
 
     // Если новое значение не равно `nothing`, и мы удалили слушателя, нам
     // нужно добавить часть как слушателя.
@@ -1747,16 +1750,16 @@ class EventPart extends AttributePart {
       (oldListener === nothing || shouldRemoveListener);
 
     debugLogEvent &&
-      debugLogEvent({
-        kind: 'commit event listener',
-        element: this.element,
-        name: this.name,
-        value: newListener,
-        options: this.options,
-        removeListener: shouldRemoveListener,
-        addListener: shouldAddListener,
-        oldListener,
-      });
+    debugLogEvent({
+      kind: 'commit event listener',
+      element: this.element,
+      name: this.name,
+      value: newListener,
+      options: this.options,
+      removeListener: shouldRemoveListener,
+      addListener: shouldAddListener,
+      oldListener,
+    });
     if (shouldRemoveListener) {
       this.element.removeEventListener(
         this.name,
@@ -1784,6 +1787,7 @@ class EventPart extends AttributePart {
 }
 
 export type {ElementPart};
+
 class ElementPart implements Disconnectable {
   readonly type = ELEMENT_PART;
 
@@ -1818,12 +1822,12 @@ class ElementPart implements Disconnectable {
 
   _$setValue(value: unknown): void {
     debugLogEvent &&
-      debugLogEvent({
-        kind: 'commit to element binding',
-        element: this.element,
-        value,
-        options: this.options,
-      });
+    debugLogEvent({
+      kind: 'commit to element binding',
+      element: this.element,
+      value,
+      options: this.options,
+    });
     resolveDirective(this, value);
   }
 }
@@ -1880,7 +1884,7 @@ if (DEV_MODE && global.litHtmlVersions.length > 1) {
     issueWarning!(
       'multiple-versions',
       `Загружены несколько версий Lit. ` +
-        `Загрузка нескольких версий не рекомендуется.`
+      `Загрузка нескольких версий не рекомендуется.`
     );
   });
 }
@@ -1918,7 +1922,7 @@ export const render = (
   if (DEV_MODE && container == null) {
     // Даем более понятное сообщение об ошибке, чем
     //     Uncaught TypeError: Cannot read properties of null (reading
-    //     '_$litPart$')
+    //     '_$htmlPart$')
     // которое читается как внутренняя ошибка Lit.
     throw new TypeError(`Контейнер для рендеринга не может быть ${container}`);
   }
@@ -1926,21 +1930,21 @@ export const render = (
   const partOwnerNode = options?.renderBefore ?? container;
   // Это свойство должно оставаться неминифицированным.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let part: ChildPart = (partOwnerNode as any)['_$litPart$'];
+  let part: ChildPart = (partOwnerNode as any)['_$htmlPart$'];
   debugLogEvent &&
-    debugLogEvent({
-      kind: 'begin render',
-      id: renderId,
-      value,
-      container,
-      options,
-      part,
-    });
+  debugLogEvent({
+    kind: 'begin render',
+    id: renderId,
+    value,
+    container,
+    options,
+    part,
+  });
   if (part === undefined) {
     const endNode = options?.renderBefore ?? null;
     // Это свойство должно оставаться неминифицированным.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (partOwnerNode as any)['_$litPart$'] = part = new ChildPart(
+    (partOwnerNode as any)['_$htmlPart$'] = part = new ChildPart(
       container.insertBefore(createMarker(), endNode),
       endNode,
       undefined,
@@ -1949,14 +1953,14 @@ export const render = (
   }
   part._$setValue(value);
   debugLogEvent &&
-    debugLogEvent({
-      kind: 'end render',
-      id: renderId,
-      value,
-      container,
-      options,
-      part,
-    });
+  debugLogEvent({
+    kind: 'end render',
+    id: renderId,
+    value,
+    container,
+    options,
+    part,
+  });
   return part as RootPart;
 };
 

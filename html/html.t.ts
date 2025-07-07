@@ -27,7 +27,7 @@ export const COMMENT_PART = 7;
 // ==================== ТИПЫ РЕЗУЛЬТАТА ШАБЛОНА ====================
 
 export type UncompiledTemplateResult<T extends ResultType = ResultType> = {
-  ['_$litType$']: T;
+  ['_$htmlType$']: T;
   strings: TemplateStringsArray;
   values: unknown[];
 };
@@ -46,7 +46,7 @@ export type SVGTemplateResult = TemplateResult<typeof SVG_RESULT>;
 export type MathMLTemplateResult = TemplateResult<typeof MATHML_RESULT>;
 
 export interface CompiledTemplateResult {
-  ['_$litType$']: CompiledTemplate;
+  ['_$htmlType$']: CompiledTemplate;
   values: unknown[];
 }
 
