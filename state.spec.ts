@@ -27,8 +27,10 @@ describe("Новый API с state", () => {
       .states({
         idle: {
           process: {
-            action: () => {},
-            error: ({ update }) => {},
+            action: ({ context }) => {
+              expect(typeof context.name, 'context.name должен быть строкой').toBe('string')
+            },
+            error: ({ update }) => update({ status: "error" }),
           },
           to: {
             loading: {},
@@ -36,9 +38,11 @@ describe("Новый API с state", () => {
         },
         loading: {
           process: {
-            action: () => {},
-            error: ({ update }) => {},
-            success: ({ update }) => {},
+            action: ({ context }) => {
+              expect(typeof context.status, 'context.status должен быть строкой').toBe('string')
+            },
+            error: ({ update }) => update({ status: "error" }),
+            success: ({ update }) => update({ name: "Успешно обновлено" }),
           },
           to: {
             success: {},
@@ -104,7 +108,7 @@ describe("Новый API с state", () => {
   })
 
   it("process функции получают update с полной типизацией", () => {
-    const { context, update } = MetaFor("user")
+    const { context } = MetaFor("user")
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("idle", "loading", "success", "error").required({ default: "idle" }),
@@ -112,7 +116,9 @@ describe("Новый API с state", () => {
       .states({
         idle: {
           process: {
-            action: () => {},
+            action: ({ context }) => {
+              expect(typeof context.name, 'context.name должен быть строкой').toBe('string')
+            },
             error: ({ update }) => update({ status: "error" }),
           },
           to: {
@@ -121,7 +127,9 @@ describe("Новый API с state", () => {
         },
         loading: {
           process: {
-            action: () => {},
+            action: ({ context }) => {
+              expect(typeof context.status, 'context.status должен быть строкой').toBe('string')
+            },
             error: ({ update }) => update({ status: "error" }),
             success: ({ update }) => update({ name: "Успешно обновлено" }),
           },

@@ -11,7 +11,7 @@ export type StateTransitions<T extends string> = {
 import type { UpdateValues, ExtractValues, ContextSchema } from "./context.t"
 
 export type StateProcess<T extends ContextSchema = any> = {
-  action: () => void
+  action: (params: { context: ExtractValues<T> }) => void
   error: (params: { update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T> }) => void
   success?: (params: { update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T> }) => void
 }
