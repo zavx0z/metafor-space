@@ -1,8 +1,3 @@
-/**
- * @license
- * Copyright 2020 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 import {nothing, type ElementPart} from '../html.js'
 
 import {directive, AsyncDirective} from '../async-directive.js'
@@ -43,8 +38,8 @@ export type RefOrCallback<T = Element> = Ref<T> | ((el: T | undefined) => void)
 
 class RefDirective extends AsyncDirective {
   private _element?: Element
-  private _ref?: RefOrCallback
-  private _context?: object
+  private _ref?: RefOrCallback | undefined
+  private _context?: object | undefined
 
   render(_ref?: RefOrCallback) {
     return nothing
@@ -60,8 +55,8 @@ class RefDirective extends AsyncDirective {
     if (refChanged || this._lastElementForRef !== this._element) {
       // We either got a new ref or this is the first render;
       // store the ref/element & update the ref value
-      this._ref = ref
-      this._context = part.options?.host
+      this._ref = ref ?? undefined
+      this._context = part.options?.host ?? undefined
       this._updateRefValue((this._element = part.element))
     }
     return nothing
