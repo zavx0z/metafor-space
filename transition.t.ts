@@ -3,7 +3,15 @@
  * @packageDocumentation
  */
 
-import type { ContextSchema, ExtractValues, RequiredStringDefinition, OptionalStringDefinition, RequiredNumberDefinition, OptionalNumberDefinition, RequiredBooleanDefinition, OptionalBooleanDefinition, RequiredArrayDefinition, OptionalArrayDefinition, RequiredEnumDefinition, OptionalEnumDefinition } from "./context.t"
+import type {
+  ContextSchema,
+  ExtractValues,
+  RequiredStringDefinition,
+  RequiredNumberDefinition,
+  RequiredBooleanDefinition,
+  RequiredArrayDefinition,
+  RequiredEnumDefinition,
+} from "./context.t"
 
 /** # Условия для булевых значений (required)
 
@@ -301,27 +309,37 @@ export type CondArrayOptional<T = any> =
  Определяет условия для любого типа значения в контексте.
  Автоматически выбирает подходящий тип условий на основе типа поля.
  */
-export type Condition<T> =
-  T extends boolean ? CondBooleanRequired :
-  T extends string ? CondStringRequired :
-  T extends number ? CondNumberRequired :
-  T extends (infer U)[] ? CondArrayRequired<U> :
-  T extends readonly (infer U)[] ? CondArrayRequired<U> :
-  T extends null ? null :
-  never
+export type Condition<T> = T extends boolean
+  ? CondBooleanRequired
+  : T extends string
+  ? CondStringRequired
+  : T extends number
+  ? CondNumberRequired
+  : T extends (infer U)[]
+  ? CondArrayRequired<U>
+  : T extends readonly (infer U)[]
+  ? CondArrayRequired<U>
+  : T extends null
+  ? null
+  : never
 
 /** # Универсальный тип условий для optional полей
 
  Определяет условия для опциональных полей в контексте.
  */
-export type ConditionOptional<T> =
-  T extends boolean ? CondBooleanOptional :
-  T extends string ? CondStringOptional :
-  T extends number ? CondNumberOptional :
-  T extends (infer U)[] ? CondArrayOptional<U> :
-  T extends readonly (infer U)[] ? CondArrayOptional<U> :
-  T extends null ? null :
-  never
+export type ConditionOptional<T> = T extends boolean
+  ? CondBooleanOptional
+  : T extends string
+  ? CondStringOptional
+  : T extends number
+  ? CondNumberOptional
+  : T extends (infer U)[]
+  ? CondArrayOptional<U>
+  : T extends readonly (infer U)[]
+  ? CondArrayOptional<U>
+  : T extends null
+  ? null
+  : never
 
 /** # Условия перехода
 
@@ -330,10 +348,14 @@ export type ConditionOptional<T> =
  Правильно различает required и optional поля.
  */
 export type TransitionConditions<T extends ContextSchema> = {
-  [K in keyof T]?: 
-    T[K] extends RequiredStringDefinition | RequiredNumberDefinition | RequiredBooleanDefinition | RequiredArrayDefinition<any> | RequiredEnumDefinition<any> 
-      ? Condition<ExtractValues<T>[K]>
-      : ConditionOptional<ExtractValues<T>[K]>
+  [K in keyof T]?: T[K] extends
+    | RequiredStringDefinition
+    | RequiredNumberDefinition
+    | RequiredBooleanDefinition
+    | RequiredArrayDefinition<any>
+    | RequiredEnumDefinition<any>
+    ? Condition<ExtractValues<T>[K]>
+    : ConditionOptional<ExtractValues<T>[K]>
 }
 
 // Обратная совместимость - старые типы теперь являются union типов
@@ -341,4 +363,4 @@ export type CondBoolean = CondBooleanRequired | CondBooleanOptional
 export type CondEnum<E extends readonly (string | number)[]> = CondEnumRequired<E> | CondEnumOptional<E>
 export type CondString = CondStringRequired | CondStringOptional
 export type CondNumber = CondNumberRequired | CondNumberOptional
-export type CondArray<T = any> = CondArrayRequired<T> | CondArrayOptional<T> 
+export type CondArray<T = any> = CondArrayRequired<T> | CondArrayOptional<T>

@@ -4,16 +4,16 @@
  */
 
 import { createContext } from "./context"
-import type { ContextSchema, ContextTypes, ContextInstance, ContextWithStateCb, ExtractValues, UpdateValues } from "./context.t"
+import type { ContextSchema, ContextTypes, ContextInstance } from "./context.t"
 import type { StateConfig } from "./state.t"
-import type { ContextWithStateConfig } from "./metafor.t"
+import type { ViewCallbacks as ViewConfig } from "./view.t"
 
 /**
  * Основная функция MetaFor
  * Создает экземпляр MetaFor с указанным именем (имя используется только для идентификации, не влияет на логику).
  * Возвращает объект с методом context для создания типизированного контекста.
  *
- * @param name - Имя контекста (произвольная строка, для идентификации)
+ * @param tag - Имя актора
  * @returns Объект с методом context для создания типизированного контекста
  *
  * @example
@@ -24,7 +24,7 @@ import type { ContextWithStateConfig } from "./metafor.t"
  * userContext.context // доступ к значениям
  * userContext.update({ name: 'Иван' })
  */
-export function MetaFor(name: string) {
+export function MetaFor(tag: string) {
   return {
     /**
      * Создает типизированный контекст на основе схемы.
@@ -44,7 +44,7 @@ export function MetaFor(name: string) {
      * context.context.nickname // string | null (optional)
      * context.context.tags // string[] | null (optional)
      */
-    context<const T extends ContextSchema>(schema: ((types: ContextTypes) => T) | T): ContextWithStateCb<T> {
+    context<const T extends ContextSchema>(schema: ((types: ContextTypes) => T) | T) {
       const { context, update, onUpdate } = createContext(schema) as ContextInstance<T>
       return {
         /**
@@ -52,16 +52,16 @@ export function MetaFor(name: string) {
          * @param states - Конфигурация состояний и переходов
          * @returns Объект с иммутабельным контекстом и методами update и onUpdate
          */
-        states<S extends string>(states: StateConfig<S, T>): ContextWithStateConfig<T, S> {
-          return { 
-            view() {
+        states<S extends string>(states: StateConfig<S, T>) {
+          return {
+            view(view?: ViewConfig) {
               return {
                 context,
                 update,
                 onUpdate,
                 stateConfig: states
               }
-            }
+            },
           }
         },
       }

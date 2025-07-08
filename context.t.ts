@@ -117,19 +117,3 @@ export interface ContextInstance<T extends ContextSchema> {
    */
   onUpdate: (cb: (patches: JsonPatch[]) => void) => () => void
 }
-
-export interface ContextWithStateCb<T extends ContextSchema> {
-  /**
-   * Создает состояние контекста с возможностью управления переходами
-   * @param stateConfig - Конфигурация состояний и переходов
-   * @returns Объект с иммутабельным контекстом и методами update и onUpdate
-   */
-  states: <S extends string>(stateConfig: import("./state.t").StateConfig<S, T>) => {
-    view(): {
-      context: ExtractValues<T>
-      update: (values: UpdateValues<ExtractValues<T>>) => ExtractValues<T>
-      onUpdate: (callback: (patches: any[]) => void) => () => void
-      stateConfig: import("./state.t").StateConfig<S, T>
-    }
-  }
-}
