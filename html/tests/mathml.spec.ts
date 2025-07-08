@@ -3,7 +3,7 @@ import { mathml, render } from "../html"
 import type { MathMLTemplateResult, TemplateResult } from "../html.t"
 
 describe("MathML", () => {
-  test("renders MathML", () => {
+  test("рендерит MathML", () => {
     const container = document.createElement("math")
     const t = mathml`<mi>x</mi>`
     render(t, container)
@@ -14,11 +14,11 @@ describe("MathML", () => {
 
   const staticAssertExtends = <T, U extends T>(_?: [T, U]) => {}
 
-  test("`MathMLTemplateResult` is a subtype of `TemplateResult`", () => {
+  test("`MathMLTemplateResult` является подтипом `TemplateResult`", () => {
     staticAssertExtends<TemplateResult, MathMLTemplateResult>()
   })
 
-  test("`mathml` returns a `MathMLTemplateResult`", () => {
+  test("`mathml` возвращает `MathMLTemplateResult`", () => {
     staticAssertExtends<MathMLTemplateResult, ReturnType<typeof mathml>>()
   })
 })

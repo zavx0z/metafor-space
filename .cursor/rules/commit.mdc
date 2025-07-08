@@ -1,8 +1,6 @@
 ---
-description: коммит commit git message
-alwaysApply: false
+alwaysApply: true
 ---
-
 # Рекомендации по формулировке
 
 - Используйте страдательное наклонение: "добавлен", "исправлен", "обновлен"

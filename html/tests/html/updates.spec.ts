@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, test} from "bun:test"
 import {html, render} from "../../html"
 
-describe("updates", () => {
+describe("обновления", () => {
   let container: HTMLElement
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe("updates", () => {
 
   const assertContent = (expected: string) => expect(container.innerHTML).toMatchStringHTMLStripComments(expected)
 
-  test("dirty checks simple values", () => {
+  test("проверяет изменения простых значений", () => {
     const foo = "aaa"
 
     const t = () => html`
@@ -22,24 +22,24 @@ describe("updates", () => {
     const text = container.querySelector("div")!
     expect(text.textContent).toBe("aaa")
 
-    // Set textContent manually (without disturbing the part marker node).
-    // Since @metafor/html doesn't dirty check against actual DOM, but again
-    // previous part values, this modification should persist through the
-    // next render with the same value.
+    // Устанавливаем textContent вручную (не нарушая узел-маркер части).
+    // Поскольку @metafor/html не проверяет изменения против реального DOM, а против
+    // предыдущих значений частей, это изменение должно сохраниться через
+    // следующий рендер с тем же значением.
     text.lastChild!.textContent = "bbb"
     expect(text.textContent).toBe("bbb")
     assertContent("<div>bbb</div>")
 
-    // Re-render with the same content, should be a no-op
+    // Повторный рендер с тем же содержимым, должен быть no-op
     render(t(), container)
     assertContent("<div>bbb</div>")
     const text2 = container.querySelector("div")!
 
-    // The next node should be the same too
+    // Следующий узел должен быть тем же самым
     expect(text).toBe(text2)
   })
 
-  test("dirty checks node values", async () => {
+  test("проверяет изменения значений узлов", async () => {
     const node = document.createElement("div")
     const t = () =>
       html`
@@ -68,7 +68,7 @@ describe("updates", () => {
     expect(mutationRecords.length).toBe(0)
   })
 
-  test("renders to and updates a container", () => {
+  test("рендерит в контейнер и обновляет его", () => {
     let foo = "aaa"
 
     const t = () => html`
@@ -84,11 +84,11 @@ describe("updates", () => {
     render(t(), container)
     assertContent("<div>bbb</div>")
     const div2 = container.querySelector("div")!
-    // check that only the part changed
+    // проверяем, что изменилась только часть
     expect(div).toBe(div2)
   })
 
-  test("renders to and updates sibling parts", () => {
+  test("рендерит в контейнер и обновляет соседние части", () => {
     let foo = "foo"
     const bar = "bar"
 
@@ -104,7 +104,7 @@ describe("updates", () => {
     assertContent("<div>bbbbar</div>")
   })
 
-  test("renders and updates attributes", () => {
+  test("рендерит и обновляет атрибуты", () => {
     let foo = "foo"
     const bar = "bar"
 
@@ -120,7 +120,7 @@ describe("updates", () => {
     assertContent('<div a="bbb:bar"></div>')
   })
 
-  test("updates nested templates", () => {
+  test("обновляет вложенные шаблоны", () => {
     let foo = "foo"
     const bar = "bar"
     const baz = "baz"
@@ -153,7 +153,7 @@ describe("updates", () => {
     assertContent("<h2>bar</h2>baz")
   })
 
-  test("updates an element", () => {
+  test("обновляет элемент", () => {
     let child: any = document.createElement("p")
     const t = () => html`
       <div>
@@ -173,7 +173,7 @@ describe("updates", () => {
     assertContent("<div>foo<div></div></div>")
   })
 
-  test("overwrites an existing TemplateInstance if one exists and does " + "not have a matching Template", () => {
+  test("перезаписывает существующий TemplateInstance, если он существует и не имеет соответствующего Template", () => {
     render(
       html`
         <div>foo</div>

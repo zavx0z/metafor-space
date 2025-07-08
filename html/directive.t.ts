@@ -3,20 +3,20 @@
  * @packageDocumentation
  */
 
-import type {Directive} from './directive.js';
+import type {Directive} from './directive.js'
 
 /**
  * Интерфейс класса-директивы (конструктор).
  */
 export interface DirectiveClass {
-  new (part: PartInfo): Directive;
+  new (part: PartInfo): Directive
 }
 
 /**
  * Вспомогательный тип для извлечения сигнатуры метода render() из класса-директивы.
  * Используется для типизации функции-директивы.
  */
-export type DirectiveParameters<C extends Directive> = Parameters<C['render']>;
+export type DirectiveParameters<C extends Directive> = Parameters<C['render']>
 
 /**
  * Результат вызова функции-директивы. Не выполняет саму директиву, а только
@@ -27,9 +27,9 @@ export interface DirectiveResult<C extends DirectiveClass = DirectiveClass> {
    * Это свойство не должно быть минифицировано.
    * @internal
    */
-  ['_$litDirective$']: C;
+  ['_$htmlDirective$']: C
   /** @internal */
-  values: DirectiveParameters<InstanceType<C>>;
+  values: DirectiveParameters<InstanceType<C>>
 }
 
 /**
@@ -42,15 +42,15 @@ export const PartType = {
   BOOLEAN_ATTRIBUTE: 4,
   EVENT: 5,
   ELEMENT: 6,
-} as const;
+} as const
 
-export type PartType = (typeof PartType)[keyof typeof PartType];
+export type PartType = (typeof PartType)[keyof typeof PartType]
 
 /**
  * Информация о части типа CHILD.
  */
 export interface ChildPartInfo {
-  readonly type: typeof PartType.CHILD;
+  readonly type: typeof PartType.CHILD
 }
 
 /**
@@ -61,17 +61,17 @@ export interface AttributePartInfo {
     | typeof PartType.ATTRIBUTE
     | typeof PartType.PROPERTY
     | typeof PartType.BOOLEAN_ATTRIBUTE
-    | typeof PartType.EVENT;
-  readonly strings?: ReadonlyArray<string>;
-  readonly name: string;
-  readonly tagName: string;
+    | typeof PartType.EVENT
+  readonly strings?: ReadonlyArray<string>
+  readonly name: string
+  readonly tagName: string
 }
 
 /**
  * Информация о части типа ELEMENT.
  */
 export interface ElementPartInfo {
-  readonly type: typeof PartType.ELEMENT;
+  readonly type: typeof PartType.ELEMENT
 }
 
 /**
@@ -79,4 +79,4 @@ export interface ElementPartInfo {
  *
  * Используется для проверки, что директива применяется к корректной части шаблона.
  */
-export type PartInfo = ChildPartInfo | AttributePartInfo | ElementPartInfo;
+export type PartInfo = ChildPartInfo | AttributePartInfo | ElementPartInfo

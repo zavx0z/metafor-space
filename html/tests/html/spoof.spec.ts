@@ -2,12 +2,12 @@ import { stripExpressionMarkers } from "../../../fixture/expectExtend"
 import { render, html } from "../../html"
 import { beforeEach, describe, expect, test } from "bun:test"
 
-describe(`don't render simple spoof template results`, () => {
+describe(`не рендерит простые поддельные результаты шаблонов`, () => {
   let container: HTMLDivElement
   beforeEach(() => {
     container = document.createElement("div")
   })
-  test(`don't render simple spoof template results`, () => {
+  test(`не рендерит простые поддельные результаты шаблонов`, () => {
     const spoof = {
       ["_$htmlType$"]: 1,
       strings: ["<div>spoofed string</div>"],

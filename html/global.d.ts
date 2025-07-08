@@ -17,4 +17,4 @@ declare global {
   var litIssuedWarnings: Set<string>
 }
 
-export {};
+export {}

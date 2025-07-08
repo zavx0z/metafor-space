@@ -864,7 +864,7 @@ function resolveDirective(
   const nextDirectiveConstructor = isPrimitive(value)
     ? undefined
     : // Это свойство должно оставаться неминифицированным.
-    (value as DirectiveResult)['_$litDirective$'];
+    (value as DirectiveResult)['_$htmlDirective$'];
   if (currentDirective?.constructor !== nextDirectiveConstructor) {
     // Это свойство должно оставаться неминифицированным.
     currentDirective?.['_$notifyDirectiveConnectionChanged']?.(false);

@@ -1,6 +1,6 @@
-import {beforeEach, describe, expect, test} from "bun:test"
-import {type CompiledTemplateResult, html, nothing, type RenderOptions, type TemplateResult} from "../../html.js"
-import {render} from "../../html.js"
+import { beforeEach, describe, expect, test } from "bun:test"
+import { render, html, nothing } from "../../html"
+import type { CompiledTemplateResult, RenderOptions, TemplateResult } from "../../html.t"
 
 // @ts-ignore У нас нет прямого доступа к DEV_MODE, но это достаточно хороший прокси.
 const DEV_MODE = render.setSanitizer != null
@@ -38,45 +38,20 @@ describe("вставка маркера", () => {
   })
 
   test("только текст", () => {
-    render(
-      html`
-        ${"A"}
-      `,
-      container
-    )
-    assertRender(
-      html`
-        ${"A"}
-      `,
-      "A"
-    )
+    render(html` ${"A"} `, container)
+    assertRender(html` ${"A"} `, "A")
   })
 
   test("текст похожий на атрибут", () => {
-    assertRender(
-      html`
-        a=${"A"}
-      `,
-      "a=A"
-    )
+    assertRender(html` a=${"A"} `, "a=A")
   })
 
   test("< в тексте", () => {
-    assertRender(
-      html`
-        a < ${"b"}
-      `,
-      "a &lt; b"
-    )
+    assertRender(html` a < ${"b"} `, "a &lt; b")
   })
 
   test("дочерний текстовый элемент", () => {
-    assertRender(
-      html`
-        <div>${"A"}</div>
-      `,
-      "<div>A</div>"
-    )
+    assertRender(html` <div>${"A"}</div> `, "<div>A</div>")
   })
   test("Текстовый дочерний элемент различных имён тегов", () => {
     assertRender(html`<x-foo>${"A"}</x-foo>`, "<x-foo>A</x-foo>") // prettier-ignore
@@ -103,12 +78,7 @@ describe("вставка маркера", () => {
   })
 
   test("дочерний текст элемента с несвязанным атрибутом в кавычках", () => {
-    assertRender(
-      html`
-        <div a="b">${"d"}</div>
-      `,
-      '<div a="b">d</div>'
-    )
+    assertRender(html` <div a="b">${"d"}</div> `, '<div a="b">d</div>')
 
     render(
       html`
@@ -120,17 +90,12 @@ describe("вставка маркера", () => {
     )
     expect(container.innerHTML).oneOfMatchStringHTMLStripMarkers([
       '<script a="b" type="foo">d</script>',
-      '<script type="foo" a="b">d</script>'
+      '<script type="foo" a="b">d</script>',
     ])
   })
 
   test("дочерний текст элемента с несвязанным атрибутом без кавычек", () => {
-    assertRender(
-      html`
-        <div a="b">${"d"}</div>
-      `,
-      '<div a="b">d</div>'
-    )
+    assertRender(html` <div a="b">${"d"}</div> `, '<div a="b">d</div>')
 
     render(
       html`
@@ -142,35 +107,20 @@ describe("вставка маркера", () => {
     )
     expect(container.innerHTML).oneOfMatchStringHTMLStripMarkers([
       '<script a="b" type="foo">d</script>',
-      '<script type="foo" a="b">d</script>'
+      '<script type="foo" a="b">d</script>',
     ])
   })
 
   test("отрисовка частей с пробелами после них", () => {
-    assertRender(
-      html`
-        <div>${"foo"}</div>
-      `,
-      "<div>foo </div>"
-    )
+    assertRender(html` <div>${"foo"}</div> `, "<div>foo </div>")
   })
 
   test("отрисовка частей похожих на атрибуты", () => {
-    assertRender(
-      html`
-        <div>foo bar=${"baz"}</div>
-      `,
-      "<div>foo bar=baz</div>"
-    )
+    assertRender(html` <div>foo bar=${"baz"}</div> `, "<div>foo bar=baz</div>")
   })
 
   test("отрисовка нескольких частей на элемент с сохранением пробелов", () => {
-    assertRender(
-      html`
-        <div>${"foo"} ${"bar"}</div>
-      `,
-      "<div>foo bar</div>"
-    )
+    assertRender(html` <div>${"foo"} ${"bar"}</div> `, "<div>foo bar</div>")
   })
 
   test("отрисовка шаблонов с комментариями", () => {
@@ -205,9 +155,7 @@ describe("вставка маркера", () => {
     assertRender(
       html`
         <a>${"foo"}</a>
-        ${html`
-          <h1>${"bar"}</h1>
-        `}
+        ${html` <h1>${"bar"}</h1> `}
       `,
       "<a>foo</a><h1>bar</h1>"
     )
@@ -242,18 +190,8 @@ describe("вставка маркера", () => {
       `,
       "<style>A</style>"
     )
-    assertRender(
-      html`
-        <title>${"A"}</title>
-      `,
-      "<title>A</title>"
-    )
-    assertRender(
-      html`
-        <textarea>${"A"}</textarea>
-      `,
-      "<textarea>A</textarea>"
-    )
+    assertRender(html` <title>${"A"}</title> `, "<title>A</title>")
+    assertRender(html` <textarea>${"A"}</textarea> `, "<textarea>A</textarea>")
   })
 
   test("текст в элементе с необработанным текстом после <", () => {
@@ -438,12 +376,7 @@ describe("вставка маркера", () => {
   })
 
   test("отрисовка внутри элемента похожего на необработанный", () => {
-    assertRender(
-      html`
-        <scriptx>${"foo"}</scriptx>
-      `,
-      "<scriptx>foo</scriptx>"
-    )
+    assertRender(html` <scriptx>${"foo"}</scriptx> `, "<scriptx>foo</scriptx>")
   })
 
   test("атрибут без кавычек", () => {
@@ -457,90 +390,35 @@ describe("вставка маркера", () => {
   })
 
   test("атрибут в кавычках", () => {
-    assertRender(
-      html`
-        <div a="${"A"}"></div>
-      `,
-      '<div a="A"></div>'
-    )
-    assertRender(
-      html`
-        <div abc="${"A"}"></div>
-      `,
-      '<div abc="A"></div>'
-    )
-    assertRender(
-      html`
-        <div abc="${"A"}"></div>
-      `,
-      '<div abc="A"></div>'
-    )
-    assertRender(
-      html`
-        <div abc="${"A"}/>"></div>
-      `,
-      '<div abc="A/>"></div>'
-    )
-    assertRender(
-      html`
-        <input value="${"A"}" />
-      `,
-      '<input value="A">'
-    )
+    assertRender(html` <div a="${"A"}"></div> `, '<div a="A"></div>')
+    assertRender(html` <div abc="${"A"}"></div> `, '<div abc="A"></div>')
+    assertRender(html` <div abc="${"A"}"></div> `, '<div abc="A"></div>')
+    assertRender(html` <div abc="${"A"}/>"></div> `, '<div abc="A/>"></div>')
+    assertRender(html` <input value="${"A"}" /> `, '<input value="A">')
   })
 
   test("второй атрибут в кавычках", () => {
-    assertRender(
-      html`
-        <div a="b" c="${"A"}"></div>
-      `,
-      '<div a="b" c="A"></div>'
-    )
+    assertRender(html` <div a="b" c="${"A"}"></div> `, '<div a="b" c="A"></div>')
   })
 
   test("два атрибута в кавычках", () => {
-    assertRender(
-      html`
-        <div a="${"A"}" b="${"A"}"></div>
-      `,
-      '<div a="A" b="A"></div>'
-    )
+    assertRender(html` <div a="${"A"}" b="${"A"}"></div> `, '<div a="A" b="A"></div>')
   })
 
   test("два атрибута без кавычек", () => {
-    assertRender(
-      html`
-        <div a=${"A"} b=${"A"}></div>
-      `,
-      '<div a="A" b="A"></div>'
-    )
+    assertRender(html` <div a=${"A"} b=${"A"}></div> `, '<div a="A" b="A"></div>')
   })
 
   test("множественный атрибут в кавычках", () => {
-    assertRender(
-      html`
-        <div a="${"A"} ${"A"}"></div>
-      `,
-      '<div a="A A"></div>'
-    )
+    assertRender(html` <div a="${"A"} ${"A"}"></div> `, '<div a="A A"></div>')
   })
 
   test("атрибут в кавычках с разметкой", () => {
-    assertRender(
-      html`
-        <div a="<table>${"A"}"></div>
-      `,
-      '<div a="<table>A"></div>'
-    )
+    assertRender(html` <div a="<table>${"A"}"></div> `, '<div a="<table>A"></div>')
   })
 
   test("текст после связанного атрибута в кавычках", () => {
-    assertRender(
-      html`
-        <div a="${"A"}">${"A"}</div>
-      `,
-      '<div a="A">A</div>'
-    )
+    assertRender(html` <div a="${"A"}">${"A"}</div> `, '<div a="A">A</div>')
     assertRender(
       html`
         <script type="foo" a="${"A"}">
@@ -552,12 +430,7 @@ describe("вставка маркера", () => {
   })
 
   test("текст после связанного атрибута без кавычек", () => {
-    assertRender(
-      html`
-        <div a=${"A"}>${"A"}</div>
-      `,
-      '<div a="A">A</div>'
-    )
+    assertRender(html` <div a=${"A"}>${"A"}</div> `, '<div a="A">A</div>')
     assertRender(
       html`
         <script type="foo" a=${"A"}>
@@ -569,38 +442,18 @@ describe("вставка маркера", () => {
   })
 
   test("внутри открывающего тега", () => {
-    assertRender(
-      html`
-        <div ${`a`}></div>
-      `,
-      "<div></div>"
-    )
+    assertRender(html` <div ${`a`}></div> `, "<div></div>")
   })
 
   test("внутри открывающего тега x2", () => {
     // We don't support multiple attribute-position bindings yet, so just
     // ensure this parses ok
-    assertRender(
-      html`
-        <div ${`a`} ${`a`}></div>
-      `,
-      "<div></div>"
-    )
+    assertRender(html` <div ${`a`} ${`a`}></div> `, "<div></div>")
   })
 
   test("внутри открывающего тега после атрибута в кавычках", () => {
-    assertRender(
-      html`
-        <div a="b" ${`c`}></div>
-      `,
-      '<div a="b"></div>'
-    )
-    assertRender(
-      html`
-        <script a="b" ${`c`}></script>
-      `,
-      '<script a="b"></script>'
-    )
+    assertRender(html` <div a="b" ${`c`}></div> `, '<div a="b"></div>')
+    assertRender(html` <script a="b" ${`c`}></script> `, '<script a="b"></script>')
   })
 
   test("внутри открывающего тега после атрибута без кавычек", () => {
@@ -611,22 +464,12 @@ describe("вставка маркера", () => {
 
   test("внутри открывающего тега перед атрибутом без кавычек", () => {
     // bound attributes always appear after static attributes
-    assertRender(
-      html`
-        <div ${`c`} a="b"></div>
-      `,
-      '<div a="b"></div>'
-    )
+    assertRender(html` <div ${`c`} a="b"></div> `, '<div a="b"></div>')
   })
 
   test("внутри открывающего тега перед атрибутом в кавычках", () => {
     // bound attributes always appear after static attributes
-    assertRender(
-      html`
-        <div ${`c`} a="b"></div>
-      `,
-      '<div a="b"></div>'
-    )
+    assertRender(html` <div ${`c`} a="b"></div> `, '<div a="b"></div>')
   })
 
   test('"динамическое" имя тега', () => {
@@ -663,22 +506,12 @@ describe("вставка маркера", () => {
   })
 
   test("комментарий с содержимым похожим на атрибут", () => {
-    render(
-      html`
-        <!-- a=${"A"}-->
-      `,
-      container
-    )
+    render(html` <!-- a=${"A"}--> `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<!-- a=-->")
   })
 
   test("комментарий с содержимым похожим на элемент", () => {
-    render(
-      html`
-        <!-- <div>${"A"}</div> -->
-      `,
-      container
-    )
+    render(html` <!-- <div>${"A"}</div> --> `, container)
     expect(container.innerHTML).toMatchStringHTMLStripMarkers("<!-- <div></div> -->")
   })
 
@@ -694,26 +527,19 @@ describe("вставка маркера", () => {
 
   test("отрисовка после существующего содержимого", () => {
     container.appendChild(document.createElement("div"))
-    assertRender(
-      html`
-        <span></span>
-      `,
-      "<div></div><span></span>"
-    )
+    assertRender(html` <span></span> `, "<div></div><span></span>")
   })
 
   test("отрисовка/обновление перед `renderBefore`, если указан", () => {
     const renderBefore = container.appendChild(document.createElement("div"))
-    const template = html`
-      <span></span>
-    `
+    const template = html` <span></span> `
     assertRender(template, "<span></span><div></div>", {
-      renderBefore
+      renderBefore,
     })
     // Ensure re-render updates rather than re-rendering.
     const containerChildNodes = Array.from(container.childNodes)
     assertRender(template, "<span></span><div></div>", {
-      renderBefore
+      renderBefore,
     })
     expect(Array.from(container.childNodes)).toEqual(containerChildNodes)
     // assert.sameMembers(Array.from(container.childNodes), containerChildNodes)
@@ -722,39 +548,35 @@ describe("вставка маркера", () => {
   test("отрисовка/обновление одного шаблона перед разными узлами `renderBefore`", () => {
     const renderBefore1 = container.appendChild(document.createElement("div"))
     const renderBefore2 = container.appendChild(document.createElement("div"))
-    const template = html`
-      <span></span>
-    `
+    const template = html` <span></span> `
     assertRender(template, "<span></span><div></div><div></div>", {
-      renderBefore: renderBefore1
+      renderBefore: renderBefore1,
     })
     const renderedNode1 = container.querySelector("span")
     assertRender(template, "<span></span><div></div><span></span><div></div>", {
-      renderBefore: renderBefore2
+      renderBefore: renderBefore2,
     })
     const renderedNode2 = container.querySelector("span:last-of-type")
     // Ensure updates are handled as expected.
     assertRender(template, "<span></span><div></div><span></span><div></div>", {
-      renderBefore: renderBefore1
+      renderBefore: renderBefore1,
     })
     expect(container.querySelector("span")).toBe(renderedNode1)
     expect(container.querySelector("span:last-of-type")).toBe(renderedNode2)
     assertRender(template, "<span></span><div></div><span></span><div></div>", {
-      renderBefore: renderBefore2
+      renderBefore: renderBefore2,
     })
     expect(container.querySelector("span")).toBe(renderedNode1)
     expect(container.querySelector("span:last-of-type")).toBe(renderedNode2)
   })
 
   test("отрисовка/обновление при указании или отсутствии узла `renderBefore`", () => {
-    const template = html`
-      <span></span>
-    `
+    const template = html` <span></span> `
     const renderBefore = container.appendChild(document.createElement("div"))
     assertRender(template, "<div></div><span></span>")
     const containerRenderedNode = container.querySelector("span")
     assertRender(template, "<span></span><div></div><span></span>", {
-      renderBefore
+      renderBefore,
     })
     const beforeRenderedNode = container.querySelector("span")
     // Ensure re-render updates rather than re-rendering.
@@ -762,21 +584,14 @@ describe("вставка маркера", () => {
     expect(container.querySelector("span:last-of-type")).toBe(containerRenderedNode)
     expect(container.querySelector("span")).toBe(beforeRenderedNode)
     assertRender(template, "<span></span><div></div><span></span>", {
-      renderBefore
+      renderBefore,
     })
     expect(container.querySelector("span:last-of-type")).toBe(containerRenderedNode)
     expect(container.querySelector("span")).toBe(beforeRenderedNode)
   })
 
   test("последовательные выражения", () => {
-    const template = (a: unknown, b: unknown) =>
-      html`
-        ${html`
-          ${a}
-        `}${html`
-          ${b}
-        `}
-      `
+    const template = (a: unknown, b: unknown) => html` ${html` ${a} `}${html` ${b} `} `
     assertRender(template("a", "b"), "ab")
     assertRender(template(nothing, "b"), "b")
     assertRender(template(nothing, nothing), "")

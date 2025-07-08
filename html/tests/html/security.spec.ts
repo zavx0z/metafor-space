@@ -1,8 +1,8 @@
 import {afterEach, beforeEach, describe, expect, test} from "bun:test"
 import {html, render} from "../../html"
-import type {SanitizerFactory} from "../../html.t.ts";
+import type {SanitizerFactory} from "../../html.t"
 
-describe("enhanced security hooks", () => {
+describe("расширенные хуки безопасности", () => {
   let container: HTMLDivElement
   beforeEach(() => {
     container = document.createElement("div")
@@ -50,7 +50,7 @@ describe("enhanced security hooks", () => {
     }
   }
 
-  test("sanitizes text content when the text is alone", () => {
+  test("санитизирует текстовое содержимое, когда текст находится отдельно", () => {
     const getTemplate = (value: unknown) => html`
       <div>${value}</div>
     `
@@ -71,7 +71,7 @@ describe("enhanced security hooks", () => {
     ])
   })
 
-  test("sanitizes text content when the text is interpolated", () => {
+  test("санитизирует текстовое содержимое, когда текст интерполируется", () => {
     const getTemplate = (value: unknown) =>
       html`
         <div>hello ${value} world</div>
@@ -94,7 +94,7 @@ describe("enhanced security hooks", () => {
     ])
   })
 
-  test("sanitizes full attribute values", () => {
+  test("санитизирует полные значения атрибутов", () => {
     const getTemplate = (value: unknown) => html`
       <div attrib=${value}></div>
     `
@@ -115,7 +115,7 @@ describe("enhanced security hooks", () => {
     ])
   })
 
-  test("sanitizes concatenated attributes after concatenation", () => {
+  test("санитизирует конкатенированные атрибуты после конкатенации", () => {
     render(
       html`
         <div attrib="hello ${"big"} world"></div>
@@ -134,7 +134,7 @@ describe("enhanced security hooks", () => {
     ])
   })
 
-  test("sanitizes properties", () => {
+  test("санитизирует свойства", () => {
     const getTemplate = (value: unknown) => html`
       <div .foo=${value}></div>
     `

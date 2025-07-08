@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2020 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
 import type {
   Part,
   DirectiveParent,
@@ -11,9 +5,9 @@ import type {
   MaybeCompiledTemplateResult,
   UncompiledTemplateResult,
 } from "./html.t"
-
 import { _$LH } from "./html"
-import type { DirectiveResult, DirectiveClass, PartInfo, AttributePartInfo } from "./directive.js"
+import type { DirectiveResult, DirectiveClass, PartInfo, AttributePartInfo } from "./directive"
+
 type Primitive = null | undefined | boolean | number | string | symbol | bigint
 
 const { _ChildPart: ChildPart } = _$LH
@@ -22,15 +16,17 @@ type ChildPart = InstanceType<typeof ChildPart>
 
 const ENABLE_SHADYDOM_NOPATCH = true
 
-const wrap =
-  ENABLE_SHADYDOM_NOPATCH && window.ShadyDOM?.inUse && window.ShadyDOM?.noPatch === true
-    ? window.ShadyDOM!.wrap
-    : (node: Node) => node
+const wrap = (node: Node): Node => {
+  if (ENABLE_SHADYDOM_NOPATCH && window.ShadyDOM?.inUse && window.ShadyDOM?.noPatch === true && window.ShadyDOM?.wrap) {
+    return window.ShadyDOM.wrap(node)
+  }
+  return node
+}
 
 /**
- * Tests if a value is a primitive value.
+ * Проверяет, является ли значение примитивным.
  *
- * See https://tc39.github.io/ecma262/#sec-typeof-operator
+ * См. https://tc39.github.io/ecma262/#sec-typeof-operator
  */
 export const isPrimitive = (value: unknown): value is Primitive =>
   value === null || (typeof value != "object" && typeof value != "function")
@@ -49,61 +45,59 @@ type IsTemplateResult = {
 }
 
 /**
- * Tests if a value is a TemplateResult or a CompiledTemplateResult.
+ * Проверяет, является ли значение TemplateResult или CompiledTemplateResult.
  */
 export const isTemplateResult: IsTemplateResult = (
   value: unknown,
   type?: TemplateResultType
 ): value is UncompiledTemplateResult =>
   type === undefined
-    ? // This property needs to remain unminified.
-      (value as UncompiledTemplateResult)?.["_$litType$"] !== undefined
-    : (value as UncompiledTemplateResult)?.["_$litType$"] === type
+    ? // Это свойство не должно быть минифицировано.
+      (value as UncompiledTemplateResult)?.["_$htmlType$"] !== undefined
+    : (value as UncompiledTemplateResult)?.["_$htmlType$"] === type
 
 /**
- * Tests if a value is a CompiledTemplateResult.
+ * Проверяет, является ли значение CompiledTemplateResult.
  */
 export const isCompiledTemplateResult = (value: unknown): value is CompiledTemplateResult => {
-  return (value as CompiledTemplateResult)?.["_$litType$"]?.h != null
+  return (value as CompiledTemplateResult)?.["_$htmlType$"]?.h != null
 }
 
 /**
- * Tests if a value is a DirectiveResult.
+ * Проверяет, является ли значение DirectiveResult.
  */
 export const isDirectiveResult = (value: unknown): value is DirectiveResult =>
-  // This property needs to remain unminified.
-  (value as DirectiveResult)?.["_$litDirective$"] !== undefined
+  // Это свойство не должно быть минифицировано.
+  (value as DirectiveResult)?.["_$htmlDirective$"] !== undefined
 
 /**
- * Retrieves the Directive class for a DirectiveResult
+ * Получает класс директивы для DirectiveResult
  */
 export const getDirectiveClass = (value: unknown): DirectiveClass | undefined =>
-  // This property needs to remain unminified.
-  (value as DirectiveResult)?.["_$litDirective$"]
+  // Это свойство не должно быть минифицировано.
+  (value as DirectiveResult)?.["_$htmlDirective$"]
 
 /**
- * Tests whether a part has only a single-expression with no strings to
- * interpolate between.
+ * Проверяет, имеет ли часть только одно выражение без строк для интерполяции между ними.
  *
- * Only AttributePart and PropertyPart can have multiple expressions.
- * Multi-expression parts have a `strings` property and single-expression
- * parts do not.
+ * Только AttributePart и PropertyPart могут иметь множественные выражения.
+ * Части с множественными выражениями имеют свойство `strings`, а части с одним выражением - нет.
  */
 export const isSingleExpression = (part: PartInfo) => (part as AttributePartInfo).strings === undefined
 
 const createMarker = () => document.createComment("")
 
 /**
- * Inserts a ChildPart into the given container ChildPart's DOM, either at the
- * end of the container ChildPart, or before the optional `refPart`.
+ * Вставляет ChildPart в DOM указанной контейнерной ChildPart, либо в конец
+ * контейнерной ChildPart, либо перед опциональной `refPart`.
  *
- * This does not add the part to the containerPart's committed value. That must
- * be done by callers.
+ * Это не добавляет часть к закоммиченному значению containerPart. Это должно
+ * быть сделано вызывающим кодом.
  *
- * @param containerPart Part within which to add the new ChildPart
- * @param refPart Part before which to add the new ChildPart; when omitted the
- *     part added to the end of the `containerPart`
- * @param part Part to insert, or undefined to create a new part
+ * @param containerPart Часть, в которую добавляется новая ChildPart
+ * @param refPart Часть, перед которой добавляется новая ChildPart; при пропуске
+ *     часть добавляется в конец `containerPart`
+ * @param part Часть для вставки, или undefined для создания новой части
  */
 export const insertPart = (containerPart: ChildPart, refPart?: ChildPart, part?: ChildPart): ChildPart => {
   const container = wrap(containerPart._$startNode).parentNode!
@@ -120,14 +114,14 @@ export const insertPart = (containerPart: ChildPart, refPart?: ChildPart, part?:
     const parentChanged = oldParent !== containerPart
     if (parentChanged) {
       part._$reparentDisconnectables?.(containerPart)
-      // Note that although `_$reparentDisconnectables` updates the part's
-      // `_$parent` reference after unlinking from its current parent, that
-      // method only exists if Disconnectables are present, so we need to
-      // unconditionally set it here
+      // Обратите внимание, что хотя `_$reparentDisconnectables` обновляет ссылку
+      // `_$parent` части после отвязки от текущего родителя, этот метод
+      // существует только если присутствуют Disconnectables, поэтому нам нужно
+      // безусловно установить его здесь
       part._$parent = containerPart
-      // Since the _$isConnected getter is somewhat costly, only
-      // read it once we know the subtree has directives that need
-      // to be notified
+      // Поскольку геттер _$isConnected довольно дорогой, читаем его только
+      // один раз, когда знаем, что поддерево имеет директивы, которые нужно
+      // уведомить
       let newConnectionState
       if (
         part._$notifyConnectionChanged !== undefined &&
@@ -150,20 +144,21 @@ export const insertPart = (containerPart: ChildPart, refPart?: ChildPart, part?:
 }
 
 /**
- * Sets the value of a Part.
+ * Устанавливает значение части.
  *
- * Note that this should only be used to set/update the value of user-created
- * parts (i.e. those created using `insertPart`); it should not be used
- * by directives to set the value of the directive's container part. Directives
- * should return a value from `update`/`render` to update their part state.
+ * Обратите внимание, что это должно использоваться только для установки/обновления
+ * значения пользовательских частей (т.е. тех, которые созданы с помощью `insertPart`);
+ * это не должно использоваться директивами для установки значения контейнерной
+ * части директивы. Директивы должны возвращать значение из `update`/`render`
+ * для обновления состояния части.
  *
- * For directives that require setting their part value asynchronously, they
- * should extend `AsyncDirective` and call `this.setValue()`.
+ * Для директив, которые требуют асинхронной установки значения части, они должны
+ * расширять `AsyncDirective` и вызывать `this.setValue()`.
  *
- * @param part Part to set
- * @param value Value to set
- * @param index For `AttributePart`s, the index to set
- * @param directiveParent Used internally; should not be set by user
+ * @param part Часть для установки
+ * @param value Значение для установки
+ * @param index Для `AttributePart`, индекс для установки
+ * @param directiveParent Используется внутренне; не должно устанавливаться пользователем
  */
 export const setChildPartValue = <T extends ChildPart>(
   part: T,
@@ -174,17 +169,18 @@ export const setChildPartValue = <T extends ChildPart>(
   return part
 }
 
-// A sentinel value that can never appear as a part value except when set by
-// live(). Used to force a dirty-check to fail and cause a re-render.
+// Сентинельное значение, которое никогда не может появиться как значение части,
+// кроме случаев, когда оно установлено live(). Используется для принудительного
+// сбоя проверки изменений и вызова перерендеринга.
 const RESET_VALUE = {}
 
 /**
- * Sets the committed value of a ChildPart directly without triggering the
- * commit stage of the part.
+ * Устанавливает закоммиченное значение ChildPart напрямую без запуска
+ * стадии коммита части.
  *
- * This is useful in cases where a directive needs to update the part such
- * that the next update detects a value change or not. When value is omitted,
- * the next update will be guaranteed to be detected as a change.
+ * Это полезно в случаях, когда директива должна обновить часть так, чтобы
+ * следующее обновление обнаружило изменение значения или нет. Когда значение
+ * пропущено, следующее обновление гарантированно будет обнаружено как изменение.
  *
  * @param part
  * @param value
@@ -192,30 +188,30 @@ const RESET_VALUE = {}
 export const setCommittedValue = (part: Part, value: unknown = RESET_VALUE) => (part._$committedValue = value)
 
 /**
- * Returns the committed value of a ChildPart.
+ * Возвращает закоммиченное значение ChildPart.
  *
- * The committed value is used for change detection and efficient updates of
- * the part. It can differ from the value set by the template or directive in
- * cases where the template value is transformed before being committed.
+ * Закоммиченное значение используется для обнаружения изменений и эффективных
+ * обновлений части. Оно может отличаться от значения, установленного шаблоном
+ * или директивой в случаях, когда значение шаблона преобразуется перед коммитом.
  *
- * - `TemplateResult`s are committed as a `TemplateInstance`
- * - Iterables are committed as `Array<ChildPart>`
- * - All other types are committed as the template value or value returned or
- *   set by a directive.
+ * - `TemplateResult` коммитятся как `TemplateInstance`
+ * - Итерируемые объекты коммитятся как `Array<ChildPart>`
+ * - Все остальные типы коммитятся как значение шаблона или значение, возвращенное
+ *   или установленное директивой.
  *
  * @param part
  */
 export const getCommittedValue = (part: ChildPart) => part._$committedValue
 
 /**
- * Removes a ChildPart from the DOM, including any of its content and markers.
+ * Удаляет ChildPart из DOM, включая все её содержимое и маркеры.
  *
- * Note: The only difference between this and clearPart() is that this also
- * removes the part's start node. This means that the ChildPart must own its
- * start node, ie it must be a marker node specifically for this part and not an
- * anchor from surrounding content.
+ * Примечание: Единственное различие между этим и clearPart() в том, что это также
+ * удаляет начальный узел части. Это означает, что ChildPart должна владеть своим
+ * начальным узлом, т.е. это должен быть маркерный узел специально для этой части,
+ * а не якорь из окружающего содержимого.
  *
- * @param part The Part to remove
+ * @param part Часть для удаления
  */
 export const removePart = (part: ChildPart) => {
   part._$clear()

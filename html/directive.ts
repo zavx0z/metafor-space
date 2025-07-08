@@ -11,7 +11,7 @@ export interface DirectiveClass {
  * Вспомогательный тип для извлечения сигнатуры метода render() из класса-директивы.
  * Используется для типизации функции-директивы.
  */
-export type DirectiveParameters<C extends Directive> = Parameters<C['render']>;
+export type DirectiveParameters<C extends Directive> = Parameters<C['render']>
 
 /**
  * Результат вызова функции-директивы. Не выполняет саму директиву, а только
@@ -22,9 +22,9 @@ export interface DirectiveResult<C extends DirectiveClass = DirectiveClass> {
    * Это свойство не должно быть минифицировано.
    * @internal
    */
-  ['_$litDirective$']: C;
+  ['_$htmlDirective$']: C
   /** @internal */
-  values: DirectiveParameters<InstanceType<C>>;
+  values: DirectiveParameters<InstanceType<C>>
 }
 
 /**
@@ -45,7 +45,7 @@ export type PartType = (typeof PartType)[keyof typeof PartType]
  * Информация о части типа CHILD.
  */
 export interface ChildPartInfo {
-  readonly type: typeof PartType.CHILD;
+  readonly type: typeof PartType.CHILD
 }
 
 /**
@@ -56,17 +56,17 @@ export interface AttributePartInfo {
     | typeof PartType.ATTRIBUTE
     | typeof PartType.PROPERTY
     | typeof PartType.BOOLEAN_ATTRIBUTE
-    | typeof PartType.EVENT;
-  readonly strings?: ReadonlyArray<string>;
-  readonly name: string;
-  readonly tagName: string;
+    | typeof PartType.EVENT
+  readonly strings?: ReadonlyArray<string>
+  readonly name: string
+  readonly tagName: string
 }
 
 /**
  * Информация о части типа ELEMENT.
  */
 export interface ElementPartInfo {
-  readonly type: typeof PartType.ELEMENT;
+  readonly type: typeof PartType.ELEMENT
 }
 
 /**
@@ -74,7 +74,7 @@ export interface ElementPartInfo {
  *
  * Используется для проверки, что директива применяется к корректной части шаблона.
  */
-export type PartInfo = ChildPartInfo | AttributePartInfo | ElementPartInfo;
+export type PartInfo = ChildPartInfo | AttributePartInfo | ElementPartInfo
 
 /**
  * Создаёт пользовательскую функцию-директиву из класса-директивы.
@@ -84,7 +84,7 @@ export const directive =
   <C extends DirectiveClass>(c: C) =>
   (...values: DirectiveParameters<InstanceType<C>>): DirectiveResult<C> => ({
     // Это свойство не должно быть минифицировано.
-    ['_$litDirective$']: c,
+    ['_$htmlDirective$']: c,
     values,
   })
 
@@ -95,27 +95,27 @@ export const directive =
  */
 export abstract class Directive implements Disconnectable {
   //@internal
-  __part!: Part;
+  __part!: Part
   //@internal
-  __attributeIndex: number | undefined;
+  __attributeIndex: number | undefined
   //@internal
-  __directive?: Directive;
+  __directive?: Directive
 
   //@internal
-  _$parent!: Disconnectable;
+  _$parent!: Disconnectable
 
   // Эти поля будут только у AsyncDirective
   //@internal
-  _$disconnectableChildren?: Set<Disconnectable>;
+  _$disconnectableChildren?: Set<Disconnectable>
   // Это свойство не должно быть минифицировано.
   //@internal
-  ['_$notifyDirectiveConnectionChanged']?(isConnected: boolean): void;
+  ['_$notifyDirectiveConnectionChanged']?(isConnected: boolean): void
 
   constructor(_partInfo: PartInfo) {}
 
   // См. комментарий в интерфейсе Disconnectable, почему это геттер
   get _$isConnected() {
-    return this._$parent._$isConnected;
+    return this._$parent._$isConnected
   }
 
   /** @internal */
@@ -124,25 +124,25 @@ export abstract class Directive implements Disconnectable {
     parent: Disconnectable,
     attributeIndex: number | undefined
   ) {
-    this.__part = part;
-    this._$parent = parent;
-    this.__attributeIndex = attributeIndex;
+    this.__part = part
+    this._$parent = parent
+    this.__attributeIndex = attributeIndex
   }
   /** @internal */
   _$resolve(part: Part, props: Array<unknown>): unknown {
-    return this.update(part, props);
+    return this.update(part, props)
   }
 
   /**
    * Метод, который должен быть реализован в пользовательской директиве.
    * Возвращает значение для вставки в шаблон.
    */
-  abstract render(...props: Array<unknown>): unknown;
+  abstract render(...props: Array<unknown>): unknown
 
   /**
    * Метод обновления директивы. По умолчанию вызывает render().
    */
   update(_part: Part, props: Array<unknown>): unknown {
-    return this.render(...props);
+    return this.render(...props)
   }
 }

@@ -3,7 +3,7 @@ import {render, svg} from "../html"
 import type { SVGTemplateResult, TemplateResult } from "../html.t"
 
 describe("svg", () => {
-  test("renders SVG", () => {
+  test("рендерит SVG", () => {
     const container = document.createElement("svg")
     const t = svg`<line y1="1" y2="1"/>`
     render(t, container)
@@ -15,11 +15,11 @@ describe("svg", () => {
   const staticAssertExtends = <T, U extends T>(_?: [T, U]) => {
   }
 
-  test("`SVGTemplateResult` is a subtype of `TemplateResult`", () => {
+  test("`SVGTemplateResult` является подтипом `TemplateResult`", () => {
     staticAssertExtends<TemplateResult, SVGTemplateResult>()
   })
 
-  test("`svg` returns an `SVGTemplateResult`", () => {
+  test("`svg` возвращает `SVGTemplateResult`", () => {
     staticAssertExtends<SVGTemplateResult, ReturnType<typeof svg>>()
   })
 })
