@@ -6,7 +6,7 @@
 import { createContext } from "./context"
 import type { ContextSchema, ContextTypes, ContextInstance } from "./context.t"
 import type { StateConfig } from "./state.t"
-import type { ViewCallbacks as ViewConfig } from "./view.t"
+import type { ViewConfig as ViewConfig } from "./view.t"
 
 /**
  * Основная функция MetaFor
@@ -54,7 +54,7 @@ export function MetaFor(tag: string) {
          */
         states<S extends string>(states: StateConfig<S, T>) {
           return {
-            view(view?: ViewConfig) {
+            view(view?: ViewConfig<T>) {
               return {
                 context,
                 update,
