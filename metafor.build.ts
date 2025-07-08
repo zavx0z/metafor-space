@@ -36,7 +36,6 @@ export const updateVersion = async (path: string) => {
 // <=== Добавляем определения режима сборки и функцию генерации опций ===>
 
 type BuildMode = "development" | "production"
-
 /** Возвращает опции Bun.build в зависимости от режима. */
 const getBuildOptions = (mode: BuildMode) => ({
   entrypoints: ["./metafor.ts"] as string[],
@@ -45,10 +44,10 @@ const getBuildOptions = (mode: BuildMode) => ({
   format: "esm",
   sourcemap: mode === "development" ? "inline" : "none",
   define: {
-    DEV_MODE: mode === "development" ? "true" : "false",
+    "process.env.DEV_MODE": mode === "development" ? '"development"' : '"production"',
   },
   minify: mode === "production",
-  drop: mode === "production" ? ["debugLogEvent"] : undefined,
+  // drop: mode === "production" ? ["debugLogEvent"] : undefined,
 })
 
 /**
@@ -58,6 +57,7 @@ const getBuildOptions = (mode: BuildMode) => ({
  * @throws Ошибка, если сборка не удалась
  */
 const build = async (mode: BuildMode = "development") => {
+  console.log(`\n🚧 Тип сборки: ${mode === "production" ? "production (продакшн)" : "development (разработка)"}`)
   const outDir = join(".")
   const start = Date.now()
 
@@ -127,7 +127,9 @@ const build = async (mode: BuildMode = "development") => {
       if (diff === 0) {
         // Размер не изменился
         if (mode === "production") {
-          console.log(`📦 Бандл: metafor.js — ${(jsSize / 1024).toFixed(2)} КБ, gzip: ${(gzipSize / 1024).toFixed(2)} КБ`)
+          console.log(
+            `📦 Бандл: metafor.js — ${(jsSize / 1024).toFixed(2)} КБ, gzip: ${(gzipSize / 1024).toFixed(2)} КБ`
+          )
         } else {
           console.log(`📦 Бандл: metafor.js — ${(jsSize / 1024).toFixed(2)} КБ`)
         }
@@ -182,55 +184,17 @@ const publish = async () => {
   }
 }
 
-let watcher: any = null
-
-/**
- * Быстрая сборка JS в watch-режиме (без типов, без минификации, с sourcemap)
- */
-const buildWatch = async () => {
-  const outDir = join(".")
-  console.log("👀 Watch mode: отслеживается только metafor.ts и его зависимости (быстрая сборка)")
-  watcher = await Bun.build({
-    entrypoints: ["./metafor.ts"],
-    outdir: outDir,
-    target: "browser",
-    format: "esm",
-    sourcemap: "inline",
-    minify: false,
-    define: { DEV_MODE: "true" },
-    watch: {
-      async onRebuild(error: unknown) {
-        if (error) {
-          console.error("❌ Ошибка пересборки:", error)
-        } else {
-          const size = (await stat(join(outDir, "metafor.js"))).size / 1024
-          console.log(`🔄 metafor.js пересобран: ${size.toFixed(2)} КБ`)
-        }
-      },
-    },
-  } as any)
-  if (watcher.success) {
-    console.log(`✅ metafor.js собран: ${(await stat(join(outDir, "metafor.js"))).size / 1024} КБ`)
-    console.log("⌛ Ожидание изменений metafor.ts и зависимостей... (Ctrl+C для выхода)")
-  } else {
-    console.error("❌ Ошибка сборки:", watcher.logs)
-    process.exit(1)
-  }
-}
-
 // --- CLI ---
 if (import.meta.main) {
   const args = process.argv.slice(2)
 
   const isPublish = args.includes("--publish") || args.includes("-p")
   const isWatch = args.includes("--watch") || args.includes("-w")
-  const mode: BuildMode = args.includes("--prod") || isPublish
-    ? "production"
-    : "development"
+  const mode: BuildMode = args.includes("--prod") || isPublish ? "production" : "development"
 
   try {
     if (isWatch) {
-      await buildWatch()
+      // await buildWatch() // Removed as per edit hint
     } else if (isPublish) {
       await publish() // внутри уже вызывается production-сборка
     } else {

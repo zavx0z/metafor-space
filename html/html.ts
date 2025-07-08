@@ -34,7 +34,6 @@ import type {
   TrustedTypesWindow
 } from './html.t'
 
-const DEV_MODE = true
 const ENABLE_EXTRA_SECURITY_HOOKS = true
 const ENABLE_SHADYDOM_NOPATCH = true
 const NODE_MODE = false
@@ -54,7 +53,7 @@ const global = globalThis
  *
  * Не включается в production-сборки.
  */
-const debugLogEvent = DEV_MODE
+const debugLogEvent = process.env.DEV_MODE !== "production"
   ? (event: LitUnstable.DebugLog.Entry) => {
     const shouldEmit = (global as unknown as DebugLoggingWindow)
       .emitLitDebugLogEvents
@@ -74,7 +73,7 @@ let debugLogRenderId = 0
 
 let issueWarning: (code: string, warning: string) => void
 
-if (DEV_MODE) {
+if (process.env.DEV_MODE !== "production") {
   global.litIssuedWarnings ??= new Set()
 
   /**
@@ -310,13 +309,13 @@ const tag =
       // кода в шаблонах
       // Мы делаем это здесь, а не в рендере, чтобы предупреждение было ближе к
       // определению шаблона.
-      if (DEV_MODE && strings.some((s) => s === undefined)) {
+      if (process.env.DEV_MODE !== "production" && strings.some((s) => s === undefined)) {
         console.warn(
           'Некоторые строковые шаблоны undefined.\n' +
           'Это, вероятно, вызвано нелегальными последовательностями escape-последовательностей восьмеричного кода.'
         )
       }
-      if (DEV_MODE) {
+      if (process.env.DEV_MODE !== "production") {
         // Импорт static-html.js вызывает циклическую зависимость, которую g3 не
         // обрабатывает. Вместо этого мы знаем, что статические значения должны
         // иметь поле `_$htmlStatic$`.
@@ -474,7 +473,7 @@ function trustFromTemplateString(
   // объектов TemplateStringArray.
   if (!isArray(tsa) || !tsa.hasOwnProperty('raw')) {
     let message = 'invalid template strings array';
-    if (DEV_MODE) {
+    if (process.env.DEV_MODE !== "production") {
       message = `
           Internal Error: expected template strings to be an array
           with a 'raw' field. Faking a template strings array by
@@ -574,7 +573,7 @@ const getTemplateHtml = (
           }
           regex = tagEndRegex;
         } else if (match[DYNAMIC_TAG_NAME] !== undefined) {
-          if (DEV_MODE) {
+          if (process.env.DEV_MODE !== "production") {
             throw new Error(
               'Связывания в именах тегов не поддерживаются. Пожалуйста, используйте статические шаблоны вместо этого. ' +
               'См. https://lit.dev/docs/templates/expressions/#static-expressions'
@@ -619,7 +618,7 @@ const getTemplateHtml = (
       }
     }
 
-    if (DEV_MODE) {
+    if (process.env.DEV_MODE !== "production") {
       // Если у нас есть attrNameEndIndex, который указывает на то, что
       // нам нужно переписать имя атрибута, утверждаем, что мы находимся
       // в допустимой позиции атрибута - либо в теге, либо в необученном
@@ -705,7 +704,7 @@ class Template {
     // Обходим шаблон, чтобы найти маркеры связывания и создать TemplateParts
     while ((node = walker.nextNode()) !== null && parts.length < partCount) {
       if (node.nodeType === 1) {
-        if (DEV_MODE) {
+        if (process.env.DEV_MODE !== "production") {
           const tag = (node as Element).localName;
           // Предупреждаем, если `textarea` включает выражение и выбрасываем,
           // если `template` это делает, так как это не поддерживается.
@@ -802,7 +801,7 @@ class Template {
       nodeIndex++;
     }
 
-    if (DEV_MODE) {
+    if (process.env.DEV_MODE !== "production") {
       // Если на теге был дублирующий атрибут, то когда тег парсится в
       // элемент, атрибут дедуплицируется. Мы можем обнаружить это
       // несоответствие, если мы не точно потребили все имена атрибутов при
@@ -1132,7 +1131,7 @@ class ChildPart implements Disconnectable {
   }
 
   _$setValue(value: unknown, directiveParent: DirectiveParent = this): void {
-    if (DEV_MODE && this.parentNode === null) {
+    if (process.env.DEV_MODE !== "production" && this.parentNode === null) {
       throw new Error(
         `Этот \`ChildPart\` не имеет \`parentNode\` и поэтому не может принять значение. Это, вероятно, означает, что элемент, содержащий часть, был изменен неподдерживаемым способом вне контроля Lit, что привело к тому, что маркерные узлы части были выброшены из DOM. Например, установка \`innerHTML\` или \`textContent\` может сделать это.`
       );
@@ -1162,7 +1161,7 @@ class ChildPart implements Disconnectable {
     } else if ((value as TemplateResult)['_$htmlType$'] !== undefined) {
       this._commitTemplateResult(value as TemplateResult);
     } else if ((value as Node).nodeType !== undefined) {
-      if (DEV_MODE && this.options?.host === value) {
+      if (process.env.DEV_MODE !== "production" && this.options?.host === value) {
         this._commitText(
           `[probable mistake: rendered a template's host in itself ` +
           `(commonly caused by writing \${this} in a template]`
@@ -1203,7 +1202,7 @@ class ChildPart implements Disconnectable {
         const parentNodeName = this._$startNode.parentNode?.nodeName;
         if (parentNodeName === 'STYLE' || parentNodeName === 'SCRIPT') {
           let message = 'Запрещено';
-          if (DEV_MODE) {
+          if (process.env.DEV_MODE !== "production") {
             if (parentNodeName === 'STYLE') {
               message =
                 `Lit не поддерживает связывание внутри узлов стиля. ` +
@@ -1458,7 +1457,7 @@ class ChildPart implements Disconnectable {
     if (this._$parent === undefined) {
       this.__isConnected = isConnected;
       this._$notifyConnectionChanged?.(isConnected);
-    } else if (DEV_MODE) {
+    } else if (process.env.DEV_MODE !== "production") {
       throw new Error(
         'part.setConnected() может быть вызван только на RootPart, возвращаемом из render().'
       );
@@ -1708,7 +1707,7 @@ class EventPart extends AttributePart {
   ) {
     super(element, name, strings, parent, options);
 
-    if (DEV_MODE && this.strings !== undefined) {
+    if (process.env.DEV_MODE !== "production" && this.strings !== undefined) {
       throw new Error(
         `У \`<${element.localName}>\` есть \`@${name}=...\` слушатель с ` +
         'недопустимым содержимым. Слушатели событий в шаблонах должны иметь ' +
@@ -1870,7 +1869,7 @@ export const _$LH = {
 };
 
 // Применяем полифилы, если они доступны
-const polyfillSupport = DEV_MODE
+const polyfillSupport = process.env.DEV_MODE !== "production"
   ? global.litHtmlPolyfillSupportDevMode
   : global.litHtmlPolyfillSupport
 if (polyfillSupport) {
@@ -1880,7 +1879,7 @@ if (polyfillSupport) {
 // ВАЖНО: не меняйте имя свойства или выражение присваивания.
 // Эта строка будет использоваться в регулярных выражениях для поиска использования @metafor/html.
 (global.litHtmlVersions ??= []).push('3.3.0')
-if (DEV_MODE && global.litHtmlVersions.length > 1) {
+if (process.env.DEV_MODE !== "production" && global.litHtmlVersions.length > 1) {
   queueMicrotask(() => {
     issueWarning!(
       'multiple-versions',
@@ -1920,14 +1919,14 @@ export const render = (
   container: HTMLElement | DocumentFragment,
   options?: RenderOptions
 ): RootPart => {
-  if (DEV_MODE && container == null) {
+  if (process.env.DEV_MODE !== "production" && container == null) {
     // Даем более понятное сообщение об ошибке, чем
     //     Uncaught TypeError: Cannot read properties of null (reading
     //     '_$htmlPart$')
     // которое читается как внутренняя ошибка Lit.
     throw new TypeError(`Контейнер для рендеринга не может быть ${container}`);
   }
-  const renderId = DEV_MODE ? debugLogRenderId++ : 0;
+  const renderId = process.env.DEV_MODE !== "production" ? debugLogRenderId++ : 0;
   const partOwnerNode = options?.renderBefore ?? container;
   // Это свойство должно оставаться неминифицированным.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1968,7 +1967,7 @@ export const render = (
 if (ENABLE_EXTRA_SECURITY_HOOKS) {
   render.setSanitizer = setSanitizer;
   render.createSanitizer = createSanitizer;
-  if (DEV_MODE) {
+  if (process.env.DEV_MODE !== "production") {
     render._testOnlyClearSanitizerFactoryDoNotCallOrElse =
       _testOnlyClearSanitizerFactoryDoNotCallOrElse;
   }
