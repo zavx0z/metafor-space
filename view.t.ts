@@ -1,15 +1,18 @@
+import type { ExtractValues, ContextSchema } from "./context.t"
+import type { TemplateResult } from "./html/html.t"
+
 /**
  * Конфигурация колбэков для view
  */
-export interface ViewCallbacks {
+export interface ViewCallbacks<T extends ContextSchema = ContextSchema> {
   /** Колбэк рендеринга */
-  render?: (...args: any[]) => any
+  render?: (params: { context: ExtractValues<T>; html: typeof import("./html/html").html }) => TemplateResult | void
   /** Колбэк после рендеринга */
-  rendered?: (...args: any[]) => any
+  rendered?: (...args: unknown[]) => unknown
   /** Колбэк монтирования */
-  onMount?: (...args: any[]) => any
+  onMount?: (...args: unknown[]) => unknown
   /** Колбэк уничтожения */
-  onDestroy?: (...args: any[]) => any
-  /** Стили */
-  styles?: any
+  onDestroy?: (...args: unknown[]) => unknown
+  /** Колбэк стилей */
+  styles?: (...args: unknown[]) => unknown
 }
