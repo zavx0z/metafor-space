@@ -13,6 +13,9 @@
 import { join } from 'node:path'
 import { $ } from 'bun'
 import { readFile, writeFile, stat } from "node:fs/promises"
+import { gzip } from "node:zlib"
+import { promisify } from "node:util"
+const gzipAsync = promisify(gzip)
 
 /**
  * Обновляет patch-версию в package.json в указанной директории.
@@ -75,6 +78,13 @@ const build = async () => {
   try {
     jsSize = (await stat(jsPath)).size
     dtsSize = (await stat(dtsPath)).size
+    const jsBuffer = await readFile(jsPath)
+    const gzipped = await gzipAsync(jsBuffer)
+    const gzipSize = gzipped.length
+    // Сохраняем gzip-файл
+    const gzipPath = jsPath + '.gz'
+    await writeFile(gzipPath, gzipped)
+    console.log(`💾 Сохранён gzip-файл: ${gzipPath}`)
     const pkgPath = join(outDir, 'package.json')
     const pkg = JSON.parse(await readFile(pkgPath, 'utf-8'))
     version = pkg.version
@@ -85,9 +95,11 @@ const build = async () => {
       const sign = diff > 0 ? '+' : diff < 0 ? '-' : ''
       const absDiff = Math.abs(diff) / 1024
       if (diff === 0) {
-        console.log('📦 Размер бандла не изменился.')
+        // Размер не изменился
+        console.log(`📦 Бандл: metafor.js — ${(jsSize/1024).toFixed(2)} КБ, gzip: ${(gzipSize/1024).toFixed(2)} КБ`)
       } else {
-        console.log(`📦 Размер бандла изменился: ${sign}${absDiff.toFixed(2)} КБ (${(lastBundleSize/1024).toFixed(2)} КБ → ${(jsSize/1024).toFixed(2)} КБ)`)
+        // Размер изменился
+        console.log(`📦 Бандл: metafor.js — ${sign}${absDiff.toFixed(2)} КБ (${(lastBundleSize/1024).toFixed(2)} КБ → ${(jsSize/1024).toFixed(2)} КБ), gzip: ${(gzipSize/1024).toFixed(2)} КБ`)
       }
     }
     // Обновление lastBundleSize

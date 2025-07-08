@@ -31,6 +31,7 @@
   },
   "scripts": {
     "test": "bun test",
+    "serve": "bun index.server.ts",
     "build": "bun metafor.build.ts",
     "publish-pkg": "bun metafor.build.ts --publish"
   },
@@ -46,5 +47,5 @@
   "peerDependencies": {
     "typescript": "5.8.3"
   },
-  "lastBundleSize": 2905
+  "lastBundleSize": 21364
 }
