@@ -3,13 +3,18 @@ import { MetaFor } from "./metafor"
 
 describe("Новый API с state", () => {
   it("работает с пустым stateConfig", () => {
-    const { context, update } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         age: types.number.optional(),
       }))
       .states({})
       .view()
+
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { context, update } = el
 
     expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
     expect(context.age, "Поле age должно быть null по умолчанию").toBe(null)
@@ -20,7 +25,8 @@ describe("Новый API с state", () => {
   })
 
   it("работает с stateConfig и условиями переходов", () => {
-    const { context, update } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("idle", "loading", "success", "error").required({ default: "idle" }),
@@ -31,7 +37,7 @@ describe("Новый API с state", () => {
         idle: {
           process: {
             action: ({ context }) => {
-              expect(typeof context.name, 'context.name должен быть строкой').toBe('string')
+              expect(typeof context.name, "context.name должен быть строкой").toBe("string")
             },
             error: ({ update }) => update({ status: "error" }),
           },
@@ -42,7 +48,7 @@ describe("Новый API с state", () => {
         loading: {
           process: {
             action: ({ context }) => {
-              expect(typeof context.status, 'context.status должен быть строкой').toBe('string')
+              expect(typeof context.status, "context.status должен быть строкой").toBe("string")
             },
             error: ({ update }) => update({ status: "error" }),
             success: ({ update }) => update({ name: "Успешно обновлено" }),
@@ -64,6 +70,10 @@ describe("Новый API с state", () => {
         },
       })
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { context, update } = el
+
     expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
     expect(context.status, 'Поле status должно быть "idle" по умолчанию').toBe("idle")
 
@@ -73,7 +83,8 @@ describe("Новый API с state", () => {
   })
 
   it("поддерживает сложные условия переходов", () => {
-    const { context, update } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         error: types.string.optional(),
@@ -81,33 +92,40 @@ describe("Новый API с state", () => {
         age: types.number.optional(),
       }))
       .states({
-        "неактивно": {
+        неактивно: {
           to: {
-            "активно": { error: null, active: false },
+            активно: { error: null, active: false },
           },
         },
-        "активно": {
+        активно: {
           to: {
-            "неактивно": { error: null, active: true },
+            неактивно: { error: null, active: true },
           },
         },
       })
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { context, update } = el
 
-    expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
-    expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
+    expect(context.active, "Поле active должно быть false по умолчанию").toBe(false)
+    expect(context.error, "Поле error должно быть null по умолчанию").toBe(null)
 
     update({ active: true, error: null })
-    expect(context.active, 'Поле active должно обновиться на true').toBe(true)
+    expect(context.active, "Поле active должно обновиться на true").toBe(true)
   })
 
   it("поддерживает onUpdate", () => {
-    const { update, onUpdate } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
       }))
       .states({})
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { update, onUpdate } = el
 
     let patches: any[] = []
     onUpdate((p: any[]) => {
@@ -122,28 +140,34 @@ describe("Новый API с state", () => {
   })
 
   it("типизация и автодополнение ключей stateConfig через MetaFor.stateConfig", () => {
-    const { stateConfig } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         status: types.enum("ожидание", "процесс").required({ default: "ожидание" }),
       }))
       .states({
-        "ожидание": {
-          to: { "процесс": { status: "ожидание" } },
+        ожидание: {
+          to: { процесс: { status: "ожидание" } },
         },
-        "процесс": {
-          to: { "ожидание": { status: "процесс" } },
+        процесс: {
+          to: { ожидание: { status: "процесс" } },
         },
       })
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { states } = el
+
     // @ts-expect-error
-    stateConfig["ошибка"]
+    states["ошибка"]
     // Проверяем, что допустимые ключи доступны
-    expect(Object.keys(stateConfig)).toContain("ожидание")
-    expect(Object.keys(stateConfig)).toContain("процесс")
+    expect(Object.keys(states)).toContain("ожидание")
+    expect(Object.keys(states)).toContain("процесс")
   })
 
   it("process функции получают update с полной типизацией", () => {
-    const { context } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         status: types.enum("idle", "loading", "success", "error").required({ default: "idle" }),
@@ -152,7 +176,7 @@ describe("Новый API с state", () => {
         idle: {
           process: {
             action: ({ context }) => {
-              expect(typeof context.name, 'context.name должен быть строкой').toBe('string')
+              expect(typeof context.name, "context.name должен быть строкой").toBe("string")
             },
             error: ({ update }) => update({ status: "error" }),
           },
@@ -163,7 +187,7 @@ describe("Новый API с state", () => {
         loading: {
           process: {
             action: ({ context }) => {
-              expect(typeof context.status, 'context.status должен быть строкой').toBe('string')
+              expect(typeof context.status, "context.status должен быть строкой").toBe("string")
             },
             error: ({ update }) => update({ status: "error" }),
             success: ({ update }) => update({ name: "Успешно обновлено" }),
@@ -185,13 +209,17 @@ describe("Новый API с state", () => {
         },
       })
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { context } = el
 
     expect(context.status, 'Статус должен быть "idle" по умолчанию').toBe("idle")
     expect(context.name, 'Имя должно быть "Гость" по умолчанию').toBe("Гость")
   })
 
   it("поддерживает различные типы условий", () => {
-    const { context, update } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         name: types.string.required({ default: "Гость" }),
         age: types.number.optional(),
@@ -203,14 +231,14 @@ describe("Новый API с state", () => {
       .states({
         pending: {
           to: {
-            approved: { 
+            approved: {
               status: "pending",
               isActive: true,
-              age: { null: false, gte: 18 }
+              age: { null: false, gte: 18 },
             },
-            rejected: { 
+            rejected: {
               status: "pending",
-              error: { null: false }
+              error: { null: false },
             },
           },
         },
@@ -226,89 +254,48 @@ describe("Новый API с state", () => {
         },
       })
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { context, update } = el
 
     expect(context.status, 'Статус должен быть "pending" по умолчанию').toBe("pending")
-    expect(context.isActive, 'isActive должен быть false по умолчанию').toBe(false)
+    expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
 
     update({ age: 25, isActive: true })
-    expect(context.age, 'Возраст должен обновиться на 25').toBe(25)
-    expect(context.isActive, 'isActive должен обновиться на true').toBe(true)
+    expect(context.age, "Возраст должен обновиться на 25").toBe(25)
+    expect(context.isActive, "isActive должен обновиться на true").toBe(true)
   })
 
   it("пример использования условий переходов как в документации", () => {
-    const { context, update } = MetaFor("user")
+    const tag = Bun.randomUUIDv7()
+    const meta = MetaFor(tag)
       .context((types) => ({
         error: types.string.optional(),
         active: types.boolean.required({ default: false }),
       }))
       .states({
-        "неактивно": {
+        неактивно: {
           to: {
-            "активно": { error: null, active: false },
+            активно: { error: null, active: false },
           },
         },
-        "активно": {
+        активно: {
           to: {
-            "неактивно": { error: null, active: true },
+            неактивно: { error: null, active: true },
           },
         },
       })
       .view()
+    document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+    const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+    const { context, update } = el
 
-    expect(context.active, 'Поле active должно быть false по умолчанию').toBe(false)
-    expect(context.error, 'Поле error должно быть null по умолчанию').toBe(null)
+    expect(context.active, "Поле active должно быть false по умолчанию").toBe(false)
+    expect(context.error, "Поле error должно быть null по умолчанию").toBe(null)
 
     // Проверяем, что условия переходов корректно типизированы
     update({ active: true, error: null })
-    expect(context.active, 'Поле active должно обновиться на true').toBe(true)
-    expect(context.error, 'Поле error должно остаться null').toBe(null)
-  })
-
-  it("метод view() возвращает объект с контекстом и методами", () => {
-    const view = MetaFor("user")
-      .context((types) => ({
-        name: types.string.required({ default: "Гость" }),
-        age: types.number.optional(),
-        isActive: types.boolean.required({ default: false }),
-      }))
-      .states({
-        idle: {
-          to: {
-            active: { isActive: false },
-          },
-        },
-        active: {
-          to: {
-            idle: { isActive: true },
-          },
-        },
-      })
-      .view()
-    
-    expect(view.context, "view.context должен содержать контекст").toBeDefined()
-    expect(view.update, "view.update должен быть функцией").toBeTypeOf("function")
-    expect(view.onUpdate, "view.onUpdate должен быть функцией").toBeTypeOf("function")
-    expect(view.stateConfig, "view.stateConfig должен содержать конфигурацию состояний").toBeDefined()
-    
-    expect(view.context.name, 'view.context.name должен быть "Гость"').toBe("Гость")
-    expect(view.context.age, "view.context.age должен быть null").toBe(null)
-    expect(view.context.isActive, "view.context.isActive должен быть false").toBe(false)
-    
-    // Проверяем, что update работает через view
-    view.update({ name: "Иван", age: 25 })
-    expect(view.context.name, 'view.context.name должен обновиться на "Иван"').toBe("Иван")
-    expect(view.context.age, "view.context.age должен обновиться на 25").toBe(25)
-    
-    // Проверяем, что onUpdate работает через view
-    let patches: any[] = []
-    const unsubscribe = view.onUpdate((p: any[]) => {
-      patches = p
-    })
-    
-    view.update({ isActive: true })
-    expect(patches.length, "onUpdate должен вызываться").toBeGreaterThan(0)
-    expect(view.context.isActive, "view.context.isActive должен обновиться на true").toBe(true)
-    
-    unsubscribe()
+    expect(context.active, "Поле active должно обновиться на true").toBe(true)
+    expect(context.error, "Поле error должно остаться null").toBe(null)
   })
 })

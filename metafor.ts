@@ -4,7 +4,8 @@
  */
 
 import { createContext } from "./context"
-import type { ContextSchema, ContextTypes, ContextInstance } from "./context.t"
+import type { ContextSchema, ContextTypes, ContextInstance, ExtractValues, UpdateValues, JsonPatch } from "./context.t"
+import { html, render } from "./html/html"
 import type { StateConfig } from "./state.t"
 import type { ViewConfig as ViewConfig } from "./view.t"
 
@@ -17,49 +18,74 @@ import type { ViewConfig as ViewConfig } from "./view.t"
  * @returns Объект с методом context для создания типизированного контекста
  *
  * @example
- * const userContext = MetaFor('user').context(types => ({
- *   name: types.string.required({ default: 'Гость' }),
- *   age: types.number.optional()
- * })).state({})
- * userContext.context // доступ к значениям
- * userContext.update({ name: 'Иван' })
  */
 export function MetaFor(tag: string) {
   return {
     /**
      * Создает типизированный контекст на основе схемы.
-     * @template T - Схема контекста
+     * @template C - Схема контекста
      * @param schema - Функция, принимающая types и возвращающая схему, либо сама схема
      * @returns Объект с методом state для создания состояния
      *
      * @example
-     * const context = MetaFor('user').context(types => ({
-     *   name: types.string.required({ default: 'Гость' }),
-     *   role: types.enum('user', 'admin').required({ default: 'user' }),
-     *   nickname: types.string(),
-     *   tags: types.array.optional()
-     * })).state({})
-     * context.context.name // string (required)
-     * context.context.role // 'user' | 'admin' (required)
-     * context.context.nickname // string | null (optional)
-     * context.context.tags // string[] | null (optional)
      */
-    context<const T extends ContextSchema>(schema: ((types: ContextTypes) => T) | T) {
-      const { context, update, onUpdate } = createContext(schema) as ContextInstance<T>
+    context<const C extends ContextSchema>(schema: ((types: ContextTypes) => C) | C) {
       return {
         /**
          * Создает состояние контекста с возможностью управления переходами
          * @param states - Конфигурация состояний и переходов
          * @returns Объект с иммутабельным контекстом и методами update и onUpdate
          */
-        states<S extends string>(states: StateConfig<S, T>) {
+        states<S extends string>(states: StateConfig<S, C>) {
           return {
-            view(view?: ViewConfig<T>) {
+            /**
+             *
+             * @param view
+             * @returns
+             */
+            view(view?: ViewConfig<C>) {
+              customElements.define(
+                `metafor-${tag}`,
+                class extends HTMLElement {
+                  #shadow = this.attachShadow({ mode: "closed" })
+                  context!: ContextInstance<C>["context"]
+                  update!: ContextInstance<C>["update"]
+                  onUpdate!: ContextInstance<C>["onUpdate"]
+                  states!: StateConfig<S, C>
+
+                  constructor() {
+                    super()
+                    const { context, update, onUpdate } = createContext(schema) as ContextInstance<C>
+                    this.context = context
+                    this.update = update
+                    this.onUpdate = onUpdate
+                    this.states = states
+                    view?.style?.({
+                      css: (strings, ...values) => {
+                        const sheet = new CSSStyleSheet()
+                        const result = strings.reduce((acc, str, i) => acc + str + (values[i] || ""), "")
+                        sheet.replaceSync(result)
+                        this.#shadow.adoptedStyleSheets.push(sheet)
+                        return sheet
+                      },
+                    })
+                  }
+                  connectedCallback() {
+                    this.#updateView()
+                  }
+                  disconnectedCallback() {}
+                  #updateView = () => {
+                    if (!view?.render) return
+                    const template = view.render({ context: this.context, html })
+                    if (template) render(template, this.#shadow)
+                  }
+                }
+              )
               return {
-                context,
-                update,
-                onUpdate,
-                stateConfig: states
+                context: undefined as unknown as ExtractValues<C>,
+                update: undefined as unknown as (values: UpdateValues<ExtractValues<C>>) => ExtractValues<C>,
+                onUpdate: undefined as unknown as (cb: (patches: JsonPatch[]) => void) => () => void,
+                states: undefined as unknown as StateConfig<S, C>,
               }
             },
           }

@@ -1,364 +1,488 @@
-import { describe, it, expect } from "bun:test"
+import { describe, it, expect, afterEach } from "bun:test"
 import { MetaFor } from "./metafor"
 import { types } from "./context"
 
-describe("Основная функциональность создания и обновления контекстов", () => {
-  it("создаёт контекст с правильными типами и значениями по умолчанию", () => {
-    const { context } = MetaFor("user").context((types) => ({
-      name: types.string.required({ default: "Гость" }),
-      role: types.enum("user", "admin", "moderator").required({ default: "user" }),
-      nickname: types.string(),
-      bio: types.string.optional(),
-      priority: types.enum("low", "medium", "high")(),
-      tags: types.array.optional({ default: [] }),
-    })).states({}).view()
-    expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
-    expect(context.role, 'Поле role должно быть "user" по умолчанию').toBe("user")
-    expect(context.nickname, "Поле nickname должно быть null по умолчанию").toBe(null)
-    expect(context.bio, "Поле bio должно быть null по умолчанию").toBe(null)
-    expect(context.priority, "Поле priority должно быть null по умолчанию").toBe(null)
-    expect(context.tags, "Поле tags должно быть [] по умолчанию").toEqual([])
-  })
+describe("Контекст", () => {
+  afterEach(() => document.body.innerHTML = "")
 
-  it("обновляет только переданные значения, игнорирует undefined", () => {
-    const { context, update } = MetaFor("user").context((types) => ({
-      name: types.string.required({ default: "Гость" }),
-      nickname: types.string(),
-    })).states({}).view()
-    update({ name: "test" })
-    expect(context.name, 'Поле name должно обновиться на "test"').toBe("test")
-    update({ nickname: "nick" })
-    expect(context.nickname, 'Поле nickname должно обновиться на "nick"').toBe("nick")
-    update({ nickname: null })
-    expect(context.nickname, "Поле nickname должно обновиться на null").toBe(null)
-    // update({ name: undefined }) // TS должен ругаться
-  })
+  describe("Основная функциональность создания и обновления контекстов", () => {
+    it("создаёт контекст с правильными типами и значениями по умолчанию", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          name: types.string.required({ default: "Гость" }),
+          role: types.enum("user", "admin", "moderator").required({ default: "user" }),
+          nickname: types.string(),
+          bio: types.string.optional(),
+          priority: types.enum("low", "medium", "high")(),
+          tags: types.array.optional({ default: [] }),
+        }))
+        .states({})
+        .view()
 
-  it("не допускает undefined для optional полей (TS)", () => {
-    const { context, update } = MetaFor("user").context((types) => ({
-      nickname: types.string(),
-    })).states({}).view()
-    // update({ nickname: undefined }) // TS должен ругаться
-    update({ nickname: null })
-    expect(context.nickname, "Поле nickname должно быть null после update").toBe(null)
-  })
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context } = el
 
-  it("enum допускает только строки и числа", () => {
-    // types.enum(true, false)() // TS должен ругаться
-    // types.enum({})() // TS должен ругаться
-    const { context, update } = MetaFor("user").context((types) => ({
-      role: types.enum("user", "admin")(),
-    })).states({}).view()
-    expect(context.role, "Поле role должно быть null по умолчанию").toBe(null)
-    update({ role: "admin" })
-    expect(context.role, 'Поле role должно обновиться на "admin"').toBe("admin")
-  })
-
-  it("array допускает только строки, числа или булево", () => {
-    // types.array({ default: [{}] }) // TS должен ругаться
-    const { context } = MetaFor("user").context((types) => ({
-      tags: types.array<string>({ default: ["a", "b"] }),
-      numbers: types.array<number>(),
-      flags: types.array<boolean>(),
-    })).states({}).view()
-    expect(context.tags, 'Поле tags должно быть ["a", "b"] по умолчанию').toEqual(["a", "b"])
-    expect(context.numbers, "Поле numbers должно быть null по умолчанию").toBe(null)
-    expect(context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
-  })
-
-  it("корректно работает с разными типами", () => {
-    const { context, update } = MetaFor("complex").context((types) => ({
-      title: types.string.required({ default: "Заголовок" }),
-      description: types.string(),
-      age: types.number.required({ default: 18 }),
-      score: types.number(),
-      isActive: types.boolean.required({ default: true }),
-      isVerified: types.boolean(),
-      status: types.enum("draft", "published", "archived").required({ default: "draft" }),
-      category: types.enum("tech", "design", "business")(),
-      tags: types.array.required<string>({ default: [] }),
-      permissions: types.array<number>(),
-      flags: types.array<boolean>(),
-    })).states({}).view()
-    update({
-      title: "Новый заголовок",
-      description: "Новое описание",
-      age: 25,
-      score: 100,
-      isActive: false,
-      isVerified: true,
-      status: "published",
-      category: "tech",
-      tags: ["typescript", "library"],
-      permissions: [1, 2, 3],
-      flags: [true, false, true],
-    })
-    expect(context.title, 'Поле title должно быть "Новый заголовок"').toBe("Новый заголовок")
-    expect(context.description, 'Поле description должно быть "Новое описание"').toBe("Новое описание")
-    expect(context.age, "Поле age должно быть 25").toBe(25)
-    expect(context.score, "Поле score должно быть 100").toBe(100)
-    expect(context.isActive, "Поле isActive должно быть false").toBe(false)
-    expect(context.isVerified, "Поле isVerified должно быть true").toBe(true)
-    expect(context.status, 'Поле status должно быть "published"').toBe("published")
-    expect(context.category, 'Поле category должно быть "tech"').toBe("tech")
-    expect(context.tags, 'Поле tags должно быть ["typescript", "library"]').toEqual(["typescript", "library"])
-    expect(context.permissions, "Поле permissions должно быть [1, 2, 3]").toEqual([1, 2, 3])
-    expect(context.flags, "Поле flags должно быть [true, false, true]").toEqual([true, false, true])
-  })
-
-  describe("Иммутабельность контекста", () => {
-    it("запрещает прямое изменение значений контекста", () => {
-      const { context } = MetaFor("user").context((types) => ({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({}).view()
-      // context.name = "other" // будет ошибка линтинга
-      // Попытка прямого изменения должна вызывать ошибку
-      expect(() => {
-        ;(context as any).name = "Новое имя"
-      }, "Должна быть ошибка при прямом изменении поля name").toThrow("Прямое изменение контекста запрещено")
-
-      expect(() => {
-        ;(context as any).status = "process"
-      }, "Должна быть ошибка при прямом изменении поля status").toThrow("Прямое изменение контекста запрещено")
-
-      expect(() => {
-        ;(context as any).newField = "значение"
-      }, "Должна быть ошибка при прямом добавлении нового поля").toThrow("Прямое изменение контекста запрещено")
+      expect(context.name, 'Поле name должно быть "Гость" по умолчанию').toBe("Гость")
+      expect(context.role, 'Поле role должно быть "user" по умолчанию').toBe("user")
+      expect(context.nickname, "Поле nickname должно быть null по умолчанию").toBe(null)
+      expect(context.bio, "Поле bio должно быть null по умолчанию").toBe(null)
+      expect(context.priority, "Поле priority должно быть null по умолчанию").toBe(null)
+      expect(context.tags, "Поле tags должно быть [] по умолчанию").toEqual([])
     })
 
-    it("запрещает удаление свойств контекста", () => {
-      const { context } = MetaFor("user").context((types) => ({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({}).view()
-
-      // Попытка удаления свойства должна вызывать ошибку
-      expect(() => {
-        delete (context as any).name
-      }, "Должна быть ошибка при удалении поля name").toThrow("Удаление свойств контекста запрещено")
-
-      expect(() => {
-        delete (context as any).status
-      }, "Должна быть ошибка при удалении поля status").toThrow("Удаление свойств контекста запрещено")
+    it("обновляет только переданные значения, игнорирует undefined", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          name: types.string.required({ default: "Гость" }),
+          nickname: types.string(),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      el.update({ name: "test" })
+      expect(el.context.name, 'Поле name должно обновиться на "test"').toBe("test")
+      el.update({ nickname: "nick" })
+      expect(el.context.nickname, 'Поле nickname должно обновиться на "nick"').toBe("nick")
+      el.update({ nickname: null })
+      expect(el.context.nickname, "Поле nickname должно обновиться на null").toBe(null)
+      // el.update({ name: undefined }) // TS должен ругаться
     })
 
-    it("позволяет читать значения контекста", () => {
-      const { context } = MetaFor("user").context((types) => ({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({}).view()
-
-      // Чтение значений должно работать
-      expect(context.name, 'Поле name должно быть "Гость"').toBe("Гость")
-      expect(context.status, 'Поле status должно быть "start"').toBe("start")
+    it("не допускает undefined для optional полей (TS)", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          nickname: types.string(),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      // el.update({ nickname: undefined }) // TS должен ругаться
+      el.update({ nickname: null })
+      expect(el.context.nickname, "Поле nickname должно быть null после update").toBe(null)
     })
 
-    it("обновление через update() работает корректно", () => {
-      const { context, update } = MetaFor("user").context((types) => ({
-        name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({}).view()
-
-      // Обновление через update() должно работать
-      update({ name: "Новое имя", status: "process" })
-      expect(context.name, 'Поле name должно обновиться на "Новое имя"').toBe("Новое имя")
-      expect(context.status, 'Поле status должно обновиться на "process"').toBe("process")
+    it("enum допускает только строки и числа", () => {
+      // types.enum(true, false)() // TS должен ругаться
+      // types.enum({})() // TS должен ругаться
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          role: types.enum("user", "admin")(),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      expect(el.context.role, "Поле role должно быть null по умолчанию").toBe(null)
+      el.update({ role: "admin" })
+      expect(el.context.role, 'Поле role должно обновиться на "admin"').toBe("admin")
     })
 
-    it("контекст остается иммутабельным после обновления", () => {
-      const { context, update } = MetaFor("user").context((types) => ({
+    it("array допускает только строки, числа или булево", () => {
+      // types.array({ default: [{}] }) // TS должен ругаться
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          tags: types.array<string>({ default: ["a", "b"] }),
+          numbers: types.array<number>(),
+          flags: types.array<boolean>(),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      expect(el.context.tags, 'Поле tags должно быть ["a", "b"] по умолчанию').toEqual(["a", "b"])
+      expect(el.context.numbers, "Поле numbers должно быть null по умолчанию").toBe(null)
+      expect(el.context.flags, "Поле flags должно быть null по умолчанию").toBe(null)
+    })
+
+    it("корректно работает с разными типами", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          title: types.string.required({ default: "Заголовок" }),
+          description: types.string(),
+          age: types.number.required({ default: 18 }),
+          score: types.number(),
+          isActive: types.boolean.required({ default: true }),
+          isVerified: types.boolean(),
+          status: types.enum("draft", "published", "archived").required({ default: "draft" }),
+          category: types.enum("tech", "design", "business")(),
+          tags: types.array.required<string>({ default: [] }),
+          permissions: types.array<number>(),
+          flags: types.array<boolean>(),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      el.update({
+        title: "Новый заголовок",
+        description: "Новое описание",
+        age: 25,
+        score: 100,
+        isActive: false,
+        isVerified: true,
+        status: "published",
+        category: "tech",
+        tags: ["typescript", "library"],
+        permissions: [1, 2, 3],
+        flags: [true, false, true],
+      })
+      expect(el.context.title, 'Поле title должно быть "Новый заголовок"').toBe("Новый заголовок")
+      expect(el.context.description, 'Поле description должно быть "Новое описание"').toBe("Новое описание")
+      expect(el.context.age, "Поле age должно быть 25").toBe(25)
+      expect(el.context.score, "Поле score должно быть 100").toBe(100)
+      expect(el.context.isActive, "Поле isActive должно быть false").toBe(false)
+      expect(el.context.isVerified, "Поле isVerified должно быть true").toBe(true)
+      expect(el.context.status, 'Поле status должно быть "published"').toBe("published")
+      expect(el.context.category, 'Поле category должно быть "tech"').toBe("tech")
+      expect(el.context.tags, 'Поле tags должно быть ["typescript", "library"]').toEqual(["typescript", "library"])
+      expect(el.context.permissions, "Поле permissions должно быть [1, 2, 3]").toEqual([1, 2, 3])
+      expect(el.context.flags, "Поле flags должно быть [true, false, true]").toEqual([true, false, true])
+    })
+
+    describe("Иммутабельность контекста", () => {
+      it("запрещает прямое изменение значений контекста", () => {
+        const tag = Bun.randomUUIDv7()
+        const meta = MetaFor(tag)
+          .context((types) => ({
+            name: types.string.required({ default: "Гость" }),
+            status: types.enum("start", "process", "end").required({ default: "start" }),
+          }))
+          .states({})
+          .view()
+        document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+        const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<{ name: string; status: string }>
+        // el.context.name = "other" // будет ошибка линтинга
+        // Попытка прямого изменения должна вызывать ошибку
+        expect(() => {
+          ;(el.context as any).name = "Новое имя"
+        }, "Должна быть ошибка при прямом изменении поля name").toThrow("Прямое изменение контекста запрещено")
+
+        expect(() => {
+          ;(el.context as any).status = "process"
+        }, "Должна быть ошибка при прямом изменении поля status").toThrow("Прямое изменение контекста запрещено")
+
+        expect(() => {
+          ;(el.context as any).newField = "значение"
+        }, "Должна быть ошибка при прямом добавлении нового поля").toThrow("Прямое изменение контекста запрещено")
+      })
+
+      it("запрещает удаление свойств контекста", () => {
+        const tag = Bun.randomUUIDv7()
+        const meta = MetaFor(tag)
+          .context((types) => ({
+            name: types.string.required({ default: "Гость" }),
+            status: types.enum("start", "process", "end").required({ default: "start" }),
+          }))
+          .states({})
+          .view()
+        document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+        const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+
+        // Попытка удаления свойства должна вызывать ошибку
+        expect(() => {
+          delete (el.context as any).name
+        }, "Должна быть ошибка при удалении поля name").toThrow("Удаление свойств контекста запрещено")
+
+        expect(() => {
+          delete (el.context as any).status
+        }, "Должна быть ошибка при удалении поля status").toThrow("Удаление свойств контекста запрещено")
+      })
+
+      it("позволяет читать значения контекста", () => {
+        const tag = Bun.randomUUIDv7()
+        const meta = MetaFor(tag)
+          .context((types) => ({
+            name: types.string.required({ default: "Гость" }),
+            status: types.enum("start", "process", "end").required({ default: "start" }),
+          }))
+          .states({})
+          .view()
+        document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+        const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+
+        // Чтение значений должно работать
+        expect(el.context.name, 'Поле name должно быть "Гость"').toBe("Гость")
+        expect(el.context.status, 'Поле status должно быть "start"').toBe("start")
+      })
+
+      it("обновление через update() работает корректно", () => {
+        const tag = Bun.randomUUIDv7()
+        const meta = MetaFor(tag)
+          .context((types) => ({
+            name: types.string.required({ default: "Гость" }),
+            status: types.enum("start", "process", "end").required({ default: "start" }),
+          }))
+          .states({})
+          .view()
+        document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+        const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+
+        // Обновление через update() должно работать
+        el.update({ name: "Новое имя", status: "process" })
+        expect(el.context.name, 'Поле name должно обновиться на "Новое имя"').toBe("Новое имя")
+        expect(el.context.status, 'Поле status должно обновиться на "process"').toBe("process")
+      })
+
+      it("контекст остается иммутабельным после обновления", () => {
+        const tag = Bun.randomUUIDv7()
+        const meta = MetaFor(tag)
+          .context((types) => ({
+            name: types.string.required({ default: "Гость" }),
+            status: types.enum("start", "process", "end").required({ default: "start" }),
+          }))
+          .states({})
+          .view()
+        document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+        const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+
+        el.update({ name: "Новое имя" })
+
+        // После обновления прямое изменение все еще должно быть запрещено
+        expect(() => {
+          ;(el.context as any).name = "Другое имя"
+        }, "Должна быть ошибка при прямом изменении поля name после update").toThrow(
+          "Прямое изменение контекста запрещено"
+        )
+
+        expect(() => {
+          ;(el.context as any).status = "end"
+        }, "Должна быть ошибка при прямом изменении поля status после update").toThrow(
+          "Прямое изменение контекста запрещено"
+        )
+      })
+    })
+  })
+
+  describe("Примеры использования (документация)", () => {
+    it("MetaFor: создание и обновление userContext", () => {
+      const schema = {
         name: types.string.required({ default: "Гость" }),
-        status: types.enum("start", "process", "end").required({ default: "start" }),
-      })).states({}).view()
-
-      update({ name: "Новое имя" })
-
-      // После обновления прямое изменение все еще должно быть запрещено
-      expect(() => {
-        ;(context as any).name = "Другое имя"
-      }, "Должна быть ошибка при прямом изменении поля name после update").toThrow(
-        "Прямое изменение контекста запрещено"
+        age: types.number.optional(),
+        isActive: types.boolean.required({ default: true }),
+        role: types.enum("user", "admin", "moderator").required({ default: "user" }),
+        tags: types.array.optional(),
+      }
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context(() => schema)
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      expect(el.context, "userContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(
+        schema,
+        {
+          name: "Гость",
+          age: null,
+          isActive: true,
+          role: "user",
+          tags: null,
+        }
       )
 
-      expect(() => {
-        ;(context as any).status = "end"
-      }, "Должна быть ошибка при прямом изменении поля status после update").toThrow(
-        "Прямое изменение контекста запрещено"
+      const updated = el.update({ name: "Иван", age: 25 })
+      expect(
+        updated,
+        "После update должны обновиться только переданные поля, остальные остаться прежними"
+      ).toPlainObjectEqual(schema, {
+        name: "Иван",
+        age: 25,
+        isActive: true,
+        role: "user",
+        tags: null,
+      })
+    })
+
+    it("MetaFor: создание и обновление productContext", () => {
+      const schema = {
+        id: types.string.required(),
+        name: types.string.required({ default: "Новый продукт" }),
+        price: types.number.required({ default: 0 }),
+        inStock: types.boolean.required({ default: false }),
+        category: types.enum("electronics", "clothing", "books").optional(),
+        images: types.array.required({ default: [] }),
+      }
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context(() => schema)
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      expect(el.context, "productContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(
+        schema,
+        {
+          id: "",
+          name: "Новый продукт",
+          price: 0,
+          inStock: false,
+          category: null,
+          images: [],
+        }
       )
-    })
-  })
-})
 
-describe("Примеры использования (документация)", () => {
-  it("MetaFor: создание и обновление userContext", () => {
-    const schema = {
-      name: types.string.required({ default: "Гость" }),
-      age: types.number.optional(),
-      isActive: types.boolean.required({ default: true }),
-      role: types.enum("user", "admin", "moderator").required({ default: "user" }),
-      tags: types.array.optional(),
-    }
-    const { context, update } = MetaFor("user").context(() => schema).states({}).view()
-    expect(context, "userContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
-      name: "Гость",
-      age: null,
-      isActive: true,
-      role: "user",
-      tags: null,
-    })
-
-    const updated = update({ name: "Иван", age: 25 })
-    expect(
-      updated,
-      "После update должны обновиться только переданные поля, остальные остаться прежними"
-    ).toPlainObjectEqual(schema, {
-      name: "Иван",
-      age: 25,
-      isActive: true,
-      role: "user",
-      tags: null,
-    })
-  })
-
-  it("MetaFor: создание и обновление productContext", () => {
-    const schema = {
-      id: types.string.required(),
-      name: types.string.required({ default: "Новый продукт" }),
-      price: types.number.required({ default: 0 }),
-      inStock: types.boolean.required({ default: false }),
-      category: types.enum("electronics", "clothing", "books").optional(),
-      images: types.array.required({ default: [] }),
-    }
-    const { context, update } = MetaFor("product").context(() => schema).states({}).view()
-    expect(context, "productContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
-      id: "",
-      name: "Новый продукт",
-      price: 0,
-      inStock: false,
-      category: null,
-      images: [],
+      const updated = el.update({
+        id: "prod-123",
+        name: "iPhone 15",
+        price: 99999,
+        inStock: true,
+        category: "electronics",
+      })
+      expect(
+        updated,
+        "После update должны обновиться только переданные поля, остальные остаться прежними"
+      ).toPlainObjectEqual(schema, {
+        id: "prod-123",
+        name: "iPhone 15",
+        price: 99999,
+        inStock: true,
+        category: "electronics",
+        images: [],
+      })
     })
 
-    const updated = update({
-      id: "prod-123",
-      name: "iPhone 15",
-      price: 99999,
-      inStock: true,
-      category: "electronics",
-    })
-    expect(
-      updated,
-      "После update должны обновиться только переданные поля, остальные остаться прежними"
-    ).toPlainObjectEqual(schema, {
-      id: "prod-123",
-      name: "iPhone 15",
-      price: 99999,
-      inStock: true,
-      category: "electronics",
-      images: [],
+    it("MetaFor: создание и обновление articleContext", () => {
+      const schema = {
+        title: types.string.required({ default: "Заголовок" }),
+        content: types.string.optional(),
+        published: types.boolean.required({ default: false }),
+        views: types.number.required({ default: 0 }),
+      }
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context(() => schema)
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      expect(el.context, "articleContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(
+        schema,
+        {
+          title: "Заголовок",
+          content: null,
+          published: false,
+          views: 0,
+        }
+      )
+
+      const updated = el.update({
+        title: "Новый заголовок",
+        content: "Содержание статьи",
+        published: true,
+      })
+      expect(
+        updated,
+        "После update должны обновиться только переданные поля, остальные остаться прежними"
+      ).toPlainObjectEqual(schema, {
+        title: "Новый заголовок",
+        content: "Содержание статьи",
+        published: true,
+        views: 0,
+      })
     })
   })
 
-  it("MetaFor: создание и обновление articleContext", () => {
-    const schema = {
-      title: types.string.required({ default: "Заголовок" }),
-      content: types.string.optional(),
-      published: types.boolean.required({ default: false }),
-      views: types.number.required({ default: 0 }),
-    }
-    const { context, update } = MetaFor("article").context(() => schema).states({}).view()
-    expect(context, "articleContext должен содержать значения по умолчанию для всех полей").toPlainObjectEqual(schema, {
-      title: "Заголовок",
-      content: null,
-      published: false,
-      views: 0,
+  describe("onUpdate", () => {
+    it("вызывает коллбек с правильными патчами при update", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          name: types.string.required({ default: "Гость" }),
+          age: types.number.optional(),
+          isActive: types.boolean.required({ default: true }),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      let received: any = null
+      el.onUpdate((patches: any) => {
+        received = patches
+      })
+      el.update({ name: "Иван", age: 25 })
+      expect(received, "onUpdate должен вызываться с патчами").toEqual([
+        { op: "replace", path: "/name", value: "Иван" },
+        { op: "replace", path: "/age", value: 25 },
+      ])
+      el.update({ age: null })
+      expect(received, "onUpdate должен вызываться с патчем remove").toEqual([{ op: "remove", path: "/age" }])
     })
 
-    const updated = update({
-      title: "Новый заголовок",
-      content: "Содержание статьи",
-      published: true,
+    it("функция отписки работает корректно", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          name: types.string.required({ default: "Гость" }),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      let called = 0
+      const unsubscribe = el.onUpdate(() => {
+        called++
+      })
+      el.update({ name: "Вася" })
+      expect(called, "onUpdate должен быть вызван").toBe(1)
+      unsubscribe()
+      el.update({ name: "Петя" })
+      expect(called, "onUpdate не должен вызываться после отписки").toBe(1)
     })
-    expect(
-      updated,
-      "После update должны обновиться только переданные поля, остальные остаться прежними"
-    ).toPlainObjectEqual(schema, {
-      title: "Новый заголовок",
-      content: "Содержание статьи",
-      published: true,
-      views: 0,
-    })
-  })
-})
 
-describe("onUpdate", () => {
-  it("вызывает коллбек с правильными патчами при update", () => {
-    const { update, onUpdate } = MetaFor("user").context((types) => ({
-      name: types.string.required({ default: "Гость" }),
-      age: types.number.optional(),
-      isActive: types.boolean.required({ default: true }),
-    })).states({}).view()
-    let received: any = null
-    onUpdate((patches: any) => {
-      received = patches
+    it("несколько подписчиков получают патчи", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          name: types.string.required({ default: "Гость" }),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      let a = 0,
+        b = 0
+      el.onUpdate(() => {
+        a++
+      })
+      el.onUpdate(() => {
+        b++
+      })
+      el.update({ name: "Оля" })
+      expect(a, "Первый подписчик должен быть вызван").toBe(1)
+      expect(b, "Второй подписчик должен быть вызван").toBe(1)
     })
-    update({ name: "Иван", age: 25 })
-    expect(received, "onUpdate должен вызываться с патчами").toEqual([
-      { op: "replace", path: "/name", value: "Иван" },
-      { op: "replace", path: "/age", value: 25 },
-    ])
-    update({ age: null })
-    expect(received, "onUpdate должен вызываться с патчем remove").toEqual([{ op: "remove", path: "/age" }])
-  })
 
-  it("функция отписки работает корректно", () => {
-    const { update, onUpdate } = MetaFor("user").context((types) => ({
-      name: types.string.required({ default: "Гость" }),
-    })).states({}).view()
-    let called = 0
-    const unsubscribe = onUpdate(() => {
-      called++
+    it("патчи соответствуют формату JSON Patch", () => {
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
+        .context((types) => ({
+          name: types.string.required({ default: "Гость" }),
+          age: types.number.optional(),
+        }))
+        .states({})
+        .view()
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      let patches: any[] = []
+      el.onUpdate((p: any) => {
+        patches = p
+      })
+      el.update({ name: "Лена" })
+      expect(patches[0].op, "op должен быть 'replace'").toBe("replace")
+      expect(patches[0].path, "path должен быть '/name'").toBe("/name")
+      expect(patches[0]).toHaveProperty("value", "Лена")
+      el.update({ age: null })
+      expect(patches[0].op, "op должен быть 'remove'").toBe("remove")
+      expect(patches[0].path, "path должен быть '/age'").toBe("/age")
     })
-    update({ name: "Вася" })
-    expect(called, "onUpdate должен быть вызван").toBe(1)
-    unsubscribe()
-    update({ name: "Петя" })
-    expect(called, "onUpdate не должен вызываться после отписки").toBe(1)
-  })
-
-  it("несколько подписчиков получают патчи", () => {
-    const { update, onUpdate } = MetaFor("user").context((types) => ({
-      name: types.string.required({ default: "Гость" }),
-    })).states({}).view()
-    let a = 0,
-      b = 0
-    onUpdate(() => {
-      a++
-    })
-    onUpdate(() => {
-      b++
-    })
-    update({ name: "Оля" })
-    expect(a, "Первый подписчик должен быть вызван").toBe(1)
-    expect(b, "Второй подписчик должен быть вызван").toBe(1)
-  })
-
-  it("патчи соответствуют формату JSON Patch", () => {
-    const { update, onUpdate } = MetaFor("user").context((types) => ({
-      name: types.string.required({ default: "Гость" }),
-      age: types.number.optional(),
-    })).states({}).view()
-    let patches: any[] = []
-    onUpdate((p: any) => {
-      patches = p
-    })
-    update({ name: "Лена" })
-    expect(patches[0].op, "op должен быть 'replace'").toBe("replace")
-    expect(patches[0].path, "path должен быть '/name'").toBe("/name")
-    expect(patches[0]).toHaveProperty("value", "Лена")
-    update({ age: null })
-    expect(patches[0].op, "op должен быть 'remove'").toBe("remove")
-    expect(patches[0].path, "path должен быть '/age'").toBe("/age")
   })
 })

@@ -4,9 +4,9 @@ import type { TemplateResult } from "./html/html.t"
 /**
  * Конфигурация ов для view
  */
-export interface ViewConfig<T extends ContextSchema = ContextSchema> {
+export interface ViewConfig<C extends ContextSchema = ContextSchema> {
   /** Шаблонизатор */
-  render?: (params: { context: ExtractValues<T>; html: typeof import("./html/html").html }) => TemplateResult | void
+  render?: (params: { context: ExtractValues<C>; html: typeof import("./html/html").html }) => TemplateResult
   /**  монтирования */
   onMount?: (...args: unknown[]) => unknown
   /**  уничтожения */

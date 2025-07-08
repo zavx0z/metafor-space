@@ -27,4 +27,4 @@ export type StateDefinition<T extends string, C extends ContextSchema = any> = {
 /**
  * Конфигурация всех состояний
  */
-export type StateConfig<T extends string, C extends ContextSchema = any> = Record<T, StateDefinition<T, C>>
+export type StateConfig<S extends string, C extends ContextSchema = any> = Record<S, StateDefinition<S, C>>

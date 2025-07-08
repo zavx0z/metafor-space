@@ -1,27 +1,34 @@
-import { describe, it, expect } from "bun:test"
+import { describe, it, expect, afterEach } from "bun:test"
 import { MetaFor } from "./metafor"
 
 describe("Условия переходов между состояниями", () => {
+  afterEach(() => document.body.innerHTML = "")
+
   describe("Базовые переходы", () => {
     it("работает с простыми условиями", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           error: types.string.optional(),
           active: types.boolean.required({ default: false }),
         }))
         .states({
-                  "неактивно": {
-          to: {
-            "активно": { error: null, active: false },
+          неактивно: {
+            to: {
+              активно: { error: null, active: false },
+            },
           },
-        },
-        "активно": {
-          to: {
-            "неактивно": { error: null, active: true },
+          активно: {
+            to: {
+              неактивно: { error: null, active: true },
+            },
           },
-        },
         })
         .view()
+
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
 
       expect(context.active, "Поле active должно быть false по умолчанию").toBe(false)
       expect(context.error, "Поле error должно быть null по умолчанию").toBe(null)
@@ -32,7 +39,8 @@ describe("Условия переходов между состояниями", 
     })
 
     it("поддерживает переходы с проверкой статуса", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           status: types.enum("idle", "loading", "success", "error").required({ default: "idle" }),
           name: types.string.required({ default: "Гость" }),
@@ -62,6 +70,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.status, 'Статус должен быть "idle" по умолчанию').toBe("idle")
       update({ status: "loading" })
       expect(context.status, 'Статус должен обновиться на "loading"').toBe("loading")
@@ -70,7 +82,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Условия для булевых значений", () => {
     it("поддерживает прямое булево значение", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           isActive: types.boolean.required({ default: false }),
           isVerified: types.boolean.optional(),
@@ -89,13 +102,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
       update({ isActive: true })
       expect(context.isActive, "isActive должен обновиться на true").toBe(true)
     })
 
     it("поддерживает проверку на null для optional булевых полей", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           isVerified: types.boolean.optional(),
         }))
@@ -113,13 +131,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.isVerified, "isVerified должен быть null по умолчанию").toBe(null)
       update({ isVerified: true })
       expect(context.isVerified, "isVerified должен обновиться на true").toBe(true)
     })
 
     it("поддерживает объект с условиями для булевых значений", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           isActive: types.boolean.required({ default: false }),
           isVerified: types.boolean.optional(),
@@ -144,6 +167,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
       expect(context.isVerified, "isVerified должен быть null по умолчанию").toBe(null)
     })
@@ -151,7 +178,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Условия для строк", () => {
     it("поддерживает прямое строковое значение", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           name: types.string.required({ default: "Гость" }),
           email: types.string.optional(),
@@ -170,13 +198,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
-      expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
+        expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
       update({ name: "Иван" })
       expect(context.name, 'name должен обновиться на "Иван"').toBe("Иван")
     })
 
     it("поддерживает регулярные выражения", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           email: types.string.optional(),
         }))
@@ -203,13 +236,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.email, "email должен быть null по умолчанию").toBe(null)
       update({ email: "test@example.com" })
       expect(context.email, 'email должен обновиться на "test@example.com"').toBe("test@example.com")
     })
 
     it("поддерживает проверку на null", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           name: types.string.required({ default: "Гость" }),
           email: types.string.optional(),
@@ -234,12 +272,17 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
       expect(context.email, "email должен быть null по умолчанию").toBe(null)
     })
 
     it("поддерживает сложные строковые условия", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           username: types.string.optional(),
         }))
@@ -269,6 +312,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.username, "username должен быть null по умолчанию").toBe(null)
       update({ username: "john_doe" })
       expect(context.username, 'username должен обновиться на "john_doe"').toBe("john_doe")
@@ -277,7 +324,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Условия для чисел", () => {
     it("поддерживает прямое числовое значение", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           age: types.number.optional(),
           score: types.number.required({ default: 0 }),
@@ -296,6 +344,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       expect(context.score, "score должен быть 0 по умолчанию").toBe(0)
       update({ age: 25 })
@@ -303,7 +355,8 @@ describe("Условия переходов между состояниями", 
     })
 
     it("поддерживает проверку на null", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           age: types.number.optional(),
         }))
@@ -321,13 +374,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       update({ age: 30 })
       expect(context.age, "age должен обновиться на 30").toBe(30)
     })
 
     it("поддерживает сложные числовые условия", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           age: types.number.optional(),
           score: types.number.required({ default: 0 }),
@@ -358,6 +416,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       expect(context.score, "score должен быть 0 по умолчанию").toBe(0)
       update({ age: 25, score: 250 })
@@ -366,7 +428,8 @@ describe("Условия переходов между состояниями", 
     })
 
     it("поддерживает диапазоны чисел", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           rating: types.number.optional(),
         }))
@@ -389,6 +452,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.rating, "rating должен быть null по умолчанию").toBe(null)
       update({ rating: 5 })
       expect(context.rating, "rating должен обновиться на 5").toBe(5)
@@ -397,7 +464,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Условия для enum", () => {
     it("поддерживает прямое enum значение", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           status: types.enum("pending", "approved", "rejected").required({ default: "pending" }),
           role: types.enum("user", "admin", "moderator").optional(),
@@ -421,13 +489,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.status, 'status должен быть "pending" по умолчанию').toBe("pending")
       update({ status: "approved" })
       expect(context.status, 'status должен обновиться на "approved"').toBe("approved")
     })
 
     it("поддерживает проверку на null для optional enum", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           role: types.enum("user", "admin", "moderator").optional(),
         }))
@@ -445,13 +518,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.role, "role должен быть null по умолчанию").toBe(null)
       update({ role: "admin" })
       expect(context.role, 'role должен обновиться на "admin"').toBe("admin")
     })
 
     it("поддерживает сложные enum условия", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           status: types.enum("draft", "review", "published", "archived").required({ default: "draft" }),
         }))
@@ -480,6 +558,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.status, 'status должен быть "draft" по умолчанию').toBe("draft")
       update({ status: "review" })
       expect(context.status, 'status должен обновиться на "review"').toBe("review")
@@ -488,7 +570,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Условия для массивов", () => {
     it("поддерживает прямое значение массива", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           tags: types.array.optional<string>(),
           permissions: types.array.required<number>({ default: [] }),
@@ -507,6 +590,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       expect(context.permissions, "permissions должен быть [] по умолчанию").toEqual([])
       update({ tags: ["typescript", "react"] })
@@ -514,7 +601,8 @@ describe("Условия переходов между состояниями", 
     })
 
     it("поддерживает проверку на null", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           tags: types.array.optional<string>(),
         }))
@@ -532,13 +620,18 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       update({ tags: ["javascript"] })
       expect(context.tags, 'tags должен обновиться на ["javascript"]').toEqual(["javascript"])
     })
 
     it("поддерживает сложные условия для массивов", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           tags: types.array.optional<string>(),
           scores: types.array.required<number>({ default: [] }),
@@ -579,7 +672,11 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
-      expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
+        expect(context.tags, "tags должен быть null по умолчанию").toBe(null)
       expect(context.scores, "scores должен быть [] по умолчанию").toEqual([])
       update({ tags: ["javascript", "typescript"], scores: [85, 90, 95] })
       expect(context.tags, "tags должен обновиться").toEqual(["javascript", "typescript"])
@@ -589,7 +686,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Комбинированные условия", () => {
     it("поддерживает множественные условия разных типов", () => {
-      const { context, update } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           name: types.string.required({ default: "Гость" }),
           age: types.number.optional(),
@@ -628,6 +726,10 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(context.name, 'name должен быть "Гость" по умолчанию').toBe("Гость")
       expect(context.age, "age должен быть null по умолчанию").toBe(null)
       expect(context.isActive, "isActive должен быть false по умолчанию").toBe(false)
@@ -648,7 +750,8 @@ describe("Условия переходов между состояниями", 
     })
 
     it("поддерживает сложную валидацию формы", () => {
-      const { context, update } = MetaFor("form")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           email: types.string.optional(),
           password: types.string.required({ default: "" }),
@@ -659,16 +762,16 @@ describe("Условия переходов между состояниями", 
         .states({
           "не заполнено": {
             to: {
-              "заполняется": {
+              заполняется: {
                 email: { null: false, include: "@" },
                 password: { length: { min: 8 } },
                 username: { null: false, pattern: /^[a-zA-Z0-9_]+$/ },
               },
             },
           },
-          "заполняется": {
+          заполняется: {
             to: {
-              "валидно": {
+              валидно: {
                 email: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
                 // Следующая строка должна вызывать ошибку TypeScript, потому что password — required:
                 // @ts-expect-error - required поле не поддерживает проверку на null
@@ -682,22 +785,26 @@ describe("Условия переходов между состояниями", 
               },
             },
           },
-          "валидно": {
+          валидно: {
             to: {
-              "заполняется": {
+              заполняется: {
                 email: null,
               },
             },
           },
           "не валидно": {
             to: {
-              "заполняется": {
+              заполняется: {
                 email: { include: "@" },
               },
             },
           },
         })
         .view()
+
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
 
       expect(context.email, "email должен быть null по умолчанию").toBe(null)
       expect(context.password, 'password должен быть "" по умолчанию').toBe("")
@@ -723,7 +830,8 @@ describe("Условия переходов между состояниями", 
 
   describe("Типизация и автодополнение", () => {
     it("обеспечивает правильную типизацию для всех типов условий", () => {
-      const { context } = MetaFor("user")
+      const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           name: types.string.required({ default: "Гость" }),
           age: types.number.optional(),
@@ -758,6 +866,10 @@ describe("Условия переходов между состояниями", 
         .view()
 
       // Проверяем, что контекст доступен для чтения
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { context, update } = el
+
       expect(typeof context.name, "context.name должен быть строкой").toBe("string")
       expect(typeof context.age === "number" || context.age === null, "context.age должен быть number | null").toBe(
         true
@@ -770,7 +882,8 @@ describe("Условия переходов между состояниями", 
     })
 
     it("проверяет автодополнение ключей состояний", () => {
-      const { stateConfig } = MetaFor("user")
+        const tag = Bun.randomUUIDv7()
+      const meta = MetaFor(tag)
         .context((types) => ({
           status: types.enum("idle", "loading", "success").required({ default: "idle" }),
         }))
@@ -787,13 +900,17 @@ describe("Условия переходов между состояниями", 
         })
         .view()
 
+      document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+      const el = document.querySelector(`metafor-${tag}`) as unknown as Meta<typeof meta>
+      const { states } = el
+
       // @ts-expect-error - несуществующее состояние должно вызывать ошибку TypeScript
-      stateConfig["error"]
+      states.error
 
       // Проверяем, что допустимые ключи доступны
-      expect(Object.keys(stateConfig)).toContain("idle")
-      expect(Object.keys(stateConfig)).toContain("loading")
-      expect(Object.keys(stateConfig)).toContain("success")
+      expect(Object.keys(states)).toContain("idle")
+      expect(Object.keys(states)).toContain("loading")
+      expect(Object.keys(states)).toContain("success")
     })
   })
 })
