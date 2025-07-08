@@ -1874,7 +1874,9 @@ export const _$LH = {
 const polyfillSupport = DEV_MODE
   ? global.litHtmlPolyfillSupportDevMode
   : global.litHtmlPolyfillSupport
-polyfillSupport?.(Template, ChildPart)
+if (polyfillSupport) {
+  polyfillSupport(Template, ChildPart)
+}
 
 // ВАЖНО: не меняйте имя свойства или выражение присваивания.
 // Эта строка будет использоваться в регулярных выражениях для поиска использования @metafor/html.

@@ -272,7 +272,7 @@ const installDisconnectAPI = (obj: Disconnectable) => {
   if ((obj as ChildPart).type == PartType.CHILD) {
     (obj as ChildPart)._$notifyConnectionChanged ??=
       notifyChildPartConnectedChanged
-    (obj as ChildPart)._$reparentDisconnectables ??= reparentDisconnectables
+    ;(obj as ChildPart)._$reparentDisconnectables ??= reparentDisconnectables
   }
 }
 
@@ -371,8 +371,9 @@ export abstract class AsyncDirective extends Directive {
       if (DEV_MODE && this.__attributeIndex === undefined) {
         throw new Error(`Expected this.__attributeIndex to be a number`)
       }
-      const newValues = [...(this.__part._$committedValue as Array<unknown>)]
-      newValues[this.__attributeIndex!] = value
+      const committedValue = this.__part._$committedValue as Array<unknown>
+      const newValues = [...committedValue]
+      newValues[this.__attributeIndex!] = value as unknown
       (this.__part as AttributePart)._$setValue(newValues, this, 0)
     }
   }
