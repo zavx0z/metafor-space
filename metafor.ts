@@ -3,16 +3,14 @@
  * @packageDocumentation
  */
 
-import { createContext } from "./context"
-import type { ContextSchema, ContextTypes, ContextInstance, ExtractValues, UpdateValues, JsonPatch } from "./context.t"
+import { createContext } from "./core/context.ts"
+import type { ContextSchema, ContextTypes, ContextInstance, ExtractValues, UpdateValues, JsonPatch } from "./core/context.t.ts"
 import { html, render } from "./html/html"
-import type { StateConfig } from "./state.t"
-import type { ViewConfig as ViewConfig } from "./view.t"
+import type { StateConfig } from "./core/state.t.ts"
+import type { ViewConfig as ViewConfig } from "./core/view.t.ts"
 
 /**
  * Основная функция MetaFor
- * Создает экземпляр MetaFor с указанным именем (имя используется только для идентификации, не влияет на логику).
- * Возвращает объект с методом context для создания типизированного контекста.
  *
  * @param tag - Имя актора
  * @returns Объект с методом context для создания типизированного контекста
@@ -25,7 +23,7 @@ export function MetaFor(tag: string) {
      * Создает типизированный контекст на основе схемы.
      * @template C - Схема контекста
      * @param schema - Функция, принимающая types и возвращающая схему, либо сама схема
-     * @returns Объект с методом state для создания состояния
+     * @returns Конструктор состояний
      *
      * @example
      */
@@ -39,7 +37,6 @@ export function MetaFor(tag: string) {
         states<S extends string>(states: StateConfig<S, C>) {
           return {
             /**
-             *
              * @param view
              * @returns
              */

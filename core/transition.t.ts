@@ -11,7 +11,7 @@ import type {
   RequiredBooleanDefinition,
   RequiredArrayDefinition,
   RequiredEnumDefinition,
-} from "./context.t"
+} from "./context.t.ts"
 
 /** # Условия для булевых значений (required)
 

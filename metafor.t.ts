@@ -1,5 +1,3 @@
-import type { JsonPatch, UpdateValues } from "./context.t"
-
 declare global {
   /** Meta */
   export interface Meta<T> extends HTMLElement {

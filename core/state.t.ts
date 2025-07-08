@@ -1,8 +1,8 @@
 /**
  * Тип StateTransitions — переходы только к ключам из T с условиями
  */
-import type { TransitionConditions } from "./transition.t"
-import type { ContextSchema } from "./context.t"
+import type { TransitionConditions } from "./transition.t.ts"
+import type { ContextSchema } from "./context.t.ts"
 
 export type StateTransitions<T extends string, C extends ContextSchema = any> = {
   [K in T]?: TransitionConditions<C>
@@ -11,7 +11,7 @@ export type StateTransitions<T extends string, C extends ContextSchema = any> = 
 /**
  * Конфигурация одного состояния
  */
-import type { UpdateValues, ExtractValues } from "./context.t"
+import type { UpdateValues, ExtractValues } from "./context.t.ts"
 
 export type StateProcess<T extends ContextSchema = any> = {
   action: (params: { context: ExtractValues<T> }) => void

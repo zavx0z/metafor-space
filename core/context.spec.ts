@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "bun:test"
-import { MetaFor } from "./metafor"
-import { types } from "./context"
+import { MetaFor } from "../metafor.ts"
+import { types } from "./context.ts"
 
 describe("Контекст", () => {
   afterEach(() => document.body.innerHTML = "")

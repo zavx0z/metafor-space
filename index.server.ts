@@ -1,9 +1,10 @@
-import {getMimeType} from "./fixture/browser/static.ts"
-import {join} from "node:path"
+import { getMimeType } from "./fixture/browser/static.ts"
+import { join } from "node:path"
 
 const PROJECT_DIR = join(import.meta.dir, "/")
 
 const server = Bun.serve({
+  development: true,
   hostname: "0.0.0.0",
   routes: {
     "/": new Response(await Bun.file(join(PROJECT_DIR, "index.html")).bytes(), {
@@ -16,7 +17,7 @@ const server = Bun.serve({
         "Content-Type": "image/x-icon",
       },
     }),
-    "/*": async req => {
+    "/*": async (req) => {
       const url = new URL(req.url)
       const path = join(PROJECT_DIR, url.pathname)
       const type = getMimeType(url.pathname)
@@ -25,22 +26,22 @@ const server = Bun.serve({
       let headers: Record<string, string> = { "Content-Type": type }
 
       // Если клиент поддерживает gzip и есть .gz-файл — отдаём его
-      if (acceptEncoding.includes("gzip") && await Bun.file(path + ".gz").exists()) {
+      if (acceptEncoding.includes("gzip") && (await Bun.file(path + ".gz").exists())) {
         filePath = path + ".gz"
         headers["Content-Encoding"] = "gzip"
       }
 
       try {
         const file = Bun.file(filePath)
-        return new Response(await file.bytes(), {headers})
+        return new Response(await file.bytes(), { headers })
       } catch (e) {
         console.log(e)
-        return new Response("fallback response");
+        return new Response("fallback response")
       }
-    }
+    },
   },
   fetch(request) {
-    return new Response("fallback response");
+    return new Response("fallback response")
   },
 })
 

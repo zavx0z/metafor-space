@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "bun:test"
-import { MetaFor } from "./metafor"
+import { MetaFor } from "../metafor.ts"
 
 describe("Условия переходов между состояниями", () => {
   afterEach(() => document.body.innerHTML = "")

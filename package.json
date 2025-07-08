@@ -1,7 +1,7 @@
 {
   "name": "@metafor/space",
   "description": "MetaFor",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "type": "module",
   "license": "MIT",
   "author": "zavx0z",
@@ -32,8 +32,9 @@
   "scripts": {
     "test": "bun test",
     "serve": "bun index.server.ts",
-    "build": "bun metafor.build.ts",
-    "publish-pkg": "bun metafor.build.ts --publish"
+    "build:dev": "bun metafor.build.ts --dev",
+    "build:prod": "bun metafor.build.ts --prod",
+    "build:publish": "bun metafor.build.ts --publish"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "18.0.1",
@@ -47,5 +48,5 @@
   "peerDependencies": {
     "typescript": "5.8.3"
   },
-  "lastBundleSize": 21364
+  "lastBundleSize": 220626
 }

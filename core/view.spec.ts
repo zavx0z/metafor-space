@@ -1,8 +1,8 @@
 import { describe, it, expect } from "bun:test"
-import { MetaFor } from "./metafor"
-import { render } from "./html/html"
-import { html, literal, unsafeStatic } from "./html/static"
-import { ref } from "./html/directives/ref"
+import { MetaFor } from "../metafor.ts"
+import { render } from "../html/html.ts"
+import { html, literal, unsafeStatic } from "../html/static.ts"
+import { ref } from "../html/directives/ref.ts"
 
 describe("Представление", async () => {
   const tag = Bun.randomUUIDv7()

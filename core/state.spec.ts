@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test"
-import { MetaFor } from "./metafor"
+import { MetaFor } from "../metafor.ts"
 
 describe("Новый API с state", () => {
   it("работает с пустым stateConfig", () => {
