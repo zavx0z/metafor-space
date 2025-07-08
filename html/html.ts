@@ -84,7 +84,7 @@ if (DEV_MODE) {
    */
   issueWarning = (code: string, warning: string) => {
     warning += code
-      ? ` См. https://metafor.dev/msg/${code} для получения дополнительной информации.`
+      ? ` См. https://metafor.space/msg/${code} для получения дополнительной информации.`
       : ''
     if (
       !global.litIssuedWarnings!.has(warning) &&
@@ -715,12 +715,12 @@ class Template {
             /^(?:textarea|template)$/i!.test(tag) &&
             (node as Element).innerHTML.includes(marker)
           ) {
-                      const m =
-            `Выражения не поддерживаются внутри \`${tag}\` ` +
-            `элементов. См. https://metafor.dev/msg/expression-in-${tag} для получения дополнительной информации.`
-          if (tag === 'template') {
-            throw new Error(m)
-          } else issueWarning('', m)
+            const m =
+              `Выражения не поддерживаются внутри \`${tag}\` ` +
+              `элементов. См. https://metafor.dev/msg/expression-in-${tag} для получения дополнительной информации.`
+            if (tag === 'template') {
+              throw new Error(m)
+            } else issueWarning('', m)
           }
         }
         // TODO (justinfagnani): для попыток динамических имен тегов мы не
@@ -1465,7 +1465,6 @@ class ChildPart implements Disconnectable {
     }
   }
 }
-
 
 
 export class AttributePart implements Disconnectable {
