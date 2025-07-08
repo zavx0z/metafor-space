@@ -17,7 +17,7 @@ export interface StaticValue {
 
 /**
  * Символ-бренд для защиты от подделки статических значений.
- * Используется для быстрой проверки и совместимости между разными версиями Lit.
+ * Используется для быстрой проверки и совместимости между разными версиями.
  */
 const brand = Symbol.for("")
 
@@ -76,7 +76,7 @@ export const literal = (strings: TemplateStringsArray, ...values: unknown[]): St
 const stringsCache = new Map<string, TemplateStringsArray>()
 
 /**
- * Обёртка для lit-html тегов (html, svg, mathml), добавляющая поддержку статических значений.
+ * Обёртка для html тегов (html, svg, mathml), добавляющая поддержку статических значений.
  * Позволяет смешивать статические и динамические части в шаблоне.
  */
 export const withStatic =

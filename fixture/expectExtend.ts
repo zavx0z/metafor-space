@@ -1,11 +1,11 @@
-import {expect} from "bun:test"
-// import {render} from "../../html.js"
+import { expect } from "bun:test"
+import { render } from "../html/html"
 
 /** Удаляет комментарии выражений из предоставленной html-строки. */
-export const stripExpressionComments = (html: string) => html.replace(/<!--\?html\$[0-9]+\$-->|<!--\??-->/g, '')
+export const stripExpressionComments = (html: string) => html.replace(/<!--\?html\$[0-9]+\$-->|<!--\??-->/g, "")
 /** Удаляет маркеры выражений из предоставленной html-строки. */
 export const stripExpressionMarkers = (html: string) =>
-  html.replace(/<!--\?html\$[0-9]+\$-->|<!--\??-->|html\$[0-9]+\$/g, '')
+  html.replace(/<!--\?html\$[0-9]+\$-->|<!--\??-->|html\$[0-9]+\$/g, "")
 
 /** Удаляет все пробельные символы */
 export const stripWhitespace = (str: unknown) => {
@@ -13,11 +13,11 @@ export const stripWhitespace = (str: unknown) => {
   return normalized.trim()
 }
 
-// export const makeExpectRender = (getContainer: () => HTMLElement) => (value: any, expected: string) => {
-//   const container = getContainer()
-//   render(value, container)
-//   return expect(stripWhitespace(stripExpressionComments(container.innerHTML))).toBe(expected)
-// }
+export const makeExpectRender = (getContainer: () => HTMLElement) => (value: any, expected: string) => {
+  const container = getContainer()
+  render(value, container)
+  return expect(stripWhitespace(stripExpressionComments(container.innerHTML))).toBe(expected)
+}
 const divider = "\n" + "-".repeat(20) + "\n"
 
 const toMatchStringHTML = (received: unknown, expected: string) => {
@@ -28,12 +28,12 @@ const toMatchStringHTML = (received: unknown, expected: string) => {
   if (pass) {
     return {
       message: () => `expected ${received} not to match ${expected} ignoring whitespace`,
-      pass: true
+      pass: true,
     }
   } else {
     return {
       message: () => `not match:${divider}${normalizedReceived}${divider}${normalizedExpected}${divider}`,
-      pass: false
+      pass: false,
     }
   }
 }
@@ -58,34 +58,34 @@ expect.extend({
   /** Проверяет, что строка соответствует одной из ожидаемых строк, игнорируя пробельные символы и маркеры выражений. */
   oneOfMatchStringHTMLStripMarkers(received: unknown, expected: string[]) {
     const receivedString = stripWhitespace(stripExpressionMarkers(received as string))
-    const expectedStrings = expected.map(e => stripWhitespace(stripExpressionMarkers(e)))
+    const expectedStrings = expected.map((e) => stripWhitespace(stripExpressionMarkers(e)))
     const pass = expectedStrings.includes(receivedString)
     if (pass) {
       return {
         message: () => `expected ${received} not to match ${expected} ignoring whitespace`,
-        pass: true
+        pass: true,
       }
     } else {
       return {
         message: () => `not match:${divider}${receivedString}${divider}${expectedStrings.join("\n")}`,
-        pass: false
+        pass: false,
       }
     }
   },
   /** Проверяет, что строка соответствует одной из ожидаемых строк, игнорируя пробельные символы и комментарии. */
   oneOfMatchStringHTMLStripComments(received: unknown, expected: string[]) {
     const receivedString = stripWhitespace(stripExpressionComments(received as string))
-    const expectedStrings = expected.map(e => stripWhitespace(stripExpressionComments(e)))
+    const expectedStrings = expected.map((e) => stripWhitespace(stripExpressionComments(e)))
     const pass = expectedStrings.includes(receivedString)
     if (pass) {
       return {
         message: () => `expected ${received} not to match ${expected} ignoring whitespace`,
-        pass: true
+        pass: true,
       }
     } else {
       return {
         message: () => `not match:${divider}${receivedString}${divider}${expectedStrings.join("\n")}`,
-        pass: false
+        pass: false,
       }
     }
   },
@@ -101,12 +101,12 @@ expect.extend({
     if (pass) {
       return {
         message: () => `expected ${received} not to include ${expected} ignoring whitespace`,
-        pass: true
+        pass: true,
       }
     } else {
       return {
         message: () => `not include:${divider}${receivedString}${divider}${expectedString}`,
-        pass: false
+        pass: false,
       }
     }
   },
@@ -116,12 +116,17 @@ expect.extend({
     if (pass) {
       return {
         message: () => `expected контекст не совпадать с plain-объектом по схеме`,
-        pass: true
+        pass: true,
       }
     } else {
       return {
-        message: () => `контекст не совпадает с plain-объектом по схеме\nОжидалось: ${JSON.stringify(expected, null, 2)}\nПолучено: ${JSON.stringify(plain, null, 2)}`,
-        pass: false
+        message: () =>
+          `контекст не совпадает с plain-объектом по схеме\nОжидалось: ${JSON.stringify(
+            expected,
+            null,
+            2
+          )}\nПолучено: ${JSON.stringify(plain, null, 2)}`,
+        pass: false,
       }
     }
   },

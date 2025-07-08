@@ -1,6 +1,6 @@
 import { MetaFor } from "@metafor/space"
 
-const { context, update } = MetaFor("roadmap")
+const Meta = MetaFor("roadmap")
   .context((t) => ({
     status: t.enum("start", "process", "end").required({ title: "Статус", default: "start" }),
     error: t.string.optional({ title: "Ошибка" }),
@@ -10,17 +10,13 @@ const { context, update } = MetaFor("roadmap")
     конец: { to: {} },
   })
   .view({
-    render: ({ html, context }) => html`
-    <h1>${context.status}</h1>
-    `,
+    render: ({ html, context }) => html` <h1>${context.status}</h1> `,
   })
-console.log(context)
 
-setTimeout(() => {
-  update({ status: "process" })
-  console.log(context)
-}, 1000)
+const meta = /**@type {Meta<typeof Meta>} */ (document.querySelector("metafor-roadmap"))
 
-// context.status = "other"
+meta.onUpdate((patches) => {
+  console.log(patches)
+})
 
-console.log(context)
+meta.update({ status: "process" })
