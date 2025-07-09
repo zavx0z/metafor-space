@@ -9,35 +9,12 @@ export {BroadcastMessage, PatchMetaFor} from "./types/meta.ts"
 export type {Snapshot}
 
 /**
-
- # MetaFor - мета для ...
-
- Создает класс/коллекцию Мета - которые порождают сущности - называемые meta.
-
- > Декларативное описание сущности и её поведения
-
-
- ## Основные составляющие:
- - Состояния
- - Контекст
- - Переходы между состояниями
- - Ядро
- - Действия
- - Функция создания частицы
-
- ## Дополнительные составляющие:
- - Представление отображения частицы
- - Реакции на изменения других частиц
-
- > Meta (класс/коллекция) порождает meta (актор/сущность) при вызове метода create
-
- @param tag - Имя частицы
- @param [conf] - Конфигурация частицы
- @param conf.description - Описание частицы
+ @param tag - Имя
+ @param [conf] - Конфигурация
+ @param conf.description - Описание
  @param conf.development - Режим разработки (подключена валидация)
-
  @includeExample tests/metafor.spec.ts
- */ // prettier-ignore
+ */
 export declare function MetaFor(
   tag: string,
   conf?: {
@@ -49,12 +26,12 @@ export declare function MetaFor(
     core: <I extends CoreObj>(core?: CoreDefinition<I, C>) => {
       reactions: <R extends Reactions<C, I>>(reactions: R) => {
         states: <S extends string>(...states: S[]) => {
-        /**
-         * Переходы состояний
-         * @param initialState - начальное состояние
-         * @param transitions - правила переходов
-         */
-        transitions: (initialState: S, transitions: Transitions<S, C, I, R>) => {
+          /**
+           * Переходы состояний
+           * @param initialState - начальное состояние
+           * @param transitions - правила переходов
+           */
+          transitions: (initialState: S, transitions: Transitions<S, C, I, R>) => {
             view: (view: ViewDefinition<I, C, S>) => Meta<S, C, I>
           }
         }
@@ -71,24 +48,19 @@ declare global {
    @template C - Контекст
    @template I - Ядро
 
-   @property id - Идентификатор meta
-   @property title - Заголовок meta
-   @property description - Описание meta
-   @property state - Состояние meta
-   @property context - Контекст meta
-   @property states - Состояния meta
-   @property types - Типы meta
-   @property core - Ядро meta
-   @property reactions - Реакции meta
-   @property channel - Канал meta
-   @property process - Флаг процесса meta
-   @property component - Компонент meta
-   @property update - Обновление meta
-   @property onUpdate - Обработчик обновления meta
-   @property onTransition - Обработчик перехода meta
-   @property snapshot - Снимок meta
-   @property graph - Граф meta
-   @property destroy - Уничтожение meta
+   @property id - Идентификатор
+   @property title - Заголовок
+   @property description - Описание
+   @property state - Состояние
+   @property context - Контекст
+   @property states - Состояния
+   @property types - Типы
+   @property process - Флаг процесса
+   @property update - Обновление
+   @property onUpdate - Обработчик обновления
+   @property onTransition - Обработчик перехода
+   @property snapshot - Снимок
+   @property destroy - Уничтожение
    */
   export interface Meta<S extends string, C extends ContextDefinition, I extends CoreObj = CoreObj> extends HTMLElement {
     id: string
@@ -99,8 +71,6 @@ declare global {
     states: readonly S[]
     types: ContextDefinition
     process: boolean
-    parent: HTMLElement
-
     update: Update<C>
     onUpdate: OnUpdate<C>
     onTransition: OnTransition<S>

@@ -4,14 +4,13 @@ import {ref} from "./html/directives/ref.js"
 import {repeat} from "./html/directives/repeat.js"
 
 const debug = localStorage.getItem('debug') === "true"
-let log = /** @type {(message: import("./metafor").BroadcastMessage, debug: CoreObj)=>void}*/(message, core) => void {}
+let log = /**@type{(message: import("./metafor").BroadcastMessage, debug: CoreObj)=>void}*/() => void {}
 if (debug) log = (await import('./debug/console.js')).log
 
 let devChannel = /**@type{BroadcastChannel}*/(/**@type{unknown}*/(undefined))
-/**
- * Установка канала для разработки
- * @param {BroadcastChannel} channel - Канал для разработки
- */
+
+/** Установка канала для разработки
+ * @param {BroadcastChannel} channel - Канал для разработки */
 const setDevChannel = (channel) => {
   if (devChannel) return
   devChannel = channel
@@ -19,20 +18,12 @@ const setDevChannel = (channel) => {
   console.debug("Режим разработки активирован")
 }
 
-/**
- * Преобразование объектного формата переходов в массив для обратной совместимости
- * @param {Record<string, any>} objectTransitions - Переходы в объектном формате
- * @returns {Array<any>} Переходы в массиве
- */
-// Удаляю функцию convertObjectToArrayFormat и её описание
-
 /** @type {import("./metafor").MetaFor} */
 export const MetaFor = (tag, conf = {}) => {
-  const {development, description} = conf
+  const {development, description} = conf // todo: добавить проверку имени
   if (development) {
     import("./debug/validator/index.js")
     setDevChannel(new BroadcastChannel("validator"))
-    // todo: добавить проверку имени
   }
   return {
     context(context) {
@@ -69,11 +60,8 @@ export const MetaFor = (tag, conf = {}) => {
                 }))
                 return {
                   transitions(initialState, transitions) {
-                    // transitions теперь только объект
-                    if (development) {
-                      const data = {tag, transitions, contextDefinition}
-                      import("./debug/validator/index.js").then((module) => module.validateTransitions(data))
-                    }
+                    if (development) import("./debug/validator/index.js")
+                      .then((module) => module.validateTransitions({tag, transitions, contextDefinition}))
                     return {
                       view: (view) => createMeta({
                         states,

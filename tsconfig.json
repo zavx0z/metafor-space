@@ -25,17 +25,17 @@
     "noPropertyAccessFromIndexSignature": false
   },
   "exclude": [
-    "node_modules/**/*",
-    "**/docs/**/*",
-    "**/__snapshot__/**/*",
-    "**/lib/**/*",
-    "**/public/**/*",
     ".cursor/**/*",
     ".idea/**/*",
     ".github/**/*",
     ".idx/**/*",
     ".vscode/**/*",
+    "node_modules/**/*",
+    "**/docs/**/*",
+    "**/__snapshot__/**/*",
+    "**/lib/**/*",
+    "**/public/**/*",
+    "fixtures",
     "assets/**/*",
-    "fixtures/browser/index.html",
   ]
 }

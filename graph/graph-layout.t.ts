@@ -1,3 +1,11 @@
+import type GraphLayout from "./graph-layout"
+
+declare global {
+  export interface HTMLElementTagNameMap {
+    'metafor-graph-context': typeof GraphLayout
+  }
+}
+
 /**
  * Данные одного мета элемента
  * 

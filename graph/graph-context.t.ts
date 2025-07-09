@@ -1,12 +1,8 @@
-import meta from "./graph-context.js"
-import type  GraphParam from "./graph-param"
-import type GraphSocket from "./graph-socket"
-
-const snapshot = meta.snapshot()
+import GraphContext from "./graph-context.js"
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-graph-context': Meta<typeof snapshot.state, typeof snapshot.types>
+    'metafor-graph-context': typeof GraphContext
   }
 }
 
@@ -25,12 +21,12 @@ export interface Sockets {
 }
 
 /** Состояния актора */
-export type States = 
-  | "рендер" 
-  | "измерение" 
-  | "позиционирование" 
-  | "неактивно" 
-  | "активно" 
+export type States =
+  | "рендер"
+  | "измерение"
+  | "позиционирование"
+  | "неактивно"
+  | "активно"
   | "в процессе"
 
 /** Контекст актора */

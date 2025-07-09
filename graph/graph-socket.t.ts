@@ -1,9 +1,7 @@
-import meta from "./graph-socket.js"
-
-const snapshot = meta.snapshot()
+import GraphSocket from "./graph-socket"
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-graph-socket': Meta<typeof snapshot.state, typeof snapshot.types>
+    'metafor-graph-socket': GraphSocket
   }
 }

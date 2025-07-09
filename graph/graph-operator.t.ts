@@ -1,10 +1,8 @@
-import meta from "./graph-operator.js"
-
-const snapshot = meta.snapshot()
+import GraphOperator from "./graph-operator"
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-graph-operator': Meta<typeof snapshot.state, typeof snapshot.types>
+    'metafor-graph-operator': typeof GraphOperator
   }
 }
 

@@ -54,9 +54,9 @@ export function validateContextDefinition({ tag, context }) {
  Валидация переходов
 
  @param {Object} params Параметры валидации
- @param {string} params.tag Имя частицы
- @param {Record<string, import('../../types/transitions').Transition<any, any, any>>} params.transitions Переходы в объектном формате
- @param {import('../../types/context').ContextDefinition} params.contextDefinition Определение контекста
+ @param {string} tag тег
+ @param {Record<string, import('../../types/transitions').Transition<any, any, {}>>} transitions Переходы в объектном формате
+ @param {import('../../types/context').ContextDefinition} contextDefinition Определение контекста
  */
 export function validateTransitions({ tag, transitions, contextDefinition }) {
   if (typeof transitions !== 'object' || transitions === null) {

@@ -1,9 +1,7 @@
-import meta from "./graph-state.js"
-
-const snapshot = meta.snapshot()
+import type GraphState from "./graph-state"
 
 declare global {
   export interface HTMLElementTagNameMap {
-    'metafor-graph-state': Meta<typeof snapshot.state, typeof snapshot.types>
+    'metafor-graph-state': typeof GraphState
   }
 }
