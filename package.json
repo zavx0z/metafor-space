@@ -29,20 +29,28 @@
       "default": "./metafor.js"
     }
   },
+  "workspaces": [
+    "@zavx0z/*"
+  ],
   "devDependencies": {
     "@happy-dom/global-registrator": "18.0.1",
-    "@types/bun": "latest",
-    "@types/three": "0.178.0",
-    "elkjs": "0.10.1",
+    "@types/bun": "^1.2.18",
+    "@types/three": "0.178.1",
+    "@zavx0z/context": "workspace:*",
+    "@zavx0z/metafor": "workspace:*",
+    "dts-bundle-generator": "^9.5.1",
+    "elkjs": "0.10.0",
     "happy-dom": "18.0.1",
-    "puppeteer": "^24.11.2",
+    "puppeteer": "^24.12.1",
     "three": "0.178.0"
   },
   "peerDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "scripts": {
+    "upd": "bun update --latest && bun i",
     "run": "bun index.server.ts",
+    "workspace:build": "bun ./scripts/workspace.ts",
     "build": "bun index.build.ts",
     "publish-pkg": "bun run ./scripts/updateVersion.ts ./ && bun publish",
     "docs": "bunx typedoc",

@@ -1,5 +1,6 @@
 const config = {
-  active: true,
+  active: false,
+  // active: true,
   collapseAll: true,
   /**@type{Array<string>}*/
   tag: [
