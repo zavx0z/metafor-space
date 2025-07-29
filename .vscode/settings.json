@@ -11,5 +11,10 @@
         "**/__pycache__": true,
         ".venv": true
     },
-    "hide-files.files": []
+    "hide-files.files": [],
+    "cSpell.words": [
+        "Валидируйте",
+        "инкапсулированных",
+        "коммита"
+    ]
 }

@@ -37,7 +37,6 @@
     ".idx/**/*",
     ".vscode/**/*",
     "assets/**/*",
-    "fixtures/browser/index.html",
-    "@zavx0z"
+    "fixtures/browser/index.html"
   ]
 }

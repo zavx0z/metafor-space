@@ -1,58 +1,42 @@
-import {MetaFor} from "@zavx0z/metafor"
+import { MetaFor } from "./metafor.js"
 
-const {context, update, onUpdate, schema} = MetaFor("roadmap")
-  .context((types) => ({
-    status: types.enum("start", "process", "end")("end")({title: "Статус"}),
-    error: types.string()({title: "Ошибка"})
+export default MetaFor("roadmap")
+  .context((t) => ({
+    status: t.enum("copy", "process", "end").required("end")({ title: "Статус" }),
+    error: t.string.optional()({ title: "Ошибка" }),
   }))
-console.log(context.status)
-console.log(context.error)
-console.log(schema)
-onUpdate(patches => {
-  console.log(patches)
-})
-update({status: "end", error: "Ошибочка"})
-console.log(context.status)
-console.log(context.error)
-console.log(context._title.status)
-console.log(context._title.error)
-
-// import {MetaFor} from "./metafor.js"
-//
-// await import ("./graph/graph-nodes.js")
-//
-// export default MetaFor("roadmap", {description: "MetaFor RoadMap", development: false})
-//   .context((t) => ({
-//     status: t.enum("start", "process", "end")({title: "Статус", default: "end"}),
-//     error: t.string({title: "Ошибка", nullable: true})
-//   }))
-//   .core()
-//   .reactions({})%
-//   .states("конец", "в процессе", "начало")
-//   .transitions("начало", {
-//     "начало": {
-//       action: () => new Promise((resolve) => {
-//         setTimeout(() => {
-//           resolve({status: "end"})
-//         }, 6000)
-//       }),
-//       reaction: [],
-//       to: {
-//         "конец": {status: "end"},
-//         "в процессе": {status: "process"}
-//       }
-//     },
-//     "конец": {
-//       to: {
-//         "начало": {status: "start"}
-//       }
-//     },
-//     // "в процессе": {
-//     //   to: {
-//     //     "конец": {status: "end"}
-//     //   }
-//     // }
-//   })
-//   .view({
-//     // render: ({html, context}) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`
-//   })
+  .states({
+    начало: {
+      конец: { status: "end" },
+      "в процессе": { status: "process" },
+    },
+    конец: {
+      начало: { status: "start" },
+    },
+    "в процессе": {
+      конец: { status: "end" },
+    },
+  })
+  .core()
+  .processes((process) => ({
+    начало: process({ title: "Начальный процесс" })
+      .action(({ context }) => ({ status: /**@type{typeof context['status']}*/ ("end") }))
+      .success(({ update, data }) => {
+        update({ status: data.status })
+      }),
+  }))
+  .reactions((reaction) => [
+    [
+      ["начало", "конец", "в процессе"],
+      reaction()
+        .filter({
+          path: "/state",
+        })
+        .equal(({ update, patch }) => {
+          console.log("Состояние изменилось:", patch.value)
+        }),
+    ],
+  ])
+  .view({
+    render: ({ html, context }) => html`<h1>${context.status === "end" ? "я еще тут!" : "Я тут!"}</h1>`,
+  })
