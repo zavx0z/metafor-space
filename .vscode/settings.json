@@ -12,9 +12,18 @@
         ".venv": true
     },
     "hide-files.files": [],
+    "cSpell.ignorePaths": [
+        ".github",
+        "./script",
+        ".cursor"
+    ],
     "cSpell.words": [
         "Валидируйте",
         "инкапсулированных",
         "коммита"
+    ],
+    "markdownlint.lintWorkspaceGlobs": [
+        "!**/node_modules/**/*.md",
+        "!**/docs/**/*.md"
     ]
 }
