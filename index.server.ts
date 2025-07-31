@@ -1,6 +1,13 @@
 import { getMimeType } from "./fixtures/browser/static.ts"
 import { join } from "node:path"
 
+const channel = new BroadcastChannel("channel")
+channel.onmessage = (event) => {
+  console.log("message", event)
+}
+
+import("./server.space.ts")
+
 const PROJECT_DIR = import.meta.dir
 
 const server = Bun.serve({

@@ -1,18 +1,13 @@
 {
   "name": "@metafor/space",
   "version": "1.3.22",
+  "type": "module",
   "author": "zavx0z",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/zavx0z/metafor-space.git"
-  },
-  "main": "metafor.js",
-  "module": "metafor.js",
+  "private": true,
   "devDependencies": {
     "@happy-dom/global-registrator": "18.0.1",
     "@types/bun": "^1.2.19",
     "@types/three": "0.178.1",
-    "dts-bundle-generator": "^9.5.1",
     "elkjs": "0.10.0",
     "happy-dom": "18.0.1",
     "puppeteer": "^24.15.0",
@@ -21,37 +16,17 @@
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
-  "exports": {
-    ".": {
-      "types": "./metafor.d.ts",
-      "default": "./metafor.js"
-    }
-  },
-  "description": "MetaFor particle system",
-  "files": [
-    "metafor.js"
-  ],
-  "homepage": "https://github.com/zavx0z/metafor-space",
-  "keywords": [
-    "metafor",
-    "fsm",
-    "finite state machine",
-    "html template",
-    "actor system"
-  ],
-  "license": "MIT",
   "scripts": {
     "serve": "bun --hot index.server.ts",
     "upd": "bun update --latest && bun i",
     "run": "bun index.server.ts",
-    "metafor:build:dev": "bun ./scripts/metafor.build.ts",
-    "build": "bun index.build.ts",
-    "publish-pkg": "bun run ./scripts/updateVersion.ts ./ && bun publish",
-    "TEST:GRAPH-----------": "bun test graph/*",
-    "test:graph-layout": "bun test graph/graph-layout.spec.ts",
-    "test:graph-state": "bun test graph/graph-state.spec.ts",
-    "test:graph-transition": "bun test graph/graph-transition.spec.ts"
-  },
-  "type": "module",
-  "types": "metafor.d.ts"
+    "metafor:build:dev": "bun run metafor:server:build:dev && bun run metafor:server:typegen && bun run metafor:web:build:dev && bun run metafor:web:typegen",
+    "metafor:build:prod": "bun run metafor:server:build:prod && bun run metafor:server:typegen && bun run metafor:web:build:prod && bun run metafor:web:typegen",
+    "metafor:server:build:dev": "cd ../metafor && bun run server:build:dev && cp -r dist/server ../space/",
+    "metafor:server:build:prod": "cd ../metafor && bun run server:build:prod && cp -r dist/server ../space/",
+    "metafor:server:typegen": "cd ../metafor && bun run server:typegen && cp -r dist/server/metafor.d.ts ../space/server/metafor.d.ts",
+    "metafor:web:build:dev": "cd ../metafor && bun run web:build:dev && cp -r dist/web ../space/",
+    "metafor:web:build:prod": "cd ../metafor && bun run web:build:prod && cp -r dist/web ../space/",
+    "metafor:web:typegen": "cd ../metafor && bun run web:typegen && cp -r dist/web/metafor.d.ts ../space/web/metafor.d.ts"
+  }
 }

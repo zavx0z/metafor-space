@@ -37,6 +37,8 @@
     ".idx/**/*",
     ".vscode/**/*",
     "assets/**/*",
-    "fixtures/browser/index.html"
+    "fixtures/browser/index.html",
+    "server/**/*",
+    "web/**/*"
   ]
 }

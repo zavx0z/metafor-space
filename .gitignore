@@ -5,3 +5,5 @@ __snapshots__
 .idea
 .DS_Store
 public
+server
+web

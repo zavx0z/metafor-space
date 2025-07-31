@@ -1,4 +1,4 @@
-import { MetaFor } from "./metafor.js"
+import { MetaFor } from "./web/metafor.js"
 
 const socket = new WebSocket("ws://localhost:3000")
 
