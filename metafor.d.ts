@@ -827,6 +827,10 @@ export type StateDefinition<T extends string, C extends ContextSchema> = StateTr
  */
 export type StatesConfig<S extends string, C extends ContextSchema> = Record<S, StateDefinition<S, C>>;
 /**
+ *  Ядро компонента
+ */
+export type Core = Record<string, any>;
+/**
  * Тип билдера для декларации набора процессов автомата.
  *
  * Позволяет создавать типизированные процессы с удобным API.
@@ -839,10 +843,10 @@ export type StatesConfig<S extends string, C extends ContextSchema> = Record<S, 
  * @includeExample ./proc/test/actions.basic.spec.ts
  * @includeExample ./proc/test/actions.types.spec.ts
  */
-export type ActionsDeclaration<C extends ContextSchema, S extends string> = (process: (config?: {
+export type ProcessesDeclaration<C extends ContextSchema, S extends string, I extends Core> = (process: (config?: {
 	title?: string;
 	description?: string;
-}) => ProcessChain<C>) => Partial<Record<S, ActionChain<C, any>>>;
+}) => ProcessChain<C, I>) => Partial<Record<S, ActionChain<C, I, any>>>;
 /**
  * Chain API для создания процесса с опциональными параметрами title и description.
  * Позволяет удобно и строго типизировано описывать обработчики процессов автомата.
@@ -863,7 +867,7 @@ export type ActionsDeclaration<C extends ContextSchema, S extends string> = (pro
  * chain.getResult() // { action, success, error, title?, description? }
  * ```
  */
-export type ProcessChain<C extends ContextSchema> = {
+export type ProcessChain<C extends ContextSchema, I extends Core> = {
 	/**
 	 * Добавляет основную функцию процесса.
 	 *
@@ -894,9 +898,20 @@ export type ProcessChain<C extends ContextSchema> = {
 	 * })
 	 * ```
 	 */
-	action: <Res>(fn: (params: {
-		context: ExtractValues<C>;
-	}) => Res | Promise<Res>) => ActionChain<C, Res>;
+	action: <Res>(fn: (params: ActionParams<C, I>) => Res | Promise<Res>) => ActionChain<C, I, Res>;
+};
+/**
+ * Параметры для action
+ * @template C - схема контекста автомата
+ * @template I - тип ядра автомата
+ */
+export type ActionParams<C extends ContextSchema, I extends Core> = {
+	/** Контекст */
+	context: ExtractValues<C>;
+	/** Ядро */
+	core: I;
+	/** Элемент */
+	element: HTMLElement;
 };
 /**
  * Цепочка для декларации action с типобезопасной поддержкой success и error.
@@ -914,7 +929,7 @@ export type ProcessChain<C extends ContextSchema> = {
  * chain.getResult() // { action, success, error }
  * ```
  */
-export type ActionChain<C extends ContextSchema, Res> = {
+export type ActionChain<C extends ContextSchema, I extends Core, Res> = {
 	/**
 	 * Основная функция процесса, вызывается автоматом.
 	 *
@@ -934,9 +949,7 @@ export type ActionChain<C extends ContextSchema, Res> = {
 	 * }
 	 * ```
 	 */
-	action: (params: {
-		context: ExtractValues<C>;
-	}) => Res | Promise<Res>;
+	action: (params: ActionParams<C, I>) => Res | Promise<Res>;
 	/**
 	 * Добавляет обработчик успешного завершения процесса.
 	 *
@@ -962,7 +975,7 @@ export type ActionChain<C extends ContextSchema, Res> = {
 	success: (handler: (params: {
 		update: (values: Partial<ExtractValues<C>>) => void;
 		data: Res;
-	}) => void) => ActionChain<C, Res>;
+	}) => void) => ActionChain<C, I, Res>;
 	/**
 	 * Добавляет обработчик ошибки выполнения процесса.
 	 *
@@ -987,7 +1000,7 @@ export type ActionChain<C extends ContextSchema, Res> = {
 	error: (handler: (params: {
 		update: (values: Partial<ExtractValues<C>>) => void;
 		error: Error;
-	}) => void) => ActionChain<C, Res>;
+	}) => void) => ActionChain<C, I, Res>;
 	/**
 	 * Возвращает итоговый объект конфигурации процесса для автомата.
 	 *
@@ -1007,7 +1020,7 @@ export type ActionChain<C extends ContextSchema, Res> = {
 	 * // }
 	 * ```
 	 */
-	getResult: () => Process<C, Res>;
+	getResult: () => Process<C, I, Res>;
 };
 /**
  * Конфигурация одного процесса
@@ -1036,11 +1049,9 @@ export type ActionChain<C extends ContextSchema, Res> = {
  * }
  * ```
  */
-export type Process<C extends ContextSchema, Res = any> = {
+export type Process<C extends ContextSchema, I extends Core, Res = any> = {
 	/** Основная функция процесса */
-	action: (params: {
-		context: ExtractValues<C>;
-	}) => Res | Promise<Res>;
+	action: (params: ActionParams<C, I>) => Res | Promise<Res>;
 	/** Обработчик успешного завершения */
 	success?: (params: {
 		update: (values: UpdateValues<ExtractValues<C>>) => void;
@@ -1056,6 +1067,10 @@ export type Process<C extends ContextSchema, Res = any> = {
 	/** Описание процесса для документации */
 	description?: string;
 };
+declare const choose: <T, V, K extends T = T>(value: T, cases: Array<[
+	K,
+	() => V
+]>, defaultCase?: () => V) => V | undefined;
 declare function map<T>(items: Iterable<T> | undefined, f: (value: T, index: number) => unknown): Generator<unknown, void, unknown>;
 export type ResultType = typeof HTML_RESULT | typeof SVG_RESULT | typeof MATHML_RESULT;
 declare const HTML_RESULT = 1;
@@ -1186,6 +1201,7 @@ declare abstract class Directive implements Disconnectable {
 }
 declare const html: (strings: TemplateStringsArray, ...values: unknown[]) => TemplateResult<1>;
 declare const noChange: unique symbol;
+declare const nothing: unique symbol;
 declare class AttributePart implements Disconnectable {
 	readonly type: typeof ATTRIBUTE_PART | typeof PROPERTY_PART | typeof BOOLEAN_ATTRIBUTE_PART | typeof EVENT_PART;
 	readonly element: HTMLElement;
@@ -1292,6 +1308,7 @@ declare abstract class AsyncDirective extends Directive {
 	protected disconnected(): void;
 	protected reconnected(): void;
 }
+declare const createRef: <T = Element>() => Ref<T>;
 declare class Ref<T = Element> {
 	/**
 	 * Текущее значение элемента ref, либо `undefined`, если ref больше не отрисован.
@@ -1348,8 +1365,8 @@ declare function when<C, T, F = undefined>(condition: C, trueCase: (c: Exclude<C
  *
  * В функцию render компонента MetaFor передаётся объект с полезными утилитами и данными для построения UI.
  *
- * @includeExample ./test/context.init.spec.ts
- * @includeExample ./test/context.update.spec.ts
+ * @includeExample view/test/context.init.spec.ts
+ * @includeExample view/test/context.update.spec.ts
  *
  * @example
  * ```ts
@@ -1371,7 +1388,7 @@ declare function when<C, T, F = undefined>(condition: C, trueCase: (c: Exclude<C
  * }
  * ```
  */
-export type ViewDefinitionParams<C extends ContextSchema, S extends string> = {
+export type ViewDefinitionParams<C extends ContextSchema, S extends string, I extends Core> = {
 	/**
 	 * Функция для обновления контекста.
 	 * Вызывается с частичным объектом контекста для изменения состояния.
@@ -1390,6 +1407,7 @@ export type ViewDefinitionParams<C extends ContextSchema, S extends string> = {
 	 * ```
 	 */
 	context: ExtractValues<C>;
+	core: I;
 	/**
 	 * Текущее состояние автомата/актора.
 	 * Обычно строка, определённая в .states(...)
@@ -1470,6 +1488,35 @@ export type ViewDefinitionParams<C extends ContextSchema, S extends string> = {
 	 * ```
 	 */
 	style: typeof styleMap;
+	/**
+	 * Специальное значение для пустого контента.
+	 *
+	 * ```ts
+	 * const button = html`${
+	 *  user.isAdmin ? html`<button>DELETE</button>` : nothing
+	 * }`;
+	 * ```
+	 *
+	 * Удаляет узлы в child выражениях и атрибуты в атрибутных выражениях.
+	 */
+	nothing: typeof nothing;
+	/**
+	 * Директива для условного выбора шаблона по значению.
+	 *
+	 * Выбирает и выполняет функцию шаблона из списка на основе соответствия
+	 * заданного значения к случаю. Случаи структурированы как `[caseValue, func]`.
+	 *
+	 * @example
+	 * ```ts
+	 * render: ({ context, html }) => html`
+	 *   ${choose(context.section, [
+	 *     ['home', () => html`<h1>Главная</h1>`],
+	 *     ['about', () => html`<h1>О нас</h1>`]
+	 *   ], () => html`<h1>Ошибка</h1>`)}
+	 * `
+	 * ```
+	 */
+	choose: typeof choose;
 };
 /**
  * Конфигурация для представления компонента.
@@ -1478,10 +1525,10 @@ export type ViewDefinitionParams<C extends ContextSchema, S extends string> = {
  * При первой отрисовке контекст устанавливается без дополнительных сообщений,
  * при обновлении контекста родителя автоматически обновляется контекст ребенка.
  *
- * @includeExample ./test/context.init.spec.ts
- * @includeExample ./test/context.update.spec.ts
+ * @includeExample view/test/context.init.spec.ts
+ * @includeExample view/test/context.update.spec.ts
  */
-export interface ViewConfig<C extends ContextSchema, S extends string> {
+export interface ViewConfig<C extends ContextSchema, S extends string, I extends Core> {
 	/**
 	 * Функция рендеринга компонента.
 	 * Получает параметры с контекстом, состоянием и утилитами для построения UI.
@@ -1500,7 +1547,7 @@ export interface ViewConfig<C extends ContextSchema, S extends string> {
 	 * `
 	 * ```
 	 */
-	render?: (params: ViewDefinitionParams<C, S>) => TemplateResult;
+	render?: (params: ViewDefinitionParams<C, S, I>) => TemplateResult | typeof nothing;
 	/**
 	 * Функция, вызываемая после монтирования компонента в DOM.
 	 * Используется для инициализации после рендера.
@@ -1996,7 +2043,9 @@ export type ReactionsChain<C extends ContextSchema, S extends string, Core = Rec
  * @param tag - уникальный тег web-компонента
  * @returns chain API: context() -> states() -> actions()
  */
-export declare function MetaFor(tag: string): {
+export declare function MetaFor(tag: string, config?: {
+	description?: string;
+}): {
 	/**
 	 * Регистрирует схему контекста для автомата.
 	 *
@@ -2031,7 +2080,7 @@ export declare function MetaFor(tag: string): {
 		 * @returns chain API для вызова .actions(...)
 		 */
 		states<S extends string>(states: StatesConfig<S, C>): {
-			core(core?: Record<string, any>): {
+			core<I extends Core>(coreBuilder?: (ref: typeof createRef) => I): {
 				/**
 				 * Регистрирует процессы автомата для нужных состояний.
 				 *
@@ -2051,14 +2100,14 @@ export declare function MetaFor(tag: string): {
 				 *
 				 * @returns Объект с процессами только для нужных состояний
 				 */
-				processes(process?: ActionsDeclaration<C, S>): {
+				processes(process?: ProcessesDeclaration<C, S, I>): {
 					/**
 					 * Регистрирует карту реакций для автомата.
 					 * @param reaction Функция (filter => декларация), где декларация — массив кортежей [string[], { update, filter, title }]
 					 * @returns chain API для вызова .view(...)
 					 */
 					reactions(reaction?: ReactionsChain<C, S>): {
-						view(view?: ViewConfig<C, S>): void;
+						view(view?: ViewConfig<C, S, I>): void;
 					};
 				};
 			};

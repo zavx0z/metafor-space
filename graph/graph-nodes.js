@@ -1,55 +1,54 @@
-import {MetaFor} from "../metafor.js"
-import "./graph-layout.js"
-import "./graph-listener.js"
-import "./graph-meta.js"
-import "./graph-state.js"
-import "./graph-context.js"
-import "./graph-param.js"
-import "./graph-condition.js"
+import { MetaFor } from "../metafor.js"
+// import "./graph-layout.js"
+// import "./graph-listener.js"
+// import "./graph-meta.js"
+// import "./graph-state.js"
+// import "./graph-context.js"
+// import "./graph-param.js"
+// import "./graph-condition.js"
 
-export default MetaFor("graph-nodes", {
-  description: "",
-  development: true
-})
-  .context(t => ({
-    error: t.string({title: "Ошибка", nullable: true}),
-    queue: t.array({title: "Очередь акторов для добавления"})
+MetaFor("graph-nodes")
+  .context((t) => ({
+    error: t.string.optional()({ title: "Ошибка" }),
+    queue: t.array.optional()({ title: "Очередь акторов для добавления" }),
   }))
-  .core()
-  .reactions({
-    "Блокировка всплытия": {
-      filter: () => true,
-      block: true,
-      action() {
-      }
-    },
-    "получение списка добавляемых акторов": {
-      filter: ({meta, patch}) => meta.tag === "graph-listener"
-        && patch.path === "/context"
-        && patch.value.op === "add"
-        && patch.value.nodes?.length
-      ,
-      action({meta, patch}) {
-        // console.log(meta, patch)
-      }
-    }
-  })
-  .states("render", "центрирование одной ноды")
-  .transitions("render", {
-    "render": {
-      to: {"центрирование одной ноды": {error: null, queue: {length: 1}}}
+  .states({
+    render: {
+      "центрирование одной ноды": { error: null, queue: { length: 1 } },
     },
     "центрирование одной ноды": {
-      to: {"render": {error: {isNull: false}}}
-    }
+      render: { error: { null: false } },
+    },
   })
+  .core()
+  .processes((process) => ({}))
+  .reactions((reaction) => [
+    [
+      ["render", "центрирование одной ноды"],
+      reaction({ title: "Блокировка всплытия" })
+        .filter({
+          tag: /\*/,
+        })
+        .equal(() => {}),
+    ],
+    [
+      ["render", "центрирование одной ноды"],
+      reaction({ title: "получение списка добавляемых акторов" })
+        .filter({
+          tag: "graph-listener",
+          path: "/context",
+          op: "add",
+          // value:{nodes: { length: 1 }},
+        })
+        .equal(({ context }) => {}),
+    ],
+  ])
   .view({
-    render: ({html}) => html`
+    render: ({ html }) => html`
       <metafor-graph-layout>
-        <metafor-graph-listener/>
       </metafor-graph-layout>
     `,
-    style: ({css}) => css`
+    style: ({ css }) => css`
       :host {
         color: rgb(var(--surface-50));
         width: 100vw;
@@ -59,4 +58,3 @@ export default MetaFor("graph-nodes", {
       }
     `,
   })
-

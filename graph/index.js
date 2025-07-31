@@ -1,28 +1,27 @@
 import { MetaFor } from "../metafor.js"
 
-export default MetaFor("test", { description: "Nodes", development: false })
+export default MetaFor("test", { description: "Nodes" })
   .context((t) => ({
-    status: t.enum("start", "end")({ title: "Статус", default: "end" }),
+    status: t.enum("start", "end").required("end")({ title: "Статус" }),
   }))
-  .core()
-  .reactions({})
-  .states("конец", "начало")
-  .transitions("начало", {
+  .states({
     начало: {
-      action: () =>
+      конец: { status: "end" },
+    },
+    конец: {
+      начало: { status: "start" },
+    },
+  })
+  .core()
+  .processes((process) => ({
+    начало: process().action(
+      () =>
         new Promise((resolve) => {
           setTimeout(() => {
             resolve({ status: "end" })
           }, 6000)
-        }),
-      to: {
-        конец: { status: "end" },
-      },
-    },
-    конец: {
-      to: {
-        начало: { status: "start" },
-      },
-    },
-  })
+        })
+    ),
+  }))
+  .reactions()
   .view({})

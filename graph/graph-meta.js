@@ -1,98 +1,107 @@
-import {MetaFor} from "../metafor.js"
-import {collectEdges, drawRoundedPath} from "./graph-meta.actions.js"
-import {createRef} from "../html/directives/ref.js"
+import { MetaFor } from "../metafor.js"
+import { collectEdges, drawRoundedPath } from "./graph-meta.actions.js"
 
-export default MetaFor("graph-meta", {development: true, description: "Node"})
-  .context(t => ({
-    id: t.string({title: "ID meta"}),
-    description: t.string({title: "Описание", nullable: true}),
-    width: t.number({default: 0}),
-    height: t.number({nullable: true}),
-    error: t.string({title: "Ошибка", nullable: true})
+export default MetaFor("graph-meta", { description: "Node" })
+  .context((t) => ({
+    id: t.string.required()({ title: "ID meta" }),
+    description: t.string.optional()({ title: "Описание" }),
+    width: t.number.optional(),
+    height: t.number.optional(),
+    error: t.string.optional()({ title: "Ошибка" }),
   }))
-  .core(() => ({
+  .states({
+    рендер: { позиционирование: { width: { null: false }, height: { null: false } } },
+    позиционирование: {},
+  })
+  .core((createRef) => ({
     header: createRef(),
     canvas: createRef(),
     /**@type{import('./graph-meta.t').Edge[]} */
-    edges: []
+    edges: [],
   }))
-  .reactions({
-    "вычисленное положение": {
-      filter: ({meta, patch}) => meta.tag === "graph-layout"
-        && patch.path === "/state"
-        && patch.value === "ожидание"
-      ,
-      action({context, update, core}) {
-        const data = sessionStorage.getItem(context.id)
-        if (!data) {
-          update({error: "Нет данных разметки"})
-          return
-        }
-        /**@type{import("./graph-layout.t").TypedLayoutResult}*/
-        const layout = JSON.parse(data)
-        core.edges = collectEdges(layout)
-        update({width: layout.width, height: layout.height})
-      }
-    }
-  })
-  .states("рендер", "позиционирование")
-  .transitions("рендер", {
-    "рендер": {
-      to: {
-        "позиционирование": {width: {isNull: false}, height: {isNull: false}}
-      }
-    },
-    "позиционирование": {
-      action({element, context, core}) {
-        const headerBB = /**@type{DOMRect} */ (core.header?.value?.getBoundingClientRect())
-        element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
-        const canvas = /**@type{HTMLCanvasElement}*/ (core.canvas.value)
-        if (!canvas) return
-        canvas.width = context.width
-        canvas.height = context.height
-
-        // Рисуем edges на canvas
-        requestAnimationFrame(() => {
-          if (!canvas || !core.edges.length) return
-          const ctx = canvas.getContext('2d')
-          if (!ctx) return
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-          core.edges.forEach(/** @param {import('./graph-meta.t').Edge} edge */edge => {
-            // Цвет и стиль линии
-            ctx.strokeStyle = edge.type === 'east-input' ? '#9c27b0' : edge.type === 'west' ? '#2196f3' : '#4caf50'
-            ctx.lineWidth = 2
-
-            // Всегда применяем тень для всех рёбер
-            ctx.shadowColor = 'rgba(0,0,0,0.4)'
-            ctx.shadowBlur = 4
-            ctx.shadowOffsetY = 4
-
-            // Рисуем скругленный путь
-            drawRoundedPath(ctx, edge.points, 8)
-            ctx.stroke()
-            ctx.closePath()
-          })
-
-          // Сбросить тень после отрисовки
-          ctx.shadowColor = 'transparent'
-          ctx.shadowBlur = 0
-          ctx.shadowOffsetY = 0
+  .processes()
+  .reactions((process) => [
+    [
+      ["рендер", "позиционирование"],
+      process({ title: "Вычисленное положение" })
+        .filter({
+          tag: "graph-layout",
+          path: "/state",
+          value: "ожидание",
         })
-      },
-      to: {}
-    }
-  })
+        .equal(({ context, update, core }) => {
+          const data = sessionStorage.getItem(context.id)
+          if (!data) {
+            update({ error: "Нет данных разметки" })
+            return
+          }
+          /**@type{import("./graph-layout.t").TypedLayoutResult}*/
+          const layout = JSON.parse(data)
+          core.edges = collectEdges(layout)
+          update({ width: layout.width, height: layout.height })
+        }),
+    ],
+  ])
+  // .transitions("рендер", {
+  //   рендер: {
+  //     to: {
+  //       позиционирование: { width: { isNull: false }, height: { isNull: false } },
+  //     },
+  //   },
+  //   позиционирование: {
+  //     action({ element, context, core }) {
+  //       const headerBB = /**@type{DOMRect} */ (core.header?.value?.getBoundingClientRect())
+  //       element.style.cssText = `width: ${context.width}px; height: ${context.height + headerBB.height}px;`
+  //       const canvas = /**@type{HTMLCanvasElement}*/ (core.canvas.value)
+  //       if (!canvas) return
+  //       canvas.width = context.width
+  //       canvas.height = context.height
+
+  //       // Рисуем edges на canvas
+  //       requestAnimationFrame(() => {
+  //         if (!canvas || !core.edges.length) return
+  //         const ctx = canvas.getContext("2d")
+  //         if (!ctx) return
+  //         ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  //         core.edges.forEach(
+  //           /** @param {import('./graph-meta.t').Edge} edge */ (edge) => {
+  //             // Цвет и стиль линии
+  //             ctx.strokeStyle = edge.type === "east-input" ? "#9c27b0" : edge.type === "west" ? "#2196f3" : "#4caf50"
+  //             ctx.lineWidth = 2
+
+  //             // Всегда применяем тень для всех рёбер
+  //             ctx.shadowColor = "rgba(0,0,0,0.4)"
+  //             ctx.shadowBlur = 4
+  //             ctx.shadowOffsetY = 4
+
+  //             // Рисуем скругленный путь
+  //             drawRoundedPath(ctx, edge.points, 8)
+  //             ctx.stroke()
+  //             ctx.closePath()
+  //           }
+  //         )
+
+  //         // Сбросить тень после отрисовки
+  //         ctx.shadowColor = "transparent"
+  //         ctx.shadowBlur = 0
+  //         ctx.shadowOffsetY = 0
+  //       })
+  //     },
+  //     to: {},
+  //   },
+  // })
   .view({
-    render: ({html, context, core, ref}) => html`
+    render: ({ html, context, core, ref }) => html`
       <header ${ref(core.header)}>
         <div><!--кнопки слева--></div>
         <h2 class="noselect">${context.description || context.id.split("/")[0]}</h2>
-        <div><!--кнопки справа-->
+        <div>
+          <!--кнопки справа-->
           <button aria-label="Редактировать">
             <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor">
               <path
-                d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/>
+                d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z" />
             </svg>
           </button>
         </div>
@@ -102,7 +111,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         <canvas ${ref(core.canvas)}></canvas>
       </section>
     `,
-    style: ({css}) => css`
+    style: ({ css }) => css`
       :host {
         backdrop-filter: var(--backdrop-filter-blur);
         -webkit-backdrop-filter: var(--backdrop-filter-blur);
@@ -172,7 +181,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
         user-select: none;
         border-top-left-radius: inherit;
         border-top-right-radius: inherit;
-        font-family: "Russo One", 'Courier New', Courier, monospace;
+        font-family: "Russo One", "Courier New", Courier, monospace;
         cursor: move;
 
         &::after {
@@ -207,7 +216,7 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           text-align: center;
           margin: 0;
           padding: 0;
-          text-wrap: nowrap;
+          white-space: nowrap;
         }
 
         & > div:last-child {
@@ -256,6 +265,5 @@ export default MetaFor("graph-meta", {development: true, description: "Node"})
           display: block;
         }
       }
-
-    `
+    `,
   })

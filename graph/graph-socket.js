@@ -1,41 +1,52 @@
-import {MetaFor} from "../metafor.js"
+import { MetaFor } from "../metafor.js"
 
-export default MetaFor('graph-socket')
-  .context(t => ({
-    id: t.string({title: "ID meta"}),
-    state: t.string({title: "Название состояния"}),
-    param: t.string({title: "Ключ параметра"}),
-    direction: t.enum("west", "east")({title: "Вход/Выход"}),
-    parent: t.enum("state", "condition")({title: "Принадлежность"}),
-    type: t.enum("string", "number", "boolean", "array", "enum")({title: "Тип параметра", default: "string"}),
-    size: t.number({nullable: true}),
-    x: t.number({nullable: true}),
-    y: t.number({nullable: true}),
-    error: t.string({title: "Ошибка", nullable: true}),
+export default MetaFor("graph-socket")
+  .context((t) => ({
+    id: t.string.required()({ title: "ID meta" }),
+    state: t.string.required()({ title: "Название состояния" }),
+    param: t.string.required()({ title: "Ключ параметра" }),
+    direction: t.enum("west", "east").required()({ title: "Вход/Выход" }),
+    parent: t.enum("state", "condition").required()({ title: "Принадлежность" }),
+    type: t.enum("string", "number", "boolean", "array", "enum").required("string")({ title: "Тип параметра" }),
+    size: t.number.optional(),
+    x: t.number.optional(),
+    y: t.number.optional(),
+    error: t.string.optional()({ title: "Ошибка" }),
   }))
-  .core()
-      .reactions({})
-.states("рендер", "измерение")
-  .transitions("рендер", {
-    "рендер": {
-      action({element, context}) {
-        element.dataset['direction'] = typeof context.direction !== "undefined" ? context.direction === 'west' ? 'input' : 'output' : ''
-        element.dataset['type'] = context.type || 'string'
-      },
-      to: {"измерение": {error: null}}
+  .states({
+    рендер: {
+      измерение: { error: null },
     },
-    "измерение": {
-      action: ({element}) => new Promise((res) => {
-        requestAnimationFrame(() => {
-          const {width, x, y} = element.getBoundingClientRect()
-          return res({size: Math.round(width), x: Math.round(x), y: Math.round(y)})
+    измерение: {},
+  })
+  .core()
+  .processes((process) => ({
+    рендер: process().action(({ element, context }) => {
+      element.dataset["direction"] =
+        typeof context.direction !== "undefined" ? (context.direction === "west" ? "input" : "output") : ""
+      element.dataset["type"] = context.type || "string"
+    }),
+    измерение: process()
+      .action(
+        ({ element }) =>
+          new Promise((res) => {
+            requestAnimationFrame(() => {
+              const { width, x, y } = element.getBoundingClientRect()
+              return res({ size: Math.round(width), x: Math.round(x), y: Math.round(y) })
+            })
+          })
+      )
+      .success(({ update, data }) => {
+        update({
+          size: data.size,
+          x: data.x,
+          y: data.y,
         })
       }),
-      to: {}
-    },
-  })
+  }))
+  .reactions()
   .view({
-    style: ({css}) => {
+    style: ({ css }) => {
       const position = -6
       const size = 12
       // noinspection CssUnresolvedCustomProperty
@@ -103,31 +114,31 @@ export default MetaFor('graph-socket')
         /* Цвета по типам параметров */
 
         :host([data-type="string"]) {
-          background: #6082B6;
+          background: #6082b6;
           border: 2px solid var(--socket-border-color);
           box-shadow: none;
         }
 
         :host([data-type="number"]) {
-          background: #B6A160;
+          background: #b6a160;
           border: 2px solid var(--socket-border-color);
           box-shadow: none;
         }
 
         :host([data-type="boolean"]) {
-          background: #60B67A;
+          background: #60b67a;
           border: 2px solid var(--socket-border-color);
           box-shadow: none;
         }
 
         :host([data-type="array"]) {
-          background: #B660A1;
+          background: #b660a1;
           border: 2px solid var(--socket-border-color);
           box-shadow: none;
         }
 
         :host([data-type="enum"]) {
-          background: #B66060;
+          background: #b66060;
           border: 2px solid var(--socket-border-color);
           box-shadow: none;
         }

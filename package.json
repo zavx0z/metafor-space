@@ -43,7 +43,7 @@
   "scripts": {
     "upd": "bun update --latest && bun i",
     "run": "bun index.server.ts",
-    "metafor:dev": "bun ./scripts/metafor.build.ts",
+    "metafor:build:dev": "bun ./scripts/metafor.build.ts",
     "build": "bun index.build.ts",
     "publish-pkg": "bun run ./scripts/updateVersion.ts ./ && bun publish",
     "TEST:GRAPH-----------": "bun test graph/*",

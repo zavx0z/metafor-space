@@ -1,198 +1,203 @@
-import {MetaFor} from "../metafor.js"
-import {nothing} from "../html/html.js"
+import { MetaFor } from "../metafor.js"
 
-export default MetaFor("graph-operator", {development: true})
-  .context(t => ({
-    id: t.string({title: "ID meta"}),
-    from: t.string({title: "Исходное состояние"}),
-    to: t.string({title: "Текущее состояние"}),
+export default MetaFor("graph-operator")
+  .context((t) => ({
+    id: t.string.required()({ title: "ID meta" }),
+    from: t.string.required()({ title: "Исходное состояние" }),
+    to: t.string.required()({ title: "Текущее состояние" }),
 
-    title: t.string({title: "Название оператора", nullable: true}),
-    value: t.string({title: "Значение", nullable: true}),
-    symbol: t.string({title: "Графический символ", nullable: true}),
-    op: t.enum("eq", "notEq", "gt", "gte", "lt", "lte", "between", "notGt", "notGte", "notLt", "notLte",
-      "notMin", "notMax", "startsWith", "endsWith", "notStartsWith", "notEndsWith", "include",
-      "notInclude", "pattern", "includes", "length", "every", "some", "logicalEq", "not",
-      "isNull", "notNull")({title: "Операция сравнения", nullable: true}),
-    error: t.string({title: "Ошибка", nullable: true}),
+    title: t.string.optional()({ title: "Название оператора" }),
+    value: t.string.optional()({ title: "Значение" }),
+    symbol: t.string.optional()({ title: "Графический символ" }),
+    // prettier-ignore
+    op: t.enum( "eq", "notEq", "gt", "gte", "lt", "lte", "between", "notGt", "notGte", "notLt", "notLte", "notMin", "notMax",
+        "startsWith", "endsWith", "notStartsWith", "notEndsWith", "include", "notInclude", "pattern", "includes", "length",
+        "every", "some", "logicalEq", "not", "isNull", "notNull")
+      .optional()({ title: "Операция сравнения" }),
+    error: t.string.optional()({ title: "Ошибка" }),
   }))
-  .core(() => ({
+  .states({
+    "инициализация оператора": {
+      ready: {
+        op: { null: true },
+        title: { null: true },
+        symbol: { null: true },
+      },
+    },
+    ready: {},
+  })
+  .core({
     operators: {
       // Числовые операторы
       eq: {
-        symbol: '⊜',
-        title: 'Равно',
-        description: 'Проверяет равенство двух числовых значений'
+        symbol: "⊜",
+        title: "Равно",
+        description: "Проверяет равенство двух числовых значений",
       },
       notEq: {
-        symbol: '≠',
-        title: 'Не равно',
-        description: 'Проверяет неравенство двух значений'
+        symbol: "≠",
+        title: "Не равно",
+        description: "Проверяет неравенство двух значений",
       },
       gt: {
-        symbol: '⊐',
-        title: 'Больше',
-        description: 'Проверяет, что значение больше указанного числа'
+        symbol: "⊐",
+        title: "Больше",
+        description: "Проверяет, что значение больше указанного числа",
       },
       gte: {
-        symbol: '⊒',
-        title: 'Больше или равно',
-        description: 'Проверяет, что значение больше или равно указанному числу'
+        symbol: "⊒",
+        title: "Больше или равно",
+        description: "Проверяет, что значение больше или равно указанному числу",
       },
       lt: {
-        symbol: '⊏',
-        title: 'Меньше',
-        description: 'Проверяет, что значение меньше указанного числа'
+        symbol: "⊏",
+        title: "Меньше",
+        description: "Проверяет, что значение меньше указанного числа",
       },
       lte: {
-        symbol: '⊑',
-        title: 'Меньше или равно',
-        description: 'Проверяет, что значение не меньше или равно указанного числа'
+        symbol: "⊑",
+        title: "Меньше или равно",
+        description: "Проверяет, что значение не меньше или равно указанного числа",
       },
       between: {
-        symbol: '⋈',
-        title: 'Между значениями',
-        description: 'Проверяет, что значение находится в указанном диапазоне'
+        symbol: "⋈",
+        title: "Между значениями",
+        description: "Проверяет, что значение находится в указанном диапазоне",
       },
       notGt: {
-        symbol: '≯',
-        title: 'Не больше',
-        description: 'Проверяет, что значение не больше указанного числа'
+        symbol: "≯",
+        title: "Не больше",
+        description: "Проверяет, что значение не больше указанного числа",
       },
       notGte: {
-        symbol: '≱',
-        title: 'Не больше или равно',
-        description: 'Проверяет, что значение не больше или равно указанному числу'
+        symbol: "≱",
+        title: "Не больше или равно",
+        description: "Проверяет, что значение не больше или равно указанному числу",
       },
       notLt: {
-        symbol: '≮',
-        title: 'Не меньше',
-        description: 'Проверяет, что значение не меньше указанного числа'
+        symbol: "≮",
+        title: "Не меньше",
+        description: "Проверяет, что значение не меньше указанного числа",
       },
       notLte: {
-        symbol: '≰',
-        title: 'Не меньше или равно',
-        description: 'Проверяет, что значение не меньше или равно указанного числа'
+        symbol: "≰",
+        title: "Не меньше или равно",
+        description: "Проверяет, что значение не меньше или равно указанного числа",
       },
       notMin: {
-        symbol: '⊀',
-        title: 'Не минимальное',
-        description: 'Проверяет, что значение не является минимальным'
+        symbol: "⊀",
+        title: "Не минимальное",
+        description: "Проверяет, что значение не является минимальным",
       },
       notMax: {
-        symbol: '⊁',
-        title: 'Не максимальное',
-        description: 'Проверяет, что значение не является максимальным'
+        symbol: "⊁",
+        title: "Не максимальное",
+        description: "Проверяет, что значение не является максимальным",
       },
 
       // Строковые операторы
       startsWith: {
-        symbol: '⊰',
-        title: 'Начинается с',
-        description: 'Проверяет, начинается ли строка с указанного значения'
+        symbol: "⊰",
+        title: "Начинается с",
+        description: "Проверяет, начинается ли строка с указанного значения",
       },
       endsWith: {
-        symbol: '⊱',
-        title: 'Заканчивается на',
-        description: 'Проверяет, заканчивается ли строка указанным значением'
+        symbol: "⊱",
+        title: "Заканчивается на",
+        description: "Проверяет, заканчивается ли строка указанным значением",
       },
       notStartsWith: {
-        symbol: '⋪',
-        title: 'Не начинается с',
-        description: 'Проверяет, что строка не начинается с указанного значения'
+        symbol: "⋪",
+        title: "Не начинается с",
+        description: "Проверяет, что строка не начинается с указанного значения",
       },
       notEndsWith: {
-        symbol: '⋫',
-        title: 'Не заканчивается на',
-        description: 'Проверяет, что строка не заканчивается указанным значением'
+        symbol: "⋫",
+        title: "Не заканчивается на",
+        description: "Проверяет, что строка не заканчивается указанным значением",
       },
       include: {
-        symbol: '⊆',
-        title: 'Содержит',
-        description: 'Проверяет наличие подстроки в строке'
+        symbol: "⊆",
+        title: "Содержит",
+        description: "Проверяет наличие подстроки в строке",
       },
       notInclude: {
-        symbol: '⊈',
-        title: 'Не содержит',
-        description: 'Проверяет отсутствие подстроки в строке'
+        symbol: "⊈",
+        title: "Не содержит",
+        description: "Проверяет отсутствие подстроки в строке",
       },
       pattern: {
-        symbol: '⋊',
-        title: 'Регулярное выражение',
-        description: 'Проверяет соответствие строки регулярному выражению'
+        symbol: "⋊",
+        title: "Регулярное выражение",
+        description: "Проверяет соответствие строки регулярному выражению",
       },
 
       // Операторы массивов
       includes: {
-        symbol: '⊂',
-        title: 'Содержит элемент',
-        description: 'Проверяет наличие элемента в массиве'
+        symbol: "⊂",
+        title: "Содержит элемент",
+        description: "Проверяет наличие элемента в массиве",
       },
       length: {
-        symbol: '⊢',
-        title: 'Длина массива',
-        description: 'Проверяет длину массива'
+        symbol: "⊢",
+        title: "Длина массива",
+        description: "Проверяет длину массива",
       },
       every: {
-        symbol: '⋀',
-        title: 'Все элементы',
-        description: 'Проверяет условие для всех элементов массива'
+        symbol: "⋀",
+        title: "Все элементы",
+        description: "Проверяет условие для всех элементов массива",
       },
       some: {
-        symbol: '⋁',
-        title: 'Хотя бы один',
-        description: 'Проверяет условие хотя бы для одного элемента массива'
+        symbol: "⋁",
+        title: "Хотя бы один",
+        description: "Проверяет условие хотя бы для одного элемента массива",
       },
 
       // Логические операторы
       logicalEq: {
-        symbol: '⊨',
-        title: 'Логическое равно',
-        description: 'Проверяет логическое равенство'
+        symbol: "⊨",
+        title: "Логическое равно",
+        description: "Проверяет логическое равенство",
       },
       not: {
-        symbol: '⊭',
-        title: 'Не равно',
-        description: 'Инвертирует логическое значение'
+        symbol: "⊭",
+        title: "Не равно",
+        description: "Инвертирует логическое значение",
       },
 
       // Операторы проверки на null
       isNull: {
-        symbol: '∅',
-        title: 'Проверка на null',
-        description: 'Проверяет, является ли значение null или undefined'
+        symbol: "∅",
+        title: "Проверка на null",
+        description: "Проверяет, является ли значение null или undefined",
       },
       notNull: {
-        symbol: '¬∅',
-        title: 'Проверка на не null',
-        description: 'Проверяет, что значение не является null или undefined'
-      }
+        symbol: "¬∅",
+        title: "Проверка на не null",
+        description: "Проверяет, что значение не является null или undefined",
+      },
     },
-  }))
-  .reactions({})
-  .states('инициализация оператора', 'ready')
-  .transitions('инициализация оператора', {
-    "инициализация оператора": {
-      action({context, core}) {
+  })
+  .processes((process) => ({
+    "инициализация оператора": process({})
+      .action(({ context, core }) => {
         if (!context.op) throw new Error("Не установлен в контекст значение параметра op")
         const operator = core.operators[context.op]
-        return {title: operator.title, symbol: operator.symbol}
-      },
-      to: {
-        "ready": {
-          op: {isNull: false},
-          title: {isNull: false},
-          symbol: {isNull: false}
-        }
-      }
-    }
-  })
+        return { title: operator.title, symbol: operator.symbol }
+      })
+      .success(({ update, data }) => update({ title: data.title, symbol: data.symbol })),
+  }))
+  .reactions()
   .view({
-    render: ({context, html, state}) => state !== "ready" ? nothing : html`
-      <span>${context.symbol}</span>
-      <span>${String(context.value)}</span>
-    `,
-    style: ({css}) => css`
+    render: ({ context, html, state, nothing }) =>
+      state !== "ready"
+        ? nothing
+        : html`
+            <span>${context.symbol}</span>
+            <span>${String(context.value)}</span>
+          `,
+    style: ({ css }) => css`
       :host {
         border-radius: var(--node-border-radius);
         background-color: rgb(var(--primary-900));
@@ -214,7 +219,6 @@ export default MetaFor("graph-operator", {development: true})
           color: #4caf50;
           font-size: x-large;
         }
-
       }
-    `
+    `,
   })
