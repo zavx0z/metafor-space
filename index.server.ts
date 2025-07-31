@@ -1,71 +1,10 @@
 import { getMimeType } from "./fixtures/browser/static.ts"
 import { join } from "node:path"
+import { log } from "./server/debug.ts"
 import type { Message } from "./server/metafor.d.ts"
 
 const channel = new BroadcastChannel("channel")
-channel.addEventListener("message", (event: MessageEvent<Message>) => {
-  const { meta, patch } = event.data
-  const timestamp = new Date().toLocaleTimeString("ru-RU", { hour12: false })
-  const tag = (meta.tag as string) || "unknown"
-
-  // ANSI цветовые коды
-  const colors = {
-    reset: "\x1b[0m",
-    bright: "\x1b[1m",
-    dim: "\x1b[2m",
-    red: "\x1b[31m",
-    green: "\x1b[32m",
-    yellow: "\x1b[33m",
-    blue: "\x1b[34m",
-    magenta: "\x1b[35m",
-    cyan: "\x1b[36m",
-    white: "\x1b[37m",
-    gray: "\x1b[90m",
-  }
-
-  switch (patch.path) {
-    case "/state":
-      console.log(
-        `${colors.gray}[${timestamp}]${colors.reset} ${colors.cyan}${tag.padEnd(20)}${colors.reset} | ${
-          colors.yellow
-        }STATE${colors.reset}  | ${colors.magenta}${patch.op.padEnd(8)}${colors.reset} | ${colors.green}${patch.value}${
-          colors.reset
-        }`
-      )
-      break
-    case "/context":
-      const contextStr = JSON.stringify(patch.value).substring(0, 50)
-      console.log(
-        `${colors.gray}[${timestamp}]${colors.reset} ${colors.cyan}${tag.padEnd(20)}${colors.reset} | ${
-          colors.blue
-        }CONTEXT${colors.reset}| ${colors.magenta}${patch.op.padEnd(8)}${colors.reset} | ${colors.white}${contextStr}${
-          colors.reset
-        }`
-      )
-      break
-    case "/":
-      console.log(
-        `${colors.gray}[${timestamp}]${colors.reset} ${colors.cyan}${tag.padEnd(20)}${colors.reset} | ${
-          colors.green
-        }ADD${colors.reset}    | ${colors.magenta}${patch.op.padEnd(8)}${colors.reset} | ${colors.cyan}${tag}${
-          colors.reset
-        }`
-      )
-      break
-    default:
-      const path = patch.path as string
-      console.log(
-        `${colors.gray}[${timestamp}]${colors.reset} ${colors.cyan}${tag.padEnd(20)}${colors.reset} | ${
-          colors.red
-        }${path.padEnd(7)}${colors.reset} | ${colors.magenta}${patch.op.padEnd(8)}${colors.reset} | ${
-          colors.white
-        }${JSON.stringify(patch.value).substring(0, 30)}${colors.reset}`
-      )
-      break
-  }
-})
-
-import("./server.space.ts")
+channel.addEventListener("message", log)
 
 const PROJECT_DIR = import.meta.dir
 
@@ -104,20 +43,51 @@ const server = Bun.serve({
   },
   websocket: {
     open(ws) {
+      console.log("🔗 WebSocket соединение открыто")
       channel.addEventListener("message", (event: MessageEvent<Message>) => ws.send(JSON.stringify(event.data)))
-      console.log("websocket opened")
     },
     message(ws, message) {
-      console.log("websocket message", message)
-      ws.send("hello")
+      console.log("📨 WebSocket сообщение:", message)
     },
     close(ws) {
-      console.log("websocket closed")
+      console.log("🔌 WebSocket соединение закрыто")
     },
     drain(ws) {
-      console.log("websocket drained")
+      console.log("💧 WebSocket буфер очищен")
     },
   },
 })
 
-console.log(`Server started on http://${server.hostname}:${server.port}`)
+// События жизненного цикла сервера
+console.log(`🚀 Сервер запускается на http://${server.hostname}:${server.port}`)
+
+// Обработка сигналов завершения
+process.on("SIGINT", () => {
+  console.log("\n🛑 Получен сигнал SIGINT, корректное завершение...")
+  server.stop()
+  process.exit(0)
+})
+
+process.on("SIGTERM", () => {
+  console.log("\n🛑 Получен сигнал SIGTERM, корректное завершение...")
+  server.stop()
+  process.exit(0)
+})
+
+// Обработка необработанных ошибок
+process.on("uncaughtException", (error) => {
+  console.error("❌ Необработанное исключение:", error)
+  server.stop()
+  process.exit(1)
+})
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Необработанное отклонение промиса:", promise, "причина:", reason)
+  server.stop()
+  process.exit(1)
+})
+
+console.log(`✅ Сервер слушает на http://${server.hostname}:${server.port}`)
+console.log("📡 WebSocket сервер готов к подключениям")
+
+import("./server.space.ts")

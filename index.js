@@ -1,4 +1,5 @@
 import { MetaFor } from "./web/metafor.js"
+import { log } from "./web/debug/console.js"
 
 /** @type {WebSocket|null} */
 let socket = null
@@ -19,7 +20,7 @@ function connectWebSocket() {
     }
 
     socket.onmessage = (/** @type {MessageEvent} */ event) => {
-      console.log("📨 message", event.data)
+      log(JSON.parse(event.data))
     }
 
     socket.onclose = (event) => {

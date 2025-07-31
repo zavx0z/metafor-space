@@ -5,5 +5,9 @@ __snapshots__
 .idea
 .DS_Store
 public
-server
-web
+
+server/metafor.d.ts
+server/metafor.js
+web/debug
+web/metafor.d.ts
+web/metafor.js
