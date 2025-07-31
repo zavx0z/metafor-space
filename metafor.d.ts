@@ -2041,7 +2041,7 @@ export type ReactionsChain<C extends ContextSchema, S extends string, Core = Rec
 /**
  * MetaFor — фабрика для создания web-компонента-актора конечного автомата
  * @param tag - уникальный тег web-компонента
- * @returns chain API: context() -> states() -> actions()
+ * @returns chain API: context() -> states() -> core() -> processes() -> reactions() -> view()
  */
 export declare function MetaFor(tag: string, config?: {
 	description?: string;

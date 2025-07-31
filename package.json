@@ -41,6 +41,7 @@
   ],
   "license": "MIT",
   "scripts": {
+    "serve": "bun --hot index.server.ts",
     "upd": "bun update --latest && bun i",
     "run": "bun index.server.ts",
     "metafor:build:dev": "bun ./scripts/metafor.build.ts",

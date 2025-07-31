@@ -1,7 +1,7 @@
-import {getMimeType} from "./fixtures/browser/static.ts"
-import {join} from "node:path"
+import { getMimeType } from "./fixtures/browser/static.ts"
+import { join } from "node:path"
 
-const PROJECT_DIR = join(import.meta.dir, "/")
+const PROJECT_DIR = import.meta.dir
 
 const server = Bun.serve({
   hostname: "0.0.0.0",
@@ -16,22 +16,40 @@ const server = Bun.serve({
         "Content-Type": "image/x-icon",
       },
     }),
-    "/*": async req => {
+    "/*": async (req) => {
+      if (server.upgrade(req)) {
+        return
+      }
       const url = new URL(req.url)
       const path = join(PROJECT_DIR, url.pathname)
       const type = getMimeType(url.pathname)
       let file
       try {
         file = Bun.file(path)
-        return new Response(await file.bytes(), {headers: {"Content-Type": type}})
+        return new Response(await file.bytes(), { headers: { "Content-Type": type } })
       } catch (e) {
         console.log(e)
-        return new Response("fallback response");
+        return new Response("fallback response")
       }
-    }
+    },
   },
   fetch(request) {
-    return new Response("fallback response");
+    return new Response("fallback response")
+  },
+  websocket: {
+    open(ws) {
+      console.log("websocket opened")
+    },
+    message(ws, message) {
+      console.log("websocket message", message)
+      ws.send("hello")
+    },
+    close(ws) {
+      console.log("websocket closed")
+    },
+    drain(ws) {
+      console.log("websocket drained")
+    },
   },
 })
 
