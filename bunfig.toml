@@ -1,2 +1,4 @@
+[console]
+depth = 7
 [test]
 preload = ["./fixtures/happydom.ts", "./html/tests/fixtures/expectExtend.ts"]

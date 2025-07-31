@@ -1,15 +1,61 @@
 import { MetaFor } from "./web/metafor.js"
 
-const socket = new WebSocket("ws://localhost:3000")
+/** @type {WebSocket|null} */
+let socket = null
+let reconnectAttempts = 0
+const maxReconnectAttempts = 5
+const reconnectDelay = 1000 // 1 секунда
 
-socket.onopen = () => {
-  console.log("connected")
-  socket.send("hello")
+function connectWebSocket() {
+  try {
+    socket = new WebSocket("ws://localhost:3000")
+
+    socket.onopen = () => {
+      console.log("✅ WebSocket connected")
+      reconnectAttempts = 0 // Сбрасываем счетчик попыток при успешном подключении
+      if (socket) {
+        socket.send("hello")
+      }
+    }
+
+    socket.onmessage = (/** @type {MessageEvent} */ event) => {
+      console.log("📨 message", event.data)
+    }
+
+    socket.onclose = (event) => {
+      console.log("❌ WebSocket closed:", event.code, event.reason)
+
+      if (reconnectAttempts < maxReconnectAttempts) {
+        reconnectAttempts++
+        console.log(`🔄 Reconnecting... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`)
+
+        setTimeout(() => {
+          connectWebSocket()
+        }, reconnectDelay * reconnectAttempts) // Увеличиваем задержку с каждой попыткой
+      } else {
+        console.log("💀 Max reconnection attempts reached. Giving up.")
+      }
+    }
+
+    socket.onerror = (error) => {
+      console.log("⚠️ WebSocket error:", error)
+    }
+  } catch (error) {
+    console.log("🚨 Failed to create WebSocket:", error)
+
+    if (reconnectAttempts < maxReconnectAttempts) {
+      reconnectAttempts++
+      console.log(`🔄 Retrying connection... (attempt ${reconnectAttempts}/${maxReconnectAttempts})`)
+
+      setTimeout(() => {
+        connectWebSocket()
+      }, reconnectDelay * reconnectAttempts)
+    }
+  }
 }
 
-socket.onmessage = (/** @type {MessageEvent} */ event) => {
-  console.log("message", event.data)
-}
+// Начинаем подключение
+connectWebSocket()
 
 export default MetaFor("roadmap")
   .context((t) => ({
