@@ -65,55 +65,53 @@ MetaFor("websocket")
             }
           })
       )
-      .success(({ update }) => {
-        update({ status: "connecting" })
-      })
+      .success(({ update }) => update({ status: "connecting" }))
       .error(({ update, error }) => update({ status: "error", error: error.message })),
 
     connecting: process({ title: "Ожидание подключения WebSocket" })
-      .action(({ core }) => {
-        return new Promise((resolve) => {
-          // Проверяем, что WebSocket действительно подключен
-          if (core.socket && core.socket.readyState === WebSocket.OPEN) {
-            resolve({ success: true })
-          } else {
-            // Если WebSocket еще не готов, ждем немного
-            setTimeout(() => {
+      .action(
+        ({ core }) =>
+          new Promise((resolve) => {
+            // Проверяем, что WebSocket действительно подключен
+            if (core.socket && core.socket.readyState === WebSocket.OPEN) {
               resolve({ success: true })
-            }, 100)
-          }
-        })
-      })
-      .success(({ update }) => {
-        update({ status: "connected" })
-      }),
+            } else {
+              // Если WebSocket еще не готов, ждем немного
+              setTimeout(() => {
+                resolve({ success: true })
+              }, 100)
+            }
+          })
+      )
+      .success(({ update }) => update({ status: "connected" })),
 
     error: process({ title: "Переподключение к WebSocket" })
-      .action(({ context, core }) => {
-        return new Promise((resolve, reject) => {
-          if (context.reconnectAttempts >= core.maxReconnectAttempts) {
-            console.log("💀 Достигнуто максимальное количество попыток переподключения. Сдаюсь.")
-            resolve({ success: false })
-            return
-          }
+      .action(
+        ({ context, core }) =>
+          new Promise((resolve, reject) => {
+            if (context.reconnectAttempts >= core.maxReconnectAttempts) {
+              console.log("💀 Достигнуто максимальное количество попыток переподключения. Сдаюсь.")
+              resolve({ success: false })
+              return
+            }
 
-          const attempts = context.reconnectAttempts + 1
-          const delay = core.reconnectDelay * attempts
+            const attempts = context.reconnectAttempts + 1
+            const delay = core.reconnectDelay * attempts
 
-          console.log(`🔄 Переподключение... (попытка ${attempts}/${core.maxReconnectAttempts})`)
+            console.log(`🔄 Переподключение... (попытка ${attempts}/${core.maxReconnectAttempts})`)
 
-          core.reconnectTimer = setTimeout(() => {
-            // Здесь нужно будет обновить через другой механизм
-            resolve({ success: true, attempts, delay })
-          }, delay)
-        })
-      })
-      .success(({ update, data }) => {
+            core.reconnectTimer = setTimeout(() => {
+              // Здесь нужно будет обновить через другой механизм
+              resolve({ success: true, attempts, delay })
+            }, delay)
+          })
+      )
+      .success(({ update, data }) =>
         update({
           status: "connecting",
           reconnectAttempts: data.attempts || 0,
         })
-      }),
+      ),
   }))
   .reactions(() => [])
   .view({
