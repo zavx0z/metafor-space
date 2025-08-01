@@ -11,20 +11,20 @@ MetaFor("websocket")
     error: t.string.optional()({ title: "Ошибка соединения" }),
   }))
   .states({
-    disconnected: {
-      connecting: { timeStampConnecting: { null: false }, error: { null: true } },
+    отключен: {
+      подключение: { timeStampConnecting: { null: false }, error: { null: true } },
     },
-    connecting: {
-      connected: { timeStampConnected: { null: false } },
-      error: { error: { null: false } },
+    подключение: {
+      подключен: { timeStampConnected: { null: false } },
+      ошибка: { error: { null: false } },
     },
-    connected: {
-      disconnected: { timeStampDisconnected: { null: false } },
-      error: { error: { null: false } },
+    подключен: {
+      отключен: { timeStampDisconnected: { null: false } },
+      ошибка: { error: { null: false } },
     },
-    error: {
-      connecting: { timeStampConnecting: { null: false } },
-      disconnected: { error: { null: true } },
+    ошибка: {
+      подключение: { timeStampConnecting: { null: false } },
+      отключен: { error: { null: true } },
     },
   })
   .core(
@@ -36,7 +36,7 @@ MetaFor("websocket")
     })
   )
   .processes((process) => ({
-    disconnected: process({ title: "Подключение к WebSocket" })
+    отключен: process({ title: "Подключение к WebSocket" })
       .action(async ({ core }) => {
         try {
           core.socket = new WebSocket(core.url)
@@ -49,7 +49,7 @@ MetaFor("websocket")
       .success(({ update, data }) => update(data))
       .error(({ update, error }) => update({ error: error.message })),
 
-    connecting: process({ title: "Ожидание подключения WebSocket" })
+    подключение: process({ title: "Ожидание подключения WebSocket" })
       .action(
         ({ context, core }) =>
           new Promise((resolve, reject) => {
@@ -81,7 +81,7 @@ MetaFor("websocket")
       .success(({ update, data }) => update(data))
       .error(({ update, error }) => update({ error: error.message })),
 
-    connected: process({ title: "Мониторинг WebSocket соединения" })
+    подключен: process({ title: "Мониторинг WebSocket соединения" })
       .action(
         ({ core }) =>
           new Promise((_, reject) => {
@@ -109,7 +109,7 @@ MetaFor("websocket")
       )
       .error(({ update, error }) => update({ error: error.message })),
 
-    error: process({ title: "Переподключение к WebSocket" })
+    ошибка: process({ title: "Переподключение к WebSocket" })
       .action(
         ({ context, core }) =>
           new Promise((resolve, reject) => {
@@ -151,7 +151,7 @@ MetaFor("websocket")
             : nothing}
         </div>
         <span class="icon">
-          ${state === "connected" ? "🔗" : state === "connecting" ? "🔄" : state === "error" ? "❌" : "🔌"}
+          ${state === "подключен" ? "🔗" : state === "подключение" ? "🔄" : state === "ошибка" ? "❌" : "🔌"}
         </span>
       </div>
     `,
@@ -196,22 +196,22 @@ MetaFor("websocket")
         transition: all 0.3s ease;
       }
 
-      .status.connected {
+      .status.подключен {
         color: rgba(var(--success-400) / 0.95);
         text-shadow: 0 1px 2px rgba(var(--success-900) / 0.3);
       }
 
-      .status.connecting {
+      .status.подключение {
         color: rgba(var(--warning-400) / 0.95);
         text-shadow: 0 1px 2px rgba(var(--warning-900) / 0.3);
       }
 
-      .status.error {
+      .status.ошибка {
         color: rgba(var(--error-400) / 0.95);
         text-shadow: 0 1px 2px rgba(var(--error-900) / 0.3);
       }
 
-      .status.disconnected {
+      .status.отключен {
         color: rgba(var(--surface-400) / 0.7);
       }
 
