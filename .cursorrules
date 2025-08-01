@@ -51,6 +51,19 @@
     resolve({ success: true })
   }))
   ```
+- **ВАЖНО: Все процессы должны иметь обработчики success и error**
+- Используйте reject для ошибок, а не resolve({ success: false })
+- Обработчики обеспечивают полную обработку всех результатов Promise
+- **Предпочтительно передавать данные через action для обновления контекста:**
+  ```javascript
+  // Хорошо - данные передаются через action
+  .action(({ core }) => Promise.resolve("connected"))
+  .success(({ update, data }) => update({ status: data }))
+  
+  // Плохо - данные дублируются в success
+  .action(({ core }) => Promise.resolve())
+  .success(({ update }) => update({ status: "connected" }))
+  ```
 
 ### Реакции (Reactions)
 - Используйте специфичные фильтры для реакций

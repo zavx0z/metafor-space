@@ -44,7 +44,7 @@ MetaFor("websocket")
 
               core.socket.onopen = () => {
                 console.log("✅ WebSocket подключен")
-                resolve({ success: true })
+                resolve("connecting")
               }
 
               core.socket.onmessage = (/** @type {MessageEvent} */ event) => {
@@ -65,25 +65,32 @@ MetaFor("websocket")
             }
           })
       )
-      .success(({ update }) => update({ status: "connecting" }))
+      .success(({ update, data }) => update({ status: data }))
       .error(({ update, error }) => update({ status: "error", error: error.message })),
 
     connecting: process({ title: "Ожидание подключения WebSocket" })
       .action(
         ({ core }) =>
-          new Promise((resolve) => {
+          new Promise((resolve, reject) => {
             // Проверяем, что WebSocket действительно подключен
             if (core.socket && core.socket.readyState === WebSocket.OPEN) {
-              resolve({ success: true })
+              resolve("connected")
+            } else if (core.socket) {
+              // Ждем события onopen для подтверждения подключения
+              const originalOnOpen = core.socket.onopen
+              core.socket.onopen = (event) => {
+                // Восстанавливаем оригинальный обработчик
+                if (originalOnOpen && core.socket) originalOnOpen.call(core.socket, event)
+                resolve("connected")
+              }
             } else {
-              // Если WebSocket еще не готов, ждем немного
-              setTimeout(() => {
-                resolve({ success: true })
-              }, 100)
+              // Если WebSocket не создан, считаем это ошибкой
+              reject(new Error("WebSocket не создан"))
             }
           })
       )
-      .success(({ update }) => update({ status: "connected" })),
+      .success(({ update, data }) => update({ status: data }))
+      .error(({ update, error }) => update({ status: "error", error: error.message })),
 
     error: process({ title: "Переподключение к WebSocket" })
       .action(
@@ -91,7 +98,7 @@ MetaFor("websocket")
           new Promise((resolve, reject) => {
             if (context.reconnectAttempts >= core.maxReconnectAttempts) {
               console.log("💀 Достигнуто максимальное количество попыток переподключения. Сдаюсь.")
-              resolve({ success: false })
+              reject(new Error("Достигнуто максимальное количество попыток переподключения"))
               return
             }
 
@@ -102,13 +109,13 @@ MetaFor("websocket")
 
             core.reconnectTimer = setTimeout(() => {
               // Здесь нужно будет обновить через другой механизм
-              resolve({ success: true, attempts, delay })
+              resolve({ status: "connecting", attempts })
             }, delay)
           })
       )
       .success(({ update, data }) =>
         update({
-          status: "connecting",
+          status: data.status,
           reconnectAttempts: data.attempts || 0,
         })
       ),
