@@ -20,7 +20,8 @@
     "cSpell.words": [
         "Валидируйте",
         "инкапсулированных",
-        "коммита"
+        "коммита",
+        "Segoe"
     ],
     "markdownlint.lintWorkspaceGlobs": [
         "!**/node_modules/**/*.md",

@@ -67,16 +67,25 @@ MetaFor("websocket")
       )
       .success(({ update }) => {
         update({ status: "connecting" })
-        // Автоматически запускаем процесс подключения
-        setTimeout(() => {
-          update({ status: "connected" })
-        }, 100)
       })
-      .error(({ update, error }) => {
-        update({
-          status: "error",
-          error: error.message,
+      .error(({ update, error }) => update({ status: "error", error: error.message })),
+
+    connecting: process({ title: "Ожидание подключения WebSocket" })
+      .action(({ core }) => {
+        return new Promise((resolve) => {
+          // Проверяем, что WebSocket действительно подключен
+          if (core.socket && core.socket.readyState === WebSocket.OPEN) {
+            resolve({ success: true })
+          } else {
+            // Если WebSocket еще не готов, ждем немного
+            setTimeout(() => {
+              resolve({ success: true })
+            }, 100)
+          }
         })
+      })
+      .success(({ update }) => {
+        update({ status: "connected" })
       }),
 
     error: process({ title: "Переподключение к WebSocket" })
@@ -104,16 +113,12 @@ MetaFor("websocket")
           status: "connecting",
           reconnectAttempts: data.attempts || 0,
         })
-        // Автоматически пытаемся подключиться после задержки
-        setTimeout(() => {
-          update({ status: "connected" })
-        }, data.delay || 1000)
       }),
   }))
   .reactions(() => [])
   .view({
     render: ({ html, context }) => html`
-      <div class="websocket-status">
+      <div class="websocket-status ${context.status}">
         <div class="status-info">
           <span class="status ${context.status}">${context.status}</span>
           ${context.error ? html`<span class="error">${context.error}</span>` : ""}
@@ -133,52 +138,109 @@ MetaFor("websocket")
     style: ({ css }) => css`
       .websocket-status {
         position: fixed;
-        top: 10px;
-        right: 10px;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-family: monospace;
+        top: 20px;
+        right: 20px;
+        background: rgba(var(--surface-800) / 0.8);
+        backdrop-filter: blur(22px);
+        border: 1px solid rgba(var(--surface-400) / 0.4);
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-size: 14px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         z-index: 1000;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 150px;
+        min-width: 180px;
+        box-shadow: 0 8px 32px rgba(var(--surface-900) / 0.6), 0 2px 8px rgba(var(--surface-900) / 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .websocket-status:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 48px rgba(var(--surface-900) / 0.5), 0 4px 16px rgba(var(--surface-900) / 0.3);
+        border-color: rgba(var(--primary-400) / 0.5);
       }
 
       .status-info {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 4px;
+        flex: 1;
+      }
+
+      .status {
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        text-transform: capitalize;
+        transition: all 0.3s ease;
       }
 
       .status.connected {
-        color: #4ade80;
+        color: rgba(var(--success-400) / 0.95);
+        text-shadow: 0 1px 2px rgba(var(--success-900) / 0.3);
       }
+
       .status.connecting {
-        color: #fbbf24;
+        color: rgba(var(--warning-400) / 0.95);
+        text-shadow: 0 1px 2px rgba(var(--warning-900) / 0.3);
       }
+
       .status.error {
-        color: #f87171;
+        color: rgba(var(--error-400) / 0.95);
+        text-shadow: 0 1px 2px rgba(var(--error-900) / 0.3);
       }
+
       .status.disconnected {
-        color: #9ca3af;
+        color: rgba(var(--surface-300) / 0.8);
+        text-shadow: 0 1px 2px rgba(var(--surface-900) / 0.3);
       }
 
       .error {
-        color: #f87171;
-        font-size: 10px;
+        color: rgba(var(--error-300) / 0.8);
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        line-height: 1.3;
       }
 
       .attempts {
-        color: #9ca3af;
-        font-size: 10px;
+        color: rgba(var(--surface-400) / 0.7);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
       }
 
       .icon {
-        font-size: 16px;
+        font-size: 20px;
+        margin-left: 12px;
+        filter: drop-shadow(0 2px 4px rgba(var(--surface-900) / 0.3));
+        transition: all 0.3s ease;
+      }
+
+      .websocket-status.connected .icon {
+        filter: drop-shadow(0 2px 8px rgba(var(--success-500) / 0.4));
+      }
+
+      .websocket-status.connecting .icon {
+        filter: drop-shadow(0 2px 8px rgba(var(--warning-500) / 0.4));
+        animation: pulse 2s infinite;
+      }
+
+      .websocket-status.error .icon {
+        filter: drop-shadow(0 2px 8px rgba(var(--error-500) / 0.4));
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.1);
+        }
       }
     `,
   })
