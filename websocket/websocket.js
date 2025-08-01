@@ -1,29 +1,30 @@
 import { MetaFor } from "../web/metafor.js"
-import { createWebSocket, waitForConnection, reconnectWebSocket } from "./websocket.actions.js"
+import { log } from "../web/debug/console.js"
 
 MetaFor("websocket")
   .context((t) => ({
-    status: t.enum("disconnected", "connecting", "connected", "error").required("disconnected")({
-      title: "Статус соединения",
-    }),
+    timeStampConnecting: t.number.optional()({ title: "Время начала подключения" }),
+    timeStampConnected: t.number.optional()({ title: "Время подключения" }),
+    timeStampDisconnected: t.number.optional()({ title: "Время отключения" }),
     reconnectAttempts: t.number.required(0)({ title: "Количество попыток переподключения" }),
+    reconnectDelay: t.number.required(1000)({ title: "Базовая задержка переподключения" }),
     error: t.string.optional()({ title: "Ошибка соединения" }),
   }))
   .states({
     disconnected: {
-      connecting: { status: "connecting" },
+      connecting: { timeStampConnecting: { null: false }, error: { null: true } },
     },
     connecting: {
-      connected: { status: "connected" },
-      error: { status: "error" },
+      connected: { timeStampConnected: { null: false } },
+      error: { error: { null: false } },
     },
     connected: {
-      disconnected: { status: "disconnected" },
-      error: { status: "error" },
+      disconnected: { timeStampDisconnected: { null: false } },
+      error: { error: { null: false } },
     },
     error: {
-      connecting: { status: "connecting" },
-      disconnected: { status: "disconnected" },
+      connecting: { timeStampConnecting: { null: false } },
+      disconnected: { error: { null: true } },
     },
   })
   .core(
@@ -31,62 +32,126 @@ MetaFor("websocket")
       socket: null,
       url: "ws://localhost:3000",
       maxReconnectAttempts: 5,
-      reconnectDelay: 1000,
       reconnectTimer: null,
     })
   )
   .processes((process) => ({
     disconnected: process({ title: "Подключение к WebSocket" })
       .action(async ({ core }) => {
-        const result = await createWebSocket(core.url)
-        core.socket = result.socket
-        return /**@type{"connecting"}*/ ("connecting")
+        try {
+          core.socket = new WebSocket(core.url)
+          return { timeStampConnecting: new Date().getTime() }
+        } catch (error) {
+          console.log("🚨 Не удалось создать WebSocket:", error)
+          throw error
+        }
       })
-      .success(({ update, data }) => update({ status: data }))
-      .error(({ update, error }) => update({ status: "error", error: error.message })),
+      .success(({ update, data }) => update(data))
+      .error(({ update, error }) => update({ error: error.message })),
 
     connecting: process({ title: "Ожидание подключения WebSocket" })
-      .action(async ({ core }) => {
-        const result = await waitForConnection(core.socket)
-        return result
-      })
-      .success(({ update, data }) => update({ status: data }))
-      .error(({ update, error }) => update({ status: "error", error: error.message })),
+      .action(
+        ({ context, core }) =>
+          new Promise((resolve, reject) => {
+            if (core.socket && core.socket.readyState === WebSocket.OPEN) {
+              resolve({ timeStampConnected: new Date().getTime() })
+            } else if (core.socket) {
+              // Вычисляем таймаут на основе количества попыток
+              const attempts = context.reconnectAttempts || 0
+              const timeout = context.reconnectDelay * (attempts + 1)
+
+              const timeoutId = setTimeout(() => {
+                reject(new Error(`Таймаут подключения WebSocket (${timeout}ms)`))
+              }, timeout)
+
+              // Ждем события onopen для подтверждения подключения
+              const originalOnOpen = core.socket.onopen
+              core.socket.onopen = (event) => {
+                clearTimeout(timeoutId)
+                // Восстанавливаем оригинальный обработчик
+                if (originalOnOpen && core.socket) originalOnOpen.call(core.socket, event)
+                resolve({ timeStampConnected: new Date().getTime() })
+              }
+            } else {
+              // Если WebSocket не создан, считаем это ошибкой
+              reject(new Error("WebSocket не создан"))
+            }
+          })
+      )
+      .success(({ update, data }) => update(data))
+      .error(({ update, error }) => update({ error: error.message })),
+
+    connected: process({ title: "Мониторинг WebSocket соединения" })
+      .action(
+        ({ core }) =>
+          new Promise((_, reject) => {
+            if (!core.socket) return reject(new Error("Нет WebSocket соединения в состоянии connected"))
+
+            // Настраиваем обработчики событий WebSocket
+            core.socket.onopen = () => {
+              console.log("✅ WebSocket подключен")
+            }
+
+            core.socket.onmessage = (/** @type {MessageEvent} */ event) => {
+              log(JSON.parse(event.data))
+            }
+
+            core.socket.onclose = (/** @type {CloseEvent} */ event) => {
+              console.log("🔌 WebSocket соединение закрыто:", event.code, event.reason)
+              reject(new Error("WebSocket соединение закрыто"))
+            }
+
+            core.socket.onerror = (/** @type {Event} */ error) => {
+              console.log("❌ Ошибка WebSocket соединения:", error)
+              reject(error)
+            }
+          })
+      )
+      .error(({ update, error }) => update({ error: error.message })),
 
     error: process({ title: "Переподключение к WebSocket" })
-      .action(async ({ context, core }) => {
-        const result = await reconnectWebSocket(
-          context.reconnectAttempts,
-          core.maxReconnectAttempts,
-          core.reconnectDelay
-        )
-        return result
-      })
+      .action(
+        ({ context, core }) =>
+          new Promise((resolve, reject) => {
+            if (context.reconnectAttempts >= core.maxReconnectAttempts) {
+              console.log("💀 Достигнуто максимальное количество попыток переподключения. Сдаюсь.")
+              reject(new Error("Достигнуто максимальное количество попыток переподключения"))
+              return
+            }
+
+            const attempts = context.reconnectAttempts + 1
+            const delay = context.reconnectDelay * attempts
+
+            console.log(`🔄 Переподключение... (попытка ${attempts}/${core.maxReconnectAttempts})`)
+
+            setTimeout(() => {
+              resolve({ timeStampConnecting: new Date().getTime(), attempts })
+            }, delay)
+          })
+      )
       .success(({ update, data }) =>
         update({
-          status: data.status,
+          timeStampConnecting: data.timeStampConnecting,
+          timeStampConnected: null,
+          timeStampDisconnected: null,
           reconnectAttempts: data.attempts || 0,
         })
       )
-      .error(({ update, error }) => update({ status: "error", error: error.message })),
+      .error(({ update, error }) => update({ timeStampConnecting: null, error: error.message })),
   }))
   .reactions(() => [])
   .view({
-    render: ({ html, context }) => html`
+    render: ({ html, context, state, core, nothing }) => html`
       <div class="websocket-status">
         <div class="status-info">
-          <span class="status ${context.status}">${context.status}</span>
+          <span class="status ${state}">${state}</span>
           ${context.error ? html`<span class="error">${context.error}</span>` : ""}
-          ${context.reconnectAttempts > 0 ? html`<span class="attempts">(${context.reconnectAttempts})</span>` : ""}
+          ${context.reconnectAttempts > 0
+            ? html`<span class="attempts">(${context.reconnectAttempts})</span>`
+            : nothing}
         </div>
         <span class="icon">
-          ${context.status === "connected"
-            ? "🔗"
-            : context.status === "connecting"
-            ? "🔄"
-            : context.status === "error"
-            ? "❌"
-            : "🔌"}
+          ${state === "connected" ? "🔗" : state === "connecting" ? "🔄" : state === "error" ? "❌" : "🔌"}
         </span>
       </div>
     `,

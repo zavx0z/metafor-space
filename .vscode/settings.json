@@ -27,6 +27,6 @@
     "markdownlint.lintWorkspaceGlobs": [
         "!**/node_modules/**/*.md",
         "!**/docs/**/*.md",
-        "!**/.cursor/**/*.mdc"
+        "!.cursor/rules/*.mdc"
     ]
 }
