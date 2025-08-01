@@ -24,6 +24,31 @@
 - Сложные объекты и структуры данных храните в core
 - Core доступен во всех процессах и реакциях
 - Используйте простые свойства для хранения данных
+- **Core может быть определен как объект или как функция с ref:**
+  ```javascript
+  // Простой объект (если не нужны ссылки на DOM элементы)
+  .core(
+    /**@type import("./websocket.t").WebSocketCore*/ ({
+      socket: null,
+      url: "ws://localhost:3000",
+      maxReconnectAttempts: 5,
+      reconnectDelay: 1000,
+      reconnectTimer: null,
+    })
+  )
+  
+  // Функция с ref (если нужны ссылки на DOM элементы)
+  .core(
+    /**@type import("./websocket.t").WebSocketCore*/ ((ref) => ({
+      socket: null,
+      url: "ws://localhost:3000",
+      maxReconnectAttempts: 5,
+      reconnectDelay: 1000,
+      reconnectTimer: null,
+      button: ref()
+    }))
+  )
+  ```
 
 ### Состояния (States)
 - Перечисляйте ВСЕ состояния в массивах реакций, не используйте ["*"]

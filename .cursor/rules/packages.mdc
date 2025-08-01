@@ -16,7 +16,7 @@ alwaysApply: true
 module-name/
 ├── {tag-name}.js              # Основной файл актора (обязательный)
 ├── {tag-name}.actions.js      # Выделенные действия (опционально)
-├── {tag-name}.spec.ts         # Тесты актора (обязательный)
+├── {tag-name}.spec.ts         # Тесты актора (обязательный, если есть возможность и смысл)
 ├── {tag-name}.t.ts           # TypeScript типы (опционально)
 ├── {tag-name}.fixture.ts     # Тестовые данные (опционально)
 └── {tag-name}.html           # HTML шаблоны (опционально)
@@ -72,10 +72,25 @@ export default MetaFor("graph-layout")
 /**
  * Типы для актора graph-layout
  */
-export interface LayoutConfig {
+
+// Типы для core (обязательно, если core определен)
+export interface LayoutCore {
+  /** Конфигурация компоновки */
+  config: LayoutConfig | null
+  /** Алгоритм компоновки */
   algorithm: "elk" | "dagre" | "force"
+  /** Расстояние между элементами */
   spacing: number
+  /** Направление компоновки */
   direction: "TB" | "LR" | "BT" | "RL"
+}
+
+// Типы для actions (если необходимо)
+export interface LayoutResult {
+  /** Узлы с позициями */
+  nodes: Array<{ id: string; x: number; y: number }>
+  /** Рёбра с источниками и целями */
+  edges: Array<{ id: string; source: string; target: string }>
 }
 ```
 
@@ -264,7 +279,7 @@ nodes/meta/
 
 1. **Модульность** - каждый актор автономен
 2. **Типизация** - обязательные TypeScript типы
-3. **Тестируемость** - каждый актор имеет тесты
+3. **Тестируемость** - каждый актор имеет тесты (если есть возможность и смысл)
 4. **Читаемость** - понятное именование файлов
 5. **IDE поддержка** - группировка связанных файлов
 6. **Переиспользование** - выделение действий в отдельные файлы

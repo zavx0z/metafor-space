@@ -21,10 +21,12 @@
         "Валидируйте",
         "инкапсулированных",
         "коммита",
+        "конфигов",
         "Segoe"
     ],
     "markdownlint.lintWorkspaceGlobs": [
         "!**/node_modules/**/*.md",
-        "!**/docs/**/*.md"
+        "!**/docs/**/*.md",
+        "!**/.cursor/**/*.mdc"
     ]
 }
