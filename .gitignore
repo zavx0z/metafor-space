@@ -6,8 +6,5 @@ __snapshots__
 .DS_Store
 public
 
-server/metafor.d.ts
-server/metafor.js
-web/debug
-web/metafor.d.ts
-web/metafor.js
+server/
+web/

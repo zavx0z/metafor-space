@@ -38,10 +38,7 @@
     ".vscode/**/*",
     "assets/**/*",
     "fixtures/browser/index.html",
-    "server/metafor.d.ts",
-    "server/metafor.js",
-    "web/debug",
-    "web/metafor.d.ts",
-    "web/metafor.js"
+    "server/**/*",
+    "web/**/*"
   ]
 }

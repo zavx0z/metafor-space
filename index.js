@@ -1,4 +1,4 @@
-import { log } from "./web/debug/console.js"
+import { log } from "./web/console.js"
 const channel = new BroadcastChannel("channel")
 channel.onmessage = (/** @type {MessageEvent} */ event) => {
   log(event.data)

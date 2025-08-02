@@ -1,5 +1,5 @@
 import { MetaFor } from "../web/metafor.js"
-import { log } from "../web/debug/console.js"
+import { log } from "../web/console.js"
 
 MetaFor("websocket")
   .context((t) => ({

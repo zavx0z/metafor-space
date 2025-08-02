@@ -9,9 +9,20 @@
         "**/*.crswap": true,
         "**/node_modules": true,
         "**/__pycache__": true,
-        ".venv": true
+        ".venv": true,
+        ".cursor": true,
+        ".firebase": true,
+        ".github": true,
+        ".idea": true,
+        ".vscode": true
     },
-    "hide-files.files": [],
+    "hide-files.files": [
+        ".cursor",
+        ".firebase",
+        ".github",
+        ".idea",
+        ".vscode"
+    ],
     "cSpell.ignorePaths": [
         ".github",
         "./script",

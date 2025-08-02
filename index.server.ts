@@ -1,7 +1,7 @@
-import { getMimeType } from "./fixtures/browser/static.ts"
+import { getMimeType } from "./fixtures/browser/static"
 import { join } from "node:path"
-import { log } from "./server/debug.ts"
-import type { Message } from "./server/metafor.d.ts"
+import { log } from "./server/console"
+import type { Message } from "./server/metafor.d"
 
 const channel = new BroadcastChannel("channel")
 channel.addEventListener("message", log)
