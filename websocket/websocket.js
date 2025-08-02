@@ -6,79 +6,60 @@ MetaFor("websocket")
     timeStampConnecting: t.number.optional()({ title: "Время начала подключения" }),
     timeStampConnected: t.number.optional()({ title: "Время подключения" }),
     timeStampDisconnected: t.number.optional()({ title: "Время отключения" }),
-    reconnectAttempts: t.number.required(0)({ title: "Количество попыток переподключения" }),
+    maxAttempts: t.number.required(5)({ title: "Максимальное количество попыток переподключения" }),
+    remainingAttempts: t.number.required(0)({ title: "Оставшиеся попытки переподключения" }),
     reconnectDelay: t.number.required(1000)({ title: "Базовая задержка переподключения" }),
+    reconnectDelayMultiplier: t.number.required(1.5)({ title: "Множитель задержки переподключения" }),
     error: t.string.optional()({ title: "Ошибка соединения" }),
   }))
   .states({
     отключен: {
-      подключение: { timeStampConnecting: { null: false }, error: { null: true } },
+      подключение: { remainingAttempts: { gt: 0 } },
     },
     подключение: {
-      подключен: { timeStampConnected: { null: false } },
+      подключен: { remainingAttempts: { gt: 0 } },
       ошибка: { error: { null: false } },
     },
     подключен: {
-      отключен: { timeStampDisconnected: { null: false } },
       ошибка: { error: { null: false } },
     },
     ошибка: {
+      ожидание: { remainingAttempts: { gt: 0 } },
+      отключен: { remainingAttempts: { eq: 0 } },
+    },
+    ожидание: {
       подключение: { timeStampConnecting: { null: false } },
-      отключен: { error: { null: true } },
     },
   })
   .core(
     /**@type import("./websocket.t").WebSocketCore*/ ({
       socket: null,
       url: "ws://localhost:3000",
-      maxReconnectAttempts: 5,
-      reconnectTimer: null,
     })
   )
   .processes((process) => ({
     отключен: process({ title: "Подключение к WebSocket" })
-      .action(async ({ core }) => {
-        try {
-          core.socket = new WebSocket(core.url)
-          return { timeStampConnecting: new Date().getTime() }
-        } catch (error) {
-          console.log("🚨 Не удалось создать WebSocket:", error)
-          throw error
-        }
+      .action(({ core, context }) => {
+        core.socket = null
+        if (!context.remainingAttempts) return { remainingAttempts: context.maxAttempts }
       })
-      .success(({ update, data }) => update(data))
+      .success(({ update, data }) => update({ error: null, ...data }))
       .error(({ update, error }) => update({ error: error.message })),
-
-    подключение: process({ title: "Ожидание подключения WebSocket" })
+    подключение: process({ title: "Установка соединения WebSocket" })
       .action(
-        ({ context, core }) =>
+        /** @returns {Promise<{timeStampConnected: number, remainingAttempts: number}>} */
+        ({ core, context }) =>
           new Promise((resolve, reject) => {
-            if (core.socket && core.socket.readyState === WebSocket.OPEN) {
-              resolve({ timeStampConnected: new Date().getTime() })
-            } else if (core.socket) {
-              // Вычисляем таймаут на основе количества попыток
-              const attempts = context.reconnectAttempts || 0
-              const timeout = context.reconnectDelay * (attempts + 1)
-
-              const timeoutId = setTimeout(() => {
-                reject(new Error(`Таймаут подключения WebSocket (${timeout}ms)`))
-              }, timeout)
-
-              // Ждем события onopen для подтверждения подключения
-              const originalOnOpen = core.socket.onopen
-              core.socket.onopen = (event) => {
-                clearTimeout(timeoutId)
-                // Восстанавливаем оригинальный обработчик
-                if (originalOnOpen && core.socket) originalOnOpen.call(core.socket, event)
-                resolve({ timeStampConnected: new Date().getTime() })
-              }
-            } else {
-              // Если WebSocket не создан, считаем это ошибкой
-              reject(new Error("WebSocket не создан"))
-            }
+            core.socket = new WebSocket(core.url)
+            core.socket.onclose = () => reject(new Error("WebSocket соединение закрыто"))
+            core.socket.onerror = () => reject(new Error("WebSocket ошибка соединения"))
+            core.socket.onopen = () =>
+              resolve({ timeStampConnected: new Date().getTime(), remainingAttempts: context.maxAttempts })
           })
       )
-      .success(({ update, data }) => update(data))
+      .success(({ update, data }) =>
+        update({ timeStampConnected: data.timeStampConnected, remainingAttempts: data.remainingAttempts })
+      )
       .error(({ update, error }) => update({ error: error.message })),
 
     подключен: process({ title: "Мониторинг WebSocket соединения" })
@@ -86,46 +67,31 @@ MetaFor("websocket")
         ({ core }) =>
           new Promise((_, reject) => {
             if (!core.socket) return reject(new Error("Нет WebSocket соединения в состоянии connected"))
-
-            // Настраиваем обработчики событий WebSocket
-            core.socket.onopen = () => {
-              console.log("✅ WebSocket подключен")
-            }
-
             core.socket.onmessage = (/** @type {MessageEvent} */ event) => {
               log(JSON.parse(event.data))
             }
-
             core.socket.onclose = (/** @type {CloseEvent} */ event) => {
               console.log("🔌 WebSocket соединение закрыто:", event.code, event.reason)
-              reject(new Error("WebSocket соединение закрыто"))
+              return reject(new Error("WebSocket соединение закрыто"))
             }
-
             core.socket.onerror = (/** @type {Event} */ error) => {
               console.log("❌ Ошибка WebSocket соединения:", error)
-              reject(error)
+              return reject(error)
             }
           })
       )
       .error(({ update, error }) => update({ error: error.message })),
 
-    ошибка: process({ title: "Переподключение к WebSocket" })
+    ожидание: process({ title: "Ожидание переподключения к WebSocket" })
       .action(
-        ({ context, core }) =>
-          new Promise((resolve, reject) => {
-            if (context.reconnectAttempts >= core.maxReconnectAttempts) {
-              console.log("💀 Достигнуто максимальное количество попыток переподключения. Сдаюсь.")
-              reject(new Error("Достигнуто максимальное количество попыток переподключения"))
-              return
-            }
-
-            const attempts = context.reconnectAttempts + 1
-            const delay = context.reconnectDelay * attempts
-
-            console.log(`🔄 Переподключение... (попытка ${attempts}/${core.maxReconnectAttempts})`)
-
+        ({ context }) =>
+          new Promise((resolve) => {
+            const remainingAttempts = context.remainingAttempts - 1
+            const delay =
+              context.reconnectDelay *
+              Math.pow(context.reconnectDelayMultiplier, context.maxAttempts - remainingAttempts)
             setTimeout(() => {
-              resolve({ timeStampConnecting: new Date().getTime(), attempts })
+              resolve({ timeStampConnecting: new Date().getTime(), remainingAttempts })
             }, delay)
           })
       )
@@ -134,24 +100,36 @@ MetaFor("websocket")
           timeStampConnecting: data.timeStampConnecting,
           timeStampConnected: null,
           timeStampDisconnected: null,
-          reconnectAttempts: data.attempts || 0,
+          error: null,
+          remainingAttempts: data.remainingAttempts,
         })
       )
       .error(({ update, error }) => update({ timeStampConnecting: null, error: error.message })),
   }))
   .reactions(() => [])
   .view({
-    render: ({ html, context, state, core, nothing }) => html`
+    render: ({ html, context, state, nothing }) => html`
       <div class="websocket-status">
         <div class="status-info">
           <span class="status ${state}">${state}</span>
-          ${context.error ? html`<span class="error">${context.error}</span>` : ""}
-          ${context.reconnectAttempts > 0
-            ? html`<span class="attempts">(${context.reconnectAttempts})</span>`
+          ${context.error ? html`<span class="error">${context.error}</span>` : nothing}
+          ${context.remainingAttempts !== null && context.remainingAttempts < 5
+            ? html`<span class="attempts">(${5 - context.remainingAttempts})</span>`
+            : nothing}
+          ${context.remainingAttempts !== null && context.remainingAttempts > 0 && context.remainingAttempts < 5
+            ? html`<span class="remaining">осталось: ${context.remainingAttempts}</span>`
             : nothing}
         </div>
         <span class="icon">
-          ${state === "подключен" ? "🔗" : state === "подключение" ? "🔄" : state === "ошибка" ? "❌" : "🔌"}
+          ${state === "подключен"
+            ? "🔗"
+            : state === "подключение"
+            ? "🔄"
+            : state === "ошибка"
+            ? "❌"
+            : state === "ожидание"
+            ? "⏳"
+            : "🔌"}
         </span>
       </div>
     `,
@@ -215,6 +193,11 @@ MetaFor("websocket")
         color: rgba(var(--surface-400) / 0.7);
       }
 
+      .status.ожидание {
+        color: rgba(var(--warning-400) / 0.95);
+        text-shadow: 0 1px 2px rgba(var(--warning-900) / 0.3);
+      }
+
       .error {
         color: rgba(var(--error-400) / 0.8);
         font-size: 12px;
@@ -223,6 +206,12 @@ MetaFor("websocket")
 
       .attempts {
         color: rgba(var(--surface-400) / 0.6);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .remaining {
+        color: rgba(var(--warning-400) / 0.8);
         font-size: 12px;
         font-weight: 500;
       }

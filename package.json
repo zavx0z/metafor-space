@@ -20,7 +20,7 @@
     "serve": "bun --hot index.server.ts",
     "upd": "bun update --latest && bun i",
     "run": "bun index.server.ts",
-    "metafor:build:dev": "bun run metafor:server:build:dev && bun run metafor:server:typegen && bun run metafor:web:build:dev && bun run metafor:web:typegen",
+    "metafor:build:dev": "bun run metafor:server:build:dev && bun run metafor:web:build:dev && bun run metafor:web:typegen && bun run metafor:server:typegen",
     "metafor:build:prod": "bun run metafor:server:build:prod && bun run metafor:server:typegen && bun run metafor:web:build:prod && bun run metafor:web:typegen",
     "metafor:server:build:dev": "cd ../metafor && bun run server:build:dev && cp -r dist/server ../space/",
     "metafor:server:build:prod": "cd ../metafor && bun run server:build:prod && cp -r dist/server ../space/",
