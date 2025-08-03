@@ -41,7 +41,7 @@ MetaFor("websocket")
     отключен: process({ title: "Подключение к WebSocket" })
       .action(({ core, context }) => {
         core.socket = null
-        if (!context.remainingAttempts) return { remainingAttempts: context.maxAttempts }
+        return { remainingAttempts: context.remainingAttempts || context.maxAttempts }
       })
       .success(({ update, data }) => update({ error: null, ...data }))
       .error(({ update, error }) => update({ error: error.message })),
@@ -152,6 +152,7 @@ MetaFor("websocket")
         min-width: 180px;
         box-shadow: 0 8px 32px rgba(var(--surface-900) / 0.6), 0 2px 8px rgba(var(--surface-900) / 0.3);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
       }
 
       .websocket-status:hover {

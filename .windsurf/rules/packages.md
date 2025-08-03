@@ -1,0 +1,338 @@
+---
+trigger: always_on
+description:
+globs:
+---
+
+Все скрипты проекта MetaFor запускаются из корневой директории с помощью bun run, при этом код написан на VanillaJS без сборщиков и может выполняться стандартными средствами любой IDE через встроенные возможности запуска статического сервера в браузере.
+
+# Структура модулей MetaFor
+
+## Принципы организации
+
+Модуль MetaFor - это коллекция связанных акторов в рамках одной предметной области. Все акторы модуля располагаются в одной директории и именуются по тегу.
+
+## Структура модуля
+
+```
+module-name/
+├── {tag-name}.js              # Основной файл актора (обязательный)
+├── {tag-name}.actions.js      # Выделенные действия (опционально)
+├── {tag-name}.spec.ts         # Тесты актора (обязательный, если есть возможность и смысл)
+├── {tag-name}.t.ts           # TypeScript типы (опционально)
+├── {tag-name}.fixture.ts     # Тестовые данные (опционально)
+└── {tag-name}.html           # HTML шаблоны (опционально)
+```
+
+## Именование тегов акторов
+
+Для модуля с именем `graph` теги акторов формируются по шаблону:
+
+```
+{module-name}-{feature}
+```
+
+**Примеры:**
+
+- `graph-layout` - управление компоновкой графа
+- `graph-nodes` - управление узлами графа
+- `graph-meta` - нода-актор графа
+- `graph-edges` - управление рёбрами графа
+- `graph-viewport` - управление областью просмотра
+
+## Обязательные файлы актора
+
+### 1. `{tag-name}.js` - основной файл актора
+
+```javascript
+import { MetaFor } from "../metafor.js"
+import "./{related-actors}.js" // Импорт связанных акторов
+
+export default MetaFor("graph-layout")
+  .context((t) => ({
+    nodes: t.array.required([]),
+    width: t.number.optional(),
+    height: t.number.optional(),
+  }))
+  .core({
+    config: /**@type{import("{tag-name}.t.ts").LayoutConfig|null}*/ null,
+  })
+  .states()
+  .processes()
+  .reactions()
+  .view({
+    render: ({ html, context }) => html` <!-- UI представление --> `,
+    style: ({ css }) => css`
+      /* стили */
+    `,
+  })
+```
+
+### 2. `{tag-name}.t.ts` - определения TypeScript типов
+
+```typescript
+/**
+ * Типы для актора graph-layout
+ */
+
+// Типы для core (обязательно, если core определен)
+export interface LayoutCore {
+  /** Конфигурация компоновки */
+  config: LayoutConfig | null
+  /** Алгоритм компоновки */
+  algorithm: "elk" | "dagre" | "force"
+  /** Расстояние между элементами */
+  spacing: number
+  /** Направление компоновки */
+  direction: "TB" | "LR" | "BT" | "RL"
+}
+
+// Типы для actions (если необходимо)
+export interface LayoutResult {
+  /** Узлы с позициями */
+  nodes: Array<{ id: string; x: number; y: number }>
+  /** Рёбра с источниками и целями */
+  edges: Array<{ id: string; source: string; target: string }>
+}
+```
+
+### 3. `{tag-name}.spec.ts` - тесты актора
+
+```typescript
+import { describe, expect, test } from "bun:test"
+import { MetaFor } from "../metafor.js"
+
+describe("graph-layout актор", () => {
+  const tag = Bun.randomUUIDv7()
+  document.body.innerHTML = `<metafor-${tag}></metafor-${tag}>`
+
+  test("создание актора", () => {
+    // Тесты инициализации
+  })
+
+  test("переходы состояний", () => {
+    // Тесты логики
+  })
+
+  test("реакции на события", () => {
+    // Тесты взаимодействия
+  })
+})
+```
+
+## Опциональные файлы актора
+
+### 4. `{tag-name}.actions.js` - выделенные действия
+
+```javascript
+/**
+ * Сложные действия для актора graph-layout
+ * Выносятся в отдельный файл для переиспользования
+ */
+
+/** @type {import("./graph-layout.t").calculateLayout} */
+export function calculateLayout(nodes, edges, config) {
+  // Алгоритм компоновки
+  return layoutResult
+}
+
+/** @type {import("./graph-layout.t").optimizePositions} */
+export function optimizePositions(layout) {
+  // Оптимизация позиций
+  return optimizedLayout
+}
+```
+
+### 5. `{tag-name}.fixture.ts` - тестовые данные
+
+```typescript
+import type { LayoutConfig, NodeMetrics } from "./graph-layout.t"
+
+export const mockNodes: NodeMetrics[] = [
+  { id: "node1", width: 100, height: 50 },
+  { id: "node2", width: 120, height: 60 },
+]
+
+export const defaultConfig: LayoutConfig = {
+  algorithm: "elk",
+  spacing: 20,
+  direction: "TB",
+}
+```
+
+### 7. `{tag-name}.html` - HTML для примера использования
+
+```html
+<div class="node">
+  <header class="node-header">
+    <slot name="title"></slot>
+  </header>
+  <main class="node-content">
+    <slot></slot>
+  </main>
+</div>
+```
+
+## Пример полной структуры модуля `graph`
+
+```
+graph/
+├── graph-layout.js              # Основной актор компоновки
+├── graph-layout.actions.js      # Алгоритмы компоновки
+├── graph-layout.spec.ts         # Тесты компоновки
+├── graph-layout.t.ts           # Типы компоновки
+├── graph-layout.fixture.ts     # Тестовые данные
+├── graph-nodes.js              # Управление узлами
+├── graph-nodes.spec.ts
+├── graph-nodes.t.ts
+├── graph-edges.js              # Управление рёбрами
+├── graph-edges.spec.ts
+├── graph-edges.t.ts
+├── graph-meta.js               # Мета-информация
+├── graph-meta.spec.ts
+├── graph-meta.t.ts
+├── graph-viewport.js           # Область просмотра
+├── graph-viewport.spec.ts
+└── graph-viewport.t.ts
+```
+
+## Группировка в IDE
+
+IDE автоматически сворачивает связанные файлы под основной `.js` файл через настройки группировки:
+
+### VSCode настройки
+
+```json
+{
+  "explorer.fileNesting.patterns": {
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.spec.ts, ${capture}.t.ts, ${capture}.html, ${capture}.layout.json, ${capture}.fixture.ts, ${capture}.actions.js"
+  }
+}
+```
+
+### IntelliJ IDEA настройки
+
+```
+-compiled.js; -compiled.js.map; .actions.js; .d.ts; .dev.js; .fixture.ts; .html; .js.map; .layout.json; .map; .min.js; .min.js.map; .spec.ts; .t.ts; layout.json
+```
+
+### Результат группировки
+
+```
+📁 graph/
+├── 📄 graph-layout.js          (основной файл)
+│   ├── 🔧 graph-layout.actions.js   (действия)
+│   ├── 🧪 graph-layout.spec.ts      (тесты)
+│   ├── 📝 graph-layout.t.ts         (типы)
+│   ├── 📊 graph-layout.fixture.ts   (фикстуры)
+│   └── ⚙️ graph-layout.layout.json  (конфигурация)
+├── 📄 graph-nodes.js
+│   ├── 🧪 graph-nodes.spec.ts
+│   └── 📝 graph-nodes.t.ts
+└── 📄 graph-edges.js
+    ├── 🧪 graph-edges.spec.ts
+    └── 📝 graph-edges.t.ts
+```
+
+## Использование модуля
+
+```javascript
+// Импорт всех акторов модуля
+import "./graph/graph-layout.js"
+import "./graph/graph-nodes.js"
+import "./graph/graph-edges.js"
+
+// Или импорт конкретного актора
+import "./graph/graph-layout.js"
+
+// Использование в HTML
+document.body.innerHTML = `
+  <metafor-graph-layout>
+    <metafor-graph-nodes></metafor-graph-nodes>
+    <metafor-graph-edges></metafor-graph-edges>
+  </metafor-graph-layout>
+`
+```
+
+## Существующие модули
+
+### nodes/meta
+
+```
+nodes/meta/
+├── graph-meta.js               # Основной мета-компонент
+├── node-meta.spec.ts
+├── node-meta.t.ts
+├── graph-layout.js             # Компоновка узлов
+├── node-layout.actions.js     # Алгоритмы компоновки
+├── node-layout.spec.ts
+├── node-layout.t.ts
+├── node-layout.fixture.ts
+├── node-meta-state.js         # Состояния узлов
+├── node-meta-state.spec.ts
+├── node-meta-state.t.ts
+├── graph-condition.js     # Условия переходов
+├── graph-condition.spec.ts
+├── node-meta-condition.t.ts
+└── ...
+```
+
+## Принципы разработки
+
+1. **Модульность** - каждый актор автономен
+2. **Типизация** - обязательные TypeScript типы
+3. **Тестируемость** - каждый актор имеет тесты (если есть возможность и смысл)
+4. **Читаемость** - понятное именование файлов
+5. **IDE поддержка** - группировка связанных файлов
+6. **Переиспользование** - выделение действий в отдельные файлы
+7. **Разделение логики** - функции преимущественно выносятся в `actions.js`, а не в `core`
+
+### Правило выделения функций
+
+**Основной принцип:** Функции должны выделяться в `{tag-name}.actions.js`, а не храниться в `core`.
+
+**Core предназначен для:**
+
+- Временных данных и структур
+- Ссылок на DOM элементы (refs)
+- Сервисов подписки (websockets, events)
+
+**.actions.js предназначен для:**
+
+- Сложной бизнес-логики
+- Функций из `transitions` и `reactions`
+- Алгоритмов обработки данных
+
+### Преимущества вынесения в actions.js
+
+1. **Переиспользование** - функции могут использоваться разными акторами
+2. **Тестируемость** - легче тестировать изолированные функции
+3. **Читаемость** - core остается простым и понятным
+4. **Типизация** - лучшая поддержка TypeScript типов
+5. **Модульность** - четкое разделение данных и логики
+
+## Запуск тестов модуля
+
+Все скрипты запускаются из корневой директории:
+
+```bash
+# Тесты всего модуля
+bun test graph/
+
+# Тест конкретного актора
+bun test graph/graph-layout.spec.ts
+
+# Тест с отладкой
+bun test graph/graph-layout.spec.ts --inspect-brk
+
+# Тест в watch режиме
+bun test graph/graph-layout.spec.ts --watch
+```
+
+# Тест в watch режиме
+
+```bash
+
+bun test graph/graph-layout.spec.ts --watch
+
+```

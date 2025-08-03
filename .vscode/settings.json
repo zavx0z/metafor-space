@@ -10,18 +10,22 @@
         "**/node_modules": true,
         "**/__pycache__": true,
         ".venv": true,
-        ".cursor": true,
         ".firebase": true,
         ".github": true,
         ".idea": true,
-        ".vscode": true
+        ".vscode": true,
+        ".cursor/rules": true,
+        ".cursor": true,
+        ".windsurf": true
     },
     "hide-files.files": [
-        ".cursor",
         ".firebase",
         ".github",
         ".idea",
-        ".vscode"
+        ".vscode",
+        ".cursor/rules",
+        ".cursor",
+        ".windsurf"
     ],
     "cSpell.ignorePaths": [
         ".github",

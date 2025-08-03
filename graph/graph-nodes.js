@@ -1,4 +1,4 @@
-import { MetaFor } from "../metafor.js"
+import { MetaFor } from "../web/metafor.js"
 // import "./graph-layout.js"
 // import "./graph-listener.js"
 // import "./graph-meta.js"
@@ -27,9 +27,12 @@ MetaFor("graph-nodes")
       ["render", "центрирование одной ноды"],
       reaction({ title: "Блокировка всплытия" })
         .filter({
-          tag: /\*/,
+          op: "add",
         })
-        .equal(() => {}),
+        .equal(({ meta, patch }) => {
+          const snapshot = patch.value
+          console.log(snapshot)
+        }),
     ],
     [
       ["render", "центрирование одной ноды"],
@@ -45,8 +48,8 @@ MetaFor("graph-nodes")
   ])
   .view({
     render: ({ html }) => html`
-      <metafor-graph-layout>
-      </metafor-graph-layout>
+      <!-- <metafor-graph-layout>
+      </metafor-graph-layout> -->
     `,
     style: ({ css }) => css`
       :host {
