@@ -13,24 +13,23 @@
         ".firebase": true,
         ".github": true,
         ".idea": true,
-        ".vscode": true,
-        ".cursor/rules": true,
         ".cursor": true,
+        ".vscode": true,
         ".windsurf": true
     },
     "hide-files.files": [
         ".firebase",
         ".github",
         ".idea",
-        ".vscode",
-        ".cursor/rules",
         ".cursor",
+        ".vscode",
         ".windsurf"
     ],
     "cSpell.ignorePaths": [
         ".github",
         "./script",
-        ".cursor"
+        ".cursor",
+        ".windsurf"
     ],
     "cSpell.words": [
         "Валидируйте",
@@ -41,6 +40,7 @@
     ],
     "markdownlint.lintWorkspaceGlobs": [
         "!node_modules/",
-        "!.cursor/"
+        "!.cursor/",
+        "!.windsurf/",
     ]
 }

@@ -1,8 +1,8 @@
 import { MetaFor } from "./server/metafor"
 
-document.body.innerHTML = "<metafor-video></metafor-video>"
+document.body.innerHTML = "<meta-video></meta-video>"
 
-MetaFor("video")
+MetaFor("video", { dev: true })
   .context((types) => ({
     url: types.string.required("url")({ title: "Адрес видео" }),
     test: types.string.required("test"),
