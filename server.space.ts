@@ -1,8 +1,6 @@
 import { MetaFor } from "./server/metafor"
 
-document.body.innerHTML = "<meta-video></meta-video>"
-
-MetaFor("video", { dev: true })
+const video = MetaFor("video", { dev: true })
   .context((types) => ({
     url: types.string.required("url")({ title: "Адрес видео" }),
     test: types.string.required("test"),
@@ -58,3 +56,4 @@ MetaFor("video", { dev: true })
   .view({
     render: ({ html, context }) => html`<video src="${context.url}" controls></video>`,
   })
+document.body.innerHTML = `<meta-${video}></meta-${video}>`

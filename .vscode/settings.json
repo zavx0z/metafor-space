@@ -14,16 +14,16 @@
         ".github": true,
         ".idea": true,
         ".cursor": true,
-        ".vscode": true,
-        ".windsurf": true
+        ".windsurf": true,
+        ".vscode": true
     },
     "hide-files.files": [
         ".firebase",
         ".github",
         ".idea",
         ".cursor",
-        ".vscode",
-        ".windsurf"
+        ".windsurf",
+        ".vscode"
     ],
     "cSpell.ignorePaths": [
         ".github",
@@ -41,6 +41,6 @@
     "markdownlint.lintWorkspaceGlobs": [
         "!node_modules/",
         "!.cursor/",
-        "!.windsurf/",
+        "!.windsurf"
     ]
 }

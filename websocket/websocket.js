@@ -1,7 +1,7 @@
 import { MetaFor } from "../web/metafor.js"
 import { log } from "../web/console.js"
 
-MetaFor("websocket", {dev: true})
+export default MetaFor("websocket", {dev: true})
   .context((t) => ({
     timeStampConnecting: t.number.optional()({ title: "Время начала подключения" }),
     timeStampConnected: t.number.optional()({ title: "Время подключения" }),
