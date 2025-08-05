@@ -1,5 +1,12 @@
 import { log } from "./web/console.js"
-new BroadcastChannel("channel").onmessage = (/** @type {MessageEvent} */ event) => log(event.data)
+new BroadcastChannel("channel").onmessage = (/** @type {MessageEvent} */ event) => {
+  const { data } = event
+  if (Object.hasOwn(data, "meta")) {
+    log(data)
+  } else {
+    console.log(data)
+  }
+}
 
 import websocket from "./websocket/websocket.js"
 document.body.innerHTML = `<meta-${websocket}></meta-${websocket}>`

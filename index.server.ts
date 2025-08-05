@@ -2,6 +2,7 @@ import { getMimeType } from "./fixtures/browser/static"
 import { join } from "node:path"
 import { log } from "./server/console"
 import type { Message } from "./server/metafor.d"
+import { store } from "./server/metafor"
 
 const channel = new BroadcastChannel("channel")
 channel.addEventListener("message", log)
@@ -45,6 +46,7 @@ const server = Bun.serve({
     open(ws) {
       console.log("🔗 WebSocket соединение открыто")
       channel.addEventListener("message", (event: MessageEvent<Message>) => ws.send(JSON.stringify(event.data)))
+      ws.send(JSON.stringify(store.getAllActors()))
     },
     message(ws, message) {
       console.log("📨 WebSocket сообщение:", message)

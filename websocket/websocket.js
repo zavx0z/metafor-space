@@ -1,5 +1,6 @@
 import { MetaFor } from "../web/metafor.js"
 import { log } from "../web/console.js"
+import messenger from "./messenger.js"
 
 export default MetaFor("websocket", { dev: true })
   .context((t) => ({
@@ -67,9 +68,6 @@ export default MetaFor("websocket", { dev: true })
         ({ core }) =>
           new Promise((_, reject) => {
             if (!core.socket) return reject(new Error("Нет WebSocket соединения в состоянии connected"))
-            core.socket.onmessage = (/** @type {MessageEvent} */ event) => {
-              log(JSON.parse(event.data))
-            }
             core.socket.onclose = (/** @type {CloseEvent} */ event) => {
               console.log("🔌 WebSocket соединение закрыто:", event.code, event.reason)
               return reject(new Error("WebSocket соединение закрыто"))
@@ -108,7 +106,11 @@ export default MetaFor("websocket", { dev: true })
   }))
   .reactions(() => [])
   .view({
-    render: ({ html, context, state, choose, when }) => html`
+    render: ({ html, context, state, choose, when, core }) => html`
+      ${when(
+        state === "подключен",
+        () => html`<meta-${messenger} core=${{ socket: core.socket }}></meta-${messenger}>`
+      )}
       <div class="websocket-status">
         <div class="status-info">
           <span class="status ${state}">${state}</span>
