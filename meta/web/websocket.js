@@ -1,8 +1,8 @@
-import { MetaFor } from "../web/metafor.js"
-import { log } from "../web/console.js"
+import { MetaFor } from "../../web/metafor.js"
+import { log } from "../../web/console.js"
 import messenger from "./messenger.js"
 
-export default MetaFor("websocket", { dev: true })
+export default MetaFor("websocket", { dev: true, persist: false })
   .context((t) => ({
     timeStampConnecting: t.number.optional()({ title: "Время начала подключения" }),
     timeStampConnected: t.number.optional()({ title: "Время подключения" }),

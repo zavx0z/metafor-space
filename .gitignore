@@ -1,11 +1,10 @@
 node_modules
-./@zavx0z
 dist
 __snapshots__
 .idea
 .DS_Store
 public
 
-server/
-web/
+server/**/*
+web/**/*
 *.sqlite*

@@ -7,10 +7,10 @@
   "devDependencies": {
     "@happy-dom/global-registrator": "18.0.1",
     "@types/bun": "^1.2.19",
-    "@types/three": "0.178.1",
+    "@types/three": "0.179.0",
     "elkjs": "0.10.0",
     "happy-dom": "18.0.1",
-    "puppeteer": "^24.15.0",
+    "puppeteer": "^24.16.0",
     "three": "0.179.1"
   },
   "peerDependencies": {

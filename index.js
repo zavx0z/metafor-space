@@ -8,7 +8,7 @@ new BroadcastChannel("channel").onmessage = (/** @type {MessageEvent} */ event) 
   }
 }
 
-import websocket from "./websocket/websocket.js"
+import websocket from "./meta/web/websocket.js"
 document.body.innerHTML = `<meta-${websocket}></meta-${websocket}>`
 
 import "./graph/graph-nodes.js"

@@ -1,4 +1,4 @@
-import { MetaFor } from "./server/metafor"
+import { MetaFor } from "../../server/metafor"
 
 const video = MetaFor("video", { dev: true })
   .context((types) => ({
@@ -44,11 +44,11 @@ const video = MetaFor("video", { dev: true })
       ["play"],
       reaction()
         .filter({
-          tag: "roadmap",
+          meta: "roadmap",
         })
-        .equal(({ update, meta }) => {
+        .equal(({ update, message }) => {
           update({
-            test: meta.tag,
+            test: message.meta,
           })
         }),
     ],

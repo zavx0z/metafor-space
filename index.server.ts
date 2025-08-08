@@ -46,7 +46,7 @@ const server = Bun.serve({
     open(ws) {
       console.log("🔗 WebSocket соединение открыто")
       channel.addEventListener("message", (event: MessageEvent<Message>) => ws.send(JSON.stringify(event.data)))
-      ws.send(JSON.stringify(store.getAllActors()))
+      ws.send(JSON.stringify(store.getAllActors().map((actor) => ({ ...actor, snapshot: JSON.parse(actor.snapshot) }))))
     },
     message(ws, message) {
       console.log("📨 WebSocket сообщение:", message)
@@ -92,4 +92,4 @@ process.on("unhandledRejection", (reason, promise) => {
 console.log(`✅ Сервер слушает на http://${server.hostname}:${server.port}`)
 console.log("📡 WebSocket сервер готов к подключениям")
 
-import("./server.space.ts")
+import("./meta/server/server.space.ts")
