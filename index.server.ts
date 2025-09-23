@@ -1,8 +1,8 @@
+import "./server/metafor.js"
 import { getMimeType } from "./fixtures/browser/static"
 import { join } from "node:path"
 import { log } from "./server/console"
 import type { Message } from "./server/metafor.d"
-import { store } from "./server/metafor"
 
 const channel = new BroadcastChannel("channel")
 channel.addEventListener("message", log)
@@ -22,6 +22,7 @@ const server = Bun.serve({
         "Content-Type": "image/x-icon",
       },
     }),
+    "/.well-known/appspecific/com.chrome.devtools.json": new Response(""),
     "/*": async (req) => {
       if (server.upgrade(req)) {
         return
@@ -46,7 +47,7 @@ const server = Bun.serve({
     open(ws) {
       console.log("🔗 WebSocket соединение открыто")
       channel.addEventListener("message", (event: MessageEvent<Message>) => ws.send(JSON.stringify(event.data)))
-      ws.send(JSON.stringify(store.getAllActors().map((actor) => ({ ...actor, snapshot: JSON.parse(actor.snapshot) }))))
+      // ws.send(JSON.stringify(store.getAllActors().map((actor) => ({ ...actor, snapshot: JSON.parse(actor.snapshot) }))))
     },
     message(ws, message) {
       console.log("📨 WebSocket сообщение:", message)

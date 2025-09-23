@@ -1,8 +1,9 @@
 import { log } from "./web/console.js"
-new BroadcastChannel("channel").onmessage = (/** @type {MessageEvent} */ event) => {
+new BroadcastChannel("channel").onmessage = (/** @type {MessageEvent<import("./web/metafor.js").Message>} */ event) => {
   const { data } = event
   if (Object.hasOwn(data, "meta")) {
-    log(data)
+    for (const patch of data.patches)
+      log({ meta: data.meta, patch, timestamp: data.timestamp, actor: data.actor })
   } else {
     console.log(data)
   }

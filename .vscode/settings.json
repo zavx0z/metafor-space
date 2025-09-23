@@ -14,14 +14,18 @@
         ".github": true,
         ".idea": true,
         ".windsurf": true,
-        ".vscode": true
+        ".vscode": true,
+        ".cursor/rules": true,
+        ".cursor": true
     },
     "hide-files.files": [
         ".firebase",
         ".github",
         ".idea",
         ".windsurf",
-        ".vscode"
+        ".vscode",
+        ".cursor/rules",
+        ".cursor"
     ],
     "cSpell.ignorePaths": [
         ".github",

@@ -1,10 +1,10 @@
-import { type ActorData, type Snapshot } from "../../web/metafor"
+// import { type ActorData, type Snapshot } from "../../web/metafor"
 
-export interface Core {
-  socket: WebSocket | null
-  queueList: Array<{
-    id: number
-    name: string
-  }>
-  handler: (event: MessageEvent<ActorData[]>) => void
-}
+// export interface Core {
+//   socket: WebSocket | null
+//   queueList: Array<{
+//     id: number
+//     name: string
+//   }>
+//   handler: (event: MessageEvent<ActorData[]>) => void
+// }

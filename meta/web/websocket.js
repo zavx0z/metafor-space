@@ -1,7 +1,3 @@
-import { MetaFor } from "../../web/metafor.js"
-import { log } from "../../web/console.js"
-import messenger from "./messenger.js"
-
 export default MetaFor("websocket", { dev: true, persist: false })
   .context((t) => ({
     timeStampConnecting: t.number.optional()({ title: "Время начала подключения" }),
@@ -105,36 +101,28 @@ export default MetaFor("websocket", { dev: true, persist: false })
       .error(({ update, error }) => update({ timeStampConnecting: null, error: error.message })),
   }))
   .reactions(() => [])
+  // ${state === "подключен" && html`<meta-for core=${{ socket: core.socket }} />`}
   .view({
-    render: ({ html, context, state, choose, when, core }) => html`
-      ${when(
-        state === "подключен",
-        () => html`<meta-${messenger} core=${{ socket: core.socket }}></meta-${messenger}>`
-      )}
+    render: ({ html, context, state, core }) => html`
       <div class="websocket-status">
         <div class="status-info">
           <span class="status ${state}">${state}</span>
-          ${when(context.error, () => html`<span class="error">${context.error}</span>`)}
-          ${when(
-            context.remainingAttempts !== null && context.remainingAttempts < 5,
-            () => html`<span class="attempts">(${5 - context.remainingAttempts})</span>`
-          )}
-          ${when(
-            context.remainingAttempts !== null && context.remainingAttempts > 0 && context.remainingAttempts < 5,
-            () => html`<span class="remaining">осталось: ${context.remainingAttempts}</span>`
-          )}
+          ${context.error && html`<span class="error">${context.error}</span>`}
+          ${context.remainingAttempts !== null &&
+          context.remainingAttempts < 5 &&
+          html`<span class="attempts">(${5 - context.remainingAttempts})</span>`}
+          ${context.remainingAttempts && html`<span class="remaining">осталось: ${context.remainingAttempts}</span>`}
         </div>
         <span class="icon">
-          ${choose(
-            state,
-            [
-              ["подключен", () => "🔗"],
-              ["подключение", () => "🔄"],
-              ["ошибка", () => "❌"],
-              ["ожидание", () => "⏳"],
-            ],
-            () => "🔌"
-          )}
+          ${state === "подключен"
+            ? "🔗"
+            : state === "подключение"
+            ? "🔄"
+            : state === "ошибка"
+            ? "❌"
+            : state === "ожидание"
+            ? "⏳"
+            : "🔌"}
         </span>
       </div>
     `,

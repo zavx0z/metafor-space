@@ -3,4 +3,6 @@ export interface WebSocketCore {
   socket: WebSocket | null
   /** URL для подключения */
   url: string
+  /** MessengerActor */
+  messenger: string
 }

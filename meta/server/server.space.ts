@@ -1,6 +1,4 @@
-import { MetaFor } from "../../server/metafor"
-
-const video = MetaFor("video", { dev: true })
+export default MetaFor("video", { dev: true })
   .context((types) => ({
     url: types.string.required("url")({ title: "Адрес видео" }),
     test: types.string.required("test"),
@@ -46,9 +44,9 @@ const video = MetaFor("video", { dev: true })
         .filter({
           meta: "roadmap",
         })
-        .equal(({ update, message }) => {
+        .equal(({ update, actor }) => {
           update({
-            test: message.meta,
+            test: actor.index,
           })
         }),
     ],
@@ -56,4 +54,4 @@ const video = MetaFor("video", { dev: true })
   .view({
     render: ({ html, context }) => html`<video src="${context.url}" controls></video>`,
   })
-document.body.innerHTML = `<meta-${video}></meta-${video}>`
+document.body.innerHTML = `<meta-for></meta-for>`
