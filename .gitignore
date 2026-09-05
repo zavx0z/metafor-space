@@ -11,3 +11,4 @@ server/metafor.js
 web/debug
 web/metafor.d.ts
 web/metafor.js
+.idea/
